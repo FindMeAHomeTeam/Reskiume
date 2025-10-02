@@ -10,6 +10,8 @@ plugins {
     alias(libs.plugins.kotlinxSerialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.androidx.room)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.kotlin.cocoapods)
 }
 
 kotlin {
@@ -38,6 +40,8 @@ kotlin {
             implementation(libs.kotlinx.coroutines.android)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.androidx.room.sqlite.wrapper)
+            implementation(project.dependencies.platform(libs.firebase.bom))
+            implementation(libs.firebase.auth)
         }
         androidUnitTest.dependencies {
             implementation(libs.kotlin.testJunit)
@@ -64,6 +68,7 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
+            implementation(libs.koin.compose.viewmodel.navigation)
 
             implementation(libs.coil.compose)
             implementation(libs.coil.network.ktor)
@@ -83,6 +88,26 @@ kotlin {
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
+        }
+    }
+
+    cocoapods {
+        version = "1.0.0"
+        summary = "KMP app to rescue non-human animals in danger"
+        homepage = "https://github.com/FindMeAHomeTeam/Reskiume#"
+        ios.deploymentTarget = "18.2"
+
+        framework {
+            baseName = "composeApp"
+            isStatic = true
+        }
+
+        pod("FirebaseCore"){
+            extraOpts += listOf("-compiler-option", "-fmodules")
+        }
+
+        pod("FirebaseAuth"){
+            extraOpts += listOf("-compiler-option", "-fmodules")
         }
     }
 }

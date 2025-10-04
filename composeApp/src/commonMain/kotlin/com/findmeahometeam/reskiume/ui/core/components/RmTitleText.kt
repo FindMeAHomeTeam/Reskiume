@@ -14,10 +14,10 @@ import com.findmeahometeam.reskiume.ui.core.textColor
 fun RmTitleText(
     text: String,
     isSectionTitle: Boolean = true,
-    modifier: Modifier = Modifier.fillMaxWidth()
+    modifier: Modifier = Modifier
 ) {
     Text(
-        modifier = modifier,
+        modifier = modifier.then(Modifier.fillMaxWidth()),
         textAlign = if (isSectionTitle) TextAlign.Start else TextAlign.Center,
         text = text,
         color = textColor,

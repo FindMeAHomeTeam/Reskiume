@@ -11,6 +11,7 @@
 
     <!-- Profile -->
     <string name="profile_screen_profile_image_content_description">Profile image</string>
+    <string name="profile_screen_activist_title">Activist</string>
     <string name="profile_screen_available_label">Available</string>
     <string name="profile_screen_unavailable_label">Not available</string>
     <string name="profile_screen_indicator_content_description">Availability indicator</string>
@@ -19,6 +20,8 @@
     <string name="profile_screen_settings_section">Settings</string>
     <string name="profile_screen_personal_information_title">Personal information</string>
     <string name="profile_screen_personal_information_description">Manage your personal information</string>
+    <string name="profile_screen_personal_create_account_title">Create an account</string>
+    <string name="profile_screen_personal_create_account_description">Register to use the app fully</string>
     <string name="profile_screen_reviews_title">Reviews</string>
     <string name="profile_screen_reviews_description">Manage your reviews</string>
     <string name="profile_screen_rescue_notifications_title">Nearby rescue notifications</string>
@@ -29,6 +32,8 @@
     <string name="profile_screen_my_foster_homes_description">Manage your foster homes</string>
     <string name="profile_screen_my_rescue_events_title">My rescue events</string>
     <string name="profile_screen_my_rescue_events_description">Manage your rescue events</string>
+    <string name="profile_screen_get_advice_title">Get advice</string>
+    <string name="profile_screen_get_advice_description">Learn how to help non-human animals</string>
     <string name="profile_screen_feedback_title">Give feedback</string>
     <string name="profile_screen_feedback_description">Help to improve the app</string>
     <string name="profile_screen_delete_account_title">Delete account</string>

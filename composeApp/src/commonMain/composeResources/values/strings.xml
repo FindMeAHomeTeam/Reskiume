@@ -14,9 +14,30 @@
     <string name="profile_screen_available_label">Available</string>
     <string name="profile_screen_unavailable_label">Not available</string>
     <string name="profile_screen_indicator_content_description">Availability indicator</string>
-    <string name="profile_screen_my_account_title">My account</string>
-    <string name="profile_screen_my_activism_title">My activism</string>
-    <string name="profile_screen_settings_title">Settings</string>
+    <string name="profile_screen_my_account_section">My account</string>
+    <string name="profile_screen_my_activism_section">My activism</string>
+    <string name="profile_screen_settings_section">Settings</string>
+    <string name="profile_screen_personal_information_title">Personal information</string>
+    <string name="profile_screen_personal_information_description">Manage your personal information</string>
+    <string name="profile_screen_reviews_title">Reviews</string>
+    <string name="profile_screen_reviews_description">Manage your reviews</string>
+    <string name="profile_screen_rescue_notifications_title">Nearby rescue notifications</string>
+    <string name="profile_screen_rescue_notifications_description">Receive alerts when a rescue case is reported nearby</string>
+    <string name="profile_screen_non_human_animals_title">Registered non-human animals</string>
+    <string name="profile_screen_non_human_animals_description">Manage registered non-human animals</string>
+    <string name="profile_screen_my_foster_homes_title">My foster homes</string>
+    <string name="profile_screen_my_foster_homes_description">Manage your foster homes</string>
+    <string name="profile_screen_my_rescue_events_title">My rescue events</string>
+    <string name="profile_screen_my_rescue_events_description">Manage your rescue events</string>
+    <string name="profile_screen_feedback_title">Give feedback</string>
+    <string name="profile_screen_feedback_description">Help to improve the app</string>
+    <string name="profile_screen_delete_account_title">Delete account</string>
+    <string name="profile_screen_delete_account_description">This action can not be undone</string>
+
+    <!-- Rating bar -->
+    <string name="rating_bar_rated_content_description">Rated star</string>
+    <string name="rating_bar_unrated_content_description">Unrated star</string>
+
 
 
 </resources>

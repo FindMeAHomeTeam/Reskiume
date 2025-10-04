@@ -3,12 +3,26 @@ package com.findmeahometeam.reskiume.ui.core.components
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.sp
 import com.findmeahometeam.reskiume.ui.core.textColor
 
 @Composable
 fun RmText(
     text: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    textAlign: TextAlign = TextAlign.Start,
+    fontWeight: FontWeight = FontWeight.Normal,
+    fontSize: TextUnit = 14.sp,
 ) {
-    Text(modifier = modifier, text = text, color = textColor)
+    Text(
+        modifier = modifier,
+        text = text,
+        textAlign = textAlign,
+        fontWeight = fontWeight,
+        fontSize = fontSize,
+        color = textColor
+    )
 }

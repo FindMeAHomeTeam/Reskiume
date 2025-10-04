@@ -21,7 +21,7 @@ fun RmTitleText(
         textAlign = if (isSectionTitle) TextAlign.Start else TextAlign.Center,
         text = text,
         color = textColor,
-        fontSize = if (isSectionTitle) 14.sp else 18.sp,
-        fontWeight = if (isSectionTitle) FontWeight.SemiBold else FontWeight.ExtraBold
+        fontSize = if (isSectionTitle) 18.sp else 24.sp,
+        fontWeight = if (isSectionTitle) FontWeight.ExtraBold else FontWeight.Black
     )
 }

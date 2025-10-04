@@ -32,9 +32,9 @@ fun BottomNavigationWrapper(
         }
 
         composable(route = Routes.PROFILE.route) {
-            /*ProfileScreen(navigateToLoginScreen = {
+            ProfileScreen(navigateToLoginScreen = {
                 mainNavHostController.navigate(Routes.LOGIN.route)
-            })*/
+            })
         }
 
     }

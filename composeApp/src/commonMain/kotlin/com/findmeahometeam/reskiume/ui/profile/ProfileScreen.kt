@@ -39,6 +39,7 @@ import com.findmeahometeam.reskiume.ui.core.textColor
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import reskiume.composeapp.generated.resources.Res
+import reskiume.composeapp.generated.resources.ic_advice
 import reskiume.composeapp.generated.resources.ic_delete
 import reskiume.composeapp.generated.resources.ic_feedback
 import reskiume.composeapp.generated.resources.ic_foster_homes
@@ -48,11 +49,14 @@ import reskiume.composeapp.generated.resources.ic_paw
 import reskiume.composeapp.generated.resources.ic_rating
 import reskiume.composeapp.generated.resources.ic_rescue_events
 import reskiume.composeapp.generated.resources.ic_user
+import reskiume.composeapp.generated.resources.profile_screen_activist_title
 import reskiume.composeapp.generated.resources.profile_screen_available_label
 import reskiume.composeapp.generated.resources.profile_screen_delete_account_description
 import reskiume.composeapp.generated.resources.profile_screen_delete_account_title
 import reskiume.composeapp.generated.resources.profile_screen_feedback_description
 import reskiume.composeapp.generated.resources.profile_screen_feedback_title
+import reskiume.composeapp.generated.resources.profile_screen_get_advice_description
+import reskiume.composeapp.generated.resources.profile_screen_get_advice_title
 import reskiume.composeapp.generated.resources.profile_screen_indicator_content_description
 import reskiume.composeapp.generated.resources.profile_screen_my_account_section
 import reskiume.composeapp.generated.resources.profile_screen_my_activism_section
@@ -62,6 +66,8 @@ import reskiume.composeapp.generated.resources.profile_screen_my_rescue_events_d
 import reskiume.composeapp.generated.resources.profile_screen_my_rescue_events_title
 import reskiume.composeapp.generated.resources.profile_screen_non_human_animals_description
 import reskiume.composeapp.generated.resources.profile_screen_non_human_animals_title
+import reskiume.composeapp.generated.resources.profile_screen_personal_create_account_description
+import reskiume.composeapp.generated.resources.profile_screen_personal_create_account_title
 import reskiume.composeapp.generated.resources.profile_screen_personal_information_description
 import reskiume.composeapp.generated.resources.profile_screen_personal_information_title
 import reskiume.composeapp.generated.resources.profile_screen_profile_image_content_description
@@ -95,11 +101,24 @@ fun ProfileScreen(
         Header(isRegistered, userName, isAvailable)
         Spacer(Modifier.height(32.dp))
 
-        RmTitleText(text = stringResource(Res.string.profile_screen_my_account_section))
+        RmTitleText(
+            modifier = Modifier.padding(10.dp),
+            text = stringResource(Res.string.profile_screen_my_account_section)
+        )
         Spacer(modifier = Modifier.height(10.dp))
+
+        // Profile screen
         RmListButtonItem(
-            title = stringResource(Res.string.profile_screen_personal_information_title),
-            description = stringResource(Res.string.profile_screen_personal_information_description),
+            title = if (isRegistered) {
+                stringResource(Res.string.profile_screen_personal_information_title)
+            } else {
+                stringResource(Res.string.profile_screen_personal_create_account_title)
+            },
+            description = if (isRegistered) {
+                stringResource(Res.string.profile_screen_personal_information_description)
+            } else {
+                stringResource(Res.string.profile_screen_personal_create_account_description)
+            },
             containerColor = backgroundColor,
             listAvatarType = RmListAvatarType.Icon(
                 backgroundColor = tertiaryGreen,
@@ -110,19 +129,25 @@ fun ProfileScreen(
                 navigateToLoginScreen()
             }
         )
-        RmListButtonItem(
-            title = stringResource(Res.string.profile_screen_reviews_title),
-            description = stringResource(Res.string.profile_screen_reviews_description),
-            containerColor = backgroundColor,
-            listAvatarType = RmListAvatarType.Icon(
-                backgroundColor = tertiaryGreen,
-                icon = Res.drawable.ic_rating,
-                iconColor = primaryGreen
-            ),
-            onClick = {
-                // TODO
-            }
-        )
+
+        // Reviews screen
+        if (isRegistered) {
+            RmListButtonItem(
+                title = stringResource(Res.string.profile_screen_reviews_title),
+                description = stringResource(Res.string.profile_screen_reviews_description),
+                containerColor = backgroundColor,
+                listAvatarType = RmListAvatarType.Icon(
+                    backgroundColor = tertiaryGreen,
+                    icon = Res.drawable.ic_rating,
+                    iconColor = primaryGreen
+                ),
+                onClick = {
+                    // TODO
+                }
+            )
+        }
+
+        // Notifications screen
         RmListSwitchItem(
             title = stringResource(Res.string.profile_screen_rescue_notifications_title),
             description = stringResource(Res.string.profile_screen_rescue_notifications_description),
@@ -139,51 +164,82 @@ fun ProfileScreen(
         )
 
         Spacer(Modifier.height(32.dp))
-        RmTitleText(text = stringResource(Res.string.profile_screen_my_activism_section))
+        RmTitleText(
+            modifier = Modifier.padding(10.dp),
+            text = stringResource(Res.string.profile_screen_my_activism_section)
+        )
         Spacer(modifier = Modifier.height(10.dp))
-        RmListButtonItem(
-            title = stringResource(Res.string.profile_screen_non_human_animals_title),
-            description = stringResource(Res.string.profile_screen_non_human_animals_description),
-            containerColor = backgroundColor,
-            listAvatarType = RmListAvatarType.Icon(
-                backgroundColor = tertiaryGreen,
-                icon = Res.drawable.ic_paw,
-                iconColor = primaryGreen
-            ),
-            onClick = {
-                // TODO
-            }
-        )
-        RmListButtonItem(
-            title = stringResource(Res.string.profile_screen_my_foster_homes_title),
-            description = stringResource(Res.string.profile_screen_my_foster_homes_description),
-            containerColor = backgroundColor,
-            listAvatarType = RmListAvatarType.Icon(
-                backgroundColor = tertiaryGreen,
-                icon = Res.drawable.ic_foster_homes,
-                iconColor = primaryGreen
-            ),
-            onClick = {
-                // TODO
-            }
-        )
-        RmListButtonItem(
-            title = stringResource(Res.string.profile_screen_my_rescue_events_title),
-            description = stringResource(Res.string.profile_screen_my_rescue_events_description),
-            containerColor = backgroundColor,
-            listAvatarType = RmListAvatarType.Icon(
-                backgroundColor = tertiaryGreen,
-                icon = Res.drawable.ic_rescue_events,
-                iconColor = primaryGreen
-            ),
-            onClick = {
-                // TODO
-            }
-        )
 
+        if (isRegistered) {
+
+            // Non-human animals screen
+            RmListButtonItem(
+                title = stringResource(Res.string.profile_screen_non_human_animals_title),
+                description = stringResource(Res.string.profile_screen_non_human_animals_description),
+                containerColor = backgroundColor,
+                listAvatarType = RmListAvatarType.Icon(
+                    backgroundColor = tertiaryGreen,
+                    icon = Res.drawable.ic_paw,
+                    iconColor = primaryGreen
+                ),
+                onClick = {
+                    // TODO
+                }
+            )
+
+            // Foster homes screen
+            RmListButtonItem(
+                title = stringResource(Res.string.profile_screen_my_foster_homes_title),
+                description = stringResource(Res.string.profile_screen_my_foster_homes_description),
+                containerColor = backgroundColor,
+                listAvatarType = RmListAvatarType.Icon(
+                    backgroundColor = tertiaryGreen,
+                    icon = Res.drawable.ic_foster_homes,
+                    iconColor = primaryGreen
+                ),
+                onClick = {
+                    // TODO
+                }
+            )
+
+            // Rescue events screen
+            RmListButtonItem(
+                title = stringResource(Res.string.profile_screen_my_rescue_events_title),
+                description = stringResource(Res.string.profile_screen_my_rescue_events_description),
+                containerColor = backgroundColor,
+                listAvatarType = RmListAvatarType.Icon(
+                    backgroundColor = tertiaryGreen,
+                    icon = Res.drawable.ic_rescue_events,
+                    iconColor = primaryGreen
+                ),
+                onClick = {
+                    // TODO
+                }
+            )
+        }
+
+        // Advice screen
+        RmListButtonItem(
+            title = stringResource(Res.string.profile_screen_get_advice_title),
+            description = stringResource(Res.string.profile_screen_get_advice_description),
+            containerColor = backgroundColor,
+            listAvatarType = RmListAvatarType.Icon(
+                backgroundColor = tertiaryGreen,
+                icon = Res.drawable.ic_advice,
+                iconColor = primaryGreen
+            ),
+            onClick = {
+                // TODO
+            }
+        )
         Spacer(Modifier.height(32.dp))
-        RmTitleText(text = stringResource(Res.string.profile_screen_settings_section))
+        RmTitleText(
+            modifier = Modifier.padding(10.dp),
+            text = stringResource(Res.string.profile_screen_settings_section)
+        )
         Spacer(modifier = Modifier.height(10.dp))
+
+        // Feedback screen
         RmListButtonItem(
             title = stringResource(Res.string.profile_screen_feedback_title),
             description = stringResource(Res.string.profile_screen_feedback_description),
@@ -197,19 +253,23 @@ fun ProfileScreen(
                 // TODO
             }
         )
-        RmListButtonItem(
-            title = stringResource(Res.string.profile_screen_delete_account_title),
-            description = stringResource(Res.string.profile_screen_delete_account_description),
-            containerColor = backgroundColor,
-            listAvatarType = RmListAvatarType.Icon(
-                backgroundColor = secondaryRed,
-                icon = Res.drawable.ic_delete,
-                iconColor = primaryRed
-            ),
-            onClick = {
-                // TODO
-            }
-        )
+
+        // Delete account screen
+        if (isRegistered) {
+            RmListButtonItem(
+                title = stringResource(Res.string.profile_screen_delete_account_title),
+                description = stringResource(Res.string.profile_screen_delete_account_description),
+                containerColor = backgroundColor,
+                listAvatarType = RmListAvatarType.Icon(
+                    backgroundColor = secondaryRed,
+                    icon = Res.drawable.ic_delete,
+                    iconColor = primaryRed
+                ),
+                onClick = {
+                    // TODO
+                }
+            )
+        }
         Spacer(modifier = Modifier.height(15.dp))
     }
 }
@@ -233,9 +293,15 @@ fun Header(isRegistered: Boolean, userName: String, isAvailable: Boolean) {
             tint = textColor
         )
     }
-    RmTitleText(text = userName, isSectionTitle = false)
+    RmTitleText(
+        text = if (isRegistered) {
+            userName
+        } else {
+            stringResource(Res.string.profile_screen_activist_title)
+        }, isSectionTitle = false
+    )
     Spacer(Modifier.height(16.dp))
-    if (isAvailable) {
+    if (isRegistered && isAvailable) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 modifier = Modifier.size(12.dp),
@@ -246,7 +312,7 @@ fun Header(isRegistered: Boolean, userName: String, isAvailable: Boolean) {
             Spacer(modifier = Modifier.width(8.dp))
             RmSecondaryText(stringResource(Res.string.profile_screen_available_label))
         }
-    } else {
+    } else if (isRegistered) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 modifier = Modifier.size(12.dp),

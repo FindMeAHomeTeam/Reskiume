@@ -19,7 +19,7 @@ import reskiume.composeapp.generated.resources.bottom_bar_item_rescue
 import reskiume.composeapp.generated.resources.bottom_bar_item_rescue_content_description
 import reskiume.composeapp.generated.resources.ic_chats
 import reskiume.composeapp.generated.resources.ic_foster_homes
-import reskiume.composeapp.generated.resources.ic_profile
+import reskiume.composeapp.generated.resources.ic_user
 import reskiume.composeapp.generated.resources.ic_rescue_events
 
 sealed class BottomBarItem {
@@ -72,7 +72,7 @@ sealed class BottomBarItem {
             Icon(
                 modifier = Modifier.size(24.dp),
                 contentDescription = stringResource(Res.string.bottom_bar_item_profile_content_description),
-                painter = painterResource(Res.drawable.ic_profile)
+                painter = painterResource(Res.drawable.ic_user)
             )
         }
     ) : BottomBarItem()

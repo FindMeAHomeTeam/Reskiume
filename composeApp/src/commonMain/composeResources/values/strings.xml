@@ -43,6 +43,18 @@
     <string name="rating_bar_rated_content_description">Rated star</string>
     <string name="rating_bar_unrated_content_description">Unrated star</string>
 
+    <!-- Login screen -->
+    <string name="login_screen_email_field_label">Email</string>
+    <string name="login_screen_create_account_link">Create account</string>
+    <string name="login_screen_login_button">Login</string>
+    <string name="login_screen_incorrect_credentials_message">Your email or password are incorrect</string>
 
+    <!-- Password text field -->
+    <string name="password_text_field_label">Password</string>
+    <string name="password_text_field_show_password_content_description">Show password</string>
+    <string name="password_text_field_hide_password_content_description">Hide password</string>
+
+    <!-- back arrow -->
+    <string name="back_arrow_content_description">Back to the previous screen"</string>
 
 </resources>

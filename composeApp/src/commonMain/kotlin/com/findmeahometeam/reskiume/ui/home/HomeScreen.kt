@@ -12,6 +12,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -23,16 +24,22 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.gray
 import com.findmeahometeam.reskiume.ui.core.navigation.bottomNavigation.BottomBarItem
 import com.findmeahometeam.reskiume.ui.core.navigation.bottomNavigation.BottomNavigationWrapper
 import com.findmeahometeam.reskiume.ui.core.primaryGreen
 import com.findmeahometeam.reskiume.ui.core.secondaryTextColor
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun HomeScreen(mainNavHostController: NavHostController) {
 
+    val homeViewmodel: HomeViewmodel = koinViewModel<HomeViewmodel>()
+    val authState: AuthUser? by homeViewmodel.collectAuthState().collectAsState(null)
+
+    val displayChats = authState != null
     val bottomNavHostController: NavHostController = rememberNavController()
     val items: List<BottomBarItem> = listOf(
         BottomBarItem.FosterHomes(),
@@ -42,7 +49,7 @@ fun HomeScreen(mainNavHostController: NavHostController) {
     )
 
     Scaffold(bottomBar = {
-        BottomNavigationBar(bottomNavHostController, items)
+        BottomNavigationBar(bottomNavHostController, items, displayChats)
     }) { padding: PaddingValues ->
         Box(modifier = Modifier.padding(padding)) {
             BottomNavigationWrapper(bottomNavHostController, mainNavHostController)
@@ -51,7 +58,11 @@ fun HomeScreen(mainNavHostController: NavHostController) {
 }
 
 @Composable
-fun BottomNavigationBar(bottomNavHostController: NavHostController, items: List<BottomBarItem>) {
+fun BottomNavigationBar(
+    bottomNavHostController: NavHostController,
+    items: List<BottomBarItem>,
+    displayChats: Boolean
+) {
     val navBackStackEntry: NavBackStackEntry? by bottomNavHostController.currentBackStackEntryAsState()
     val currentDestination: NavDestination? = navBackStackEntry?.destination
 
@@ -62,6 +73,8 @@ fun BottomNavigationBar(bottomNavHostController: NavHostController, items: List<
             contentColor = secondaryTextColor
         ) {
             items.forEach { item ->
+                if (item is BottomBarItem.Chats && !displayChats) return@forEach
+
                 NavigationBarItem(
                     colors = NavigationBarItemDefaults.colors(
                         indicatorColor = Color.Transparent,

@@ -16,6 +16,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,6 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.components.RmListAvatarType
 import com.findmeahometeam.reskiume.ui.core.components.RmListButtonItem
@@ -42,6 +45,7 @@ import com.findmeahometeam.reskiume.ui.core.tertiaryGreen
 import com.findmeahometeam.reskiume.ui.core.textColor
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 import reskiume.composeapp.generated.resources.Res
 import reskiume.composeapp.generated.resources.ic_advice
 import reskiume.composeapp.generated.resources.ic_delete
@@ -85,13 +89,15 @@ import reskiume.composeapp.generated.resources.profile_screen_settings_section
 fun ProfileScreen(
     navigateToCreateAccountScreen: () -> Unit
 ) {
-    val isRegistered = false // TODO read from database
-    val userName = "UserName" // TODO read from database
+    val profileViewmodel: ProfileViewmodel = koinViewModel<ProfileViewmodel>()
+    val authState: AuthUser? by profileViewmodel.collectAuthState().collectAsState(null)
+
+    val isRegistered = authState != null
+    val username = authState?.name ?: ""
     val isAvailable = true // TODO read from database
     val areNotificationsAvailable = true // TODO read from database
 
     val scrollState: ScrollState = rememberScrollState()
-
 
     Column(
         modifier = Modifier
@@ -102,7 +108,7 @@ fun ProfileScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(Modifier.height(16.dp))
-        Header(isRegistered, userName, isAvailable)
+        Header(isRegistered, username, isAvailable)
         Spacer(Modifier.height(32.dp))
 
         RmText(
@@ -115,19 +121,21 @@ fun ProfileScreen(
         Spacer(modifier = Modifier.height(10.dp))
 
         // Profile screen
-        RmListButtonItem(
-            title = stringResource(Res.string.profile_screen_personal_create_account_title),
-            description = stringResource(Res.string.profile_screen_personal_create_account_description),
-            containerColor = backgroundColor,
-            listAvatarType = RmListAvatarType.Icon(
-                backgroundColor = tertiaryGreen,
-                icon = Res.drawable.ic_user,
-                iconColor = primaryGreen
-            ),
-            onClick = {
-                navigateToCreateAccountScreen()
-            }
-        )
+        if (!isRegistered) {
+            RmListButtonItem(
+                title = stringResource(Res.string.profile_screen_personal_create_account_title),
+                description = stringResource(Res.string.profile_screen_personal_create_account_description),
+                containerColor = backgroundColor,
+                listAvatarType = RmListAvatarType.Icon(
+                    backgroundColor = tertiaryGreen,
+                    icon = Res.drawable.ic_user,
+                    iconColor = primaryGreen
+                ),
+                onClick = {
+                    navigateToCreateAccountScreen()
+                }
+            )
+        }
 
         // Reviews screen
         if (isRegistered) {

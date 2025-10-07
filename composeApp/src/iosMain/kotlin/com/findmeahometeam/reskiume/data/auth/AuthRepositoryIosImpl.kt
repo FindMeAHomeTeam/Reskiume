@@ -125,4 +125,6 @@ class AuthRepositoryIosImpl : AuthRepository {
             }
         }
     }
+
+    override fun signOut(): Boolean = auth.signOut(null)
 }

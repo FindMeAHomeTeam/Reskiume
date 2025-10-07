@@ -9,5 +9,5 @@ interface AuthRepository {
     val authState: Flow<AuthUser?>
     suspend fun createUserWithEmailAndPassword(email: String, password: String): AuthResult
     suspend fun signInWithEmailAndPassword(email: String, password: String): AuthResult
-
+    fun signOut(): Boolean
 }

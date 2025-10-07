@@ -71,4 +71,9 @@ class AuthRepositoryAndroidImpl : AuthRepository {
             AuthResult.Error(e.message ?: "Unknown error", e)
         }
     }
+
+    override fun signOut(): Boolean {
+        auth.signOut()
+        return true
+    }
 }

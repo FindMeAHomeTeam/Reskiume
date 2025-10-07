@@ -7,6 +7,7 @@ enum class Routes(val route: String) {
     CHATS("chats"),
     PROFILE("profile"),
     CREATE_ACCOUNT("createAccount"),
-    LOGIN("login")
+    LOGIN("login"),
+    PERSONAL_INFORMATION("personal information")
 
 }

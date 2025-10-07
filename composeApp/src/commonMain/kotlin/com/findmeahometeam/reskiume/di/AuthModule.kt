@@ -8,6 +8,7 @@ import com.findmeahometeam.reskiume.ui.home.HomeViewmodel
 import com.findmeahometeam.reskiume.ui.profile.ProfileViewmodel
 import com.findmeahometeam.reskiume.ui.profile.createAccount.CreateAccountViewmodel
 import com.findmeahometeam.reskiume.ui.profile.login.LoginViewmodel
+import com.findmeahometeam.reskiume.ui.profile.userScreen.PersonalInformationViewmodel
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
@@ -21,4 +22,5 @@ val authModule = module {
     viewModelOf(::ProfileViewmodel)
     viewModelOf(::CreateAccountViewmodel)
     viewModelOf(::LoginViewmodel)
+    viewModelOf(::PersonalInformationViewmodel)
 }

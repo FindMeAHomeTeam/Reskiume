@@ -32,9 +32,14 @@ fun BottomNavigationWrapper(
         }
 
         composable(route = Routes.PROFILE.route) {
-            ProfileScreen(navigateToCreateAccountScreen = {
-                mainNavHostController.navigate(Routes.CREATE_ACCOUNT.route)
-            })
+            ProfileScreen(
+                navigateToCreateAccountScreen = {
+                    mainNavHostController.navigate(Routes.CREATE_ACCOUNT.route)
+                },
+                navigateToPersonalInformationScreen = {
+                    mainNavHostController.navigate(Routes.PERSONAL_INFORMATION.route)
+                }
+            )
         }
     }
 }

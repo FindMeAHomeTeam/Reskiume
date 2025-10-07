@@ -8,6 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import com.findmeahometeam.reskiume.ui.home.HomeScreen
 import com.findmeahometeam.reskiume.ui.profile.createAccount.CreateAccountScreen
 import com.findmeahometeam.reskiume.ui.profile.login.LoginScreen
+import com.findmeahometeam.reskiume.ui.profile.userScreen.PersonalInformationScreen
 
 @Composable
 fun NavigationWrapper() {
@@ -35,8 +36,13 @@ fun NavigationWrapper() {
                 }
             )
         }
+
+        composable(route = Routes.PERSONAL_INFORMATION.route) {
+            PersonalInformationScreen(onBackPressed = {
+                mainNavController.navigateUp()
+            })
+        }
+
+
     }
-
 }
-
-

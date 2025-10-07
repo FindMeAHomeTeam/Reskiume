@@ -87,7 +87,8 @@ import reskiume.composeapp.generated.resources.reskiume
 
 @Composable
 fun ProfileScreen(
-    navigateToCreateAccountScreen: () -> Unit
+    navigateToCreateAccountScreen: () -> Unit,
+    navigateToPersonalInformationScreen: () -> Unit
 ) {
     val profileViewmodel: ProfileViewmodel = koinViewModel<ProfileViewmodel>()
     val authState: AuthUser? by profileViewmodel.collectAuthState().collectAsState(null)

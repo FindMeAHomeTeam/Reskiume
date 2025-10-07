@@ -20,9 +20,10 @@ class AuthRepositoryAndroidImpl : AuthRepository {
         val authStateListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
             val user: AuthUser? = firebaseAuth.currentUser?.let { user: FirebaseUser ->
                 AuthUser(
-                    user.uid,
-                    user.displayName,
-                    user.email
+                    uid = user.uid,
+                    name = user.displayName,
+                    email = user.email,
+                    photoUrl = user.photoUrl.toString()
                 )
             }
             trySend(user)
@@ -42,7 +43,8 @@ class AuthRepositoryAndroidImpl : AuthRepository {
                 AuthUser(
                     uid = user.uid,
                     name = user.displayName,
-                    email = user.email
+                    email = user.email,
+                    photoUrl = user.photoUrl.toString()
                 )
             )
         } catch (e: Exception) {
@@ -61,7 +63,8 @@ class AuthRepositoryAndroidImpl : AuthRepository {
                 AuthUser(
                     uid = user.uid,
                     name = user.displayName,
-                    email = user.email
+                    email = user.email,
+                    photoUrl = user.photoUrl.toString()
                 )
             )
         } catch (e: Exception) {

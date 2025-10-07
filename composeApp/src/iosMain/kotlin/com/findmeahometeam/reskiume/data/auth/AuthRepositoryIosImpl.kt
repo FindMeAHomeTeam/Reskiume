@@ -27,7 +27,14 @@ class AuthRepositoryIosImpl : AuthRepository {
 
     init {
         handle = auth.addAuthStateDidChangeListener { _, user: FIRUser? ->
-            _state.value = user?.let { AuthUser(it.uid(), it.displayName(), it.email()) }
+            _state.value = user?.let {
+                AuthUser(
+                    uid = it.uid(),
+                    name = it.displayName(),
+                    email = it.email(),
+                    photoUrl = user.photoURL().toString()
+                )
+            }
         }
     }
 
@@ -64,7 +71,8 @@ class AuthRepositoryIosImpl : AuthRepository {
                                     user = AuthUser(
                                         uid = user.uid(),
                                         name = user.displayName(),
-                                        email = user.email()
+                                        email = user.email(),
+                                        photoUrl = user.photoURL().toString()
                                     )
                                 )
                             )
@@ -106,7 +114,8 @@ class AuthRepositoryIosImpl : AuthRepository {
                                     user = AuthUser(
                                         uid = user.uid(),
                                         name = user.displayName(),
-                                        email = user.email()
+                                        email = user.email(),
+                                        photoUrl = user.photoURL().toString()
                                     )
                                 )
                             )

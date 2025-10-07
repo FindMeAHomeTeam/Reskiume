@@ -1,7 +1,6 @@
 package com.findmeahometeam.reskiume.ui.profile.login
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -9,14 +8,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -33,24 +27,21 @@ import androidx.compose.ui.unit.dp
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.components.RmButton
 import com.findmeahometeam.reskiume.ui.core.components.RmPasswordTextField
+import com.findmeahometeam.reskiume.ui.core.components.RmScaffold
 import com.findmeahometeam.reskiume.ui.core.components.RmText
 import com.findmeahometeam.reskiume.ui.core.components.RmTextField
 import com.findmeahometeam.reskiume.ui.core.primaryRed
 import com.findmeahometeam.reskiume.ui.core.secondaryGreen
-import com.findmeahometeam.reskiume.ui.core.textColor
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import reskiume.composeapp.generated.resources.Res
-import reskiume.composeapp.generated.resources.back_arrow_content_description
-import reskiume.composeapp.generated.resources.ic_back
 import reskiume.composeapp.generated.resources.login_screen_email_field_label
 import reskiume.composeapp.generated.resources.login_screen_log_in_button
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(onBackPressed: () -> Boolean, onLoginSuccessful: () -> Unit) {
+fun LoginScreen(onBackPressed: () -> Unit, onLoginSuccessful: () -> Unit) {
 
     val loginViewmodel: LoginViewmodel = koinViewModel<LoginViewmodel>()
     val uiState: LoginViewmodel.UiState by loginViewmodel.state.collectAsState()
@@ -66,22 +57,8 @@ fun LoginScreen(onBackPressed: () -> Boolean, onLoginSuccessful: () -> Unit) {
     }
     val scope = rememberCoroutineScope()
 
-    Scaffold(
-        modifier = Modifier.background(backgroundColor),
-        topBar = {
-            TopAppBar(
-                title = {},
-                navigationIcon = {
-                    Icon(
-                        painter = painterResource(Res.drawable.ic_back),
-                        contentDescription = stringResource(Res.string.back_arrow_content_description),
-                        tint = textColor,
-                        modifier = Modifier.padding(16.dp).size(24.dp).clickable { onBackPressed() }
-                    )
-                },
-                colors = TopAppBarDefaults.topAppBarColors().copy(containerColor = backgroundColor)
-            )
-        }
+    RmScaffold(
+        onBackPressed = onBackPressed,
     ) { padding ->
         Column(
             modifier = Modifier.fillMaxSize().background(backgroundColor).padding(padding)
@@ -115,8 +92,6 @@ fun LoginScreen(onBackPressed: () -> Boolean, onLoginSuccessful: () -> Unit) {
             ResultState(uiState, onLoginSuccessful)
         }
     }
-
-
 }
 
 @Composable

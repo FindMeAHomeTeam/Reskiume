@@ -1,7 +1,6 @@
 package com.findmeahometeam.reskiume.ui.profile.createAccount
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,15 +9,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -39,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.components.RmButton
 import com.findmeahometeam.reskiume.ui.core.components.RmPasswordTextField
+import com.findmeahometeam.reskiume.ui.core.components.RmScaffold
 import com.findmeahometeam.reskiume.ui.core.components.RmText
 import com.findmeahometeam.reskiume.ui.core.components.RmTextField
 import com.findmeahometeam.reskiume.ui.core.primaryGreen
@@ -46,20 +41,17 @@ import com.findmeahometeam.reskiume.ui.core.primaryRed
 import com.findmeahometeam.reskiume.ui.core.secondaryGreen
 import com.findmeahometeam.reskiume.ui.core.textColor
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import reskiume.composeapp.generated.resources.Res
-import reskiume.composeapp.generated.resources.back_arrow_content_description
 import reskiume.composeapp.generated.resources.create_account_screen_already_have_an_account
 import reskiume.composeapp.generated.resources.create_account_screen_create_account_button
 import reskiume.composeapp.generated.resources.create_account_screen_email_field_label
 import reskiume.composeapp.generated.resources.create_account_screen_log_in
-import reskiume.composeapp.generated.resources.ic_back
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreateAccountScreen(onBackPressed: () -> Boolean, navigateToLoginScreen: () -> Unit) {
+fun CreateAccountScreen(onBackPressed: () -> Unit, navigateToLoginScreen: () -> Unit) {
 
     val createAccountViewmodel: CreateAccountViewmodel = koinViewModel<CreateAccountViewmodel>()
     val uiState: CreateAccountViewmodel.UiState by createAccountViewmodel.state.collectAsState()
@@ -75,22 +67,8 @@ fun CreateAccountScreen(onBackPressed: () -> Boolean, navigateToLoginScreen: () 
     }
     val scope = rememberCoroutineScope()
 
-    Scaffold(
-        modifier = Modifier.background(backgroundColor),
-        topBar = {
-            TopAppBar(
-                title = {},
-                navigationIcon = {
-                    Icon(
-                        painter = painterResource(Res.drawable.ic_back),
-                        contentDescription = stringResource(Res.string.back_arrow_content_description),
-                        tint = textColor,
-                        modifier = Modifier.padding(16.dp).size(24.dp).clickable { onBackPressed() }
-                    )
-                },
-                colors = TopAppBarDefaults.topAppBarColors().copy(containerColor = backgroundColor)
-            )
-        }
+    RmScaffold(
+        onBackPressed = onBackPressed,
     ) { padding ->
         Column(
             modifier = Modifier.fillMaxSize().background(backgroundColor).padding(padding)
@@ -126,8 +104,6 @@ fun CreateAccountScreen(onBackPressed: () -> Boolean, navigateToLoginScreen: () 
             ResultState(uiState, onBackPressed)
         }
     }
-
-
 }
 
 @Composable
@@ -163,7 +139,7 @@ fun AlreadyHaveAnAccount(navigateToLoginScreen: () -> Unit) {
 }
 
 @Composable
-fun ResultState(uiState: CreateAccountViewmodel.UiState, onBackPressed: () -> Boolean) {
+fun ResultState(uiState: CreateAccountViewmodel.UiState, onBackPressed: () -> Unit) {
 
     when (uiState) {
         CreateAccountViewmodel.UiState.Idle -> {} // Do nothing

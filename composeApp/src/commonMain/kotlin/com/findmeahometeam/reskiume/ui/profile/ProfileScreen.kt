@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -19,14 +20,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.components.RmListAvatarType
 import com.findmeahometeam.reskiume.ui.core.components.RmListButtonItem
 import com.findmeahometeam.reskiume.ui.core.components.RmListSwitchItem
 import com.findmeahometeam.reskiume.ui.core.components.RmSecondaryText
-import com.findmeahometeam.reskiume.ui.core.components.RmTitleText
+import com.findmeahometeam.reskiume.ui.core.components.RmText
 import com.findmeahometeam.reskiume.ui.core.gray
 import com.findmeahometeam.reskiume.ui.core.primaryBlue
 import com.findmeahometeam.reskiume.ui.core.primaryGreen
@@ -101,9 +105,12 @@ fun ProfileScreen(
         Header(isRegistered, userName, isAvailable)
         Spacer(Modifier.height(32.dp))
 
-        RmTitleText(
-            modifier = Modifier.padding(10.dp),
-            text = stringResource(Res.string.profile_screen_my_account_section)
+        RmText(
+            modifier = Modifier.fillMaxWidth().padding(10.dp),
+            text = stringResource(Res.string.profile_screen_my_account_section),
+            textAlign = TextAlign.Start,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.ExtraBold
         )
         Spacer(modifier = Modifier.height(10.dp))
 
@@ -164,9 +171,12 @@ fun ProfileScreen(
         )
 
         Spacer(Modifier.height(32.dp))
-        RmTitleText(
-            modifier = Modifier.padding(10.dp),
-            text = stringResource(Res.string.profile_screen_my_activism_section)
+        RmText(
+            modifier = Modifier.fillMaxWidth().padding(10.dp),
+            text = stringResource(Res.string.profile_screen_my_activism_section),
+            textAlign = TextAlign.Start,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.ExtraBold
         )
         Spacer(modifier = Modifier.height(10.dp))
 
@@ -233,9 +243,12 @@ fun ProfileScreen(
             }
         )
         Spacer(Modifier.height(32.dp))
-        RmTitleText(
-            modifier = Modifier.padding(10.dp),
-            text = stringResource(Res.string.profile_screen_settings_section)
+        RmText(
+            modifier = Modifier.fillMaxWidth().padding(10.dp),
+            text = stringResource(Res.string.profile_screen_settings_section),
+            textAlign = TextAlign.Start,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.ExtraBold
         )
         Spacer(modifier = Modifier.height(10.dp))
 
@@ -293,12 +306,16 @@ fun Header(isRegistered: Boolean, userName: String, isAvailable: Boolean) {
             tint = textColor
         )
     }
-    RmTitleText(
+    RmText(
+        modifier = Modifier.fillMaxWidth().padding(10.dp),
         text = if (isRegistered) {
             userName
         } else {
             stringResource(Res.string.profile_screen_activist_title)
-        }, isSectionTitle = false
+        },
+        textAlign = TextAlign.Center,
+        fontSize = 24.sp,
+        fontWeight = FontWeight.Black
     )
     Spacer(Modifier.height(16.dp))
     if (isRegistered && isAvailable) {

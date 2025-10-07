@@ -59,7 +59,10 @@
     <string name="password_text_field_show_password_content_description">Show password</string>
     <string name="password_text_field_hide_password_content_description">Hide password</string>
 
-    <!-- back arrow -->
+    <!-- Back arrow -->
     <string name="back_arrow_content_description">Back to the previous screen"</string>
+
+    <!-- User screen -->
+    <string name="user_screen_log_out_button">Log out</string>
 
 </resources>

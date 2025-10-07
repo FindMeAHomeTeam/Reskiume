@@ -33,6 +33,48 @@ class AuthRepositoryIosImpl : AuthRepository {
 
     override val authState: Flow<AuthUser?> = _state.asStateFlow()
 
+    override suspend fun createUserWithEmailAndPassword(
+        email: String,
+        password: String
+    ): AuthResult {
+        return withContext(Dispatchers.Main) {
+            suspendCancellableCoroutine { continuation: CancellableContinuation<AuthResult> ->
+                auth.createUserWithEmail(
+                    email = email,
+                    password = password
+                ) { result: FIRAuthDataResult?, error: NSError? ->
+                    if (!continuation.isActive) return@createUserWithEmail
+
+                    when {
+                        // When there is an error
+                        error != null -> {
+                            continuation.resume(AuthResult.Error(message = error.localizedDescription))
+                        }
+
+                        // When the user is empty
+                        result?.user() == null -> {
+                            continuation.resume(AuthResult.Error(message = "Error! the user is empty"))
+                        }
+
+                        // If everything went well
+                        else -> {
+                            val user: FIRUser = result.user()
+                            continuation.resume(
+                                AuthResult.Success(
+                                    user = AuthUser(
+                                        uid = user.uid(),
+                                        name = user.displayName(),
+                                        email = user.email()
+                                    )
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     override suspend fun signInWithEmailAndPassword(
         email: String,
         password: String

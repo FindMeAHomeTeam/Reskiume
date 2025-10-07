@@ -31,6 +31,25 @@ class AuthRepositoryAndroidImpl : AuthRepository {
         awaitClose { auth.removeAuthStateListener(authStateListener) }
     }
 
+    override suspend fun createUserWithEmailAndPassword(
+        email: String,
+        password: String
+    ): AuthResult {
+        return try {
+            auth.createUserWithEmailAndPassword(email, password).await()
+            val user = auth.currentUser ?: error("Error creating the user account")
+            AuthResult.Success(
+                AuthUser(
+                    uid = user.uid,
+                    name = user.displayName,
+                    email = user.email
+                )
+            )
+        } catch (e: Exception) {
+            AuthResult.Error(e.message ?: "Unknown error", e)
+        }
+    }
+
     override suspend fun signInWithEmailAndPassword(
         email: String,
         password: String

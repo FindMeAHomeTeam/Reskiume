@@ -43,10 +43,15 @@
     <string name="rating_bar_rated_content_description">Rated star</string>
     <string name="rating_bar_unrated_content_description">Unrated star</string>
 
+    <!-- Create account screen -->
+    <string name="create_account_screen_email_field_label">Email</string>
+    <string name="create_account_screen_create_account_button">Create account</string>
+    <string name="create_account_screen_already_have_an_account">Already have an account? Log in</string>
+    <string name="create_account_screen_log_in">Log in</string>
+
     <!-- Login screen -->
     <string name="login_screen_email_field_label">Email</string>
-    <string name="login_screen_create_account_link">Create account</string>
-    <string name="login_screen_login_button">Login</string>
+    <string name="login_screen_log_in_button">Log in</string>
     <string name="login_screen_incorrect_credentials_message">Your email or password are incorrect</string>
 
     <!-- Password text field -->

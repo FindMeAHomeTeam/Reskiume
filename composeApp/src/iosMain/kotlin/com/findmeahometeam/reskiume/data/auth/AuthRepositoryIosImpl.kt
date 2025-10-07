@@ -19,7 +19,7 @@ import platform.Foundation.NSError
 import kotlin.coroutines.resume
 
 @OptIn(ExperimentalForeignApi::class)
-class AuthRepositoryIosImpl: AuthRepository {
+class AuthRepositoryIosImpl : AuthRepository {
 
     private val auth = FIRAuth.auth()
     private val _state = MutableStateFlow<AuthUser?>(null)
@@ -27,7 +27,7 @@ class AuthRepositoryIosImpl: AuthRepository {
 
     init {
         handle = auth.addAuthStateDidChangeListener { _, user: FIRUser? ->
-            _state.value = user?.let { AuthUser(it.uid(), it.email()) }
+            _state.value = user?.let { AuthUser(it.uid(), it.displayName(), it.email()) }
         }
     }
 
@@ -39,7 +39,10 @@ class AuthRepositoryIosImpl: AuthRepository {
     ): AuthResult {
         return withContext(Dispatchers.Main) {
             suspendCancellableCoroutine { continuation: CancellableContinuation<AuthResult> ->
-                auth.signInWithEmail(email = email, password = password) { result: FIRAuthDataResult?, error: NSError? ->
+                auth.signInWithEmail(
+                    email = email,
+                    password = password
+                ) { result: FIRAuthDataResult?, error: NSError? ->
                     if (!continuation.isActive) return@signInWithEmail
 
                     when {
@@ -56,7 +59,15 @@ class AuthRepositoryIosImpl: AuthRepository {
                         // If everything went well
                         else -> {
                             val user: FIRUser = result.user()
-                            continuation.resume(AuthResult.Success(user = AuthUser(uid = user.uid(), email = user.email())))
+                            continuation.resume(
+                                AuthResult.Success(
+                                    user = AuthUser(
+                                        uid = user.uid(),
+                                        name = user.displayName(),
+                                        email = user.email()
+                                    )
+                                )
+                            )
                         }
                     }
                 }

@@ -12,13 +12,19 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
-class AuthRepositoryAndroidImpl: AuthRepository {
+class AuthRepositoryAndroidImpl : AuthRepository {
 
     private val auth: FirebaseAuth = Firebase.auth
 
     override val authState: Flow<AuthUser?> = callbackFlow {
         val authStateListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
-            val user: AuthUser? = firebaseAuth.currentUser?.let { user: FirebaseUser -> AuthUser(user.uid, user.email) }
+            val user: AuthUser? = firebaseAuth.currentUser?.let { user: FirebaseUser ->
+                AuthUser(
+                    user.uid,
+                    user.displayName,
+                    user.email
+                )
+            }
             trySend(user)
         }
         auth.addAuthStateListener(authStateListener)
@@ -32,7 +38,13 @@ class AuthRepositoryAndroidImpl: AuthRepository {
         return try {
             auth.signInWithEmailAndPassword(email, password).await()
             val user = auth.currentUser ?: error("User is null")
-            AuthResult.Success(AuthUser(uid = user.uid, email = user.email))
+            AuthResult.Success(
+                AuthUser(
+                    uid = user.uid,
+                    name = user.displayName,
+                    email = user.email
+                )
+            )
         } catch (e: Exception) {
             AuthResult.Error(e.message ?: "Unknown error", e)
         }

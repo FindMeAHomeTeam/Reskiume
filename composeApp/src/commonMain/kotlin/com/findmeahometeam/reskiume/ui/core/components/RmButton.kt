@@ -16,7 +16,7 @@ import com.findmeahometeam.reskiume.ui.core.primaryGreen
 fun RmButton(
     text: String,
     modifier: Modifier = Modifier,
-    enabled: Boolean,
+    enabled: Boolean = true,
     onClick: () -> Unit
 ) {
     Button(

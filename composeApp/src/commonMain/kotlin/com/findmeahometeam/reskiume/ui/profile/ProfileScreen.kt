@@ -83,7 +83,7 @@ import reskiume.composeapp.generated.resources.profile_screen_settings_section
 
 @Composable
 fun ProfileScreen(
-    navigateToLoginScreen: () -> Unit
+    navigateToCreateAccountScreen: () -> Unit
 ) {
     val isRegistered = false // TODO read from database
     val userName = "UserName" // TODO read from database
@@ -116,16 +116,8 @@ fun ProfileScreen(
 
         // Profile screen
         RmListButtonItem(
-            title = if (isRegistered) {
-                stringResource(Res.string.profile_screen_personal_information_title)
-            } else {
-                stringResource(Res.string.profile_screen_personal_create_account_title)
-            },
-            description = if (isRegistered) {
-                stringResource(Res.string.profile_screen_personal_information_description)
-            } else {
-                stringResource(Res.string.profile_screen_personal_create_account_description)
-            },
+            title = stringResource(Res.string.profile_screen_personal_create_account_title),
+            description = stringResource(Res.string.profile_screen_personal_create_account_description),
             containerColor = backgroundColor,
             listAvatarType = RmListAvatarType.Icon(
                 backgroundColor = tertiaryGreen,
@@ -133,12 +125,27 @@ fun ProfileScreen(
                 iconColor = primaryGreen
             ),
             onClick = {
-                navigateToLoginScreen()
+                navigateToCreateAccountScreen()
             }
         )
 
         // Reviews screen
         if (isRegistered) {
+
+            RmListButtonItem(
+                title = stringResource(Res.string.profile_screen_personal_information_title),
+                description = stringResource(Res.string.profile_screen_personal_information_description),
+                containerColor = backgroundColor,
+                listAvatarType = RmListAvatarType.Icon(
+                    backgroundColor = tertiaryGreen,
+                    icon = Res.drawable.ic_user,
+                    iconColor = primaryGreen
+                ),
+                onClick = {
+                    // TODO
+                }
+            )
+
             RmListButtonItem(
                 title = stringResource(Res.string.profile_screen_reviews_title),
                 description = stringResource(Res.string.profile_screen_reviews_description),

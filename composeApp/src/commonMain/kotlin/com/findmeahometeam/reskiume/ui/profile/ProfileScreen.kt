@@ -42,7 +42,6 @@ import com.findmeahometeam.reskiume.ui.core.secondaryBlue
 import com.findmeahometeam.reskiume.ui.core.secondaryGreen
 import com.findmeahometeam.reskiume.ui.core.secondaryRed
 import com.findmeahometeam.reskiume.ui.core.tertiaryGreen
-import com.findmeahometeam.reskiume.ui.core.textColor
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -84,6 +83,7 @@ import reskiume.composeapp.generated.resources.profile_screen_rescue_notificatio
 import reskiume.composeapp.generated.resources.profile_screen_reviews_description
 import reskiume.composeapp.generated.resources.profile_screen_reviews_title
 import reskiume.composeapp.generated.resources.profile_screen_settings_section
+import reskiume.composeapp.generated.resources.reskiume
 
 @Composable
 fun ProfileScreen(
@@ -93,7 +93,16 @@ fun ProfileScreen(
     val authState: AuthUser? by profileViewmodel.collectAuthState().collectAsState(null)
 
     val isRegistered = authState != null
-    val username = authState?.name ?: ""
+    val username: String = if (authState?.name.isNullOrBlank()) {
+        stringResource(Res.string.profile_screen_activist_title)
+    } else {
+        authState?.name!!
+    }
+    val photoUrl: String = if (authState?.photoUrl.isNullOrBlank() || authState?.photoUrl == "null") {
+        ""
+    } else {
+        authState?.photoUrl!!
+    }
     val isAvailable = true // TODO read from database
     val areNotificationsAvailable = true // TODO read from database
 
@@ -108,7 +117,7 @@ fun ProfileScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(Modifier.height(16.dp))
-        Header(isRegistered, username, isAvailable)
+        Header(isRegistered, photoUrl, username, isAvailable)
         Spacer(Modifier.height(32.dp))
 
         RmText(
@@ -150,7 +159,7 @@ fun ProfileScreen(
                     iconColor = primaryGreen
                 ),
                 onClick = {
-                    // TODO
+                    navigateToPersonalInformationScreen()
                 }
             )
 
@@ -303,10 +312,10 @@ fun ProfileScreen(
 }
 
 @Composable
-fun Header(isRegistered: Boolean, userName: String, isAvailable: Boolean) {
-    if (isRegistered) {
+fun Header(isRegistered: Boolean, photoUrl: String, userName: String, isAvailable: Boolean) {
+    if (isRegistered && photoUrl.isNotBlank()) {
         AsyncImage(
-            model = Res.drawable.ic_user, // TODO
+            model = photoUrl,
             contentDescription =
                 stringResource(Res.string.profile_screen_profile_image_content_description),
             modifier = Modifier.size(190.dp).clip(CircleShape),
@@ -314,20 +323,16 @@ fun Header(isRegistered: Boolean, userName: String, isAvailable: Boolean) {
         )
     } else {
         Icon(
-            modifier = Modifier.size(190.dp).clip(CircleShape),
-            painter = painterResource(Res.drawable.ic_user),
+            modifier = Modifier.size(190.dp),
+            painter = painterResource(Res.drawable.reskiume),
             contentDescription =
                 stringResource(Res.string.profile_screen_profile_image_content_description),
-            tint = textColor
+            tint = primaryGreen
         )
     }
     RmText(
         modifier = Modifier.fillMaxWidth().padding(10.dp),
-        text = if (isRegistered) {
-            userName
-        } else {
-            stringResource(Res.string.profile_screen_activist_title)
-        },
+        text = userName,
         textAlign = TextAlign.Center,
         fontSize = 24.sp,
         fontWeight = FontWeight.Black

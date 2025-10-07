@@ -33,7 +33,7 @@ import com.findmeahometeam.reskiume.ui.core.secondaryTextColor
 @Composable
 fun HomeScreen(mainNavHostController: NavHostController) {
 
-    val navHostController: NavHostController = rememberNavController()
+    val bottomNavHostController: NavHostController = rememberNavController()
     val items: List<BottomBarItem> = listOf(
         BottomBarItem.FosterHomes(),
         BottomBarItem.RescueEvents(),
@@ -42,17 +42,17 @@ fun HomeScreen(mainNavHostController: NavHostController) {
     )
 
     Scaffold(bottomBar = {
-        BottomNavigationBar(navHostController, items)
+        BottomNavigationBar(bottomNavHostController, items)
     }) { padding: PaddingValues ->
         Box(modifier = Modifier.padding(padding)) {
-            BottomNavigationWrapper(navHostController, mainNavHostController)
+            BottomNavigationWrapper(bottomNavHostController, mainNavHostController)
         }
     }
 }
 
 @Composable
-fun BottomNavigationBar(navHostController: NavHostController, items: List<BottomBarItem>) {
-    val navBackStackEntry: NavBackStackEntry? by navHostController.currentBackStackEntryAsState()
+fun BottomNavigationBar(bottomNavHostController: NavHostController, items: List<BottomBarItem>) {
+    val navBackStackEntry: NavBackStackEntry? by bottomNavHostController.currentBackStackEntryAsState()
     val currentDestination: NavDestination? = navBackStackEntry?.destination
 
     Column {
@@ -73,8 +73,8 @@ fun BottomNavigationBar(navHostController: NavHostController, items: List<Bottom
                     icon = item.icon,
                     label = { Text(item.title(), fontWeight = FontWeight.Bold) },
                     onClick = {
-                        navHostController.navigate(route = item.route) {
-                            navHostController.graph.startDestinationRoute?.let { route ->
+                        bottomNavHostController.navigate(route = item.route) {
+                            bottomNavHostController.graph.startDestinationRoute?.let { route ->
                                 popUpTo(route) { saveState = true }
                             }
                             launchSingleTop = true

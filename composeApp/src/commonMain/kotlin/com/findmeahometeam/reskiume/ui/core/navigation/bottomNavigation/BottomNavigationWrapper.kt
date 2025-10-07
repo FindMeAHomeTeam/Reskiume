@@ -12,12 +12,12 @@ import com.findmeahometeam.reskiume.ui.rescue.RescueScreen
 
 @Composable
 fun BottomNavigationWrapper(
-    navHostController: NavHostController,
+    bottomNavHostController: NavHostController,
     mainNavHostController: NavHostController
 ) {
 
     // TODO start destination
-    NavHost(navController = navHostController, startDestination = Routes.PROFILE.route) {
+    NavHost(navController = bottomNavHostController, startDestination = Routes.PROFILE.route) {
 
         composable(route = Routes.FOSTER_HOMES.route) {
             FosterHomesScreen()
@@ -32,12 +32,9 @@ fun BottomNavigationWrapper(
         }
 
         composable(route = Routes.PROFILE.route) {
-            ProfileScreen(navigateToLoginScreen = {
-                mainNavHostController.navigate(Routes.LOGIN.route)
+            ProfileScreen(navigateToCreateAccountScreen = {
+                mainNavHostController.navigate(Routes.CREATE_ACCOUNT.route)
             })
         }
-
     }
-
-
 }

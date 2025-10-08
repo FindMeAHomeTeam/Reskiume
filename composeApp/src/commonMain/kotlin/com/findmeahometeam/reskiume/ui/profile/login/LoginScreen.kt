@@ -55,7 +55,6 @@ fun LoginScreen(onBackPressed: () -> Unit, onLoginSuccessful: () -> Unit) {
             email.isNotEmpty() && email.matches(emailRegexPattern) && pwd.isNotEmpty()
         }
     }
-    val scope = rememberCoroutineScope()
 
     RmScaffold(
         onBackPressed = onBackPressed,
@@ -84,9 +83,7 @@ fun LoginScreen(onBackPressed: () -> Unit, onLoginSuccessful: () -> Unit) {
                 text = stringResource(Res.string.login_screen_log_in_button),
                 enabled = isLogInButtonEnabled,
                 onClick = {
-                    scope.launch {
-                        loginViewmodel.signInUsingEmail(email, pwd)
-                    }
+                    loginViewmodel.signInUsingEmail(email, pwd)
                 })
             Spacer(modifier = Modifier.height(10.dp))
             ResultState(uiState, onLoginSuccessful)

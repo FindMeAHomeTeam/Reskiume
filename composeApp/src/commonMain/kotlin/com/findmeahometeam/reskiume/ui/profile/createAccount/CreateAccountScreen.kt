@@ -65,7 +65,6 @@ fun CreateAccountScreen(onBackPressed: () -> Unit, navigateToLoginScreen: () -> 
             email.isNotEmpty() && email.matches(emailRegexPattern) && pwd.isNotEmpty()
         }
     }
-    val scope = rememberCoroutineScope()
 
     RmScaffold(
         onBackPressed = onBackPressed,
@@ -94,9 +93,7 @@ fun CreateAccountScreen(onBackPressed: () -> Unit, navigateToLoginScreen: () -> 
                 text = stringResource(Res.string.create_account_screen_create_account_button),
                 enabled = isLogInButtonEnabled,
                 onClick = {
-                    scope.launch {
-                        createAccountViewmodel.createUserUsingEmailAndPwd(email, pwd)
-                    }
+                    createAccountViewmodel.createUserUsingEmailAndPwd(email, pwd)
                 })
             Spacer(modifier = Modifier.height(15.dp))
             AlreadyHaveAnAccount(navigateToLoginScreen)

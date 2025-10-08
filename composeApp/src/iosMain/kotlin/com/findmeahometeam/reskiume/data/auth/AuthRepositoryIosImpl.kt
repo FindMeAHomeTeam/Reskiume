@@ -8,7 +8,7 @@ import cocoapods.FirebaseAuth.FIREmailAuthProvider
 import cocoapods.FirebaseAuth.FIRUser
 import com.findmeahometeam.reskiume.data.remote.response.AuthResult
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
-import com.findmeahometeam.reskiume.domain.repository.AuthRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.AuthRepository
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.Dispatchers

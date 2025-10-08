@@ -1,4 +1,4 @@
-package com.findmeahometeam.reskiume.domain.repository
+package com.findmeahometeam.reskiume.domain.repository.remote
 
 import com.findmeahometeam.reskiume.data.remote.response.AuthResult
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser

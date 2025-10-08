@@ -2,7 +2,7 @@ package com.findmeahometeam.reskiume.data.auth
 
 import com.findmeahometeam.reskiume.data.remote.response.AuthResult
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
-import com.findmeahometeam.reskiume.domain.repository.AuthRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.AuthRepository
 import com.google.firebase.Firebase
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.EmailAuthProvider

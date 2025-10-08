@@ -65,4 +65,9 @@
     <!-- User screen -->
     <string name="user_screen_log_out_button">Log out</string>
 
+    <!-- Delete account screen -->
+    <string name="delete_account_screen_are_you_sure_delete_account_message">Are you sure you want to delete your account?</string>
+    <string name="delete_account_screen_explanation_delete_account_message">This action is irreversible. This means that your data, the non-human animals you manage, your foster homes, and your rescue events will be permanently deleted. To continue, add your password</string>
+    <string name="delete_account_screen_delete_account_button">Delete account</string>
+
 </resources>

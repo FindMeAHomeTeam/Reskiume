@@ -1,8 +1,10 @@
 package com.findmeahometeam.reskiume.data.auth
 
 import cocoapods.FirebaseAuth.FIRAuth
+import cocoapods.FirebaseAuth.FIRAuthCredential
 import cocoapods.FirebaseAuth.FIRAuthDataResult
 import cocoapods.FirebaseAuth.FIRAuthStateDidChangeListenerHandle
+import cocoapods.FirebaseAuth.FIREmailAuthProvider
 import cocoapods.FirebaseAuth.FIRUser
 import com.findmeahometeam.reskiume.data.remote.response.AuthResult
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
@@ -127,4 +129,30 @@ class AuthRepositoryIosImpl : AuthRepository {
     }
 
     override fun signOut(): Boolean = auth.signOut(null)
+
+    override suspend fun deleteUser(password: String, onDeleteUser: (String, String) -> Unit) {
+        try {
+            val email: String = auth.currentUser()?.email() ?: error("User is null")
+            val uid: String = auth.currentUser()?.uid() ?: error("User is null")
+            val authCredential: FIRAuthCredential =
+                FIREmailAuthProvider.credentialWithEmail(email = email, password = password)
+
+            auth.currentUser()
+                ?.reauthenticateWithCredential(authCredential) { firAuthDataResult: FIRAuthDataResult?, error: NSError? ->
+                    if (error == null) {
+                        auth.currentUser()?.deleteWithCompletion { error: NSError? ->
+                            if (error == null) {
+                                onDeleteUser(uid, "")
+                            } else {
+                                onDeleteUser("", error.localizedDescription)
+                            }
+                        }
+                    } else {
+                        onDeleteUser("", error.localizedDescription)
+                    }
+                }
+        } catch (e: Exception) {
+            onDeleteUser("", e.message ?: "Unknown error")
+        }
+    }
 }

@@ -3,10 +3,12 @@ package com.findmeahometeam.reskiume.data.auth
 import com.findmeahometeam.reskiume.data.remote.response.AuthResult
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.domain.repository.AuthRepository
+import com.google.firebase.Firebase
+import com.google.firebase.auth.AuthCredential
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.auth
-import com.google.firebase.Firebase
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -75,5 +77,29 @@ class AuthRepositoryAndroidImpl : AuthRepository {
     override fun signOut(): Boolean {
         auth.signOut()
         return true
+    }
+
+    override suspend fun deleteUser(password: String, onDeleteUser: (String, String) -> Unit) {
+        try {
+            val email: String = auth.currentUser?.email ?: error("User is null")
+            val uid: String = auth.currentUser?.uid ?: error("User is null")
+            val authCredential: AuthCredential = EmailAuthProvider.getCredential(email, password)
+
+            auth.currentUser?.reauthenticate(authCredential)?.addOnCompleteListener {
+                if (it.isSuccessful) {
+                    auth.currentUser?.delete()?.addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            onDeleteUser(uid, "")
+                        } else {
+                            onDeleteUser("", task.exception?.message ?: "Unknown error")
+                        }
+                    }
+                } else {
+                    onDeleteUser("", it.exception?.message ?: "Unknown error")
+                }
+            }
+        } catch (e: Exception) {
+            onDeleteUser("", e.message ?: "Unknown error")
+        }
     }
 }

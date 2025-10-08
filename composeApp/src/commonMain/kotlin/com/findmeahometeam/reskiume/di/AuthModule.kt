@@ -2,6 +2,7 @@ package com.findmeahometeam.reskiume.di
 
 import com.findmeahometeam.reskiume.domain.usecases.ObserveAuthState
 import com.findmeahometeam.reskiume.domain.usecases.CreateUserWithEmailAndPassword
+import com.findmeahometeam.reskiume.domain.usecases.DeleteUser
 import com.findmeahometeam.reskiume.domain.usecases.SignInWithEmailAndPassword
 import com.findmeahometeam.reskiume.domain.usecases.SignOut
 import com.findmeahometeam.reskiume.ui.home.HomeViewmodel
@@ -18,6 +19,7 @@ val authModule = module {
     factoryOf(::CreateUserWithEmailAndPassword)
     factoryOf(::SignInWithEmailAndPassword)
     factoryOf(::SignOut)
+    factoryOf(::DeleteUser)
     viewModelOf(::HomeViewmodel)
     viewModelOf(::ProfileViewmodel)
     viewModelOf(::CreateAccountViewmodel)

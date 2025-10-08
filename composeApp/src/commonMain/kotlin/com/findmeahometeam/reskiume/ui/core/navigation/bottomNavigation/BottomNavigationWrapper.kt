@@ -38,6 +38,9 @@ fun BottomNavigationWrapper(
                 },
                 navigateToPersonalInformationScreen = {
                     mainNavHostController.navigate(Routes.PERSONAL_INFORMATION.route)
+                },
+                navigateToDeleteAccountScreen = {
+                    mainNavHostController.navigate(Routes.DELETE_ACCOUNT.route)
                 }
             )
         }

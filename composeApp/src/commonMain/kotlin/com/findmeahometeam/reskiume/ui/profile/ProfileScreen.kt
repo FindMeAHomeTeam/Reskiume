@@ -88,7 +88,8 @@ import reskiume.composeapp.generated.resources.reskiume
 @Composable
 fun ProfileScreen(
     navigateToCreateAccountScreen: () -> Unit,
-    navigateToPersonalInformationScreen: () -> Unit
+    navigateToPersonalInformationScreen: () -> Unit,
+    navigateToDeleteAccountScreen: () -> Unit
 ) {
     val profileViewmodel: ProfileViewmodel = koinViewModel<ProfileViewmodel>()
     val authState: AuthUser? by profileViewmodel.collectAuthState().collectAsState(null)
@@ -119,8 +120,8 @@ fun ProfileScreen(
     ) {
         Spacer(Modifier.height(16.dp))
         Header(isRegistered, photoUrl, username, isAvailable)
-        Spacer(Modifier.height(32.dp))
 
+        Spacer(Modifier.height(32.dp))
         RmText(
             modifier = Modifier.fillMaxWidth().padding(10.dp),
             text = stringResource(Res.string.profile_screen_my_account_section),
@@ -304,7 +305,7 @@ fun ProfileScreen(
                     iconColor = primaryRed
                 ),
                 onClick = {
-                    // TODO
+                    navigateToDeleteAccountScreen()
                 }
             )
         }

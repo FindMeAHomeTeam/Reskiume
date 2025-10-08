@@ -17,7 +17,6 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -32,7 +31,6 @@ import com.findmeahometeam.reskiume.ui.core.components.RmText
 import com.findmeahometeam.reskiume.ui.core.components.RmTextField
 import com.findmeahometeam.reskiume.ui.core.primaryRed
 import com.findmeahometeam.reskiume.ui.core.secondaryGreen
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import reskiume.composeapp.generated.resources.Res
@@ -52,7 +50,7 @@ fun LoginScreen(onBackPressed: () -> Unit, onLoginSuccessful: () -> Unit) {
     var pwd: String by rememberSaveable { mutableStateOf("") }
     val isLogInButtonEnabled by remember(email, pwd) {
         derivedStateOf {
-            email.isNotEmpty() && email.matches(emailRegexPattern) && pwd.isNotEmpty()
+            email.isNotEmpty() && email.matches(emailRegexPattern) && pwd.isNotBlank() && pwd.length >= 6
         }
     }
 
@@ -92,7 +90,7 @@ fun LoginScreen(onBackPressed: () -> Unit, onLoginSuccessful: () -> Unit) {
 }
 
 @Composable
-fun ResultState(uiState: LoginViewmodel.UiState, onLoginSuccessful: () -> Unit) {
+private fun ResultState(uiState: LoginViewmodel.UiState, onLoginSuccessful: () -> Unit) {
 
     when (uiState) {
         LoginViewmodel.UiState.Idle -> {} // Do nothing

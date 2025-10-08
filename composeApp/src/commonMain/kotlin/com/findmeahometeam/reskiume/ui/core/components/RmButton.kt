@@ -17,6 +17,12 @@ fun RmButton(
     text: String,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    containerColor: Color = primaryGreen,
+    disabledContainerColor: Color = if (isSystemInDarkTheme()) {
+        Color.LightGray.copy(alpha = 0.2f)
+    } else {
+        Color.Gray.copy(alpha = 0.2f)
+    },
     onClick: () -> Unit
 ) {
     Button(
@@ -24,12 +30,8 @@ fun RmButton(
         enabled = enabled,
         colors = ButtonDefaults.buttonColors()
             .copy(
-                containerColor = primaryGreen,
-                disabledContainerColor = if (isSystemInDarkTheme()) {
-                    Color.LightGray.copy(alpha = 0.2f)
-                } else {
-                    Color.Gray.copy(alpha = 0.2f)
-                }
+                containerColor = containerColor,
+                disabledContainerColor = disabledContainerColor
             ),
         onClick = onClick
     ) {

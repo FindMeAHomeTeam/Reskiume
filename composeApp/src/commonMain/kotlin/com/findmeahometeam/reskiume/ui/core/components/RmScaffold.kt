@@ -3,6 +3,7 @@ package com.findmeahometeam.reskiume.ui.core.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -12,7 +13,10 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.textColor
 import org.jetbrains.compose.resources.painterResource
@@ -32,7 +36,15 @@ fun RmScaffold(
         modifier = Modifier.background(backgroundColor),
         topBar = {
             TopAppBar(
-                title = { RmText(title) },
+                title = {
+                    RmText(
+                        modifier = Modifier.fillMaxWidth().padding(end = 48.dp),
+                        text = title,
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
+                    )
+                },
                 navigationIcon = {
                     Icon(
                         painter = painterResource(Res.drawable.ic_back),

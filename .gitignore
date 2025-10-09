@@ -46,7 +46,7 @@ captures
 **/xcshareddata/WorkspaceSettings.xcsettings
 node_modules/
 iosApp/Pods/*
-google-services.json
+*.json
 *.jks
 *.plist
 

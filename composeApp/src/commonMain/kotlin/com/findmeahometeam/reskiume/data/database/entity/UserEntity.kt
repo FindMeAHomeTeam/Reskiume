@@ -2,7 +2,6 @@ package com.findmeahometeam.reskiume.data.database.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.findmeahometeam.reskiume.domain.model.RescueArea
 import com.findmeahometeam.reskiume.domain.model.User
 
 @Entity
@@ -12,8 +11,7 @@ data class UserEntity(
     val description: String,
     val email: String,
     val imageUrl: String,
-    val isAvailable: Boolean,
-    val rescueArea: String
+    val isAvailable: Boolean
 ) {
     fun toDomain(): User {
         return User(
@@ -22,8 +20,7 @@ data class UserEntity(
             description = description,
             email = email,
             imageUrl = imageUrl,
-            isAvailable = isAvailable,
-            rescueArea = RescueArea.fromDisplayName(rescueArea)!!
+            isAvailable = isAvailable
         )
     }
 }

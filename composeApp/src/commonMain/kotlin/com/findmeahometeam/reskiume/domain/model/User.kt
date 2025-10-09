@@ -8,8 +8,7 @@ data class User(
     val description: String,
     val email: String,
     val imageUrl: String,
-    val isAvailable: Boolean,
-    val rescueArea: RescueArea
+    val isAvailable: Boolean = true
 ) {
     fun toEntity(): UserEntity {
         return UserEntity(
@@ -18,8 +17,7 @@ data class User(
             description = description,
             email = email,
             imageUrl = imageUrl,
-            isAvailable = isAvailable,
-            rescueArea = rescueArea.cityName
+            isAvailable = isAvailable
         )
     }
 }

@@ -44,6 +44,10 @@
     <string name="rating_bar_unrated_content_description">Unrated star</string>
 
     <!-- Create account screen -->
+    <string name="create_account_screen_create_account_title">Create an account</string>
+    <string name="create_account_screen_photo_content_description">Add a photo</string>
+    <string name="create_account_screen_name_field_label">Name</string>
+    <string name="create_account_screen_describe_yourself_field_label">Describe yourself</string>
     <string name="create_account_screen_email_field_label">Email</string>
     <string name="create_account_screen_create_account_button">Create account</string>
     <string name="create_account_screen_already_have_an_account">Already have an account? Log in</string>

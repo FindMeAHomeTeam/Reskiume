@@ -1,4 +1,4 @@
-package com.findmeahometeam.reskiume.ui.profile.userScreen
+package com.findmeahometeam.reskiume.ui.profile.personalInformation
 
 import androidx.lifecycle.ViewModel
 import com.findmeahometeam.reskiume.domain.usecases.SignOut

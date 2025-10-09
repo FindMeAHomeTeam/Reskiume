@@ -1,4 +1,4 @@
-package com.findmeahometeam.reskiume.ui.profile.userScreen
+package com.findmeahometeam.reskiume.ui.profile.personalInformation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

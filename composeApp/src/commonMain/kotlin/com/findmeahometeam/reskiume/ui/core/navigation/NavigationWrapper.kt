@@ -9,7 +9,7 @@ import com.findmeahometeam.reskiume.ui.home.HomeScreen
 import com.findmeahometeam.reskiume.ui.profile.createAccount.CreateAccountScreen
 import com.findmeahometeam.reskiume.ui.profile.deleteUser.DeleteAccountScreen
 import com.findmeahometeam.reskiume.ui.profile.login.LoginScreen
-import com.findmeahometeam.reskiume.ui.profile.userScreen.PersonalInformationScreen
+import com.findmeahometeam.reskiume.ui.profile.personalInformation.PersonalInformationScreen
 
 @Composable
 fun NavigationWrapper() {

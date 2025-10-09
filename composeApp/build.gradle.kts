@@ -1,4 +1,3 @@
-import com.google.devtools.ksp.gradle.KspAATask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -136,29 +135,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
-    }
-}
-
-// they were generating the files for respective sourceset after kspCommonMainKotlinMetadata generates commonMain sourceset's
-// https://github.com/google/ksp/issues/2442#issuecomment-2970106196
-project.tasks.withType(KspAATask::class.java).configureEach {
-    if (name != "kspCommonMainKotlinMetadata") {
-        if (name == "kspDebugKotlinAndroid") {
-            enabled = false
-        }
-        if (name == "kspReleaseKotlinAndroid") {
-            enabled = false
-        }
-        if (name == "kspKotlinIosSimulatorArm64") {
-            enabled = false
-        }
-        if (name == "kspKotlinIosX64") {
-            enabled = false
-        }
-        if (name == "kspKotlinIosArm64") {
-            enabled = false
-        }
-        dependsOn("kspCommonMainKotlinMetadata")
     }
 }
 

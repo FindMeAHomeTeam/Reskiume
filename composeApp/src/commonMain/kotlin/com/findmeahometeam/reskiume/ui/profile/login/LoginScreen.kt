@@ -2,6 +2,7 @@ package com.findmeahometeam.reskiume.ui.profile.login
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,6 +37,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import reskiume.composeapp.generated.resources.Res
 import reskiume.composeapp.generated.resources.login_screen_email_field_label
 import reskiume.composeapp.generated.resources.login_screen_log_in_button
+import reskiume.composeapp.generated.resources.login_screen_log_in_title
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,6 +57,7 @@ fun LoginScreen(onBackPressed: () -> Unit, onLoginSuccessful: () -> Unit) {
     }
 
     RmScaffold(
+        title = stringResource(Res.string.login_screen_log_in_title),
         onBackPressed = onBackPressed,
     ) { padding ->
         Column(
@@ -63,7 +66,7 @@ fun LoginScreen(onBackPressed: () -> Unit, onLoginSuccessful: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            //Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(1f))
             RmTextField(
                 modifier = Modifier.fillMaxWidth(),
                 text = email,
@@ -76,42 +79,43 @@ fun LoginScreen(onBackPressed: () -> Unit, onLoginSuccessful: () -> Unit) {
                 password = pwd,
                 onValueChange = { pwd = it }
             )
-            //Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.height(10.dp))
+            ResultState(uiState, onLoginSuccessful)
+
+            Spacer(modifier = Modifier.weight(1f))
             RmButton(
                 text = stringResource(Res.string.login_screen_log_in_button),
                 enabled = isLogInButtonEnabled,
                 onClick = {
                     loginViewmodel.signInUsingEmail(email, pwd)
                 })
-            Spacer(modifier = Modifier.height(10.dp))
-            ResultState(uiState, onLoginSuccessful)
         }
     }
 }
 
 @Composable
 private fun ResultState(uiState: LoginViewmodel.UiState, onLoginSuccessful: () -> Unit) {
+    Box(modifier = Modifier.fillMaxWidth().height(64.dp), contentAlignment = Alignment.Center) {
+        when (uiState) {
+            LoginViewmodel.UiState.Idle -> {} // Do nothing
+            LoginViewmodel.UiState.Loading -> {
+                CircularProgressIndicator(
+                    modifier = Modifier.width(64.dp),
+                    color = secondaryGreen,
+                    trackColor = Color.White,
+                )
+            }
 
-    when (uiState) {
-        LoginViewmodel.UiState.Idle -> {} // Do nothing
-        LoginViewmodel.UiState.Loading -> {
-            CircularProgressIndicator(
-                modifier = Modifier.width(64.dp),
-                color = secondaryGreen,
-                trackColor = Color.White,
-            )
-        }
+            is LoginViewmodel.UiState.Error -> {
+                RmText(
+                    text = uiState.message,
+                    color = primaryRed
+                )
+            }
 
-        is LoginViewmodel.UiState.Error -> {
-            RmText(
-                text = uiState.message,
-                color = primaryRed
-            )
-        }
-
-        LoginViewmodel.UiState.Success -> {
-            onLoginSuccessful()
+            LoginViewmodel.UiState.Success -> {
+                onLoginSuccessful()
+            }
         }
     }
-
 }

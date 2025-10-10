@@ -76,7 +76,7 @@ kotlin {
             implementation(libs.ktor.client.negotiation)
             implementation(libs.ktor.serialization)
 
-
+            implementation(libs.image.picker.kmp)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

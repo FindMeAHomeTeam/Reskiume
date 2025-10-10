@@ -15,6 +15,7 @@ composeMultiplatform = "1.9.0"
 coroutines = "1.10.2"
 firebase-bom = "34.3.0"
 googleServices = "4.4.3"
+imagepickerkmp = "1.0.25"
 junit = "4.13.2"
 koin-bom = "4.1.1"
 kotlin = "2.2.20"
@@ -73,6 +74,9 @@ androidx-sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.r
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 androidx-room-sqlite-wrapper = { module = "androidx.room:room-sqlite-wrapper", version.ref = "room" }
+
+#imagePicker
+image-picker-kmp = { module = "io.github.ismoy:imagepickerkmp", version.ref = "imagepickerkmp" }
 
 #firebase
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }

@@ -1,7 +1,6 @@
 package com.findmeahometeam.reskiume.ui.profile.createAccount
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -64,7 +63,7 @@ fun CreateAccountScreen(onBackPressed: () -> Unit, navigateToLoginScreen: () -> 
 
     var name: String by rememberSaveable { mutableStateOf("") }
     var description: String by rememberSaveable { mutableStateOf("") }
-    var imageUrl: String by rememberSaveable { mutableStateOf("") }
+    var imageUri: String by rememberSaveable { mutableStateOf("") }
     var email: String by rememberSaveable { mutableStateOf("") }
     val emailRegexPattern =
         Regex("^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$")
@@ -87,11 +86,10 @@ fun CreateAccountScreen(onBackPressed: () -> Unit, navigateToLoginScreen: () -> 
         Column(
             modifier = Modifier.fillMaxSize().background(backgroundColor).padding(padding)
                 .padding(horizontal = 16.dp).verticalScroll(scrollState),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            RmAddPhoto{
-                // TODO: Add photo picker
+            RmAddPhoto {
+                imageUri = it
             }
             Spacer(modifier = Modifier.height(15.dp))
             RmTextField(
@@ -130,16 +128,17 @@ fun CreateAccountScreen(onBackPressed: () -> Unit, navigateToLoginScreen: () -> 
                 onClick = {
                     createAccountViewmodel.createUserUsingEmailAndPwd(
                         user = User(
-                            name = name,
+                            username = name,
                             description = description,
                             email = email,
-                            imageUrl = imageUrl
+                            image = imageUri
                         ),
                         password = pwd
                     )
                 })
             Spacer(modifier = Modifier.height(15.dp))
             AlreadyHaveAnAccountLink(navigateToLoginScreen)
+            Spacer(modifier = Modifier.height(10.dp))
         }
     }
 }

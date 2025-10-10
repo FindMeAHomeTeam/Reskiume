@@ -3,15 +3,17 @@ package com.findmeahometeam.reskiume.ui.profile.createAccount
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.findmeahometeam.reskiume.data.remote.response.AuthResult
+import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.usecases.CreateUserWithEmailAndPassword
+import com.findmeahometeam.reskiume.domain.usecases.InsertUserToLocalSource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class CreateAccountViewmodel(
-    private val createUserWithEmailAndPassword: CreateUserWithEmailAndPassword
-
+    private val createUserWithEmailAndPassword: CreateUserWithEmailAndPassword,
+    private val insertUserToLocalSource: InsertUserToLocalSource
 ) : ViewModel() {
     private var _state: MutableStateFlow<UiState> = MutableStateFlow(UiState.Idle)
     val state: StateFlow<UiState> = _state.asStateFlow()
@@ -23,25 +25,28 @@ class CreateAccountViewmodel(
         data class Error(val message: String): UiState()
     }
 
-    fun createUserUsingEmailAndPwd(email: String, password: String) {
+    fun createUserUsingEmailAndPwd(
+        user: User,
+        password: String
+    ) {
         viewModelScope.launch {
             _state.value = UiState.Loading
-            val authResult = createUserWithEmailAndPassword(email, password)
+            val authResult = createUserWithEmailAndPassword(user.email, password)
             when(authResult) {
                 is AuthResult.Error -> {
                     _state.value = UiState.Error(authResult.message)
                 }
                 is AuthResult.Success -> {
+                    saveUserToLocalSource(user.copy(uid = authResult.user.uid))
                     _state.value = UiState.Success
-                    saveUser(authResult)
                 }
             }
         }
     }
 
-    private fun saveUser(authResult: AuthResult) {
-        //TODO
+    private fun saveUserToLocalSource(user: User) {
+        viewModelScope.launch {
+            insertUserToLocalSource(user)
+        }
     }
-
-
 }

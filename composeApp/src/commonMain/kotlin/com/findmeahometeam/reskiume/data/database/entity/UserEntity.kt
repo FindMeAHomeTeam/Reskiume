@@ -7,19 +7,19 @@ import com.findmeahometeam.reskiume.domain.model.User
 @Entity
 data class UserEntity(
     @PrimaryKey val uid: String,
-    val name: String,
+    val username: String,
     val description: String,
     val email: String,
-    val imageUrl: String,
+    val image: String,
     val isAvailable: Boolean
 ) {
     fun toDomain(): User {
         return User(
             uid = uid,
-            name = name,
+            username = username,
             description = description,
             email = email,
-            imageUrl = imageUrl,
+            image = image,
             isAvailable = isAvailable
         )
     }

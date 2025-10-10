@@ -4,19 +4,19 @@ import com.findmeahometeam.reskiume.data.database.entity.UserEntity
 
 data class User(
     val uid: String = "",
-    val name: String,
+    val username: String,
     val description: String,
     val email: String,
-    val imageUrl: String,
+    val image: String,
     val isAvailable: Boolean = true
 ) {
     fun toEntity(): UserEntity {
         return UserEntity(
             uid = uid,
-            name = name,
+            username = username,
             description = description,
             email = email,
-            imageUrl = imageUrl,
+            image = image,
             isAvailable = isAvailable
         )
     }

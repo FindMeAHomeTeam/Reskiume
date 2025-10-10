@@ -45,7 +45,10 @@
 
     <!-- Create account screen -->
     <string name="create_account_screen_create_account_title">Create an account</string>
-    <string name="create_account_screen_photo_content_description">Add a photo</string>
+    <string name="create_account_screen_add_photo_message">Add a photo</string>
+    <string name="create_account_screen_from_gallery_message">Gallery</string>
+    <string name="create_account_screen_from_camera_message">Camera</string>
+    <string name="create_account_screen_delete_message">Delete</string>
     <string name="create_account_screen_name_field_label">Name</string>
     <string name="create_account_screen_describe_yourself_field_label">Describe yourself</string>
     <string name="create_account_screen_email_field_label">Email</string>
@@ -53,7 +56,17 @@
     <string name="create_account_screen_already_have_an_account">Already have an account? Log in</string>
     <string name="create_account_screen_log_in">Log in</string>
 
+    <!-- Camera picker permission -->
+    <string name="camera_picker_permission_title">Camera permission required</string>
+    <string name="camera_picker_permission_message">This app needs access to the camera to take photos</string>
+    <string name="camera_picker_permission_grant_permission_button">Grant permission</string>
+    <string name="camera_picker_permission_do_not_grant_permission_button">Later</string>
+    <string name="camera_picker_go_to_settings_title">Go to settings</string>
+    <string name="camera_picker_grant_in_settings_message">Camera permission is required to capture photos. Please grant it in settings</string>
+    <string name="camera_picker_open_settings_button">Open settings</string>
+
     <!-- Login screen -->
+    <string name="login_screen_log_in_title">Log in to your account</string>
     <string name="login_screen_email_field_label">Email</string>
     <string name="login_screen_log_in_button">Log in</string>
     <string name="login_screen_incorrect_credentials_message">Your email or password are incorrect</string>
@@ -70,6 +83,7 @@
     <string name="user_screen_log_out_button">Log out</string>
 
     <!-- Delete account screen -->
+    <string name="delete_account_screen_delete_account_title">Delete your account</string>
     <string name="delete_account_screen_are_you_sure_delete_account_message">Are you sure you want to delete your account?</string>
     <string name="delete_account_screen_explanation_delete_account_message">This action is irreversible. This means that your data, the non-human animals you manage, your foster homes, and your rescue events will be permanently deleted. To continue, add your password</string>
     <string name="delete_account_screen_delete_account_button">Delete account</string>

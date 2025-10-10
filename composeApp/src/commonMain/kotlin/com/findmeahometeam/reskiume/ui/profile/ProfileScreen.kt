@@ -18,6 +18,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,7 +30,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.components.RmListAvatarType
 import com.findmeahometeam.reskiume.ui.core.components.RmListButtonItem
@@ -92,22 +94,24 @@ fun ProfileScreen(
     navigateToDeleteAccountScreen: () -> Unit
 ) {
     val profileViewmodel: ProfileViewmodel = koinViewModel<ProfileViewmodel>()
-    val authState: AuthUser? by profileViewmodel.collectAuthState().collectAsState(null)
+    var uiUserModel: UiUserModel by remember { mutableStateOf(UiUserModel()) }
+    val uiState: ProfileViewmodel.UiState by profileViewmodel.state.collectAsState(ProfileViewmodel.UiState.Idle)
 
-    val isRegistered = authState != null
-    val username: String = if (authState?.name.isNullOrBlank()) {
-        stringResource(Res.string.profile_screen_activist_title)
+    uiUserModel = if (uiState is ProfileViewmodel.UiState.Success) {
+        (uiState as ProfileViewmodel.UiState.Success).uiUserModel.copy(
+            username = (uiState as ProfileViewmodel.UiState.Success).uiUserModel.username.ifBlank {
+                stringResource(
+                    Res.string.profile_screen_activist_title
+                )
+            }
+        )
     } else {
-        authState?.name!!
+        UiUserModel(
+            isRegistered = false,
+            username = stringResource(Res.string.profile_screen_activist_title),
+            image = ""
+        )
     }
-    val photoUrl: String = if (authState?.photoUrl.isNullOrBlank() || authState?.photoUrl == "null") {
-        ""
-    } else {
-        authState?.photoUrl!!
-    }
-    val isAvailable = true // TODO read from database
-    val areNotificationsAvailable = true // TODO read from database
-
     val scrollState: ScrollState = rememberScrollState()
 
     Column(
@@ -119,7 +123,7 @@ fun ProfileScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(Modifier.height(16.dp))
-        Header(isRegistered, photoUrl, username, isAvailable)
+        Header(uiUserModel)
 
         Spacer(Modifier.height(32.dp))
         RmText(
@@ -132,7 +136,7 @@ fun ProfileScreen(
         Spacer(modifier = Modifier.height(10.dp))
 
         // Profile screen
-        if (!isRegistered) {
+        if (!uiUserModel.isRegistered) {
             RmListButtonItem(
                 title = stringResource(Res.string.profile_screen_personal_create_account_title),
                 description = stringResource(Res.string.profile_screen_personal_create_account_description),
@@ -149,7 +153,7 @@ fun ProfileScreen(
         }
 
         // Reviews screen
-        if (isRegistered) {
+        if (uiUserModel.isRegistered) {
 
             RmListButtonItem(
                 title = stringResource(Res.string.profile_screen_personal_information_title),
@@ -190,7 +194,7 @@ fun ProfileScreen(
                 icon = Res.drawable.ic_notifications,
                 iconColor = primaryGreen
             ),
-            isChecked = areNotificationsAvailable,
+            isChecked = uiUserModel.areNotificationsAvailable,
             onCheckedChange = {
                 // TODO
             }
@@ -206,7 +210,7 @@ fun ProfileScreen(
         )
         Spacer(modifier = Modifier.height(10.dp))
 
-        if (isRegistered) {
+        if (uiUserModel.isRegistered) {
 
             // Non-human animals screen
             RmListButtonItem(
@@ -294,7 +298,7 @@ fun ProfileScreen(
         )
 
         // Delete account screen
-        if (isRegistered) {
+        if (uiUserModel.isRegistered) {
             RmListButtonItem(
                 title = stringResource(Res.string.profile_screen_delete_account_title),
                 description = stringResource(Res.string.profile_screen_delete_account_description),
@@ -314,10 +318,10 @@ fun ProfileScreen(
 }
 
 @Composable
-fun Header(isRegistered: Boolean, photoUrl: String, userName: String, isAvailable: Boolean) {
-    if (isRegistered && photoUrl.isNotBlank()) {
+fun Header(uiUserModel: UiUserModel) = uiUserModel.run {
+    if (isRegistered && image.isNotBlank()) {
         AsyncImage(
-            model = photoUrl,
+            model = image,
             contentDescription =
                 stringResource(Res.string.profile_screen_profile_image_content_description),
             modifier = Modifier.size(190.dp).clip(CircleShape),
@@ -334,7 +338,7 @@ fun Header(isRegistered: Boolean, photoUrl: String, userName: String, isAvailabl
     }
     RmText(
         modifier = Modifier.fillMaxWidth().padding(10.dp),
-        text = userName,
+        text = username,
         textAlign = TextAlign.Center,
         fontSize = 24.sp,
         fontWeight = FontWeight.Black

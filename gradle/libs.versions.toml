@@ -13,14 +13,15 @@ coil = "3.3.0"
 composeHotReload = "1.0.0-rc01"
 composeMultiplatform = "1.9.0"
 coroutines = "1.10.2"
-firebase-bom = "34.3.0"
-googleServices = "4.4.3"
+crashlyticsPlugin = "3.0.6"
+firebase-bom = "34.4.0"
+googleServices = "4.4.4"
 imagepickerkmp = "1.0.25"
 junit = "4.13.2"
 koin-bom = "4.1.1"
 kotlin = "2.2.20"
 ksp = "2.2.20-2.0.2" #2.0.3 gives ksp.gradle.KspAATask issues
-ktor = "3.3.0"
+ktor = "3.3.1"
 navigation = "2.9.0"
 paging = "3.4.0-alpha04"
 room = "2.8.2"
@@ -81,6 +82,11 @@ image-picker-kmp = { module = "io.github.ismoy:imagepickerkmp", version.ref = "i
 #firebase
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
 firebase-auth = { module = "com.google.firebase:firebase-auth" }
+firebase-database = { module = "com.google.firebase:firebase-database" }
+firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
+firebase-config = { module = "com.google.firebase:firebase-config" }
+firebase-crashlytics-ndk = { module = "com.google.firebase:firebase-crashlytics-ndk" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -93,4 +99,5 @@ kotlinxSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 androidx-room = { id = "androidx.room", version.ref = "room" }
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
+crashlytics-plugin = { id = "com.google.firebase.crashlytics", version.ref = "crashlyticsPlugin" }
 kotlin-cocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }

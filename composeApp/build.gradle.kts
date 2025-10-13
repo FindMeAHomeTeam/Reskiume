@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.androidx.room)
     alias(libs.plugins.google.services)
+    alias(libs.plugins.crashlytics.plugin)
     alias(libs.plugins.kotlin.cocoapods)
 }
 
@@ -41,6 +42,11 @@ kotlin {
             implementation(libs.androidx.room.sqlite.wrapper)
             implementation(project.dependencies.platform(libs.firebase.bom))
             implementation(libs.firebase.auth)
+            implementation(libs.firebase.database)
+            implementation(libs.firebase.firestore)
+            implementation(libs.firebase.config)
+            implementation(libs.firebase.crashlytics.ndk)
+            implementation(libs.firebase.analytics)
         }
         androidUnitTest.dependencies {
             implementation(libs.kotlin.testJunit)
@@ -108,6 +114,26 @@ kotlin {
         pod("FirebaseAuth"){
             extraOpts += listOf("-compiler-option", "-fmodules")
         }
+
+        pod("FirebaseDatabase"){
+            extraOpts += listOf("-compiler-option", "-fmodules")
+        }
+
+        pod("FirebaseFirestore"){
+            extraOpts += listOf("-compiler-option", "-fmodules")
+        }
+
+        pod("FirebaseRemoteConfig"){
+            extraOpts += listOf("-compiler-option", "-fmodules")
+        }
+
+        pod("FirebaseCrashlytics"){
+            extraOpts += listOf("-compiler-option", "-fmodules")
+        }
+
+        pod("FirebaseAnalytics"){
+            extraOpts += listOf("-compiler-option", "-fmodules")
+        }
     }
 }
 
@@ -150,4 +176,3 @@ dependencies {
 room {
     schemaDirectory("$projectDir/schemas")
 }
-

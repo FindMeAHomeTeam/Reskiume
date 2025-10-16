@@ -3,14 +3,14 @@ package com.findmeahometeam.reskiume.ui.profile.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.findmeahometeam.reskiume.data.remote.response.AuthResult
-import com.findmeahometeam.reskiume.domain.usecases.SignInWithEmailAndPassword
+import com.findmeahometeam.reskiume.domain.usecases.SignInWithEmailAndPasswordFromAuthDataSource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class LoginViewmodel(
-    private val signInWithEmailAndPassword: SignInWithEmailAndPassword
+    private val signInWithEmailAndPasswordFromAuthDataSource: SignInWithEmailAndPasswordFromAuthDataSource
 
 ) : ViewModel() {
     private var _state: MutableStateFlow<UiState> = MutableStateFlow(UiState.Idle)
@@ -26,7 +26,7 @@ class LoginViewmodel(
     fun signInUsingEmail(email: String, password: String) {
         viewModelScope.launch {
             _state.value = UiState.Loading
-            val authResult = signInWithEmailAndPassword(email, password)
+            val authResult = signInWithEmailAndPasswordFromAuthDataSource(email, password)
             when(authResult) {
                 is AuthResult.Error -> {
                     _state.value = UiState.Error(authResult.message)

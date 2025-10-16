@@ -4,23 +4,23 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.domain.model.User
-import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalSource
-import com.findmeahometeam.reskiume.domain.usecases.ObserveAuthState
+import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.ObserveAuthStateFromAuthDataSource
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
 class ProfileViewmodel(
-    private val observeAuthState: ObserveAuthState,
-    private val getUserFromLocalSource: GetUserFromLocalSource
+    private val observeAuthStateFromAuthDataSource: ObserveAuthStateFromAuthDataSource,
+    private val getUserFromLocalDataSource: GetUserFromLocalDataSource
 ) : ViewModel() {
 
-    val state: StateFlow<UiState> = observeAuthState().map { authUser: AuthUser? ->
+    val state: StateFlow<UiState> = observeAuthStateFromAuthDataSource().map { authUser: AuthUser? ->
         if (authUser?.uid == null) {
             UiState.Error("User not logged in")
         } else {
-            val user: User = getUserFromLocalSource(authUser.uid)
+            val user: User = getUserFromLocalDataSource(authUser.uid)
             UiState.Success(
                 UiUserModel(
                     isRegistered = true,

@@ -1,25 +1,33 @@
 package com.findmeahometeam.reskiume.di
 
-import com.findmeahometeam.reskiume.domain.usecases.CreateUserWithEmailAndPassword
-import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromLocalSource
-import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromRemoteSource
-import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalSource
-import com.findmeahometeam.reskiume.domain.usecases.InsertUserToLocalSource
-import com.findmeahometeam.reskiume.domain.usecases.ModifyUserFromLocalSource
-import com.findmeahometeam.reskiume.domain.usecases.ObserveAuthState
-import com.findmeahometeam.reskiume.domain.usecases.SignInWithEmailAndPassword
-import com.findmeahometeam.reskiume.domain.usecases.SignOut
+import com.findmeahometeam.reskiume.domain.usecases.CreateUserWithEmailAndPasswordFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.GetUserFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.InsertUserToLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.InsertUserToRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.ModifyUserFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.ModifyUserFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.ObserveAuthStateFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.SignInWithEmailAndPasswordFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.SignOutFromAuthDataSource
 import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
 
 val domainModule = module {
-    factoryOf(::ObserveAuthState)
-    factoryOf(::CreateUserWithEmailAndPassword)
-    factoryOf(::SignInWithEmailAndPassword)
-    factoryOf(::SignOut)
-    factoryOf(::DeleteUserFromRemoteSource)
-    factoryOf(::InsertUserToLocalSource)
-    factoryOf(::GetUserFromLocalSource)
-    factoryOf(::ModifyUserFromLocalSource)
-    factoryOf(::DeleteUserFromLocalSource)
+    factoryOf(::ObserveAuthStateFromAuthDataSource)
+    factoryOf(::CreateUserWithEmailAndPasswordFromAuthDataSource)
+    factoryOf(::SignInWithEmailAndPasswordFromAuthDataSource)
+    factoryOf(::SignOutFromAuthDataSource)
+    factoryOf(::DeleteUserFromAuthDataSource)
+    factoryOf(::InsertUserToLocalDataSource)
+    factoryOf(::InsertUserToRemoteDataSource)
+    factoryOf(::GetUserFromLocalDataSource)
+    factoryOf(::GetUserFromRemoteDataSource)
+    factoryOf(::ModifyUserFromLocalDataSource)
+    factoryOf(::ModifyUserFromRemoteDataSource)
+    factoryOf(::DeleteUserFromLocalDataSource)
+    factoryOf(::DeleteUserFromRemoteDataSource)
 }

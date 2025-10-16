@@ -2,6 +2,7 @@ package com.findmeahometeam.reskiume.ui.profile.deleteUser
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -40,6 +41,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import reskiume.composeapp.generated.resources.Res
 import reskiume.composeapp.generated.resources.delete_account_screen_are_you_sure_delete_account_message
 import reskiume.composeapp.generated.resources.delete_account_screen_delete_account_button
+import reskiume.composeapp.generated.resources.delete_account_screen_delete_account_title
 import reskiume.composeapp.generated.resources.delete_account_screen_explanation_delete_account_message
 import reskiume.composeapp.generated.resources.ic_warning
 
@@ -57,6 +59,7 @@ fun DeleteAccountScreen(onBackPressed: () -> Unit) {
     }
 
     RmScaffold(
+        title = stringResource(Res.string.delete_account_screen_delete_account_title),
         onBackPressed = onBackPressed,
     ) { padding ->
         Column(
@@ -124,26 +127,27 @@ fun DeleteAccountScreen(onBackPressed: () -> Unit) {
 
 @Composable
 private fun ResultState(uiState: DeleteAccountViewmodel.UiState, onSuccessfulDelete: () -> Unit) {
+    Box(modifier = Modifier.fillMaxWidth().height(64.dp), contentAlignment = Alignment.Center) {
+        when (uiState) {
+            DeleteAccountViewmodel.UiState.Idle -> {} // Do nothing
+            DeleteAccountViewmodel.UiState.Loading -> {
+                CircularProgressIndicator(
+                    modifier = Modifier.width(64.dp),
+                    color = secondaryGreen,
+                    trackColor = Color.White,
+                )
+            }
 
-    when (uiState) {
-        DeleteAccountViewmodel.UiState.Idle -> {} // Do nothing
-        DeleteAccountViewmodel.UiState.Loading -> {
-            CircularProgressIndicator(
-                modifier = Modifier.width(64.dp),
-                color = secondaryGreen,
-                trackColor = Color.White,
-            )
-        }
+            is DeleteAccountViewmodel.UiState.Error -> {
+                RmText(
+                    text = uiState.message,
+                    color = primaryRed
+                )
+            }
 
-        is DeleteAccountViewmodel.UiState.Error -> {
-            RmText(
-                text = uiState.message,
-                color = primaryRed
-            )
-        }
-
-        DeleteAccountViewmodel.UiState.Success -> {
-            onSuccessfulDelete()
+            DeleteAccountViewmodel.UiState.Success -> {
+                onSuccessfulDelete()
+            }
         }
     }
 }

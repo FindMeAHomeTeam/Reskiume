@@ -1,4 +1,4 @@
-package com.findmeahometeam.reskiume.data.auth
+package com.findmeahometeam.reskiume.data.remote.auth
 
 import cocoapods.FirebaseAuth.FIRAuth
 import cocoapods.FirebaseAuth.FIRAuthCredential

@@ -11,7 +11,6 @@ plugins {
     alias(libs.plugins.androidx.room)
     alias(libs.plugins.google.services)
     alias(libs.plugins.crashlytics.plugin)
-    alias(libs.plugins.kotlin.cocoapods)
 }
 
 kotlin {
@@ -96,11 +95,11 @@ kotlin {
         }
     }
 
-    cocoapods {
+    /*cocoapods {
         version = "1.0.0"
         summary = "KMP app to rescue non-human animals in danger"
         homepage = "https://github.com/FindMeAHomeTeam/Reskiume#"
-        ios.deploymentTarget = "18.2"
+        ios.deploymentTarget = "15.6"
 
         framework {
             baseName = "composeApp"
@@ -134,7 +133,7 @@ kotlin {
         pod("FirebaseAnalytics"){
             extraOpts += listOf("-compiler-option", "-fmodules")
         }
-    }
+    }*/
 }
 
 android {

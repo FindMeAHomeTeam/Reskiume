@@ -8,5 +8,4 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform) apply false
     alias(libs.plugins.composeHotReload) apply false
     alias(libs.plugins.crashlytics.plugin) apply false
-    alias(libs.plugins.kotlin.cocoapods) apply false
 }

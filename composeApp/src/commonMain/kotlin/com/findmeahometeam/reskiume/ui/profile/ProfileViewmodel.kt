@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
 class ProfileViewmodel(
-    private val observeAuthStateFromAuthDataSource: ObserveAuthStateFromAuthDataSource,
+    observeAuthStateFromAuthDataSource: ObserveAuthStateFromAuthDataSource,
     private val getUserFromLocalDataSource: GetUserFromLocalDataSource
 ) : ViewModel() {
 
@@ -20,7 +20,10 @@ class ProfileViewmodel(
         if (authUser?.uid == null) {
             UiState.Error("User not logged in")
         } else {
-            val user: User = getUserFromLocalDataSource(authUser.uid)
+            val user: User? = getUserFromLocalDataSource(authUser.uid)
+            if (user == null) {
+                return@map UiState.Error("User data not found")
+            }
             UiState.Success(
                 UiUserModel(
                     isRegistered = true,

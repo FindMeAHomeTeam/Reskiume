@@ -18,6 +18,6 @@ class LocalRepositoryImpl(
         onDeletedUser(reskiumeDatabase.getUserDao().deleteUser(userUid))
     }
 
-    override suspend fun getUser(uid: String): User =
-        reskiumeDatabase.getUserDao().getUser(uid).toDomain()
+    override suspend fun getUser(uid: String): User? =
+        reskiumeDatabase.getUserDao().getUser(uid)?.toDomain()
 }

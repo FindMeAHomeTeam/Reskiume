@@ -3,7 +3,7 @@ package com.findmeahometeam.reskiume.data.remote.auth
 import com.findmeahometeam.reskiume.data.remote.response.RemoteUser
 import com.findmeahometeam.reskiume.data.util.Log
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
-import com.findmeahometeam.reskiume.domain.repository.remote.RealtimeDatabaseRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRepository
 import com.findmeahometeam.reskiume.data.util.Paths
 import com.google.firebase.Firebase
 import com.google.firebase.database.DataSnapshot

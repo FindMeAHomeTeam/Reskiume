@@ -1,7 +1,7 @@
 package com.findmeahometeam.reskiume.domain.usecases
 
 import com.findmeahometeam.reskiume.domain.model.User
-import com.findmeahometeam.reskiume.domain.repository.remote.RealtimeDatabaseRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

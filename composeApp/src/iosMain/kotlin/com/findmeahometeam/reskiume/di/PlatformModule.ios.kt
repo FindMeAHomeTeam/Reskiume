@@ -9,7 +9,7 @@ import com.findmeahometeam.reskiume.data.remote.auth.AuthUserRepositoryForIosDel
 import com.findmeahometeam.reskiume.data.remote.database.RealtimeDatabaseRepositoryIosImpl
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthUserRepositoryForIosDelegate
-import com.findmeahometeam.reskiume.domain.repository.remote.RealtimeDatabaseRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRepository
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind

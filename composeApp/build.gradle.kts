@@ -99,46 +99,6 @@ kotlin {
             implementation(libs.ktor.client.darwin)
         }
     }
-
-    /*cocoapods {
-        version = "1.0.0"
-        summary = "KMP app to rescue non-human animals in danger"
-        homepage = "https://github.com/FindMeAHomeTeam/Reskiume#"
-        ios.deploymentTarget = "15.6"
-
-        framework {
-            baseName = "composeApp"
-            isStatic = true
-        }
-
-        pod("FirebaseCore"){
-            extraOpts += listOf("-compiler-option", "-fmodules")
-        }
-
-        pod("FirebaseAuth"){
-            extraOpts += listOf("-compiler-option", "-fmodules")
-        }
-
-        pod("FirebaseDatabase"){
-            extraOpts += listOf("-compiler-option", "-fmodules")
-        }
-
-        pod("FirebaseFirestore"){
-            extraOpts += listOf("-compiler-option", "-fmodules")
-        }
-
-        pod("FirebaseRemoteConfig"){
-            extraOpts += listOf("-compiler-option", "-fmodules")
-        }
-
-        pod("FirebaseCrashlytics"){
-            extraOpts += listOf("-compiler-option", "-fmodules")
-        }
-
-        pod("FirebaseAnalytics"){
-            extraOpts += listOf("-compiler-option", "-fmodules")
-        }
-    }*/
 }
 
 android {

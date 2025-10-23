@@ -4,7 +4,7 @@ import com.findmeahometeam.reskiume.data.remote.auth.AuthRepositoryAndroidImpl
 import com.findmeahometeam.reskiume.data.database.ReskiumeDatabase
 import com.findmeahometeam.reskiume.data.database.getDatabase
 import com.findmeahometeam.reskiume.data.remote.auth.RealtimeDatabaseRepositoryAndroidImpl
-import com.findmeahometeam.reskiume.domain.repository.remote.AuthRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.RealtimeDatabaseRepository
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf

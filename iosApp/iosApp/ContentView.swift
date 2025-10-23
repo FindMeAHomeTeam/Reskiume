@@ -1,10 +1,11 @@
 import UIKit
+import FirebaseCore
 import SwiftUI
 import ComposeApp
 
 struct ComposeView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController {
-        MainViewControllerKt.MainViewController()
+        KMPViewControllerWrapper()
     }
 
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}

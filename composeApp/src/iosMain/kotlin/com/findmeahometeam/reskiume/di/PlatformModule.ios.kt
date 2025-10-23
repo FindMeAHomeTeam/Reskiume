@@ -3,6 +3,9 @@ package com.findmeahometeam.reskiume.di
 import com.findmeahometeam.reskiume.data.remote.auth.AuthRepositoryIosImpl
 import com.findmeahometeam.reskiume.data.database.ReskiumeDatabase
 import com.findmeahometeam.reskiume.data.database.getDatabase
+import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepositoryForIosDelegateWrapper
+import com.findmeahometeam.reskiume.data.remote.auth.AuthRepositoryForIosDelegateWrapperImpl
+import com.findmeahometeam.reskiume.data.remote.auth.AuthUserRepositoryForIosDelegateImpl
 import com.findmeahometeam.reskiume.data.remote.database.RealtimeDatabaseRepositoryIosImpl
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthUserRepositoryForIosDelegate
@@ -14,6 +17,8 @@ import org.koin.dsl.module
 
 actual val platformModule: Module = module {
     singleOf(::AuthRepositoryIosImpl) bind AuthRepository::class
+    singleOf(::AuthUserRepositoryForIosDelegateImpl) bind AuthUserRepositoryForIosDelegate::class
+    singleOf(::AuthRepositoryForIosDelegateWrapperImpl) bind AuthRepositoryForIosDelegateWrapper::class
     single<ReskiumeDatabase> { getDatabase() }
     singleOf(::RealtimeDatabaseRepositoryIosImpl) bind RealtimeDatabaseRepository::class
 }

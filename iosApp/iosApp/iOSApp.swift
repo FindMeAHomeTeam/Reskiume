@@ -1,11 +1,10 @@
 import SwiftUI
-import composeApp
+import FirebaseCore
+import ComposeApp
 
 @main
 struct iOSApp: App {
-    init() {
-        FirebaseInitKt.doInitFirebase()
-    }
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     var body: some Scene {
         WindowGroup {
             ContentView()

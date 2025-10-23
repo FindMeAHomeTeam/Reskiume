@@ -1,6 +1,5 @@
 package com.findmeahometeam.reskiume.data.remote.auth
 
-import com.findmeahometeam.reskiume.data.util.Log
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepositoryForIosDelegate
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepositoryForIosDelegateWrapper
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +13,6 @@ class AuthRepositoryForIosDelegateWrapperImpl: AuthRepositoryForIosDelegateWrapp
     override val authRepositoryForIosDelegateState: StateFlow<AuthRepositoryForIosDelegate?> = _authRepositoryForIosDelegateState.asStateFlow()
 
     override fun updateAuthRepositoryForIosDelegate(delegate: AuthRepositoryForIosDelegate?) {
-        Log.d("AuthRepositoryForIosDelegateWrapperImpl", "updateAuthRepositoryForIosDelegate: $delegate")
         _authRepositoryForIosDelegateState.value = delegate
     }
 }

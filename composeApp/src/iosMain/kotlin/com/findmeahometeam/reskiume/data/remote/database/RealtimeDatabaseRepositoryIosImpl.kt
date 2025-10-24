@@ -69,14 +69,12 @@ class RealtimeDatabaseRepositoryIosImpl(
         uid: String,
         onDeleteRemoteUser: (result: DatabaseResult) -> Unit
     ) {
-        initialCheck(
-            uid,
-            onSuccess = {
-                it.deleteRemoteUser(uid, onDeleteRemoteUser)
-            },
-            onFailure = {
-                onDeleteRemoteUser(DatabaseResult.Error("Error deleting the remote user ${uid.ifBlank { "" }}"))
-            }
-        )
+        val value =
+            realtimeDatabaseRepositoryForIosDelegateWrapper.realtimeDatabaseRepositoryForIosDelegateState.value
+        if (value != null) {
+            value.deleteRemoteUser(uid, onDeleteRemoteUser)
+        } else {
+            onDeleteRemoteUser(DatabaseResult.Error("Error deleting the remote user ${uid.ifBlank { "" }}"))
+        }
     }
 }

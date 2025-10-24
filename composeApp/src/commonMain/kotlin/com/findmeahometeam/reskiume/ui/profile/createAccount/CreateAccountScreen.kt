@@ -9,10 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,7 +23,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
@@ -35,13 +32,13 @@ import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.components.RmAddPhoto
 import com.findmeahometeam.reskiume.ui.core.components.RmButton
+import com.findmeahometeam.reskiume.ui.core.components.RmCircularProgressIndicator
 import com.findmeahometeam.reskiume.ui.core.components.RmPasswordTextField
 import com.findmeahometeam.reskiume.ui.core.components.RmScaffold
 import com.findmeahometeam.reskiume.ui.core.components.RmText
 import com.findmeahometeam.reskiume.ui.core.components.RmTextField
 import com.findmeahometeam.reskiume.ui.core.primaryGreen
 import com.findmeahometeam.reskiume.ui.core.primaryRed
-import com.findmeahometeam.reskiume.ui.core.secondaryGreen
 import com.findmeahometeam.reskiume.ui.core.textColor
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -181,11 +178,7 @@ private fun ResultState(uiState: CreateAccountViewmodel.UiState, onBackPressed: 
         when (uiState) {
             CreateAccountViewmodel.UiState.Idle -> {} // Do nothing
             CreateAccountViewmodel.UiState.Loading -> {
-                CircularProgressIndicator(
-                    modifier = Modifier.width(64.dp),
-                    color = secondaryGreen,
-                    trackColor = Color.White,
-                )
+                RmCircularProgressIndicator()
             }
 
             is CreateAccountViewmodel.UiState.Error -> {

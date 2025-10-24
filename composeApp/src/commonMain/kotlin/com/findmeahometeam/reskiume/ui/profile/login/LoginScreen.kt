@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -22,16 +20,15 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.components.RmButton
+import com.findmeahometeam.reskiume.ui.core.components.RmCircularProgressIndicator
 import com.findmeahometeam.reskiume.ui.core.components.RmPasswordTextField
 import com.findmeahometeam.reskiume.ui.core.components.RmScaffold
 import com.findmeahometeam.reskiume.ui.core.components.RmText
 import com.findmeahometeam.reskiume.ui.core.components.RmTextField
 import com.findmeahometeam.reskiume.ui.core.primaryRed
-import com.findmeahometeam.reskiume.ui.core.secondaryGreen
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import reskiume.composeapp.generated.resources.Res
@@ -99,11 +96,7 @@ private fun ResultState(uiState: LoginViewmodel.UiState, onLoginSuccessful: () -
         when (uiState) {
             LoginViewmodel.UiState.Idle -> {} // Do nothing
             LoginViewmodel.UiState.Loading -> {
-                CircularProgressIndicator(
-                    modifier = Modifier.width(64.dp),
-                    color = secondaryGreen,
-                    trackColor = Color.White,
-                )
+                RmCircularProgressIndicator()
             }
 
             is LoginViewmodel.UiState.Error -> {

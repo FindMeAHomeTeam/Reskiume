@@ -8,6 +8,13 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class RealtimeDatabaseRemoteUserRepositoryForIosDelegateImpl :
     RealtimeDatabaseRemoteUserRepositoryForIosDelegate {
+    private val _userUidState: MutableStateFlow<String> = MutableStateFlow("")
+
+    override val userUidState: StateFlow<String> = _userUidState.asStateFlow()
+
+    override fun updateUserUidState(userUid: String) {
+        _userUidState.value = userUid
+    }
 
     private val _realtimeDatabaseRemoteUserRepositoryForIosDelegateState: MutableStateFlow<RemoteUser?> =
         MutableStateFlow(null)

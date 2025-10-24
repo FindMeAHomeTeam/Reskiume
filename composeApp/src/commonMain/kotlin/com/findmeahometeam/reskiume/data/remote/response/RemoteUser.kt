@@ -32,14 +32,3 @@ data class RemoteUser(
         )
     }
 }
-
-fun Map<String, Any?>.toRemoteUser(): RemoteUser {
-    return RemoteUser(
-        uid = this["uid"] as String?,
-        username = this["username"] as String?,
-        description = this["description"] as String?,
-        email = this["email"] as String?,
-        image = this["image"] as String?,
-        isAvailable = this["isAvailable"] as Boolean?,
-    )
-}

@@ -22,7 +22,7 @@ class RealtimeDatabaseRepositoryAndroidImpl : RealtimeDatabaseRepository {
         Firebase.database.also { it.setPersistenceEnabled(true) }.reference
 
 
-    override fun insertRemoteUser(
+    override suspend fun insertRemoteUser(
         remoteUser: RemoteUser,
         onInsertRemoteUser: (result: DatabaseResult) -> Unit
     ) {
@@ -56,7 +56,7 @@ class RealtimeDatabaseRepositoryAndroidImpl : RealtimeDatabaseRepository {
         }
     }
 
-    override fun updateRemoteUser(
+    override suspend fun updateRemoteUser(
         remoteUser: RemoteUser,
         onUpdateRemoteUser: (result: DatabaseResult) -> Unit
     ) {

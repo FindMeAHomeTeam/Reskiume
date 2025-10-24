@@ -43,7 +43,7 @@ class CreateAccountViewmodel(
             when (authResult) {
                 is AuthResult.Error -> {
                     _state.value = UiState.Error(authResult.message)
-                    Log.w(
+                    Log.e(
                         "CreateAccountViewmodel",
                         "createUserUsingEmailAndPwd: ${authResult.message}"
                     )
@@ -57,14 +57,16 @@ class CreateAccountViewmodel(
     }
 
     private fun saveUserToRemoteSource(user: User, password: String) {
-        insertUserToRemoteDataSource(user) { databaseResult ->
-            when (databaseResult) {
-                is DatabaseResult.Error -> {
-                    deleteAccountFromAuthDataSource(password, databaseResult.message)
-                }
+        viewModelScope.launch {
+            insertUserToRemoteDataSource(user) { databaseResult ->
+                when (databaseResult) {
+                    is DatabaseResult.Error -> {
+                        deleteAccountFromAuthDataSource(password, databaseResult.message)
+                    }
 
-                is DatabaseResult.Success -> {
-                    saveUserToLocalSource(user, password)
+                    is DatabaseResult.Success -> {
+                        saveUserToLocalSource(user, password)
+                    }
                 }
             }
         }
@@ -78,13 +80,13 @@ class CreateAccountViewmodel(
             deleteUserFromAuthDataSource(password) { uid: String, errorMessage: String ->
                 if (errorMessage.isBlank()) {
                     _state.value = UiState.Error(errorMessageFromDataSource)
-                    Log.w(
+                    Log.e(
                         "CreateAccountViewmodel",
                         "deleteAccountFromAuthDataSource: $errorMessageFromDataSource"
                     )
                 } else {
                     _state.value = UiState.Error("$errorMessageFromDataSource - $errorMessage")
-                    Log.w(
+                    Log.e(
                         "CreateAccountViewmodel",
                         "deleteAccountFromAuthDataSource: $errorMessageFromDataSource - $errorMessage"
                     )

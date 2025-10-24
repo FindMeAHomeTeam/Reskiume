@@ -16,9 +16,9 @@ class RealtimeDatabaseRepositoryIosImpl(
     private val realtimeDatabaseRemoteUserRepositoryForIosDelegate: RealtimeDatabaseRemoteUserRepositoryForIosDelegate
 ) : RealtimeDatabaseRepository {
 
-    private fun initialCheck(
+    private suspend fun initialCheck(
         remoteUserUid: String?,
-        onSuccess: (RealtimeDatabaseRepositoryForIosDelegate) -> Unit,
+        onSuccess: suspend (RealtimeDatabaseRepositoryForIosDelegate) -> Unit,
         onFailure: () -> Unit
     ) {
         val value =
@@ -30,7 +30,7 @@ class RealtimeDatabaseRepositoryIosImpl(
         }
     }
 
-    override fun insertRemoteUser(
+    override suspend fun insertRemoteUser(
         remoteUser: RemoteUser,
         onInsertRemoteUser: (result: DatabaseResult) -> Unit
     ) {
@@ -48,7 +48,7 @@ class RealtimeDatabaseRepositoryIosImpl(
     override fun getRemoteUser(uid: String): Flow<RemoteUser?> =
         realtimeDatabaseRemoteUserRepositoryForIosDelegate.realtimeDatabaseRemoteUserRepositoryForIosDelegateState.filterNotNull()
 
-    override fun updateRemoteUser(
+    override suspend fun updateRemoteUser(
         remoteUser: RemoteUser,
         onUpdateRemoteUser: (result: DatabaseResult) -> Unit
     ) {

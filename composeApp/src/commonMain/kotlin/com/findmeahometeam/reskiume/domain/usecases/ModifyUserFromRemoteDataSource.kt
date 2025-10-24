@@ -5,6 +5,6 @@ import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRepository
 
 class ModifyUserFromRemoteDataSource(private val repository: RealtimeDatabaseRepository) {
-    operator fun invoke(user: User, onUpdateRemoteUser: (result: DatabaseResult) -> Unit) =
+    suspend operator fun invoke(user: User, onUpdateRemoteUser: (result: DatabaseResult) -> Unit) =
         repository.updateRemoteUser(remoteUser = user.toData(), onUpdateRemoteUser)
 }

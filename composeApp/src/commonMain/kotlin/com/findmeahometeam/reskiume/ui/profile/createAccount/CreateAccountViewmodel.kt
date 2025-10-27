@@ -5,12 +5,14 @@ import androidx.lifecycle.viewModelScope
 import com.findmeahometeam.reskiume.data.remote.response.AuthResult
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.util.Log
+import com.findmeahometeam.reskiume.data.util.Paths
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.usecases.CreateUserWithEmailAndPasswordFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.InsertUserToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.InsertUserToRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.UploadImageToRemoteDataSource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,6 +21,7 @@ import kotlinx.coroutines.launch
 class CreateAccountViewmodel(
     private val createUserWithEmailAndPasswordFromAuthDataSource: CreateUserWithEmailAndPasswordFromAuthDataSource,
     private val insertUserToRemoteDataSource: InsertUserToRemoteDataSource,
+    private val uploadImageToRemoteDataSource: UploadImageToRemoteDataSource,
     private val insertUserToLocalDataSource: InsertUserToLocalDataSource,
     private val deleteUserFromAuthDataSource: DeleteUserFromAuthDataSource,
     private val deleteUserFromRemoteDataSource: DeleteUserFromRemoteDataSource
@@ -57,15 +60,29 @@ class CreateAccountViewmodel(
     }
 
     private fun saveUserToRemoteSource(user: User, password: String) {
-        viewModelScope.launch {
-            insertUserToRemoteDataSource(user) { databaseResult ->
-                when (databaseResult) {
-                    is DatabaseResult.Error -> {
-                        deleteAccountFromAuthDataSource(password, databaseResult.message)
-                    }
+        uploadImageToRemoteDataSource(
+            userUid = user.uid,
+            imageType = Paths.USERS,
+            imageUri = user.image
+        ) { imageDownloadUri: String ->
+            val userWithImageDownloadUri: User = user.copy(image = imageDownloadUri).also {
+                if(it.image.isBlank()) {
+                    Log.e(
+                        "CreateAccountViewmodel",
+                        "saveUserToRemoteSource: Image download URI is blank"
+                    )
+                }
+            }
+            viewModelScope.launch {
+                insertUserToRemoteDataSource(userWithImageDownloadUri) { databaseResult ->
+                    when (databaseResult) {
+                        is DatabaseResult.Error -> {
+                            deleteAccountFromAuthDataSource(password, databaseResult.message)
+                        }
 
-                    is DatabaseResult.Success -> {
-                        saveUserToLocalSource(user, password)
+                        is DatabaseResult.Success -> {
+                            saveUserToLocalSource(user, password)
+                        }
                     }
                 }
             }

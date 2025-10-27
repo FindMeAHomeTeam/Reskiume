@@ -39,6 +39,7 @@ import reskiume.composeapp.generated.resources.Res
 import reskiume.composeapp.generated.resources.delete_account_screen_are_you_sure_delete_account_message
 import reskiume.composeapp.generated.resources.delete_account_screen_delete_account_button
 import reskiume.composeapp.generated.resources.delete_account_screen_delete_account_title
+import reskiume.composeapp.generated.resources.delete_account_screen_delete_message
 import reskiume.composeapp.generated.resources.delete_account_screen_explanation_delete_account_message
 import reskiume.composeapp.generated.resources.ic_warning
 
@@ -132,8 +133,13 @@ private fun ResultState(uiState: DeleteAccountViewmodel.UiState, onSuccessfulDel
             }
 
             is DeleteAccountViewmodel.UiState.Error -> {
+                val message: String = if(uiState.message == DeleteAccountViewmodel.Constants.ERROR_MESSAGE) {
+                    stringResource(Res.string.delete_account_screen_delete_message)
+                } else {
+                    uiState.message
+                }
                 RmText(
-                    text = uiState.message,
+                    text = message,
                     color = primaryRed
                 )
             }

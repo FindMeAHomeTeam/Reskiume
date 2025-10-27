@@ -5,26 +5,32 @@ import androidx.lifecycle.viewModelScope
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.util.Log
+import com.findmeahometeam.reskiume.data.util.Paths
+import com.findmeahometeam.reskiume.domain.usecases.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.ObserveAuthStateFromAuthDataSource
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class DeleteAccountViewmodel(
     observeAuthStateFromAuthDataSource: ObserveAuthStateFromAuthDataSource,
     private val deleteUserFromAuthDataSource: DeleteUserFromAuthDataSource,
     private val deleteUserFromRemoteDataSource: DeleteUserFromRemoteDataSource,
+    private val deleteImageFromRemoteDataSource: DeleteImageFromRemoteDataSource,
     private val deleteUserFromLocalDataSource: DeleteUserFromLocalDataSource
 
 ) : ViewModel() {
     private var _state: MutableStateFlow<UiState> = MutableStateFlow(UiState.Idle)
     val state: StateFlow<UiState> = _state.asStateFlow()
+
+    object Constants{
+        const val ERROR_MESSAGE = "error_message"
+    }
 
     sealed class UiState {
         object Idle : UiState()
@@ -33,11 +39,7 @@ class DeleteAccountViewmodel(
         data class Error(val message: String) : UiState()
     }
 
-    private val authUserState: StateFlow<AuthUser?> = observeAuthStateFromAuthDataSource().stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = null
-    )
+    private val authUserState: Flow<AuthUser?> = observeAuthStateFromAuthDataSource()
 
     fun deleteAccount(password: String) {
         deleteMyUserFromRemoteDataSource(password)
@@ -66,7 +68,16 @@ class DeleteAccountViewmodel(
                     )
                 } else {
                     // TODO delete user foster homes, events and non-human animals first
-                    deleteMyUserFromAuthDataSource(userUid, password)
+
+                    deleteImageFromRemoteDataSource(userUid, Paths.USERS) { imageDeleted: Boolean ->
+                        if (!imageDeleted) {
+                            Log.e(
+                                "DeleteAccountViewmodel",
+                                "deleteMyUserFromRemoteDataSource: Error deleting user image from remote data source"
+                            )
+                        }
+                        deleteMyUserFromAuthDataSource(userUid, password)
+                    }
                 }
             }
         }
@@ -94,7 +105,7 @@ class DeleteAccountViewmodel(
         viewModelScope.launch {
             deleteUserFromLocalDataSource(deletedUid) { rowsDeleted: Int ->
                 if (rowsDeleted == 0) {
-                    _state.value = UiState.Error("Error deleting user from local data source. Please, uninstall the app to delete it")
+                    _state.value = UiState.Error(Constants.ERROR_MESSAGE)
                     Log.e(
                         "DeleteAccountViewmodel",
                         "deleteMyUserFromLocalDataSource: Error deleting user from local data source $errorMessageFromAuthDataSource"

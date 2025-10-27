@@ -51,6 +51,7 @@ kotlin {
             implementation(libs.firebase.config)
             implementation(libs.firebase.crashlytics.ndk)
             implementation(libs.firebase.analytics)
+            implementation(libs.firebase.storage)
         }
         androidUnitTest.dependencies {
             implementation(libs.kotlin.testJunit)

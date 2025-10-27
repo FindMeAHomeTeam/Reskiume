@@ -16,7 +16,7 @@ coroutines = "1.10.2"
 crashlyticsPlugin = "3.0.6"
 firebase-bom = "34.4.0"
 googleServices = "4.4.4"
-imagepickerkmp = "1.0.25"
+imagepickerkmp = "1.0.27"
 junit = "4.13.2"
 koin-bom = "4.1.1"
 kotlin = "2.2.20"
@@ -88,6 +88,7 @@ firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
 firebase-config = { module = "com.google.firebase:firebase-config" }
 firebase-crashlytics-ndk = { module = "com.google.firebase:firebase-crashlytics-ndk" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+firebase-storage = { module = "com.google.firebase:firebase-storage" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

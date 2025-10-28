@@ -133,13 +133,8 @@ private fun ResultState(uiState: DeleteAccountViewmodel.UiState, onSuccessfulDel
             }
 
             is DeleteAccountViewmodel.UiState.Error -> {
-                val message: String = if(uiState.message == DeleteAccountViewmodel.Constants.ERROR_MESSAGE) {
-                    stringResource(Res.string.delete_account_screen_delete_message)
-                } else {
-                    uiState.message
-                }
                 RmText(
-                    text = message,
+                    text = uiState.message.ifBlank { stringResource(Res.string.delete_account_screen_delete_message) },
                     color = primaryRed
                 )
             }

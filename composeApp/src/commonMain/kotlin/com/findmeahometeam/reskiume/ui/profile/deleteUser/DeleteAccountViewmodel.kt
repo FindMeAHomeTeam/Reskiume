@@ -28,15 +28,11 @@ class DeleteAccountViewmodel(
     private var _state: MutableStateFlow<UiState> = MutableStateFlow(UiState.Idle)
     val state: StateFlow<UiState> = _state.asStateFlow()
 
-    object Constants{
-        const val ERROR_MESSAGE = "error_message"
-    }
-
     sealed class UiState {
         object Idle : UiState()
         object Loading : UiState()
         object Success : UiState()
-        data class Error(val message: String) : UiState()
+        data class Error(val message: String = "") : UiState()
     }
 
     private val authUserState: Flow<AuthUser?> = observeAuthStateFromAuthDataSource()
@@ -105,7 +101,7 @@ class DeleteAccountViewmodel(
         viewModelScope.launch {
             deleteUserFromLocalDataSource(deletedUid) { rowsDeleted: Int ->
                 if (rowsDeleted == 0) {
-                    _state.value = UiState.Error(Constants.ERROR_MESSAGE)
+                    _state.value = UiState.Error()
                     Log.e(
                         "DeleteAccountViewmodel",
                         "deleteMyUserFromLocalDataSource: Error deleting user from local data source $errorMessageFromAuthDataSource"

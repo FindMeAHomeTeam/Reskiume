@@ -8,7 +8,7 @@ data class RemoteUser(
     val description: String? = "",
     val email: String? = "",
     val image: String? = "",
-    val isAvailable: Boolean? = false,
+    val available: Boolean? = false
 ) {
     fun toMap(): Map<String, Any?> {
         return mapOf(
@@ -17,7 +17,7 @@ data class RemoteUser(
             "description" to description,
             "email" to email,
             "image" to image,
-            "isAvailable" to isAvailable,
+            "available" to available,
         )
     }
 
@@ -28,7 +28,7 @@ data class RemoteUser(
             description = description ?: "",
             email = email ?: "",
             image = image ?: "",
-            isAvailable = isAvailable ?: true
+            isAvailable = available ?: true
         )
     }
 }

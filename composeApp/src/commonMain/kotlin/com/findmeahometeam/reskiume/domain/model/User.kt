@@ -9,7 +9,8 @@ data class User(
     val description: String,
     val email: String,
     val image: String,
-    val isAvailable: Boolean = true
+    val isAvailable: Boolean = true,
+    val lastLogout: Long = 0L
 ) {
     fun toEntity(): UserEntity {
         return UserEntity(
@@ -18,7 +19,8 @@ data class User(
             description = description,
             email = email,
             image = image,
-            isAvailable = isAvailable
+            isAvailable = isAvailable,
+            lastLogout = lastLogout
         )
     }
 
@@ -29,7 +31,7 @@ data class User(
             description = description,
             email = email,
             image = image,
-            isAvailable = isAvailable
+            available = isAvailable
         )
     }
 }

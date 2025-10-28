@@ -32,6 +32,7 @@ import com.findmeahometeam.reskiume.ui.core.primaryRed
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import reskiume.composeapp.generated.resources.Res
+import reskiume.composeapp.generated.resources.general_error_unknown_message
 import reskiume.composeapp.generated.resources.login_screen_email_field_label
 import reskiume.composeapp.generated.resources.login_screen_log_in_button
 import reskiume.composeapp.generated.resources.login_screen_log_in_title
@@ -101,7 +102,7 @@ private fun ResultState(uiState: LoginViewmodel.UiState, onLoginSuccessful: () -
 
             is LoginViewmodel.UiState.Error -> {
                 RmText(
-                    text = uiState.message,
+                    text = uiState.message.ifBlank { stringResource(Res.string.general_error_unknown_message) },
                     color = primaryRed
                 )
             }

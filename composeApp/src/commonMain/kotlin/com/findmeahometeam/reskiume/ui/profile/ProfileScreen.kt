@@ -24,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -85,6 +86,7 @@ import reskiume.composeapp.generated.resources.profile_screen_rescue_notificatio
 import reskiume.composeapp.generated.resources.profile_screen_reviews_description
 import reskiume.composeapp.generated.resources.profile_screen_reviews_title
 import reskiume.composeapp.generated.resources.profile_screen_settings_section
+import reskiume.composeapp.generated.resources.profile_screen_unavailable_label
 import reskiume.composeapp.generated.resources.reskiume
 
 @Composable
@@ -344,27 +346,24 @@ fun Header(uiUserModel: UiUserModel) = uiUserModel.run {
         fontWeight = FontWeight.Black
     )
     Spacer(Modifier.height(16.dp))
+
     if (isRegistered && isAvailable) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                modifier = Modifier.size(12.dp),
-                painter = painterResource(Res.drawable.ic_indicator),
-                tint = secondaryGreen,
-                contentDescription = stringResource(Res.string.profile_screen_indicator_content_description)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            RmSecondaryText(stringResource(Res.string.profile_screen_available_label))
-        }
+        Availability(stringResource(Res.string.profile_screen_available_label), secondaryGreen)
     } else if (isRegistered) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                modifier = Modifier.size(12.dp),
-                painter = painterResource(Res.drawable.ic_indicator),
-                tint = gray,
-                contentDescription = stringResource(Res.string.profile_screen_indicator_content_description)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            RmSecondaryText(stringResource(Res.string.profile_screen_available_label))
-        }
+        Availability(stringResource(Res.string.profile_screen_unavailable_label), gray)
+    }
+}
+
+@Composable
+private fun Availability(availability: String, availabilityColor: Color) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(
+            modifier = Modifier.size(12.dp),
+            painter = painterResource(Res.drawable.ic_indicator),
+            tint = availabilityColor,
+            contentDescription = stringResource(Res.string.profile_screen_indicator_content_description)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        RmSecondaryText(availability)
     }
 }

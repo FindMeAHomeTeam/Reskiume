@@ -89,4 +89,8 @@
     <string name="delete_account_screen_delete_account_button">Delete account</string>
     <string name="delete_account_screen_delete_message">"Error deleting user from local data source. Please, uninstall the app to delete it"</string>
 
+    <!-- General error messages -->
+    <string name="general_error_network_message">Network error. Please check your internet connection and try again</string>
+    <string name="general_error_unknown_message">An unknown error occurred. Please try again later</string>
+
 </resources>

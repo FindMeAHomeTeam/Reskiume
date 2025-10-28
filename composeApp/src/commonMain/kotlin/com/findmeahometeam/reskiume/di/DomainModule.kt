@@ -12,6 +12,7 @@ import com.findmeahometeam.reskiume.domain.usecases.InsertUserToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.ModifyUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.ModifyUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.ObserveAuthStateFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.SaveImageToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.SignInWithEmailAndPasswordFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.SignOutFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.UploadImageToRemoteDataSource
@@ -34,4 +35,5 @@ val domainModule = module {
     factoryOf(::DeleteUserFromRemoteDataSource)
     factoryOf(::UploadImageToRemoteDataSource)
     factoryOf(::DeleteImageFromRemoteDataSource)
+    factoryOf(::SaveImageToLocalDataSource)
 }

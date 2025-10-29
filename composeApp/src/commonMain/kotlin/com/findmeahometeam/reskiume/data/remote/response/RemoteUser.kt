@@ -17,7 +17,7 @@ data class RemoteUser(
             "description" to description,
             "email" to email,
             "image" to image,
-            "available" to available,
+            "available" to available
         )
     }
 

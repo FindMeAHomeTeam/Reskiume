@@ -11,6 +11,10 @@ class UploadImageToRemoteDataSource(private val storageRepository: StorageReposi
         imageUri: String,
         onImageUploaded: (String) -> Unit
     ) {
-        storageRepository.uploadImage(userUid, imageType, imageUri, onImageUploaded)
+        if (imageUri.isBlank()) {
+            onImageUploaded("")
+        } else {
+            storageRepository.uploadImage(userUid, imageType, imageUri, onImageUploaded)
+        }
     }
 }

@@ -1,6 +1,7 @@
 import UIKit
 import FirebaseCore
 import FirebaseAuth
+import FirebaseStorage
 import SwiftUI
 import ComposeApp
 

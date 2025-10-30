@@ -5,7 +5,7 @@ import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepo
 
 class DeleteImageFromRemoteDataSource(private val storageRepository: StorageRepository) {
 
-    operator fun invoke(
+    suspend operator fun invoke(
         userUid: String,
         imageType: Paths,
         onImageDeleted: (Boolean) -> Unit

@@ -62,7 +62,7 @@ class StorageRepositoryAndroidImpl(
         }
     }
 
-    override fun deleteImage(
+    override suspend fun deleteImage(
         userUid: String,
         imageType: Paths,
         onImageDeleted: (Boolean) -> Unit

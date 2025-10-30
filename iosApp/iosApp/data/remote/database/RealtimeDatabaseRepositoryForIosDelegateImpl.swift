@@ -21,23 +21,32 @@ class RealtimeDatabaseRepositoryForIosDelegateImpl: RealtimeDatabaseRepositoryFo
                 let emittedValues = asyncSequence(for: realtimeDatabaseRemoteUserRepositoryForIosDelegate.userUidStateFlow)
                 for try await userUid in emittedValues {
                     
-                    if userUid == "" { return }
-                    
-                    database.reference().child(Paths.users.path).child(userUid).observeSingleEvent (of: .value, with: { snapshot in
-                        let nSDictionary: NSDictionary? = snapshot.value as? NSDictionary
-                        let remoteUser: RemoteUser = RemoteUser(
-                            uid: nSDictionary?["uid"] as? String ?? "",
-                            username: nSDictionary?["username"] as? String ?? "",
-                            description: nSDictionary?["description"] as? String ?? "",
-                            email: nSDictionary?["email"] as? String ?? "",
-                            image: nSDictionary?["image"] as? String ?? "",
-                            isAvailable: nSDictionary?["isAvailable"] as? KotlinBoolean ?? false
-                        )
-                        realtimeDatabaseRemoteUserRepositoryForIosDelegate.updateRealtimeDatabaseRemoteUserRepositoryForIosDelegate(delegate: remoteUser)
-                        
-                    }) { error in
-                        Log().e(tag: "RealtimeDatabaseRepositoryIos", message: "Error retrieving the remote user id \(userUid): \(error.localizedDescription)", throwable: nil)
-                        realtimeDatabaseRemoteUserRepositoryForIosDelegate.updateRealtimeDatabaseRemoteUserRepositoryForIosDelegate(delegate: nil)
+                    if userUid != "" {
+                        database.reference().child(Paths.users.path).child(userUid).observeSingleEvent (of: .value, with: { snapshot in
+                            let nSDictionary: NSDictionary? = snapshot.value as? NSDictionary
+                            
+                            let availableAny = nSDictionary?["available"]
+
+                            // Support NSNumber, DarwinBoolean, or Bool
+                            let availableBool: Bool? =
+                                (availableAny as? NSNumber)?.boolValue ??
+                                (availableAny as? DarwinBoolean)?.boolValue ??
+                                (availableAny as? Bool)
+                            
+                            let remoteUser: RemoteUser = RemoteUser(
+                                uid: nSDictionary?["uid"] as? String ?? "",
+                                username: nSDictionary?["username"] as? String ?? "",
+                                description: nSDictionary?["description"] as? String ?? "",
+                                email: nSDictionary?["email"] as? String ?? "",
+                                image: nSDictionary?["image"] as? String ?? "",
+                                available: KotlinBoolean(value: availableBool ?? false)
+                            )
+                            realtimeDatabaseRemoteUserRepositoryForIosDelegate.updateRealtimeDatabaseRemoteUserRepositoryForIosDelegate(delegate: remoteUser)
+                            
+                        }) { error in
+                            Log().e(tag: "RealtimeDatabaseRepositoryIos", message: "Error retrieving the remote user id \(userUid): \(error.localizedDescription)", throwable: nil)
+                            realtimeDatabaseRemoteUserRepositoryForIosDelegate.updateRealtimeDatabaseRemoteUserRepositoryForIosDelegate(delegate: nil)
+                        }
                     }
                 }
             } catch {
@@ -50,9 +59,20 @@ class RealtimeDatabaseRepositoryForIosDelegateImpl: RealtimeDatabaseRepositoryFo
         userUidTaskHandle?.cancel()
     }
     
+    private func getNSDictionaryFromRemoteUser(remoteUser: RemoteUser) -> NSDictionary {
+        return [
+            "uid": remoteUser.uid!,
+            "username": remoteUser.username!,
+            "description": remoteUser.description_!,
+            "email": remoteUser.email!,
+            "image": remoteUser.image!,
+            "available": remoteUser.available?.boolValue == true
+        ]
+    }
+    
     func insertRemoteUser(remoteUser: RemoteUser, onInsertRemoteUser: @escaping (DatabaseResult) -> Void) async {
         do {
-            try await databaseReference!.child(Paths.users.path).child(remoteUser.uid!).setValue(remoteUser.toMap())
+            try await databaseReference!.child(Paths.users.path).child(remoteUser.uid!).setValue(getNSDictionaryFromRemoteUser(remoteUser: remoteUser))
             onInsertRemoteUser(DatabaseResult.Success())
         } catch {
             Log().e(tag: "RealtimeDatabaseRepositoryIos", message: "Error inserting the remote user \(String(describing: remoteUser.uid))", throwable: nil)
@@ -65,7 +85,7 @@ class RealtimeDatabaseRepositoryForIosDelegateImpl: RealtimeDatabaseRepositoryFo
             Log().w(tag: "RealtimeDatabaseRepositoryForIosDelegateImpl", message: "Couldn't get push key for users")
             return
         }
-        let remoteUserValues = remoteUser.toMap()
+        let remoteUserValues = getNSDictionaryFromRemoteUser(remoteUser: remoteUser)
         let childUpdates = ["/\(Paths.users.path)/\(key)": remoteUserValues]
 
         do {

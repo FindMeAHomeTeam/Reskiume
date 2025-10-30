@@ -1,4 +1,4 @@
-package com.findmeahometeam.reskiume.data.util
+package com.findmeahometeam.reskiume.data.util.log
 
 import android.util.Log
 import com.google.firebase.Firebase

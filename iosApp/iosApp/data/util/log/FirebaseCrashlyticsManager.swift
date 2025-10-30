@@ -5,7 +5,7 @@ import ComposeApp
 final class FirebaseCrashlyticsManager {
     static let shared = FirebaseCrashlyticsManager()
     private var didStart = false
-    private let lock = DispatchQueue(label: "com.findmeahometeam.reskiume.CrashlyticsManager")
+    private let lock = DispatchQueue(label: "com.findmeahometeam.reskiume.FirebaseCrashlyticsManager")
 
     private init() {}
     

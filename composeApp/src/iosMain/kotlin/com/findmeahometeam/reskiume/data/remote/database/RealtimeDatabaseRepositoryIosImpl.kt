@@ -48,7 +48,7 @@ class RealtimeDatabaseRepositoryIosImpl(
 
     override fun getRemoteUser(uid: String): Flow<RemoteUser?> {
         realtimeDatabaseRemoteUserRepositoryForIosDelegate.updateUserUidState(uid)
-        return realtimeDatabaseRemoteUserRepositoryForIosDelegate.realtimeDatabaseRemoteUserRepositoryForIosDelegateState.filterNotNull()
+        return realtimeDatabaseRemoteUserRepositoryForIosDelegate.realtimeDatabaseRemoteUserRepositoryForIosDelegateState
     }
 
     override suspend fun updateRemoteUser(

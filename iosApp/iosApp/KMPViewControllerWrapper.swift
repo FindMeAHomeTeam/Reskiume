@@ -29,6 +29,7 @@ class KMPViewControllerWrapper: UIViewController {
             FirebaseAuthManager.shared.startIfNeeded()
             FirebaseDatabaseManager.shared.startIfNeeded()
             FirebaseStorageManager.shared.startIfNeeded()
+            FirebaseCrashlyticsManager.shared.startIfNeeded()
             didInitialize = true
         }
     }

@@ -1,4 +1,4 @@
-package com.findmeahometeam.reskiume.data.util
+package com.findmeahometeam.reskiume.data.util.analytics
 
 import android.os.Bundle
 import android.util.Log

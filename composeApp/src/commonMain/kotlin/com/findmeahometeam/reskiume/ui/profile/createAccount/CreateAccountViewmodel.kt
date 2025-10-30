@@ -13,6 +13,7 @@ import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromRemoteDataSour
 import com.findmeahometeam.reskiume.domain.usecases.InsertUserToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.InsertUserToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.UploadImageToRemoteDataSource
+import com.findmeahometeam.reskiume.ui.core.components.UiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,13 +29,6 @@ class CreateAccountViewmodel(
 ) : ViewModel() {
     private var _state: MutableStateFlow<UiState> = MutableStateFlow(UiState.Idle)
     val state: StateFlow<UiState> = _state.asStateFlow()
-
-    sealed class UiState {
-        object Idle : UiState()
-        object Loading : UiState()
-        object Success : UiState()
-        data class Error(val message: String) : UiState()
-    }
 
     fun createUserUsingEmailAndPwd(
         user: User,

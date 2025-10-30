@@ -11,6 +11,7 @@ import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.ObserveAuthStateFromAuthDataSource
+import com.findmeahometeam.reskiume.ui.core.components.UiState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,13 +28,6 @@ class DeleteAccountViewmodel(
 ) : ViewModel() {
     private var _state: MutableStateFlow<UiState> = MutableStateFlow(UiState.Idle)
     val state: StateFlow<UiState> = _state.asStateFlow()
-
-    sealed class UiState {
-        object Idle : UiState()
-        object Loading : UiState()
-        object Success : UiState()
-        data class Error(val message: String = "") : UiState()
-    }
 
     private val authUserState: Flow<AuthUser?> = observeAuthStateFromAuthDataSource()
 

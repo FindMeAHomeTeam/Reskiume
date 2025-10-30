@@ -1,7 +1,6 @@
 package com.findmeahometeam.reskiume.ui.profile.createAccount
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -32,13 +31,12 @@ import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.components.RmAddPhoto
 import com.findmeahometeam.reskiume.ui.core.components.RmButton
-import com.findmeahometeam.reskiume.ui.core.components.RmCircularProgressIndicator
 import com.findmeahometeam.reskiume.ui.core.components.RmPasswordTextField
+import com.findmeahometeam.reskiume.ui.core.components.RmResultState
 import com.findmeahometeam.reskiume.ui.core.components.RmScaffold
-import com.findmeahometeam.reskiume.ui.core.components.RmText
 import com.findmeahometeam.reskiume.ui.core.components.RmTextField
+import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.primaryGreen
-import com.findmeahometeam.reskiume.ui.core.primaryRed
 import com.findmeahometeam.reskiume.ui.core.textColor
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -56,7 +54,7 @@ import reskiume.composeapp.generated.resources.create_account_screen_name_field_
 fun CreateAccountScreen(onBackPressed: () -> Unit, navigateToLoginScreen: () -> Unit) {
 
     val createAccountViewmodel: CreateAccountViewmodel = koinViewModel<CreateAccountViewmodel>()
-    val uiState: CreateAccountViewmodel.UiState by createAccountViewmodel.state.collectAsState()
+    val uiState: UiState by createAccountViewmodel.state.collectAsState()
 
     var name: String by rememberSaveable { mutableStateOf("") }
     var description: String by rememberSaveable { mutableStateOf("") }
@@ -116,7 +114,7 @@ fun CreateAccountScreen(onBackPressed: () -> Unit, navigateToLoginScreen: () -> 
                 onValueChange = { pwd = it }
             )
             Spacer(modifier = Modifier.height(10.dp))
-            ResultState(uiState, onBackPressed)
+            RmResultState(uiState, onSuccess = onBackPressed)
 
             Spacer(modifier = Modifier.weight(1f))
             RmButton(
@@ -169,28 +167,5 @@ fun AlreadyHaveAnAccountLink(navigateToLoginScreen: () -> Unit) {
             text = annotatedLinkString,
             color = textColor
         )
-    }
-}
-
-@Composable
-private fun ResultState(uiState: CreateAccountViewmodel.UiState, onBackPressed: () -> Unit) {
-    Box(modifier = Modifier.fillMaxWidth().height(64.dp), contentAlignment = Alignment.Center) {
-        when (uiState) {
-            CreateAccountViewmodel.UiState.Idle -> {} // Do nothing
-            CreateAccountViewmodel.UiState.Loading -> {
-                RmCircularProgressIndicator()
-            }
-
-            is CreateAccountViewmodel.UiState.Error -> {
-                RmText(
-                    text = uiState.message,
-                    color = primaryRed
-                )
-            }
-
-            CreateAccountViewmodel.UiState.Success -> {
-                onBackPressed()
-            }
-        }
     }
 }

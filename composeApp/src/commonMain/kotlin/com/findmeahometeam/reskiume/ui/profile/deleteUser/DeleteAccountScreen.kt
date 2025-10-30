@@ -2,7 +2,6 @@ package com.findmeahometeam.reskiume.ui.profile.deleteUser
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,11 +24,12 @@ import androidx.compose.ui.unit.sp
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.components.RmAvatar
 import com.findmeahometeam.reskiume.ui.core.components.RmButton
-import com.findmeahometeam.reskiume.ui.core.components.RmCircularProgressIndicator
 import com.findmeahometeam.reskiume.ui.core.components.RmListAvatarType
 import com.findmeahometeam.reskiume.ui.core.components.RmPasswordTextField
+import com.findmeahometeam.reskiume.ui.core.components.RmResultState
 import com.findmeahometeam.reskiume.ui.core.components.RmScaffold
 import com.findmeahometeam.reskiume.ui.core.components.RmText
+import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.primaryRed
 import com.findmeahometeam.reskiume.ui.core.secondaryRed
 import com.findmeahometeam.reskiume.ui.core.secondaryTextColor
@@ -47,7 +47,7 @@ import reskiume.composeapp.generated.resources.ic_warning
 fun DeleteAccountScreen(onBackPressed: () -> Unit) {
 
     val deleteAccountViewmodel: DeleteAccountViewmodel = koinViewModel<DeleteAccountViewmodel>()
-    val uiState: DeleteAccountViewmodel.UiState by deleteAccountViewmodel.state.collectAsState()
+    val uiState: UiState by deleteAccountViewmodel.state.collectAsState()
 
     var password by remember { mutableStateOf("") }
     val buttonEnabled by remember(password) {
@@ -103,7 +103,11 @@ fun DeleteAccountScreen(onBackPressed: () -> Unit) {
                     onValueChange = { password = it }
                 )
                 Spacer(Modifier.height(10.dp))
-                ResultState(uiState, onSuccessfulDelete = onBackPressed)
+                RmResultState(
+                    uiState,
+                    customErrorMessage = stringResource(Res.string.delete_account_screen_delete_message),
+                    onSuccess = onBackPressed
+                )
             }
             Spacer(modifier = Modifier.weight(1f))
             Column(
@@ -118,29 +122,6 @@ fun DeleteAccountScreen(onBackPressed: () -> Unit) {
                 ) {
                     deleteAccountViewmodel.deleteAccount(password)
                 }
-            }
-        }
-    }
-}
-
-@Composable
-private fun ResultState(uiState: DeleteAccountViewmodel.UiState, onSuccessfulDelete: () -> Unit) {
-    Box(modifier = Modifier.fillMaxWidth().height(64.dp), contentAlignment = Alignment.Center) {
-        when (uiState) {
-            DeleteAccountViewmodel.UiState.Idle -> {} // Do nothing
-            DeleteAccountViewmodel.UiState.Loading -> {
-                RmCircularProgressIndicator()
-            }
-
-            is DeleteAccountViewmodel.UiState.Error -> {
-                RmText(
-                    text = uiState.message.ifBlank { stringResource(Res.string.delete_account_screen_delete_message) },
-                    color = primaryRed
-                )
-            }
-
-            DeleteAccountViewmodel.UiState.Success -> {
-                onSuccessfulDelete()
             }
         }
     }

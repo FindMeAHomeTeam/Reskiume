@@ -76,7 +76,7 @@ class RealtimeDatabaseRepositoryForIosDelegateImpl: RealtimeDatabaseRepositoryFo
             onInsertRemoteUser(DatabaseResult.Success())
         } catch {
             Log().e(tag: "RealtimeDatabaseRepositoryIos", message: "Error inserting the remote user \(String(describing: remoteUser.uid))", throwable: nil)
-            onInsertRemoteUser(DatabaseResult.Error(message: "Error inserting the remote user \(String(describing: remoteUser.uid))"))
+            onInsertRemoteUser(DatabaseResult.Error(message: String(describing: error)))
         }
     }
     
@@ -93,7 +93,7 @@ class RealtimeDatabaseRepositoryForIosDelegateImpl: RealtimeDatabaseRepositoryFo
             onUpdateRemoteUser(DatabaseResult.Success())
         } catch {
             Log().e(tag: "RealtimeDatabaseRepositoryIos", message: "Error updating the remote user \(String(describing: remoteUser.uid))", throwable: nil)
-            onUpdateRemoteUser(DatabaseResult.Error(message: "Error updating the remote user \(String(describing: remoteUser.uid))"))
+            onUpdateRemoteUser(DatabaseResult.Error(message: String(describing: error)))
         }
     }
     
@@ -103,7 +103,7 @@ class RealtimeDatabaseRepositoryForIosDelegateImpl: RealtimeDatabaseRepositoryFo
                 onDeleteRemoteUser(DatabaseResult.Success())
             } else {
                 Log().e(tag: "RealtimeDatabaseRepositoryIos", message: "Error deleting the remote user \(uid): \(String(describing: error))", throwable: nil)
-                onDeleteRemoteUser(DatabaseResult.Error(message: "Error deleting the remote user \(uid): \(String(describing: error))"))
+                onDeleteRemoteUser(DatabaseResult.Error(message: String(describing: error)))
             }
         }
     }

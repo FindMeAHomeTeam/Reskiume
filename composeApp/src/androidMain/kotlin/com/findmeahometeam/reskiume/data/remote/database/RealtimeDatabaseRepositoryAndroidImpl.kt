@@ -31,9 +31,12 @@ class RealtimeDatabaseRepositoryAndroidImpl : RealtimeDatabaseRepository {
                 .addOnSuccessListener {
                     onInsertRemoteUser(DatabaseResult.Success)
                 }.addOnFailureListener { e ->
-                    onInsertRemoteUser(DatabaseResult.Error("Error inserting the remote user ${remoteUser.uid}: ${e.message}"))
+                    Log.e("RealtimeDatabaseRepositoryAndroidImpl", "insertRemoteUser: Error inserting the remote user ${remoteUser.uid}: ${e.message}")
+                    onInsertRemoteUser(DatabaseResult.Error(e.message ?: ""))
                 }
-        } ?: onInsertRemoteUser(DatabaseResult.Error("Error inserting a remote user"))
+        } ?: onInsertRemoteUser(DatabaseResult.Error()).also {
+            Log.e("RealtimeDatabaseRepositoryAndroidImpl", "insertRemoteUser: Error inserting a remote user")
+        }
     }
 
     override fun getRemoteUser(uid: String): Flow<RemoteUser?> = callbackFlow {
@@ -72,7 +75,8 @@ class RealtimeDatabaseRepositoryAndroidImpl : RealtimeDatabaseRepository {
         databaseRef.updateChildren(childUpdates).addOnSuccessListener {
             onUpdateRemoteUser(DatabaseResult.Success)
         }.addOnFailureListener { e ->
-            onUpdateRemoteUser(DatabaseResult.Error("Error updating the remote user ${remoteUser.uid}: ${e.message}"))
+            Log.e("RealtimeDatabaseRepositoryAndroidImpl", "updateRemoteUser: Error updating the remote user ${remoteUser.uid}: ${e.message}")
+            onUpdateRemoteUser(DatabaseResult.Error(e.message ?: ""))
         }
     }
 
@@ -81,8 +85,8 @@ class RealtimeDatabaseRepositoryAndroidImpl : RealtimeDatabaseRepository {
             if (error == null) {
                 onDeleteRemoteUser(DatabaseResult.Success)
             } else {
-                Log.w("RealtimeDatabaseRepositoryAndroid", "Error deleting the user $uid")
-                onDeleteRemoteUser(DatabaseResult.Error("Error deleting the remote user $uid"))
+                Log.e("RealtimeDatabaseRepositoryAndroidImpl", "deleteRemoteUser: Error deleting the user $uid")
+                onDeleteRemoteUser(DatabaseResult.Error())
             }
         }
     }

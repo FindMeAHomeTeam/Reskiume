@@ -2,13 +2,13 @@ package com.findmeahometeam.reskiume.data.remote.database
 
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.remote.response.RemoteUser
+import com.findmeahometeam.reskiume.data.util.Log
 import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRemoteUserRepositoryForIosDelegate
 import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRepositoryForIosDelegate
 import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRepositoryForIosDelegateWrapper
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filterNotNull
 
 @OptIn(ExperimentalForeignApi::class)
 class RealtimeDatabaseRepositoryIosImpl(
@@ -40,7 +40,8 @@ class RealtimeDatabaseRepositoryIosImpl(
                 it.insertRemoteUser(remoteUser, onInsertRemoteUser)
             },
             onFailure = {
-                onInsertRemoteUser(DatabaseResult.Error("Error inserting the remote user ${remoteUser.uid?.ifBlank { "" }}"))
+                Log.e("RealtimeDatabaseRepositoryIosImpl", "insertRemoteUser: Error inserting the remote user ${remoteUser.uid?.ifBlank { "" }}")
+                onInsertRemoteUser(DatabaseResult.Error())
             }
         )
     }
@@ -60,7 +61,8 @@ class RealtimeDatabaseRepositoryIosImpl(
                 it.updateRemoteUser(remoteUser, onUpdateRemoteUser)
             },
             onFailure = {
-                onUpdateRemoteUser(DatabaseResult.Error("Error updating the remote user ${remoteUser.uid?.ifBlank { "" }}"))
+                Log.e("RealtimeDatabaseRepositoryIosImpl", "updateRemoteUser: Error updating the remote user ${remoteUser.uid?.ifBlank { "" }}")
+                onUpdateRemoteUser(DatabaseResult.Error())
             }
         )
     }
@@ -74,7 +76,8 @@ class RealtimeDatabaseRepositoryIosImpl(
         if (value != null) {
             value.deleteRemoteUser(uid, onDeleteRemoteUser)
         } else {
-            onDeleteRemoteUser(DatabaseResult.Error("Error deleting the remote user ${uid.ifBlank { "" }}"))
+            Log.e("RealtimeDatabaseRepositoryIosImpl", "deleteRemoteUser: Error deleting the remote user ${uid.ifBlank { "" }}")
+            onDeleteRemoteUser(DatabaseResult.Error())
         }
     }
 }

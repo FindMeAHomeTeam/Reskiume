@@ -6,10 +6,12 @@ import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.util.Log
 import com.findmeahometeam.reskiume.data.util.Paths
+import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.usecases.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.ObserveAuthStateFromAuthDataSource
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import kotlinx.coroutines.flow.Flow
@@ -20,6 +22,7 @@ import kotlinx.coroutines.launch
 
 class DeleteAccountViewmodel(
     observeAuthStateFromAuthDataSource: ObserveAuthStateFromAuthDataSource,
+    private val getUserFromLocalDataSource: GetUserFromLocalDataSource,
     private val deleteUserFromAuthDataSource: DeleteUserFromAuthDataSource,
     private val deleteUserFromRemoteDataSource: DeleteUserFromRemoteDataSource,
     private val deleteImageFromRemoteDataSource: DeleteImageFromRemoteDataSource,
@@ -57,16 +60,27 @@ class DeleteAccountViewmodel(
                         "deleteMyUserFromRemoteDataSource: ${result.message}"
                     )
                 } else {
+
                     // TODO delete user foster homes, events and non-human animals first
 
-                    deleteImageFromRemoteDataSource(userUid, Paths.USERS) { imageDeleted: Boolean ->
-                        if (!imageDeleted) {
-                            Log.e(
-                                "DeleteAccountViewmodel",
-                                "deleteMyUserFromRemoteDataSource: Error deleting user image from remote data source"
-                            )
+                    viewModelScope.launch {
+                        val user: User? = getUserFromLocalDataSource(userUid)
+                        if (user?.image.isNullOrBlank()) {
+                            deleteMyUserFromAuthDataSource(userUid, password)
+                            return@launch
                         }
-                        deleteMyUserFromAuthDataSource(userUid, password)
+                        deleteImageFromRemoteDataSource(
+                            userUid,
+                            Paths.USERS
+                        ) { imageDeleted: Boolean ->
+                            if (!imageDeleted) {
+                                Log.e(
+                                    "DeleteAccountViewmodel",
+                                    "deleteMyUserFromRemoteDataSource: Error deleting user image from remote data source"
+                                )
+                            }
+                            deleteMyUserFromAuthDataSource(userUid, password)
+                        }
                     }
                 }
             }

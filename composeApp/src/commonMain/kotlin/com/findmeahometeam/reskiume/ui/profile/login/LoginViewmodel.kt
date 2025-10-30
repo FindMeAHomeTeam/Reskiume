@@ -110,18 +110,23 @@ class LoginViewmodel(
     ) {
         getUserFromRemoteDataSource(userUid).collect { collectedUser: User? ->
             if (collectedUser == null) {
-                Log.e(
+                Log.d(
                     "LoginViewmodel",
-                    "User $userUid not found in remote data source despite successful authentication."
+                    "Unless it is the default collectedUser value, it seems that the user $userUid was not found in the remote data source despite successful authentication."
                 )
-                _state.value = UiState.Error()
-            } else {
+            } else if (collectedUser.image.isNotBlank()){
                 saveImageToLocalDataSource(
                     userUid = collectedUser.uid,
                     imageType = Paths.USERS
                 ) { localImagePath: String ->
                     onSavedAvatar(collectedUser.copy(image = localImagePath.ifBlank { collectedUser.image }))
                 }
+            } else {
+                Log.d(
+                    "LoginViewmodel",
+                    "User ${collectedUser.uid} has no avatar image to save locally."
+                )
+                onSavedAvatar(collectedUser)
             }
         }
     }
@@ -129,7 +134,7 @@ class LoginViewmodel(
     @OptIn(ExperimentalTime::class)
     private fun hasPassed24Hours(savedEpochSeconds: Long): Boolean {
         val nowEpoch: Long = Clock.System.now().epochSeconds
-        return (nowEpoch - savedEpochSeconds) >= 24 * 3600L
+        return (nowEpoch - savedEpochSeconds) >= 24 * 60 * 60
     }
 
     //TODO save foster homes, rescue events, and non-human animals related to the user

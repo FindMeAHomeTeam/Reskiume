@@ -26,6 +26,7 @@ class KMPViewControllerWrapper: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         if !didInitialize {
+            FirebaseAnalyticsManager.shared.startIfNeeded()
             FirebaseAuthManager.shared.startIfNeeded()
             FirebaseDatabaseManager.shared.startIfNeeded()
             FirebaseStorageManager.shared.startIfNeeded()

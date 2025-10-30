@@ -59,13 +59,21 @@ class CreateAccountViewmodel(
             imageType = Paths.USERS,
             imageUri = user.image
         ) { imageDownloadUri: String ->
-            val userWithImageDownloadUri: User = user.copy(image = imageDownloadUri).also {
-                if(it.image.isBlank()) {
-                    Log.e(
-                        "CreateAccountViewmodel",
-                        "saveUserToRemoteSource: Image download URI is blank"
-                    )
+            var userWithImageDownloadUri: User = user
+            if(imageDownloadUri.isNotBlank()) {
+                userWithImageDownloadUri = user.copy(image = imageDownloadUri).also {
+                    if (it.image.isBlank()) {
+                        Log.e(
+                            "CreateAccountViewmodel",
+                            "saveUserToRemoteSource: Image download URI is blank"
+                        )
+                    }
                 }
+            } else {
+                Log.d(
+                    "CreateAccountViewmodel",
+                    "saveUserToRemoteSource: Download URI is blank"
+                )
             }
             viewModelScope.launch {
                 insertUserToRemoteDataSource(userWithImageDownloadUri) { databaseResult ->

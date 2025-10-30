@@ -11,6 +11,7 @@ import com.findmeahometeam.reskiume.data.remote.database.RealtimeDatabaseReposit
 import com.findmeahometeam.reskiume.data.remote.database.RealtimeDatabaseRepositoryIosImpl
 import com.findmeahometeam.reskiume.data.remote.storage.StorageRepositoryForIosDelegateWrapperImpl
 import com.findmeahometeam.reskiume.data.remote.storage.StorageRepositoryIosImpl
+import com.findmeahometeam.reskiume.data.util.log.CrashlyticsForIosDelegateWrapperImpl
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthUserRepositoryForIosDelegate
 import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRemoteUserRepositoryForIosDelegate
@@ -18,6 +19,7 @@ import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDa
 import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRepositoryForIosDelegateWrapper
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepositoryForIosDelegateWrapper
+import com.findmeahometeam.reskiume.domain.repository.util.log.CrashlyticsForIosWrapper
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
@@ -33,4 +35,5 @@ actual val platformModule: Module = module {
     singleOf(::RealtimeDatabaseRepositoryForIosDelegateWrapperImpl) bind RealtimeDatabaseRepositoryForIosDelegateWrapper::class
     singleOf(::StorageRepositoryForIosDelegateWrapperImpl) bind StorageRepositoryForIosDelegateWrapper::class
     singleOf(::StorageRepositoryIosImpl) bind StorageRepository::class
+    singleOf(::CrashlyticsForIosDelegateWrapperImpl) bind CrashlyticsForIosWrapper::class
 }

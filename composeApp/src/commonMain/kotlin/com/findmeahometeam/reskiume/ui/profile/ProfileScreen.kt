@@ -97,11 +97,11 @@ fun ProfileScreen(
 ) {
     val profileViewmodel: ProfileViewmodel = koinViewModel<ProfileViewmodel>()
     var uiUserModel: UiUserModel by remember { mutableStateOf(UiUserModel()) }
-    val uiState: ProfileViewmodel.UiState by profileViewmodel.state.collectAsState(ProfileViewmodel.UiState.Idle)
+    val profileUiState: ProfileViewmodel.ProfileUiState by profileViewmodel.state.collectAsState(ProfileViewmodel.ProfileUiState.Idle)
 
-    uiUserModel = if (uiState is ProfileViewmodel.UiState.Success) {
-        (uiState as ProfileViewmodel.UiState.Success).uiUserModel.copy(
-            username = (uiState as ProfileViewmodel.UiState.Success).uiUserModel.username.ifBlank {
+    uiUserModel = if (profileUiState is ProfileViewmodel.ProfileUiState.Success) {
+        (profileUiState as ProfileViewmodel.ProfileUiState.Success).uiUserModel.copy(
+            username = (profileUiState as ProfileViewmodel.ProfileUiState.Success).uiUserModel.username.ifBlank {
                 stringResource(
                     Res.string.profile_screen_activist_title
                 )

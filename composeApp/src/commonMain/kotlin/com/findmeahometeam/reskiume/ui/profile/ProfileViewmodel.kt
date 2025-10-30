@@ -16,15 +16,15 @@ class ProfileViewmodel(
     private val getUserFromLocalDataSource: GetUserFromLocalDataSource
 ) : ViewModel() {
 
-    val state: StateFlow<UiState> = observeAuthStateFromAuthDataSource().map { authUser: AuthUser? ->
+    val state: StateFlow<ProfileUiState> = observeAuthStateFromAuthDataSource().map { authUser: AuthUser? ->
         if (authUser?.uid == null) {
-            UiState.Error("User not logged in")
+            ProfileUiState.Error("User not logged in")
         } else {
             val user: User? = getUserFromLocalDataSource(authUser.uid)
             if (user == null) {
-                return@map UiState.Error("User data not found")
+                return@map ProfileUiState.Error("User data not found")
             }
-            UiState.Success(
+            ProfileUiState.Success(
                 UiUserModel(
                     isRegistered = true,
                     username = user.username,
@@ -38,13 +38,13 @@ class ProfileViewmodel(
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = UiState.Idle
+        initialValue = ProfileUiState.Idle
     )
 
-    sealed class UiState {
-        object Idle : UiState()
-        data class Success(val uiUserModel: UiUserModel) : UiState()
-        data class Error(val message: String) : UiState()
+    sealed class ProfileUiState {
+        object Idle : ProfileUiState()
+        data class Success(val uiUserModel: UiUserModel) : ProfileUiState()
+        data class Error(val message: String) : ProfileUiState()
     }
 }
 

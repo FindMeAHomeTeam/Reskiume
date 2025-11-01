@@ -10,6 +10,6 @@ class DeleteImageFromRemoteDataSource(private val storageRepository: StorageRepo
         imageType: Paths,
         onImageDeleted: (Boolean) -> Unit
     ) {
-        storageRepository.deleteImage(userUid, imageType, onImageDeleted)
+        storageRepository.deleteRemoteImage(userUid, imageType, onImageDeleted)
     }
 }

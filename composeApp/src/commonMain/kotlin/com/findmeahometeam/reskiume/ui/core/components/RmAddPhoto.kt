@@ -66,13 +66,14 @@ import reskiume.composeapp.generated.resources.ic_close
 @Composable
 fun RmAddPhoto(
     pickMultiplePhotosFromGallery: Boolean = false,
+    currentImageUri: String = "",
     onUriRetrieved: (String) -> Unit
 ) {
 
-    var showAddPhoto by remember { mutableStateOf(true) }
+    var showAddPhoto by remember { mutableStateOf(currentImageUri.isBlank()) }
     var showGallery by remember { mutableStateOf(false) }
     var showCamera by remember { mutableStateOf(false) }
-    var uri by remember { mutableStateOf("") }
+    var uri by remember { mutableStateOf(currentImageUri) }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -168,6 +169,7 @@ fun RmAddPhoto(
                             .clickable {
                                 showAddPhoto = true
                                 uri = ""
+                                onUriRetrieved(uri)
                             },
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center

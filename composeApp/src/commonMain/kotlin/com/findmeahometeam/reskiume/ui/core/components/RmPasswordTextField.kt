@@ -33,6 +33,7 @@ import reskiume.composeapp.generated.resources.password_text_field_show_password
 @Composable
 fun RmPasswordTextField(
     password: String,
+    label: String = stringResource(Res.string.password_text_field_label),
     modifier: Modifier = Modifier,
     onValueChange: (String) -> Unit
 ) {
@@ -43,7 +44,7 @@ fun RmPasswordTextField(
         value = password,
         onValueChange = onValueChange,
         singleLine = true,
-        label = { Text(stringResource(Res.string.password_text_field_label)) },
+        label = { Text(label) },
         visualTransformation =
             if (passwordHidden) PasswordVisualTransformation() else VisualTransformation.None,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),

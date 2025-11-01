@@ -3,6 +3,7 @@ package com.findmeahometeam.reskiume.ui.profile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
+import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.ObserveAuthStateFromAuthDataSource
@@ -18,7 +19,8 @@ class ProfileViewmodel(
 
     val state: StateFlow<ProfileUiState> = observeAuthStateFromAuthDataSource().map { authUser: AuthUser? ->
         if (authUser?.uid == null) {
-            ProfileUiState.Error("User not logged in")
+            Log.d("ProfileViewmodel", "User not logged in")
+            ProfileUiState.Idle
         } else {
             val user: User? = getUserFromLocalDataSource(authUser.uid)
             if (user == null) {
@@ -26,11 +28,7 @@ class ProfileViewmodel(
             }
             ProfileUiState.Success(
                 UiUserModel(
-                    isRegistered = true,
-                    username = user.username,
-                    email = user.email,
-                    image = if (user.image.isBlank() || user.image == "null") "" else user.image,
-                    isAvailable = user.isAvailable,
+                    user = user.copy(image = if (user.image.isBlank() || user.image == "null") "" else user.image),
                     areNotificationsAvailable = true //TODO
                 )
             )
@@ -49,10 +47,6 @@ class ProfileViewmodel(
 }
 
 data class UiUserModel(
-    val isRegistered: Boolean = false,
-    val username: String = "",
-    val email: String = "",
-    val image: String = "",
-    val isAvailable: Boolean = true,
-    val areNotificationsAvailable: Boolean = true
+    val user: User? = null,
+    val areNotificationsAvailable: Boolean = false
 )

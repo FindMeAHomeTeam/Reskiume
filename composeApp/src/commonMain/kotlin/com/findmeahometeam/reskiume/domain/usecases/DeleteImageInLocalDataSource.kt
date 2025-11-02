@@ -8,8 +8,13 @@ class DeleteImageInLocalDataSource(private val storageRepository: StorageReposit
     operator fun invoke(
         userUid: String,
         imageType: Paths,
+        currentUserImage: String,
         onImageDeleted: (Boolean) -> Unit
     ) {
-        storageRepository.deleteLocalImage(userUid, imageType, onImageDeleted)
+        if (currentUserImage.isBlank()) {
+            onImageDeleted(true)
+        } else {
+            storageRepository.deleteLocalImage(userUid, imageType, onImageDeleted)
+        }
     }
 }

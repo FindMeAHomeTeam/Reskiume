@@ -8,8 +8,13 @@ class DeleteImageFromRemoteDataSource(private val storageRepository: StorageRepo
     suspend operator fun invoke(
         userUid: String,
         imageType: Paths,
+        currentUserImage: String,
         onImageDeleted: (Boolean) -> Unit
     ) {
-        storageRepository.deleteRemoteImage(userUid, imageType, onImageDeleted)
+        if (currentUserImage.isBlank()) {
+            onImageDeleted(true)
+        } else {
+            storageRepository.deleteRemoteImage(userUid, imageType, onImageDeleted)
+        }
     }
 }

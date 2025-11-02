@@ -63,14 +63,9 @@ class RealtimeDatabaseRepositoryAndroidImpl : RealtimeDatabaseRepository {
         remoteUser: RemoteUser,
         onUpdateRemoteUser: (result: DatabaseResult) -> Unit
     ) {
-        val key: String? = databaseRef.child(Paths.USERS.path).push().key
-        if (key == null) {
-            Log.w("RealtimeDatabaseRepositoryAndroid", "Couldn't get push key for users")
-            return
-        }
         val remoteUserValues: Map<String, Any?> = remoteUser.toMap()
         val childUpdates: HashMap<String, Any> =
-            hashMapOf("/${Paths.USERS.path}/$key" to remoteUserValues)
+            hashMapOf("/${Paths.USERS.path}/${remoteUser.uid}" to remoteUserValues)
 
         databaseRef.updateChildren(childUpdates).addOnSuccessListener {
             onUpdateRemoteUser(DatabaseResult.Success)

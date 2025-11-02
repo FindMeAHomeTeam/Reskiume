@@ -8,6 +8,7 @@ import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.data.util.Paths
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.usecases.CreateUserWithEmailAndPasswordFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.InsertUserToLocalDataSource
@@ -25,7 +26,8 @@ class CreateAccountViewmodel(
     private val uploadImageToRemoteDataSource: UploadImageToRemoteDataSource,
     private val insertUserToLocalDataSource: InsertUserToLocalDataSource,
     private val deleteUserFromAuthDataSource: DeleteUserFromAuthDataSource,
-    private val deleteUserFromRemoteDataSource: DeleteUserFromRemoteDataSource
+    private val deleteUserFromRemoteDataSource: DeleteUserFromRemoteDataSource,
+    private val deleteImageFromRemoteDataSource: DeleteImageFromRemoteDataSource
 ) : ViewModel() {
     private var _state: MutableStateFlow<UiState> = MutableStateFlow(UiState.Idle)
     val state: StateFlow<UiState> = _state.asStateFlow()
@@ -59,34 +61,59 @@ class CreateAccountViewmodel(
             imageType = Paths.USERS,
             imageUri = user.image
         ) { imageDownloadUri: String ->
-            var userWithImageDownloadUri: User = user
-            if(imageDownloadUri.isNotBlank()) {
-                userWithImageDownloadUri = user.copy(image = imageDownloadUri).also {
-                    if (it.image.isBlank()) {
-                        Log.e(
-                            "CreateAccountViewmodel",
-                            "saveUserToRemoteSource: Image download URI is blank"
-                        )
-                    }
-                }
-            } else {
+            val userWithPossibleImageDownloadUri: User = if (imageDownloadUri.isBlank()) {
                 Log.d(
                     "CreateAccountViewmodel",
                     "saveUserToRemoteSource: Download URI is blank"
                 )
+                user
+            } else {
+                Log.d(
+                    "CreateAccountViewmodel",
+                    "saveUserToRemoteSource: Download URI saved successfully"
+                )
+                user.copy(image = imageDownloadUri)
             }
             viewModelScope.launch {
-                insertUserToRemoteDataSource(userWithImageDownloadUri) { databaseResult ->
+                insertUserToRemoteDataSource(userWithPossibleImageDownloadUri) { databaseResult ->
                     when (databaseResult) {
                         is DatabaseResult.Error -> {
-                            deleteAccountFromAuthDataSource(password, databaseResult.message)
+                            removeImageFromRemoteDataSource(
+                                userUid = user.uid,
+                                currentUserImage = imageDownloadUri,
+                                password = password,
+                                errorMessage = databaseResult.message
+                            )
                         }
 
                         is DatabaseResult.Success -> {
-                            saveUserToLocalSource(user, password)
+                            saveUserToLocalSource(user, password, imageDownloadUri)
                         }
                     }
                 }
+            }
+        }
+    }
+
+    private fun removeImageFromRemoteDataSource(
+        userUid: String,
+        currentUserImage: String,
+        password: String,
+        errorMessage: String
+    ) {
+        viewModelScope.launch {
+            deleteImageFromRemoteDataSource(
+                userUid,
+                Paths.USERS,
+                currentUserImage
+            ) { imageDeleted: Boolean ->
+                if (!imageDeleted) {
+                    Log.e(
+                        "DeleteAccountViewmodel",
+                        "deleteImageFromRemoteDataSource: Error deleting user image from remote data source"
+                    )
+                }
+                deleteAccountFromAuthDataSource(password, errorMessage)
             }
         }
     }
@@ -114,7 +141,7 @@ class CreateAccountViewmodel(
         }
     }
 
-    private fun saveUserToLocalSource(user: User, password: String) {
+    private fun saveUserToLocalSource(user: User, password: String, remoteImageUri: String) {
         viewModelScope.launch {
             insertUserToLocalDataSource(user) { rowId ->
                 if (rowId > 0) {
@@ -126,6 +153,7 @@ class CreateAccountViewmodel(
                 } else {
                     deleteAccountFromRemoteDataSource(
                         user.uid,
+                        remoteImageUri,
                         password
                     )
                 }
@@ -135,6 +163,7 @@ class CreateAccountViewmodel(
 
     private fun deleteAccountFromRemoteDataSource(
         uid: String,
+        remoteImageUri: String,
         password: String,
     ) {
         val errorMessageFromLocalDataSource = "Error saving the user to local source"
@@ -143,14 +172,21 @@ class CreateAccountViewmodel(
             deleteUserFromRemoteDataSource(uid) { databaseResult ->
                 when (databaseResult) {
                     is DatabaseResult.Error -> {
-                        deleteAccountFromAuthDataSource(
-                            password,
-                            "$errorMessageFromLocalDataSource - ${databaseResult.message}"
+                        removeImageFromRemoteDataSource(
+                            userUid = uid,
+                            currentUserImage = remoteImageUri,
+                            password = password,
+                            errorMessage = "$errorMessageFromLocalDataSource - ${databaseResult.message}"
                         )
                     }
 
                     is DatabaseResult.Success -> {
-                        deleteAccountFromAuthDataSource(password, errorMessageFromLocalDataSource)
+                        removeImageFromRemoteDataSource(
+                            userUid = uid,
+                            currentUserImage = remoteImageUri,
+                            password = password,
+                            errorMessage = errorMessageFromLocalDataSource
+                        )
                     }
                 }
             }

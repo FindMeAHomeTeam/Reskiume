@@ -8,10 +8,12 @@ import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.data.util.Paths
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.usecases.DeleteImageFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.DeleteImageInLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.ObserveAuthStateFromAuthDataSource
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import kotlinx.coroutines.flow.Flow
@@ -23,9 +25,11 @@ import kotlinx.coroutines.launch
 class DeleteAccountViewmodel(
     observeAuthStateFromAuthDataSource: ObserveAuthStateFromAuthDataSource,
     private val getUserFromLocalDataSource: GetUserFromLocalDataSource,
+    private val getUserFromRemoteDataSource: GetUserFromRemoteDataSource,
     private val deleteUserFromAuthDataSource: DeleteUserFromAuthDataSource,
     private val deleteUserFromRemoteDataSource: DeleteUserFromRemoteDataSource,
     private val deleteImageFromRemoteDataSource: DeleteImageFromRemoteDataSource,
+    private val deleteImageInLocalDataSource: DeleteImageInLocalDataSource,
     private val deleteUserFromLocalDataSource: DeleteUserFromLocalDataSource
 
 ) : ViewModel() {
@@ -57,7 +61,7 @@ class DeleteAccountViewmodel(
                     _state.value = UiState.Error(result.message)
                     Log.e(
                         "DeleteAccountViewmodel",
-                        "deleteMyUserFromRemoteDataSource: ${result.message}"
+                        "deleteUserFromRemoteDataSource: ${result.message}"
                     )
                 } else {
 
@@ -67,22 +71,41 @@ class DeleteAccountViewmodel(
                         val user: User? = getUserFromLocalDataSource(userUid)
                         if (user?.image.isNullOrBlank()) {
                             deleteMyUserFromAuthDataSource(userUid, password)
-                            return@launch
-                        }
-                        deleteImageFromRemoteDataSource(
-                            userUid,
-                            Paths.USERS
-                        ) { imageDeleted: Boolean ->
-                            if (!imageDeleted) {
-                                Log.e(
-                                    "DeleteAccountViewmodel",
-                                    "deleteMyUserFromRemoteDataSource: Error deleting user image from remote data source"
-                                )
+                        } else {
+                            getUserFromRemoteDataSource(userUid).collect { remoteUser: User? ->
+                                manageImageDeletion(userUid, password, user.image, remoteUser!!.image)
                             }
-                            deleteMyUserFromAuthDataSource(userUid, password)
                         }
                     }
                 }
+            }
+        }
+    }
+
+    private suspend fun manageImageDeletion(userUid: String, password: String, localImage: String, remoteImage: String) {
+        deleteImageFromRemoteDataSource(
+            userUid,
+            Paths.USERS,
+            remoteImage
+        ) { imageDeleted: Boolean ->
+            if (!imageDeleted) {
+                Log.e(
+                    "DeleteAccountViewmodel",
+                    "deleteImageFromRemoteDataSource: Error deleting user image from remote data source"
+                )
+            }
+            deleteImageInLocalDataSource(
+                userUid,
+                Paths.USERS,
+                localImage
+            ) { isDeleted: Boolean ->
+                if (!isDeleted) {
+                    Log.e(
+                        "DeleteAccountViewmodel",
+                        "deleteImageInLocalDataSource: failed to delete image in local data source"
+                    )
+                }
+                deleteMyUserFromAuthDataSource(userUid, password)
             }
         }
     }

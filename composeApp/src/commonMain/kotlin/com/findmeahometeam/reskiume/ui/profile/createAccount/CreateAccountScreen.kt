@@ -2,7 +2,6 @@ package com.findmeahometeam.reskiume.ui.profile.createAccount
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -22,10 +20,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.LinkAnnotation
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
@@ -35,9 +29,8 @@ import com.findmeahometeam.reskiume.ui.core.components.RmPasswordTextField
 import com.findmeahometeam.reskiume.ui.core.components.RmResultState
 import com.findmeahometeam.reskiume.ui.core.components.RmScaffold
 import com.findmeahometeam.reskiume.ui.core.components.RmTextField
+import com.findmeahometeam.reskiume.ui.core.components.RmTextLink
 import com.findmeahometeam.reskiume.ui.core.components.UiState
-import com.findmeahometeam.reskiume.ui.core.primaryGreen
-import com.findmeahometeam.reskiume.ui.core.textColor
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import reskiume.composeapp.generated.resources.Res
@@ -63,7 +56,7 @@ fun CreateAccountScreen(onBackPressed: () -> Unit, navigateToLoginScreen: () -> 
     val emailRegexPattern =
         Regex("^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$")
     var pwd: String by rememberSaveable { mutableStateOf("") }
-    val isLogInButtonEnabled by remember(email, pwd) {
+    val isLogInButtonEnabled by remember(name, email, pwd) {
         derivedStateOf {
             name.isNotBlank()
                     && email.isNotBlank()
@@ -132,40 +125,12 @@ fun CreateAccountScreen(onBackPressed: () -> Unit, navigateToLoginScreen: () -> 
                     )
                 })
             Spacer(modifier = Modifier.height(15.dp))
-            AlreadyHaveAnAccountLink(navigateToLoginScreen)
+            RmTextLink(
+                text = stringResource(Res.string.create_account_screen_already_have_an_account),
+                textToLink = stringResource(Res.string.create_account_screen_log_in),
+                onClick = navigateToLoginScreen
+            )
             Spacer(modifier = Modifier.height(10.dp))
         }
-    }
-}
-
-@Composable
-fun AlreadyHaveAnAccountLink(navigateToLoginScreen: () -> Unit) {
-
-    val stringResource = stringResource(Res.string.create_account_screen_already_have_an_account)
-    val stringResourceToLink = stringResource(Res.string.create_account_screen_log_in)
-    val startIndex = stringResource.indexOf(stringResourceToLink)
-    val endIndex = startIndex + stringResourceToLink.length
-    val annotatedLinkString: AnnotatedString = buildAnnotatedString {
-        append(stringResource)
-        addStyle(
-            style = SpanStyle(color = primaryGreen),
-            start = startIndex,
-            end = endIndex
-        )
-        addLink(
-            clickable = LinkAnnotation.Clickable(
-                tag = stringResourceToLink,
-                linkInteractionListener = {
-                    navigateToLoginScreen()
-                }),
-            start = startIndex,
-            end = endIndex
-        )
-    }
-    Row {
-        Text(
-            text = annotatedLinkString,
-            color = textColor
-        )
     }
 }

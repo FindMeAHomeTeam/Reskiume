@@ -79,14 +79,83 @@ class AuthRepositoryAndroidImpl : AuthRepository {
         return true
     }
 
-    override suspend fun deleteUser(password: String, onDeleteUser: (String, String) -> Unit) {
-        try {
-            val email: String = auth.currentUser?.email ?: error("User is null")
-            val uid: String = auth.currentUser?.uid ?: error("User is null")
-            val authCredential: AuthCredential = EmailAuthProvider.getCredential(email, password)
+    private fun reauthenticateUser(
+        password: String,
+        onReauthenticated: () -> Unit,
+        onError: (error: String) -> Unit
+    ) {
+        val email: String = auth.currentUser?.email ?: error("User is null")
+        val authCredential: AuthCredential = EmailAuthProvider.getCredential(email, password)
 
-            auth.currentUser?.reauthenticate(authCredential)?.addOnCompleteListener {
-                if (it.isSuccessful) {
+        auth.currentUser?.reauthenticate(authCredential)?.addOnCompleteListener {
+            if (it.isSuccessful) {
+                onReauthenticated()
+            } else {
+                onError(it.exception?.message ?: "Unknown error")
+            }
+        }
+    }
+
+    override suspend fun updateUserEmail(
+        password: String,
+        newEmail: String,
+        onUpdatedUserEmail: (error: String) -> Unit
+    ) {
+        try {
+            reauthenticateUser(
+                password = password,
+                onReauthenticated = {
+                    auth.currentUser?.verifyBeforeUpdateEmail(newEmail)
+                        ?.addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                onUpdatedUserEmail("")
+                            } else {
+                                onUpdatedUserEmail(task.exception?.message ?: "Unknown error")
+                            }
+                        }
+                }, onError = { errorMessage: String ->
+                    onUpdatedUserEmail(errorMessage)
+                }
+            )
+        } catch (e: Exception) {
+            onUpdatedUserEmail(e.message ?: "Unknown error")
+        }
+    }
+
+    override suspend fun updateUserPassword(
+        currentPassword: String,
+        newPassword: String,
+        onUpdatedUserPassword: (error: String) -> Unit
+    ) {
+        try {
+            reauthenticateUser(
+                password = currentPassword,
+                onReauthenticated = {
+                    auth.currentUser?.updatePassword(newPassword)?.addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            onUpdatedUserPassword("")
+                        } else {
+                            onUpdatedUserPassword(task.exception?.message ?: "Unknown error")
+                        }
+                    }
+                }, onError = { errorMessage: String ->
+                    onUpdatedUserPassword(errorMessage)
+                }
+            )
+        } catch (e: Exception) {
+            onUpdatedUserPassword(e.message ?: "Unknown error")
+        }
+    }
+
+    override suspend fun deleteUser(
+        password: String,
+        onDeleteUser: (uid: String, error: String) -> Unit
+    ) {
+        try {
+            val uid: String = auth.currentUser?.uid ?: error("User is null")
+            reauthenticateUser(
+                password = password,
+                onReauthenticated = {
                     auth.currentUser?.delete()?.addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             onDeleteUser(uid, "")
@@ -94,10 +163,10 @@ class AuthRepositoryAndroidImpl : AuthRepository {
                             onDeleteUser("", task.exception?.message ?: "Unknown error")
                         }
                     }
-                } else {
-                    onDeleteUser("", it.exception?.message ?: "Unknown error")
+                }, onError = { errorMessage: String ->
+                    onDeleteUser("", errorMessage)
                 }
-            }
+            )
         } catch (e: Exception) {
             onDeleteUser("", e.message ?: "Unknown error")
         }

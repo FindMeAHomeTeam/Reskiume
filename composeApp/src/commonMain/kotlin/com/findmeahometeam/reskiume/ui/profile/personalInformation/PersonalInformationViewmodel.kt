@@ -3,13 +3,26 @@ package com.findmeahometeam.reskiume.ui.profile.personalInformation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
+import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
+import com.findmeahometeam.reskiume.data.util.Paths
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.User
+import com.findmeahometeam.reskiume.domain.usecases.DeleteImageFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.DeleteImageInLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.GetUserFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.ModifyUserEmailInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.ModifyUserFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.ModifyUserFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.ModifyUserPasswordInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.ObserveAuthStateFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.SignOutFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.UploadImageToRemoteDataSource
+import com.findmeahometeam.reskiume.ui.core.components.UiState
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -17,11 +30,220 @@ import kotlin.time.ExperimentalTime
 class PersonalInformationViewmodel(
     observeAuthStateFromAuthDataSource: ObserveAuthStateFromAuthDataSource,
     private val getUserFromLocalDataSource: GetUserFromLocalDataSource,
+    private val getUserFromRemoteDataSource: GetUserFromRemoteDataSource,
+    private val modifyUserEmailInAuthDataSource: ModifyUserEmailInAuthDataSource,
+    private val modifyUserPasswordInAuthDataSource: ModifyUserPasswordInAuthDataSource,
+    private val deleteImageInLocalDataSource: DeleteImageInLocalDataSource,
+    private val deleteImageFromRemoteDataSource: DeleteImageFromRemoteDataSource,
+    private val uploadImageToRemoteDataSource: UploadImageToRemoteDataSource,
+    private val modifyUserFromRemoteDataSource: ModifyUserFromRemoteDataSource,
     private val modifyUserFromLocalDataSource: ModifyUserFromLocalDataSource,
     private val signOutFromAuthDataSource: SignOutFromAuthDataSource
-): ViewModel() {
+) : ViewModel() {
 
     private val authUserState: Flow<AuthUser?> = observeAuthStateFromAuthDataSource()
+
+    private val _uiState: MutableStateFlow<UiState> = MutableStateFlow(UiState.Idle)
+    val uiState: StateFlow<UiState> = _uiState.asStateFlow()
+
+    fun saveUserChanges(
+        isDifferentEmail: Boolean,
+        isDifferentImage: Boolean,
+        user: User,
+        currentPassword: String,
+        newPassword: String = ""
+    ) {
+        _uiState.value = UiState.Loading
+        viewModelScope.launch {
+
+            if (isDifferentEmail) {
+                updateUserEmailInAuthDataSource(currentPassword, user.email)
+            }
+            if (newPassword.isNotBlank()) {
+                updateUserPasswordInAuthDataSource(currentPassword, newPassword)
+            }
+            if (isDifferentImage) {
+                deleteCurrentImageInRemoteDataSource(user) {
+
+                    deleteCurrentImageInLocalDataSource(user) {
+
+                        uploadNewImageToRemoteDataSource(user) { userWithPossibleImageDownloadUri: User ->
+
+                            updateUserInRemoteDataSource(userWithPossibleImageDownloadUri) {
+
+                                saveUserChangesInLocalDataSource(user)
+                            }
+                        }
+                    }
+                }
+            } else {
+                getUserFromRemoteDataSource(user.uid).collect { collectedUser: User? ->
+
+                    updateUserInRemoteDataSource(user.copy(image = collectedUser!!.image)) {
+
+                        saveUserChangesInLocalDataSource(user)
+                    }
+                }
+            }
+        }
+    }
+
+    private suspend fun updateUserEmailInAuthDataSource(
+        password: String,
+        newEmail: String
+    ) {
+        modifyUserEmailInAuthDataSource(password, newEmail) { error ->
+            if (error.isBlank()) {
+                Log.d(
+                    "PersonalInformationViewmodel",
+                    "updateUserEmailInAuthDataSource: User email updated successfully in auth data source"
+                )
+            } else {
+                Log.e(
+                    "PersonalInformationViewmodel",
+                    "updateUserEmailInAuthDataSource: failed to update user email in auth data source: $error"
+                )
+                _uiState.value = UiState.Error(error)
+            }
+        }
+    }
+
+    private suspend fun updateUserPasswordInAuthDataSource(
+        currentPassword: String,
+        newPassword: String
+    ) {
+        modifyUserPasswordInAuthDataSource(currentPassword, newPassword) { error ->
+            if (error.isBlank()) {
+                Log.d(
+                    "PersonalInformationViewmodel",
+                    "updateUserPasswordInAuthDataSource: User password updated successfully in auth data source"
+                )
+            } else {
+                Log.e(
+                    "PersonalInformationViewmodel",
+                    "updateUserPasswordInAuthDataSource: failed to update user password in auth data source: $error"
+                )
+                _uiState.value = UiState.Error(error)
+            }
+        }
+    }
+
+    private suspend fun deleteCurrentImageInRemoteDataSource(user: User, onSuccess: () -> Unit) {
+        getUserFromRemoteDataSource(user.uid).collect { previousUserData: User? ->
+
+            deleteImageFromRemoteDataSource(
+                userUid = user.uid,
+                imageType = Paths.USERS,
+                currentUserImage = previousUserData!!.image
+            ) { isDeleted ->
+
+                if (isDeleted) {
+                    Log.d(
+                        "PersonalInformationViewmodel",
+                        "deleteCurrentImageInRemoteDataSource: Image deleted successfully in remote data source"
+                    )
+                    onSuccess()
+                } else {
+                    Log.e(
+                        "PersonalInformationViewmodel",
+                        "deleteCurrentImageInRemoteDataSource: failed to delete image in remote data source"
+                    )
+                }
+            }
+        }
+    }
+
+    private fun deleteCurrentImageInLocalDataSource(user: User, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            val previousUserData: User = getUserFromLocalDataSource(user.uid)!!
+
+            deleteImageInLocalDataSource(
+                userUid = user.uid,
+                imageType = Paths.USERS,
+                currentUserImage = previousUserData.image
+            ) { isDeleted ->
+
+                if (isDeleted) {
+                    Log.d(
+                        "PersonalInformationViewmodel",
+                        "deleteCurrentImageInLocalDataSource: Image deleted successfully in local data source"
+                    )
+                    onSuccess()
+                } else {
+                    Log.e(
+                        "PersonalInformationViewmodel",
+                        "deleteCurrentImageInLocalDataSource: failed to delete image in local data source"
+                    )
+                }
+            }
+        }
+    }
+
+    private fun uploadNewImageToRemoteDataSource(
+        user: User,
+        onSuccess: suspend (userWithImageDownloadUri: User) -> Unit
+    ) {
+        uploadImageToRemoteDataSource(
+            userUid = user.uid,
+            imageType = Paths.USERS,
+            imageUri = user.image
+        ) { imageDownloadUri: String ->
+            val userWithPossibleImageDownloadUri: User = if (imageDownloadUri.isBlank()) {
+                Log.d(
+                    "PersonalInformationViewmodel",
+                    "updateUserInRemoteDataSource: Download URI is blank"
+                )
+                user
+            } else {
+                Log.d(
+                    "PersonalInformationViewmodel",
+                    "updateUserInRemoteDataSource: Download URI saved successfully"
+                )
+                user.copy(image = imageDownloadUri)
+            }
+            viewModelScope.launch {
+                onSuccess(userWithPossibleImageDownloadUri)
+            }
+        }
+    }
+
+    private suspend fun updateUserInRemoteDataSource(user: User, onSuccess: suspend () -> Unit) {
+        modifyUserFromRemoteDataSource(user) { result ->
+            if (result is DatabaseResult.Success) {
+                Log.d(
+                    "PersonalInformationViewmodel",
+                    "updateUserInRemoteDataSource: User updated successfully in remote data source"
+                )
+                viewModelScope.launch {
+                    onSuccess()
+                }
+            } else {
+                Log.e(
+                    "PersonalInformationViewmodel",
+                    "updateUserInRemoteDataSource: failed to update user in remote data source"
+                )
+                _uiState.value = UiState.Error()
+            }
+        }
+    }
+
+    private suspend fun saveUserChangesInLocalDataSource(user: User) {
+        modifyUserFromLocalDataSource(user) { rowsModified: Int ->
+            if (rowsModified > 0) {
+                Log.d(
+                    "PersonalInformationViewmodel",
+                    "saveUserChanges: User updated successfully in local data source"
+                )
+                _uiState.value = UiState.Success
+            } else {
+                Log.e(
+                    "PersonalInformationViewmodel",
+                    "saveUserChanges: failed to update user in local data source"
+                )
+                _uiState.value = UiState.Error()
+            }
+        }
+    }
 
     @OptIn(ExperimentalTime::class)
     fun logOut() {
@@ -31,10 +253,16 @@ class PersonalInformationViewmodel(
 
                 val user: User = getUserFromLocalDataSource(authUser.uid)!!
                 modifyUserFromLocalDataSource(user.copy(lastLogout = Clock.System.now().epochSeconds)) { rowsModified: Int ->
-                    if(rowsModified > 0) {
-                        Log.d("PersonalInformationViewmodel", "logOut: lastLogout updated successfully in local data source")
+                    if (rowsModified > 0) {
+                        Log.d(
+                            "PersonalInformationViewmodel",
+                            "logOut: lastLogout updated successfully in local data source"
+                        )
                     } else {
-                        Log.e("PersonalInformationViewmodel", "logOut: failed to update lastLogout in local data source")
+                        Log.e(
+                            "PersonalInformationViewmodel",
+                            "logOut: failed to update lastLogout in local data source"
+                        )
                     }
                     signOutFromAuthDataSource()
                 }

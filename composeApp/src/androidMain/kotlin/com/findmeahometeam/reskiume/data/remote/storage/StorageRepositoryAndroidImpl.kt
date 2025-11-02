@@ -48,12 +48,12 @@ class StorageRepositoryAndroidImpl(
 
     override fun saveImage(userUid: String, imageType: Paths, onImageSaved: (String) -> Unit) {
         val imageRef: StorageReference = getStorageReference(imageType, userUid)
-        val localFile = when(imageType) {
+        val localFile = when (imageType) {
             Paths.USERS -> File(context.filesDir, "$userUid.webp")
         }
 
         // Ensure the parent directory exists
-        localFile.parentFile?.apply { if(!exists()) mkdirs() }
+        localFile.parentFile?.apply { if (!exists()) mkdirs() }
 
         imageRef.getFile(localFile).addOnSuccessListener {
             onImageSaved(localFile.absolutePath)
@@ -62,7 +62,18 @@ class StorageRepositoryAndroidImpl(
         }
     }
 
-    override suspend fun deleteImage(
+    override fun deleteLocalImage(
+        userUid: String,
+        imageType: Paths,
+        onImageDeleted: (Boolean) -> Unit
+    ) {
+        val localFile = when (imageType) {
+            Paths.USERS -> File(context.filesDir, "$userUid.webp")
+        }
+        onImageDeleted(localFile.delete())
+    }
+
+    override suspend fun deleteRemoteImage(
         userUid: String,
         imageType: Paths,
         onImageDeleted: (Boolean) -> Unit

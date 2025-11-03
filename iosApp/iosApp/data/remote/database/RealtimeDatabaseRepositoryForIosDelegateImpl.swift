@@ -81,12 +81,8 @@ class RealtimeDatabaseRepositoryForIosDelegateImpl: RealtimeDatabaseRepositoryFo
     }
     
     func updateRemoteUser(remoteUser: RemoteUser, onUpdateRemoteUser: @escaping (DatabaseResult) -> Void) async {
-        guard let key: String = databaseReference!.child(Paths.users.path).childByAutoId().key else {
-            Log().w(tag: "RealtimeDatabaseRepositoryForIosDelegateImpl", message: "Couldn't get push key for users")
-            return
-        }
         let remoteUserValues = getNSDictionaryFromRemoteUser(remoteUser: remoteUser)
-        let childUpdates = ["/\(Paths.users.path)/\(key)": remoteUserValues]
+        let childUpdates = ["/\(Paths.users.path)/\(remoteUser.uid!)": remoteUserValues]
 
         do {
             try await databaseReference?.updateChildValues(childUpdates)

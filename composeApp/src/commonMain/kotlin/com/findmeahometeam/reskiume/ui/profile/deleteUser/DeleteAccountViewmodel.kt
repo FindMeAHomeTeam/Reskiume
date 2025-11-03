@@ -112,7 +112,7 @@ class DeleteAccountViewmodel(
 
     private fun deleteMyUserFromAuthDataSource(userUid: String, password: String) {
         viewModelScope.launch {
-            deleteUserFromAuthDataSource(password) { uid: String, errorMessage: String ->
+            deleteUserFromAuthDataSource(password) { errorMessage: String ->
                 if (errorMessage.isNotBlank()) {
                     val errorMessageFromAuthDataSource =
                         "and from deleteMyUserFromAuthDataSource: $errorMessage"

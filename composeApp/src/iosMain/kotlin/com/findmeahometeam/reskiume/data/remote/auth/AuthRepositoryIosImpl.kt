@@ -52,7 +52,7 @@ class AuthRepositoryIosImpl(
 
     override suspend fun deleteUser(
         password: String,
-        onDeleteUser: (String, String) -> Unit
+        onDeleteUser: (String) -> Unit
     ) {
         getDelegate().deleteUser(
             password,

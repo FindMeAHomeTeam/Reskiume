@@ -123,7 +123,7 @@ class CreateAccountViewmodel(
         errorMessageFromDataSource: String
     ) {
         viewModelScope.launch {
-            deleteUserFromAuthDataSource(password) { uid: String, errorMessage: String ->
+            deleteUserFromAuthDataSource(password) { errorMessage: String ->
                 if (errorMessage.isBlank()) {
                     _state.value = UiState.Error(errorMessageFromDataSource)
                     Log.e(

@@ -149,26 +149,23 @@ class AuthRepositoryAndroidImpl : AuthRepository {
 
     override suspend fun deleteUser(
         password: String,
-        onDeleteUser: (uid: String, error: String) -> Unit
+        onDeleteUser: (error: String) -> Unit
     ) {
         try {
-            val uid: String = auth.currentUser?.uid ?: error("User is null")
             reauthenticateUser(
                 password = password,
                 onReauthenticated = {
-                    auth.currentUser?.delete()?.addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            onDeleteUser(uid, "")
-                        } else {
-                            onDeleteUser("", task.exception?.message ?: "Unknown error")
-                        }
+                    auth.currentUser?.delete()?.addOnSuccessListener {
+                        onDeleteUser("")
+                    }?.addOnFailureListener { exception ->
+                        onDeleteUser(exception.message ?: "Unknown error")
                     }
                 }, onError = { errorMessage: String ->
-                    onDeleteUser("", errorMessage)
+                    onDeleteUser(errorMessage)
                 }
             )
         } catch (e: Exception) {
-            onDeleteUser("", e.message ?: "Unknown error")
+            onDeleteUser(e.message ?: "Unknown error")
         }
     }
 }

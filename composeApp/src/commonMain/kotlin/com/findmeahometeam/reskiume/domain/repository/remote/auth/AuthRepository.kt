@@ -22,5 +22,5 @@ interface AuthRepository {
         onUpdatedUserPassword: (error: String) -> Unit
     )
 
-    suspend fun deleteUser(password: String, onDeleteUser: (uid: String, error: String) -> Unit)
+    suspend fun deleteUser(password: String, onDeleteUser: (error: String) -> Unit)
 }

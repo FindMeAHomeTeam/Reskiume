@@ -73,7 +73,7 @@ class DeleteAccountViewmodel(
                             deleteMyUserFromAuthDataSource(userUid, password)
                         } else {
                             getUserFromRemoteDataSource(userUid).collect { remoteUser: User? ->
-                                manageImageDeletion(userUid, password, user.image, remoteUser!!.image)
+                                manageImageDeletion(userUid, password, user.image, remoteUser?.image ?: "")
                             }
                         }
                     }

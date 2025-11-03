@@ -79,7 +79,10 @@ class PersonalInformationViewmodel(
             } else {
                 getUserFromRemoteDataSource(user.uid).collect { collectedUser: User? ->
 
-                    updateUserInRemoteDataSource(user.copy(image = collectedUser!!.image)) {
+                    if(collectedUser == null) {
+                        return@collect
+                    }
+                    updateUserInRemoteDataSource(user.copy(image = collectedUser.image)) {
 
                         saveUserChangesInLocalDataSource(user)
                     }
@@ -131,10 +134,13 @@ class PersonalInformationViewmodel(
     private suspend fun deleteCurrentImageInRemoteDataSource(user: User, onSuccess: () -> Unit) {
         getUserFromRemoteDataSource(user.uid).collect { previousUserData: User? ->
 
+            if(previousUserData == null) {
+                return@collect
+            }
             deleteImageFromRemoteDataSource(
                 userUid = user.uid,
                 imageType = Paths.USERS,
-                currentUserImage = previousUserData!!.image
+                currentUserImage = previousUserData.image
             ) { isDeleted ->
 
                 if (isDeleted) {

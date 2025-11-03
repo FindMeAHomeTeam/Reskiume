@@ -24,14 +24,16 @@ class ProfileViewmodel(
         } else {
             val user: User? = getUserFromLocalDataSource(authUser.uid)
             if (user == null) {
-                return@map ProfileUiState.Error("User data not found")
-            }
-            ProfileUiState.Success(
-                UiUserModel(
-                    user = user.copy(image = if (user.image.isBlank() || user.image == "null") "" else user.image),
-                    areNotificationsAvailable = true //TODO
+                Log.e("ProfileViewmodel", "User data not found")
+                ProfileUiState.Idle
+            } else {
+                ProfileUiState.Success(
+                    UiUserModel(
+                        user = user.copy(image = if (user.image.isBlank() || user.image == "null") "" else user.image),
+                        areNotificationsAvailable = true //TODO
+                    )
                 )
-            )
+            }
         }
     }.stateIn(
         scope = viewModelScope,

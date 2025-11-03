@@ -24,8 +24,8 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
+import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.gray
 import com.findmeahometeam.reskiume.ui.core.navigation.bottomNavigation.BottomBarItem
 import com.findmeahometeam.reskiume.ui.core.navigation.bottomNavigation.BottomNavigationWrapper
@@ -37,9 +37,9 @@ import org.koin.compose.viewmodel.koinViewModel
 fun HomeScreen(mainNavHostController: NavHostController) {
 
     val homeViewmodel: HomeViewmodel = koinViewModel<HomeViewmodel>()
-    val authState: AuthUser? by homeViewmodel.collectAuthState().collectAsState(null)
+    val authState: UiState by homeViewmodel.state.collectAsState(UiState.Idle)
 
-    val displayChats = authState != null
+    val displayChats = authState == UiState.Success
     val bottomNavHostController: NavHostController = rememberNavController()
     val items: List<BottomBarItem> = listOf(
         BottomBarItem.FosterHomes(),

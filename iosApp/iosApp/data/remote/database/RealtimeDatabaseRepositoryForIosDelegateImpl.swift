@@ -18,7 +18,7 @@ class RealtimeDatabaseRepositoryForIosDelegateImpl: RealtimeDatabaseRepositoryFo
         
         userUidTaskHandle = Task {
             do {
-                let emittedValues = asyncSequence(for: realtimeDatabaseRemoteUserRepositoryForIosDelegate.userUidStateFlow)
+                let emittedValues = asyncSequence(for: realtimeDatabaseRemoteUserRepositoryForIosDelegate.userUidFlow)
                 for try await userUid in emittedValues {
                     
                     if userUid != "" {

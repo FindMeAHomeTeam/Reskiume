@@ -56,35 +56,35 @@ class PersonalInformationViewmodel(
         _uiState.value = UiState.Loading
         viewModelScope.launch {
 
-            if (isDifferentEmail) {
-                updateUserEmailInAuthDataSource(currentPassword, user.email)
-            }
-            if (newPassword.isNotBlank()) {
-                updateUserPasswordInAuthDataSource(currentPassword, newPassword)
-            }
-            if (isDifferentImage) {
-                deleteCurrentImageInRemoteDataSource(user) {
+            updateUserEmailInAuthDataSource(isDifferentEmail, currentPassword, user.email) {
 
-                    deleteCurrentImageInLocalDataSource(user) {
+                updateUserPasswordInAuthDataSource(currentPassword, newPassword) {
 
-                        uploadNewImageToRemoteDataSource(user) { userWithPossibleImageDownloadUri: User ->
+                    if (isDifferentImage) {
+                        deleteCurrentImageInRemoteDataSource(user) {
 
-                            updateUserInRemoteDataSource(userWithPossibleImageDownloadUri) {
+                            deleteCurrentImageInLocalDataSource(user) {
+
+                                uploadNewImageToRemoteDataSource(user) { userWithPossibleImageDownloadUri: User ->
+
+                                    updateUserInRemoteDataSource(userWithPossibleImageDownloadUri) {
+
+                                        saveUserChangesInLocalDataSource(user)
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        getUserFromRemoteDataSource(user.uid).collect { collectedUser: User? ->
+
+                            if (collectedUser == null) {
+                                return@collect
+                            }
+                            updateUserInRemoteDataSource(user.copy(image = collectedUser.image)) {
 
                                 saveUserChangesInLocalDataSource(user)
                             }
                         }
-                    }
-                }
-            } else {
-                getUserFromRemoteDataSource(user.uid).collect { collectedUser: User? ->
-
-                    if(collectedUser == null) {
-                        return@collect
-                    }
-                    updateUserInRemoteDataSource(user.copy(image = collectedUser.image)) {
-
-                        saveUserChangesInLocalDataSource(user)
                     }
                 }
             }
@@ -92,15 +92,25 @@ class PersonalInformationViewmodel(
     }
 
     private suspend fun updateUserEmailInAuthDataSource(
+        isDifferentEmail: Boolean,
         password: String,
-        newEmail: String
+        newEmail: String?,
+        onSuccess: suspend () -> Unit
     ) {
+
+        if (!isDifferentEmail || newEmail.isNullOrBlank()) {
+            onSuccess()
+            return
+        }
         modifyUserEmailInAuthDataSource(password, newEmail) { error ->
             if (error.isBlank()) {
                 Log.d(
                     "PersonalInformationViewmodel",
-                    "updateUserEmailInAuthDataSource: User email updated successfully in auth data source"
+                    "updateUserEmailInAuthDataSource: accepted request to update user email in auth data source"
                 )
+                viewModelScope.launch {
+                    onSuccess()
+                }
             } else {
                 Log.e(
                     "PersonalInformationViewmodel",
@@ -113,14 +123,22 @@ class PersonalInformationViewmodel(
 
     private suspend fun updateUserPasswordInAuthDataSource(
         currentPassword: String,
-        newPassword: String
+        newPassword: String,
+        onSuccess: suspend () -> Unit
     ) {
+        if (newPassword.isBlank()) {
+            onSuccess()
+            return
+        }
         modifyUserPasswordInAuthDataSource(currentPassword, newPassword) { error ->
             if (error.isBlank()) {
                 Log.d(
                     "PersonalInformationViewmodel",
                     "updateUserPasswordInAuthDataSource: User password updated successfully in auth data source"
                 )
+                viewModelScope.launch {
+                    onSuccess()
+                }
             } else {
                 Log.e(
                     "PersonalInformationViewmodel",
@@ -134,7 +152,7 @@ class PersonalInformationViewmodel(
     private suspend fun deleteCurrentImageInRemoteDataSource(user: User, onSuccess: () -> Unit) {
         getUserFromRemoteDataSource(user.uid).collect { previousUserData: User? ->
 
-            if(previousUserData == null) {
+            if (previousUserData == null) {
                 return@collect
             }
             deleteImageFromRemoteDataSource(
@@ -165,8 +183,7 @@ class PersonalInformationViewmodel(
 
             deleteImageInLocalDataSource(
                 userUid = user.uid,
-                imageType = Paths.USERS,
-                currentUserImage = previousUserData.image
+                currentImagePath = previousUserData.image
             ) { isDeleted ->
 
                 if (isDeleted) {

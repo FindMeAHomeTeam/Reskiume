@@ -86,8 +86,10 @@
     <string name="user_screen_name_field_label">Name</string>
     <string name="user_screen_describe_yourself_field_label">Describe yourself</string>
     <string name="user_screen_email_field_label">Email</string>
-    <string name="user_screen_verify_email_label">After saving your changes, please verify your email, including your spam inbox, to confirm your change</string>
-    <string name="user_screen_reintroduce_password_field_label">Reintroduce your password</string>
+    <string name="user_screen_verify_email_label">After saving the changes, check your new email, including your spam folder, and accept the request. Then, log back in to the application to confirm the change.</string>
+    <string name="user_screen_available_label">Available</string>
+    <string name="user_screen_unavailable_label">Not available</string>
+    <string name="user_screen_availability_description">Update your availability to receive rescue notifications</string>
     <string name="user_screen_change_your_password_checkbox_label">I want to change my password</string>
     <string name="user_screen_current_password_field_label">Current password</string>
     <string name="user_screen_new_password_field_label">New password</string>

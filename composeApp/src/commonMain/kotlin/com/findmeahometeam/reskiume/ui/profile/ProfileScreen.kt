@@ -32,10 +32,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.findmeahometeam.reskiume.data.util.log.Log
+import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.components.RmListAvatarType
 import com.findmeahometeam.reskiume.ui.core.components.RmListButtonItem
-import com.findmeahometeam.reskiume.ui.core.components.RmListSwitchItem
 import com.findmeahometeam.reskiume.ui.core.components.RmSecondaryText
 import com.findmeahometeam.reskiume.ui.core.components.RmText
 import com.findmeahometeam.reskiume.ui.core.gray
@@ -55,7 +55,6 @@ import reskiume.composeapp.generated.resources.ic_delete
 import reskiume.composeapp.generated.resources.ic_feedback
 import reskiume.composeapp.generated.resources.ic_foster_homes
 import reskiume.composeapp.generated.resources.ic_indicator
-import reskiume.composeapp.generated.resources.ic_notifications
 import reskiume.composeapp.generated.resources.ic_paw
 import reskiume.composeapp.generated.resources.ic_rating
 import reskiume.composeapp.generated.resources.ic_rescue_events
@@ -82,8 +81,6 @@ import reskiume.composeapp.generated.resources.profile_screen_personal_create_ac
 import reskiume.composeapp.generated.resources.profile_screen_personal_information_description
 import reskiume.composeapp.generated.resources.profile_screen_personal_information_title
 import reskiume.composeapp.generated.resources.profile_screen_profile_image_content_description
-import reskiume.composeapp.generated.resources.profile_screen_rescue_notifications_description
-import reskiume.composeapp.generated.resources.profile_screen_rescue_notifications_title
 import reskiume.composeapp.generated.resources.profile_screen_reviews_description
 import reskiume.composeapp.generated.resources.profile_screen_reviews_title
 import reskiume.composeapp.generated.resources.profile_screen_settings_section
@@ -97,13 +94,15 @@ fun ProfileScreen(
     navigateToDeleteAccountScreen: () -> Unit
 ) {
     val profileViewmodel: ProfileViewmodel = koinViewModel<ProfileViewmodel>()
-    val profileUiState: ProfileViewmodel.ProfileUiState by profileViewmodel.state.collectAsState()
-    var uiUserModel: UiUserModel by remember { mutableStateOf(UiUserModel()) }
+    val profileUiState: ProfileViewmodel.ProfileUiState by profileViewmodel.state.collectAsState(
+        initial = ProfileViewmodel.ProfileUiState.Idle
+    )
+    var user: User? by remember { mutableStateOf(null) }
     val scrollState: ScrollState = rememberScrollState()
 
-    uiUserModel = when (profileUiState) {
+    user = when (profileUiState) {
         is ProfileViewmodel.ProfileUiState.Idle -> {
-            UiUserModel()
+            null
         }
 
         is ProfileViewmodel.ProfileUiState.Error -> {
@@ -111,11 +110,11 @@ fun ProfileScreen(
                 "ProfileScreen",
                 (profileUiState as ProfileViewmodel.ProfileUiState.Error).message
             )
-            return
+            null
         }
 
         is ProfileViewmodel.ProfileUiState.Success -> {
-            (profileUiState as ProfileViewmodel.ProfileUiState.Success).uiUserModel
+            (profileUiState as ProfileViewmodel.ProfileUiState.Success).user
         }
     }
 
@@ -128,7 +127,7 @@ fun ProfileScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(Modifier.height(16.dp))
-        Header(uiUserModel)
+        Header(user)
 
         Spacer(Modifier.height(32.dp))
         RmText(
@@ -141,7 +140,7 @@ fun ProfileScreen(
         Spacer(modifier = Modifier.height(10.dp))
 
         // create account screen
-        if (uiUserModel.user == null) {
+        if (user == null) {
             RmListButtonItem(
                 title = stringResource(Res.string.profile_screen_personal_create_account_title),
                 description = stringResource(Res.string.profile_screen_personal_create_account_description),
@@ -156,7 +155,7 @@ fun ProfileScreen(
                 }
             )
         }
-        if (uiUserModel.user != null) {
+        if (user != null) {
 
             // profile screen
             RmListButtonItem(
@@ -189,22 +188,6 @@ fun ProfileScreen(
             )
         }
 
-        // Notifications screen TODO
-        /*RmListSwitchItem(
-            title = stringResource(Res.string.profile_screen_rescue_notifications_title),
-            description = stringResource(Res.string.profile_screen_rescue_notifications_description),
-            containerColor = backgroundColor,
-            listAvatarType = RmListAvatarType.Icon(
-                backgroundColor = tertiaryGreen,
-                icon = Res.drawable.ic_notifications,
-                iconColor = primaryGreen
-            ),
-            isChecked = uiUserModel.areNotificationsAvailable,
-            onCheckedChange = {
-                // TODO
-            }
-        )*/
-
         Spacer(Modifier.height(32.dp))
         RmText(
             modifier = Modifier.fillMaxWidth().padding(10.dp),
@@ -215,7 +198,7 @@ fun ProfileScreen(
         )
         Spacer(modifier = Modifier.height(10.dp))
 
-        if (uiUserModel.user != null) {
+        if (user != null) {
 
             // Non-human animals screen
             RmListButtonItem(
@@ -303,7 +286,7 @@ fun ProfileScreen(
         )
 
         // Delete account screen
-        if (uiUserModel.user != null) {
+        if (user != null) {
             RmListButtonItem(
                 title = stringResource(Res.string.profile_screen_delete_account_title),
                 description = stringResource(Res.string.profile_screen_delete_account_description),
@@ -323,8 +306,8 @@ fun ProfileScreen(
 }
 
 @Composable
-fun Header(uiUserModel: UiUserModel) = uiUserModel.run {
-    if (user != null && user.image.isNotBlank()) {
+fun Header(user: User?) {
+    if (user?.image?.isNotBlank() == true) {
         AsyncImage(
             model = user.image,
             contentDescription =

@@ -36,6 +36,8 @@ class CreateAccountViewmodel(
         user: User,
         password: String
     ) {
+        if (user.email == null) return
+
         viewModelScope.launch {
             _state.value = UiState.Loading
             val authResult = createUserWithEmailAndPasswordFromAuthDataSource(user.email, password)

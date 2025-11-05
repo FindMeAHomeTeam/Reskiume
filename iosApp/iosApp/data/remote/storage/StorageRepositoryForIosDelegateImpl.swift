@@ -34,21 +34,31 @@ class StorageRepositoryForIosDelegateImpl: StorageRepository {
         }
     }
     
+    func deleteLocalImage(userUid: String, currentImagePath: String, onImageDeleted: @escaping (KotlinBoolean) -> Void) {
+        let fileName: String = String(currentImagePath.split(separator: "/").last ?? "")
+        if let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+            let absoluteFilePath = documentsDirectory.appendingPathComponent(fileName)
+            try? FileManager.default.removeItem(at: absoluteFilePath)
+            onImageDeleted(true)
+        } else {
+            Log().e(tag: "StorageRepositoryForIosDelegateImpl", message: "deleteLocalImage: Error deleting the user avatar", throwable: nil)
+            onImageDeleted(false)
+        }
+    }
+    
     func saveImage(userUid: String, imageType: Paths, onImageSaved: @escaping (String) -> Void) {
         let imageRef: StorageReference = getStorageReference(imageType: imageType, userUid: userUid)
+        
         let fileName: String = switch imageType {
             case Paths.users: "\(userUid).webp"
             default: "\(userUid).webp"
         }
-        
         if let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
-            let fileURL = documentsDirectory.appendingPathComponent(fileName)
-            
-            // Ensure a clean target
-            try? FileManager.default.removeItem(at: fileURL)
+            let absoluteFilePath = documentsDirectory.appendingPathComponent(fileName)
+            try? FileManager.default.removeItem(at: absoluteFilePath)
             
             // Download to the local filesystem
-            imageRef.write(toFile: fileURL) { url, error in
+            imageRef.write(toFile: absoluteFilePath) { url, error in
                 if error != nil {
                     onImageSaved("")
                     Log().e(tag: "StorageRepositoryForIosDelegateImpl", message: "Error saving the user avatar \(String(describing: error!.localizedDescription))", throwable: nil)
@@ -59,7 +69,7 @@ class StorageRepositoryForIosDelegateImpl: StorageRepository {
         }
     }
     
-    func deleteImage(userUid: String, imageType: Paths, onImageDeleted: @escaping (KotlinBoolean) -> Void) async {
+    func deleteRemoteImage(userUid: String, imageType: Paths, onImageDeleted: @escaping (KotlinBoolean) -> Void) async {
         let imageRef: StorageReference = getStorageReference(imageType: imageType, userUid: userUid)
         do {
             try await imageRef.delete()

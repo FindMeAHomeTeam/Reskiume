@@ -64,11 +64,15 @@ class StorageRepositoryAndroidImpl(
 
     override fun deleteLocalImage(
         userUid: String,
-        imageType: Paths,
+        currentImagePath: String,
         onImageDeleted: (Boolean) -> Unit
     ) {
-        val localFile = when (imageType) {
-            Paths.USERS -> File(context.filesDir, "$userUid.webp")
+        val localFile = if (currentImagePath.contains("file:///")) {
+            val uri = currentImagePath.toUri()
+            File(uri.path ?: return onImageDeleted(false))
+        } else {
+            val filename = currentImagePath.split("/").last()
+            File(context.filesDir, filename)
         }
         onImageDeleted(localFile.delete())
     }

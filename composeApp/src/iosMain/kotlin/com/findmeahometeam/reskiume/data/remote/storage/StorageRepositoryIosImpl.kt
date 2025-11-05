@@ -51,14 +51,29 @@ class StorageRepositoryIosImpl(
         )
     }
 
-    override suspend fun deleteImage(
+    override fun deleteLocalImage(
+        userUid: String,
+        currentImagePath: String,
+        onImageDeleted: (Boolean) -> Unit
+    ) {
+        initialCheck(
+            onSuccess = {
+                it.deleteLocalImage(userUid, currentImagePath, onImageDeleted)
+            },
+            onFailure = {
+                onImageDeleted(false)
+            }
+        )
+    }
+
+    override suspend fun deleteRemoteImage(
         userUid: String,
         imageType: Paths,
         onImageDeleted: (Boolean) -> Unit
     ) {
         val value: StorageRepository? = storageRepositoryForIosDelegateWrapper.storageRepositoryForIosDelegateState.value
         if (value != null) {
-            value.deleteImage(userUid, imageType, onImageDeleted)
+            value.deleteRemoteImage(userUid, imageType, onImageDeleted)
         } else {
             onImageDeleted(false)
         }

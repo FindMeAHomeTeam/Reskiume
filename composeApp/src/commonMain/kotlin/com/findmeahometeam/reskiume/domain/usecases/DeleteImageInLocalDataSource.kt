@@ -1,20 +1,18 @@
 package com.findmeahometeam.reskiume.domain.usecases
 
-import com.findmeahometeam.reskiume.data.util.Paths
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 
 class DeleteImageInLocalDataSource(private val storageRepository: StorageRepository) {
 
     operator fun invoke(
         userUid: String,
-        imageType: Paths,
-        currentUserImage: String,
+        currentImagePath: String,
         onImageDeleted: (Boolean) -> Unit
     ) {
-        if (currentUserImage.isBlank()) {
+        if (currentImagePath.isBlank()) {
             onImageDeleted(true)
         } else {
-            storageRepository.deleteLocalImage(userUid, imageType, onImageDeleted)
+            storageRepository.deleteLocalImage(userUid, currentImagePath, onImageDeleted)
         }
     }
 }

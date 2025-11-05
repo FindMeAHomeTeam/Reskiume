@@ -5,6 +5,6 @@ import com.findmeahometeam.reskiume.data.util.Paths
 interface StorageRepository {
     fun uploadImage(userUid: String, imageType: Paths, imageUri: String, onImageUploaded: (String) -> Unit)
     fun saveImage(userUid: String, imageType: Paths, onImageSaved: (String) -> Unit)
-    fun deleteLocalImage(userUid: String, imageType: Paths, onImageDeleted: (Boolean) -> Unit)
+    fun deleteLocalImage(userUid: String, currentImagePath: String, onImageDeleted: (Boolean) -> Unit)
     suspend fun deleteRemoteImage(userUid: String, imageType: Paths, onImageDeleted: (Boolean) -> Unit)
 }

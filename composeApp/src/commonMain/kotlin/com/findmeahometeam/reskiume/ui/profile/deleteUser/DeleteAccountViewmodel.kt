@@ -95,9 +95,8 @@ class DeleteAccountViewmodel(
                 )
             }
             deleteImageInLocalDataSource(
-                userUid,
-                Paths.USERS,
-                localImage
+                userUid = userUid,
+                currentImagePath = localImage
             ) { isDeleted: Boolean ->
                 if (!isDeleted) {
                     Log.e(

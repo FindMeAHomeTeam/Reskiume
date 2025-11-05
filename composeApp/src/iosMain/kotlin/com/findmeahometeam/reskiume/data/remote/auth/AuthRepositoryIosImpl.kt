@@ -50,6 +50,30 @@ class AuthRepositoryIosImpl(
         authRepositoryForIosDelegateWrapper.authRepositoryForIosDelegateState.value?.signOut()
             ?: false
 
+    override suspend fun updateUserEmail(
+        password: String,
+        newEmail: String,
+        onUpdatedUserEmail: (String) -> Unit
+    ) {
+        getDelegate().updateUserEmail(
+            password,
+            newEmail,
+            onUpdatedUserEmail
+        )
+    }
+
+    override suspend fun updateUserPassword(
+        currentPassword: String,
+        newPassword: String,
+        onUpdatedUserPassword: (String) -> Unit
+    ) {
+        getDelegate().updateUserPassword(
+            currentPassword,
+            newPassword,
+            onUpdatedUserPassword
+        )
+    }
+
     override suspend fun deleteUser(
         password: String,
         onDeleteUser: (String) -> Unit

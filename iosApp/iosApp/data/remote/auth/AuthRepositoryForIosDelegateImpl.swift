@@ -3,13 +3,13 @@ import FirebaseAuth
 import ComposeApp
 import KMPNativeCoroutinesAsync
 
-class AuthRepositoryForIosDelegateImpl: AuthRepositoryForIosDelegate, ObservableObject {
+class AuthRepositoryForIosDelegateImpl: AuthRepositoryForIosDelegate {
     
     private let auth = Auth.auth()
     
     private var listenerHandle: AuthStateDidChangeListenerHandle? = nil
     
-    @Published var authUser: AuthUser?
+    var authUser: AuthUser?
     
     init (authUserRepositoryForIosDelegate: AuthUserRepositoryForIosDelegate) {
         listenerHandle = auth.addStateDidChangeListener { [weak self] _, user in
@@ -57,19 +57,86 @@ class AuthRepositoryForIosDelegateImpl: AuthRepositoryForIosDelegate, Observable
         }
     }
     
-    func deleteUser(password: String, onDeleteUser: @escaping (String, String) -> Void) async throws {
-        guard let user = auth.currentUser, let email = user.email else {
-            onDeleteUser("", "Not signed in or user has no email")
+    private func reauthenticateUser(password: String, onReauthenticate: @escaping (FirebaseAuth.User?) -> Void) async throws {
+        guard let user: FirebaseAuth.User = auth.currentUser, let email = user.email else {
+            Log().e(tag: "AuthRepositoryForIosDelegateImpl", message: "reauthenticateUser: Not signed in or user has no email", throwable: nil)
+            onReauthenticate(nil)
             return
         }
         
         do {
             let credential = EmailAuthProvider.credential(withEmail: email, password: password)
             try await user.reauthenticate(with: credential)
-            try await user.delete()
-            onDeleteUser(user.uid, "")
+            onReauthenticate(user)
         } catch {
-            onDeleteUser("", error.localizedDescription)
+            Log().e(tag: "AuthRepositoryForIosDelegateImpl", message: "reauthenticateUser: \(error.localizedDescription)", throwable: nil)
+            onReauthenticate(nil)
+        }
+    }
+    
+    func deleteUser(password: String, onDeleteUser: @escaping (String) -> Void) async throws {
+        do {
+            try await reauthenticateUser (password: password) { user in
+                guard let user = user else {
+                    onDeleteUser("AuthRepositoryForIosDelegateImpl - deleteUser: Error reauthenticating user")
+                    return
+                }
+                user.delete { error in
+                    if let error = error {
+                        Log().e(tag: "AuthRepositoryForIosDelegateImpl", message: "deleteUser: \(error.localizedDescription)", throwable: nil)
+                        onDeleteUser(error.localizedDescription)
+                    } else {
+                        onDeleteUser("")
+                    }
+                }
+            }
+        } catch {
+            Log().e(tag: "AuthRepositoryForIosDelegateImpl", message: "deleteUser: \(error.localizedDescription)", throwable: nil)
+            onDeleteUser(error.localizedDescription)
+        }
+    }
+    
+    func updateUserEmail(password: String, newEmail: String, onUpdatedUserEmail: @escaping (String) -> Void) async throws {
+        do {
+            try await reauthenticateUser (password: password) { user in
+                guard let user = user else {
+                    onUpdatedUserEmail("AuthRepositoryForIosDelegateImpl - updateUserEmail: Error reauthenticating user")
+                    return
+                }
+                user.sendEmailVerification(beforeUpdatingEmail: newEmail) { error in
+                    if let error = error {
+                        Log().e(tag: "AuthRepositoryForIosDelegateImpl", message: "updateUserEmail: \(error.localizedDescription)", throwable: nil)
+                        onUpdatedUserEmail(error.localizedDescription)
+                    } else {
+                        onUpdatedUserEmail("")
+                    }
+                }
+            }
+        } catch {
+            Log().e(tag: "AuthRepositoryForIosDelegateImpl", message: "updateUserEmail: \(error.localizedDescription)", throwable: nil)
+            onUpdatedUserEmail(error.localizedDescription)
+        }
+    }
+    
+    func updateUserPassword(currentPassword: String, newPassword: String, onUpdatedUserPassword: @escaping (String) -> Void) async throws {
+        do {
+            try await reauthenticateUser (password: currentPassword) { user in
+                guard let user = user else {
+                    onUpdatedUserPassword("AuthRepositoryForIosDelegateImpl - updateUserPassword: Error reauthenticating user")
+                    return
+                }
+                user.updatePassword(to: newPassword) { error in
+                    if let error = error {
+                        Log().e(tag: "AuthRepositoryForIosDelegateImpl", message: "updateUserPassword: \(error.localizedDescription)", throwable: nil)
+                        onUpdatedUserPassword(error.localizedDescription)
+                    } else {
+                        onUpdatedUserPassword("")
+                    }
+                }
+            }
+        } catch {
+            Log().e(tag: "AuthRepositoryForIosDelegateImpl", message: "updateUserPassword: \(error.localizedDescription)", throwable: nil)
+            onUpdatedUserPassword(error.localizedDescription)
         }
     }
     

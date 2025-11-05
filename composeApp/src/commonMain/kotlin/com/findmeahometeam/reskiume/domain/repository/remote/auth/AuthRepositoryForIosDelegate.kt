@@ -6,5 +6,15 @@ interface AuthRepositoryForIosDelegate {
     suspend fun createUserWithEmailAndPassword(email: String, password: String): AuthResult
     suspend fun signInWithEmailAndPassword(email: String, password: String): AuthResult
     fun signOut(): Boolean
-    suspend fun deleteUser(password: String, onDeleteUser: (String, String) -> Unit)
+    suspend fun updateUserEmail(
+        password: String,
+        newEmail: String,
+        onUpdatedUserEmail: (String) -> Unit
+    )
+    suspend fun updateUserPassword(
+        currentPassword: String,
+        newPassword: String,
+        onUpdatedUserPassword: (String) -> Unit
+    )
+    suspend fun deleteUser(password: String, onDeleteUser: (String) -> Unit)
 }

@@ -7,7 +7,7 @@ data class User(
     val uid: String = "",
     val username: String,
     val description: String,
-    val email: String,
+    val email: String? = null,
     val image: String,
     val isAvailable: Boolean = true,
     val lastLogout: Long = 0L
@@ -17,7 +17,6 @@ data class User(
             uid = uid,
             username = username,
             description = description,
-            email = email,
             image = image,
             isAvailable = isAvailable,
             lastLogout = lastLogout
@@ -29,7 +28,6 @@ data class User(
             uid = uid,
             username = username,
             description = description,
-            email = email,
             image = image,
             available = isAvailable
         )

@@ -9,7 +9,6 @@ data class UserEntity(
     @PrimaryKey val uid: String,
     val username: String,
     val description: String,
-    val email: String,
     val image: String,
     val isAvailable: Boolean,
     val lastLogout: Long
@@ -19,7 +18,6 @@ data class UserEntity(
             uid = uid,
             username = username,
             description = description,
-            email = email,
             image = image,
             isAvailable = isAvailable,
             lastLogout = lastLogout

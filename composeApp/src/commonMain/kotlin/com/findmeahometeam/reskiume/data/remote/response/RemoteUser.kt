@@ -6,7 +6,6 @@ data class RemoteUser(
     val uid: String? = "",
     val username: String? = "",
     val description: String? = "",
-    val email: String? = "",
     val image: String? = "",
     val available: Boolean? = false
 ) {
@@ -15,7 +14,6 @@ data class RemoteUser(
             "uid" to uid,
             "username" to username,
             "description" to description,
-            "email" to email,
             "image" to image,
             "available" to available
         )
@@ -26,7 +24,6 @@ data class RemoteUser(
             uid = uid ?: "",
             username = username ?: "",
             description = description ?: "",
-            email = email ?: "",
             image = image ?: "",
             isAvailable = available ?: true
         )

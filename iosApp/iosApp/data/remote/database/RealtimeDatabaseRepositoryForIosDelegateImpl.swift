@@ -37,7 +37,6 @@ class RealtimeDatabaseRepositoryForIosDelegateImpl: RealtimeDatabaseRepositoryFo
                                 uid: nSDictionary?["uid"] as? String ?? "",
                                 username: nSDictionary?["username"] as? String ?? "",
                                 description: nSDictionary?["description"] as? String ?? "",
-                                email: nSDictionary?["email"] as? String ?? "",
                                 image: nSDictionary?["image"] as? String ?? "",
                                 available: KotlinBoolean(value: availableBool ?? false)
                             )
@@ -64,7 +63,6 @@ class RealtimeDatabaseRepositoryForIosDelegateImpl: RealtimeDatabaseRepositoryFo
             "uid": remoteUser.uid!,
             "username": remoteUser.username!,
             "description": remoteUser.description_!,
-            "email": remoteUser.email!,
             "image": remoteUser.image!,
             "available": remoteUser.available?.boolValue == true
         ]

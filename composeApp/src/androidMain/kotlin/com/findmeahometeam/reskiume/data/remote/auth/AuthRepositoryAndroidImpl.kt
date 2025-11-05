@@ -87,12 +87,10 @@ class AuthRepositoryAndroidImpl : AuthRepository {
         val email: String = auth.currentUser?.email ?: error("User is null")
         val authCredential: AuthCredential = EmailAuthProvider.getCredential(email, password)
 
-        auth.currentUser?.reauthenticate(authCredential)?.addOnCompleteListener {
-            if (it.isSuccessful) {
-                onReauthenticated()
-            } else {
-                onError(it.exception?.message ?: "Unknown error")
-            }
+        auth.currentUser?.reauthenticate(authCredential)?.addOnSuccessListener {
+            onReauthenticated()
+        }?.addOnFailureListener { exception ->
+            onError(exception.message ?: "Unknown error")
         }
     }
 
@@ -106,12 +104,10 @@ class AuthRepositoryAndroidImpl : AuthRepository {
                 password = password,
                 onReauthenticated = {
                     auth.currentUser?.verifyBeforeUpdateEmail(newEmail)
-                        ?.addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                onUpdatedUserEmail("")
-                            } else {
-                                onUpdatedUserEmail(task.exception?.message ?: "Unknown error")
-                            }
+                        ?.addOnSuccessListener {
+                            onUpdatedUserEmail("")
+                        }?.addOnFailureListener { exception ->
+                            onUpdatedUserEmail(exception.message ?: "Unknown error")
                         }
                 }, onError = { errorMessage: String ->
                     onUpdatedUserEmail(errorMessage)
@@ -131,13 +127,12 @@ class AuthRepositoryAndroidImpl : AuthRepository {
             reauthenticateUser(
                 password = currentPassword,
                 onReauthenticated = {
-                    auth.currentUser?.updatePassword(newPassword)?.addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
+                    auth.currentUser?.updatePassword(newPassword)
+                        ?.addOnSuccessListener {
                             onUpdatedUserPassword("")
-                        } else {
-                            onUpdatedUserPassword(task.exception?.message ?: "Unknown error")
+                        }?.addOnFailureListener { exception ->
+                            onUpdatedUserPassword(exception.message ?: "Unknown error")
                         }
-                    }
                 }, onError = { errorMessage: String ->
                     onUpdatedUserPassword(errorMessage)
                 }
@@ -146,6 +141,7 @@ class AuthRepositoryAndroidImpl : AuthRepository {
             onUpdatedUserPassword(e.message ?: "Unknown error")
         }
     }
+
 
     override suspend fun deleteUser(
         password: String,

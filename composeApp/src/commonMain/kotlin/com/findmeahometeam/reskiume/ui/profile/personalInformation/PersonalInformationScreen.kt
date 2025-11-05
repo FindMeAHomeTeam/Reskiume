@@ -34,6 +34,7 @@ import com.findmeahometeam.reskiume.ui.core.components.RmAvatar
 import com.findmeahometeam.reskiume.ui.core.components.RmButton
 import com.findmeahometeam.reskiume.ui.core.components.RmCheckbox
 import com.findmeahometeam.reskiume.ui.core.components.RmListAvatarType
+import com.findmeahometeam.reskiume.ui.core.components.RmListSwitchItem
 import com.findmeahometeam.reskiume.ui.core.components.RmPasswordTextField
 import com.findmeahometeam.reskiume.ui.core.components.RmResultState
 import com.findmeahometeam.reskiume.ui.core.components.RmScaffold
@@ -44,11 +45,13 @@ import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.primaryGreen
 import com.findmeahometeam.reskiume.ui.core.tertiaryGreen
 import com.findmeahometeam.reskiume.ui.profile.ProfileViewmodel
-import com.findmeahometeam.reskiume.ui.profile.UiUserModel
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import reskiume.composeapp.generated.resources.Res
+import reskiume.composeapp.generated.resources.ic_notifications
 import reskiume.composeapp.generated.resources.ic_warning
+import reskiume.composeapp.generated.resources.user_screen_availability_description
+import reskiume.composeapp.generated.resources.user_screen_available_label
 import reskiume.composeapp.generated.resources.user_screen_change_your_password_checkbox_label
 import reskiume.composeapp.generated.resources.user_screen_current_password_field_label
 import reskiume.composeapp.generated.resources.user_screen_describe_yourself_field_label
@@ -57,8 +60,8 @@ import reskiume.composeapp.generated.resources.user_screen_log_out_account_messa
 import reskiume.composeapp.generated.resources.user_screen_log_out_text
 import reskiume.composeapp.generated.resources.user_screen_name_field_label
 import reskiume.composeapp.generated.resources.user_screen_new_password_field_label
-import reskiume.composeapp.generated.resources.user_screen_reintroduce_password_field_label
 import reskiume.composeapp.generated.resources.user_screen_save_changes_button
+import reskiume.composeapp.generated.resources.user_screen_unavailable_label
 import reskiume.composeapp.generated.resources.user_screen_user_account_title
 import reskiume.composeapp.generated.resources.user_screen_verify_email_label
 
@@ -70,9 +73,11 @@ fun PersonalInformationScreen(onBackPressed: () -> Unit) {
     val uiState: UiState by personalInformationViewmodel.uiState.collectAsState()
 
     val profileViewmodel: ProfileViewmodel = koinViewModel<ProfileViewmodel>()
-    val profileUiState: ProfileViewmodel.ProfileUiState by profileViewmodel.state.collectAsState()
+    val profileUiState: ProfileViewmodel.ProfileUiState by profileViewmodel.state.collectAsState(
+        initial = ProfileViewmodel.ProfileUiState.Idle
+    )
 
-    var uiUserModel: UiUserModel by remember { mutableStateOf(UiUserModel()) }
+    var user: User? by remember { mutableStateOf(null) }
 
     when (profileUiState) {
         is ProfileViewmodel.ProfileUiState.Idle -> {
@@ -90,33 +95,31 @@ fun PersonalInformationScreen(onBackPressed: () -> Unit) {
         }
 
         else -> {
-            uiUserModel = (profileUiState as ProfileViewmodel.ProfileUiState.Success).uiUserModel
+            user = (profileUiState as ProfileViewmodel.ProfileUiState.Success).user
         }
     }
 
-    val user = uiUserModel.user!!
-    var name: String by rememberSaveable { mutableStateOf(user.username) }
-    var description: String by rememberSaveable { mutableStateOf(user.description) }
-    var imageUri: String by rememberSaveable { mutableStateOf(user.image) }
-    var email: String by rememberSaveable { mutableStateOf(user.email) }
-    var isAvailable: Boolean by rememberSaveable { mutableStateOf(user.isAvailable) }
+    var name: String by rememberSaveable { mutableStateOf(user!!.username) }
+    var description: String by rememberSaveable { mutableStateOf(user!!.description) }
+    var imageUri: String by rememberSaveable { mutableStateOf(user!!.image) }
+    var isAvailable: Boolean by rememberSaveable { mutableStateOf(user!!.isAvailable) }
+    var email: String by rememberSaveable { mutableStateOf(user!!.email ?: "") }
     val emailRegexPattern =
         Regex("^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$")
     var currentPassword: String by rememberSaveable { mutableStateOf("") }
     var isNewPassword: Boolean by rememberSaveable { mutableStateOf(false) }
     var newPassword: String by rememberSaveable { mutableStateOf("") }
-    var isCheckboxChecked by rememberSaveable { mutableStateOf(false) }
     val isEmailAlertVisible by remember(email) {
         derivedStateOf {
-            email != user.email && email.matches(emailRegexPattern)
+            email != user!!.email && email.matches(emailRegexPattern)
         }
     }
     val isCurrentPasswordVisible by remember(
-        isCheckboxChecked,
+        isNewPassword,
         email
     ) {
         derivedStateOf {
-            isCheckboxChecked || email != user.email && email.matches(emailRegexPattern)
+            isNewPassword || email != user!!.email && email.matches(emailRegexPattern)
         }
     }
     val isUpdateUserButtonEnabled by remember(
@@ -133,18 +136,18 @@ fun PersonalInformationScreen(onBackPressed: () -> Unit) {
                     && email.matches(emailRegexPattern)
                     && (if (isCurrentPasswordVisible) currentPassword.length >= 6 else true)
                     && (if (isNewPassword) newPassword.length >= 6 else true)
-                    && (name != user.username
-                    || description != user.description
-                    || imageUri != user.image
-                    || email != user.email
-                    || isAvailable != user.isAvailable
+                    && (name != user!!.username
+                    || description != user!!.description
+                    || imageUri != user!!.image
+                    || email != user!!.email
+                    || isAvailable != user!!.isAvailable
                     || (newPassword.isNotBlank() && newPassword == currentPassword))
         }
     }
     val scrollState = rememberScrollState()
 
     RmScaffold(
-        title = stringResource(Res.string.user_screen_user_account_title, user.username),
+        title = stringResource(Res.string.user_screen_user_account_title, user!!.username),
         onBackPressed = onBackPressed,
     ) { padding ->
         Column(
@@ -215,11 +218,7 @@ fun PersonalInformationScreen(onBackPressed: () -> Unit) {
                 Column {
                     Spacer(modifier = Modifier.height(10.dp))
                     RmPasswordTextField(
-                        label = if (isNewPassword) {
-                            stringResource(Res.string.user_screen_current_password_field_label)
-                        } else {
-                            stringResource(Res.string.user_screen_reintroduce_password_field_label)
-                        },
+                        label = stringResource(Res.string.user_screen_current_password_field_label),
                         modifier = Modifier.fillMaxWidth(),
                         password = currentPassword,
                         onValueChange = { currentPassword = it }
@@ -245,13 +244,33 @@ fun PersonalInformationScreen(onBackPressed: () -> Unit) {
             }
 
             Spacer(modifier = Modifier.height(10.dp))
+            RmListSwitchItem(
+                title = if (isAvailable) {
+                    stringResource(Res.string.user_screen_available_label)
+                } else {
+                    stringResource(Res.string.user_screen_unavailable_label)
+                },
+                description = stringResource(Res.string.user_screen_availability_description),
+                containerColor = backgroundColor,
+                listAvatarType = RmListAvatarType.Icon(
+                    backgroundColor = tertiaryGreen,
+                    icon = Res.drawable.ic_notifications,
+                    iconColor = primaryGreen
+                ),
+                isChecked = isAvailable,
+                onCheckedChange = { isChecked ->
+                    isAvailable = isChecked
+                }
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
             RmCheckbox(stringResource(Res.string.user_screen_change_your_password_checkbox_label)) { isChecked ->
                 isNewPassword = isChecked
-                isCheckboxChecked = isChecked
             }
 
             Spacer(modifier = Modifier.height(10.dp))
             RmResultState(uiState, onSuccess = onBackPressed)
+            Spacer(modifier = Modifier.height(10.dp))
 
             Spacer(modifier = Modifier.weight(1f))
             RmButton(
@@ -259,16 +278,14 @@ fun PersonalInformationScreen(onBackPressed: () -> Unit) {
                 enabled = isUpdateUserButtonEnabled,
                 onClick = {
                     personalInformationViewmodel.saveUserChanges(
-                        isDifferentEmail = email != user.email,
-                        isDifferentImage = imageUri != user.image,
-                        user = User(
-                            uid = user.uid,
+                        isDifferentEmail = email != user!!.email,
+                        isDifferentImage = imageUri != user!!.image,
+                        user = user!!.copy(
                             username = name,
                             description = description,
                             email = email,
                             image = imageUri,
-                            isAvailable = isAvailable,
-                            lastLogout = user.lastLogout
+                            isAvailable = isAvailable
                         ),
                         currentPassword = currentPassword,
                         newPassword = newPassword

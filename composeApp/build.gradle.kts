@@ -43,7 +43,6 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.koin.android)
             implementation(libs.kotlinx.coroutines.android)
-            implementation(libs.ktor.client.okhttp)
             implementation(libs.androidx.room.sqlite.wrapper)
             implementation(project.dependencies.platform(libs.firebase.bom))
             implementation(libs.firebase.auth)
@@ -84,10 +83,6 @@ kotlin {
             implementation(libs.coil.compose)
             implementation(libs.coil.network.ktor)
 
-            implementation(libs.ktor.client.core)
-            implementation(libs.ktor.client.negotiation)
-            implementation(libs.ktor.serialization)
-
             implementation(libs.image.picker.kmp)
         }
         commonTest.dependencies {
@@ -98,9 +93,6 @@ kotlin {
             implementation(libs.paging.testing)
             implementation(libs.turbine)
 
-        }
-        iosMain.dependencies {
-            implementation(libs.ktor.client.darwin)
         }
     }
 }

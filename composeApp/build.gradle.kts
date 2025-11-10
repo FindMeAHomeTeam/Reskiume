@@ -12,6 +12,7 @@ plugins {
     alias(libs.plugins.google.services)
     alias(libs.plugins.crashlytics.plugin)
     alias(libs.plugins.nativecoroutines.plugin)
+    alias(libs.plugins.mokkery)
 }
 
 kotlin {
@@ -92,8 +93,10 @@ kotlin {
         commonTest.dependencies {
             implementation(libs.kotlin.test)
             implementation(libs.junit)
+            implementation(libs.kotlinx.coroutines.test)
             implementation(libs.koin.test)
             implementation(libs.paging.testing)
+            implementation(libs.turbine)
 
         }
         iosMain.dependencies {

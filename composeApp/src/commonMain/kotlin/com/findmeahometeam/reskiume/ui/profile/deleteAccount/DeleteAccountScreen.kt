@@ -1,4 +1,4 @@
-package com.findmeahometeam.reskiume.ui.profile.deleteUser
+package com.findmeahometeam.reskiume.ui.profile.deleteAccount
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

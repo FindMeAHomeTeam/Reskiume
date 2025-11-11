@@ -1,4 +1,4 @@
-package com.findmeahometeam.reskiume.ui.profile.deleteUser
+package com.findmeahometeam.reskiume.ui.profile.deleteAccount
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

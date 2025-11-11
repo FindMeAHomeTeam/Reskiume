@@ -1,12 +1,14 @@
 package com.findmeahometeam.reskiume.data.util.analytics
 
 import android.os.Bundle
-import android.util.Log
+import com.findmeahometeam.reskiume.data.util.log.Log
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.analytics
 
-actual object Analytics {
-    actual fun logEvent(
+class AnalyticsAndroidImpl(
+    private val log: Log
+) : Analytics {
+    override fun logEvent(
         name: String,
         params: Map<Any?, *>?
     ) {
@@ -23,6 +25,6 @@ actual object Analytics {
             }
         }
         Firebase.analytics.logEvent(name, bundle)
-        //Log.d("Analytics", "Event logged: $name with params: $params")
+        log.d("Analytics", "Event logged: $name with params: $params")
     }
 }

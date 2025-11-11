@@ -1,5 +1,5 @@
 package com.findmeahometeam.reskiume.data.util.analytics
 
-expect object Analytics {
+interface Analytics {
     fun logEvent(name: String, params: Map<Any?, *>? = null)
 }

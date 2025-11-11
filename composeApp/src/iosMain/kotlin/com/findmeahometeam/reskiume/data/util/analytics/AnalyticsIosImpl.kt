@@ -1,15 +1,13 @@
 package com.findmeahometeam.reskiume.data.util.analytics
 
 import com.findmeahometeam.reskiume.domain.repository.util.analytics.AnalyticsForIosWrapper
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import platform.Foundation.NSLog
 
-actual object Analytics: KoinComponent {
+class AnalyticsIosImpl(
+    private val analyticsForIosDelegateWrapper: AnalyticsForIosWrapper
+): Analytics {
 
-    private val analyticsForIosDelegateWrapper: AnalyticsForIosWrapper by inject()
-
-    actual fun logEvent(
+    override fun logEvent(
         name: String,
         params: Map<Any?, *>?
     ) {

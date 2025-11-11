@@ -5,6 +5,8 @@ import com.findmeahometeam.reskiume.data.database.ReskiumeDatabase
 import com.findmeahometeam.reskiume.data.database.getDatabase
 import com.findmeahometeam.reskiume.data.remote.database.RealtimeDatabaseRepositoryAndroidImpl
 import com.findmeahometeam.reskiume.data.remote.storage.StorageRepositoryAndroidImpl
+import com.findmeahometeam.reskiume.data.util.analytics.Analytics
+import com.findmeahometeam.reskiume.data.util.analytics.AnalyticsAndroidImpl
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.data.util.log.LogAndroidImpl
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
@@ -17,6 +19,7 @@ import org.koin.dsl.module
 
 actual val platformModule: Module = module {
     singleOf(::LogAndroidImpl) bind Log::class
+    singleOf(::AnalyticsAndroidImpl) bind Analytics::class
     singleOf(::AuthRepositoryAndroidImpl) bind AuthRepository::class
     single<ReskiumeDatabase> { getDatabase(get()) }
     singleOf(::RealtimeDatabaseRepositoryAndroidImpl) bind RealtimeDatabaseRepository::class

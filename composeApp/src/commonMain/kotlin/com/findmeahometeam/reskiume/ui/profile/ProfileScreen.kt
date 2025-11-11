@@ -31,7 +31,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.components.RmListAvatarType
@@ -48,7 +47,6 @@ import com.findmeahometeam.reskiume.ui.core.secondaryRed
 import com.findmeahometeam.reskiume.ui.core.tertiaryGreen
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import reskiume.composeapp.generated.resources.Res
 import reskiume.composeapp.generated.resources.ic_advice
@@ -98,7 +96,6 @@ fun ProfileScreen(
     val profileUiState: ProfileViewmodel.ProfileUiState by profileViewmodel.state.collectAsState(
         initial = ProfileViewmodel.ProfileUiState.Idle
     )
-    val log: Log = koinInject<Log>()
     var user: User? by remember { mutableStateOf(null) }
     val scrollState: ScrollState = rememberScrollState()
 
@@ -108,7 +105,7 @@ fun ProfileScreen(
         }
 
         is ProfileViewmodel.ProfileUiState.Error -> {
-            log.e(
+            profileViewmodel.logError(
                 "ProfileScreen",
                 (profileUiState as ProfileViewmodel.ProfileUiState.Error).message
             )

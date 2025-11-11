@@ -26,7 +26,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.components.RmAddPhoto
@@ -46,7 +45,6 @@ import com.findmeahometeam.reskiume.ui.core.primaryGreen
 import com.findmeahometeam.reskiume.ui.core.tertiaryGreen
 import com.findmeahometeam.reskiume.ui.profile.ProfileViewmodel
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import reskiume.composeapp.generated.resources.Res
 import reskiume.composeapp.generated.resources.ic_notifications
@@ -72,7 +70,6 @@ fun PersonalInformationScreen(onBackPressed: () -> Unit) {
     val personalInformationViewmodel: PersonalInformationViewmodel =
         koinViewModel<PersonalInformationViewmodel>()
     val uiState: UiState by personalInformationViewmodel.uiState.collectAsState()
-    val log: Log = koinInject<Log>()
 
     val profileViewmodel: ProfileViewmodel = koinViewModel<ProfileViewmodel>()
     val profileUiState: ProfileViewmodel.ProfileUiState by profileViewmodel.state.collectAsState(
@@ -88,7 +85,7 @@ fun PersonalInformationScreen(onBackPressed: () -> Unit) {
         }
 
         is ProfileViewmodel.ProfileUiState.Error -> {
-            log.e(
+            profileViewmodel.logError(
                 "PersonalInformationScreen",
                 (profileUiState as ProfileViewmodel.ProfileUiState.Error).message
             )

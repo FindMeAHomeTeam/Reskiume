@@ -14,7 +14,6 @@ class ProfileViewmodel(
     private val getUserFromLocalDataSource: GetUserFromLocalDataSource,
     private val log: Log
 ) : ViewModel() {
-
     val state: Flow<ProfileUiState> =
         observeAuthStateFromAuthDataSource().map { authUser: AuthUser? ->
             if (authUser?.uid == null) {
@@ -35,6 +34,10 @@ class ProfileViewmodel(
                 }
             }
         }
+
+    fun logError(string: String, message: String) {
+        log.e(string, message)
+    }
 
     sealed class ProfileUiState {
         object Idle : ProfileUiState()

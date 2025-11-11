@@ -7,9 +7,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.findmeahometeam.reskiume.ui.home.HomeScreen
 import com.findmeahometeam.reskiume.ui.profile.createAccount.CreateAccountScreen
-import com.findmeahometeam.reskiume.ui.profile.deleteUser.DeleteAccountScreen
+import com.findmeahometeam.reskiume.ui.profile.deleteAccount.DeleteAccountScreen
 import com.findmeahometeam.reskiume.ui.profile.login.LoginScreen
-import com.findmeahometeam.reskiume.ui.profile.personalInformation.PersonalInformationScreen
+import com.findmeahometeam.reskiume.ui.profile.modifyAccount.ModifyAccountScreen
 
 @Composable
 fun NavigationWrapper() {
@@ -38,8 +38,8 @@ fun NavigationWrapper() {
             )
         }
 
-        composable(route = Routes.PERSONAL_INFORMATION.route) {
-            PersonalInformationScreen(onBackPressed = {
+        composable(route = Routes.MODIFY_ACCOUNT.route) {
+            ModifyAccountScreen(onBackPressed = {
                 mainNavController.navigateUp()
             })
         }

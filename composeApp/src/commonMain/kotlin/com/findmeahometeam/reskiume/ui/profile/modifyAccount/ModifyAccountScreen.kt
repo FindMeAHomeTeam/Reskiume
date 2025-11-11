@@ -1,4 +1,4 @@
-package com.findmeahometeam.reskiume.ui.profile.personalInformation
+package com.findmeahometeam.reskiume.ui.profile.modifyAccount
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -49,27 +49,27 @@ import org.koin.compose.viewmodel.koinViewModel
 import reskiume.composeapp.generated.resources.Res
 import reskiume.composeapp.generated.resources.ic_notifications
 import reskiume.composeapp.generated.resources.ic_warning
-import reskiume.composeapp.generated.resources.user_screen_availability_description
-import reskiume.composeapp.generated.resources.user_screen_available_label
-import reskiume.composeapp.generated.resources.user_screen_change_your_password_checkbox_label
-import reskiume.composeapp.generated.resources.user_screen_current_password_field_label
-import reskiume.composeapp.generated.resources.user_screen_describe_yourself_field_label
-import reskiume.composeapp.generated.resources.user_screen_email_field_label
-import reskiume.composeapp.generated.resources.user_screen_log_out_account_message
-import reskiume.composeapp.generated.resources.user_screen_log_out_text
-import reskiume.composeapp.generated.resources.user_screen_name_field_label
-import reskiume.composeapp.generated.resources.user_screen_new_password_field_label
-import reskiume.composeapp.generated.resources.user_screen_save_changes_button
-import reskiume.composeapp.generated.resources.user_screen_unavailable_label
-import reskiume.composeapp.generated.resources.user_screen_user_account_title
-import reskiume.composeapp.generated.resources.user_screen_verify_email_label
+import reskiume.composeapp.generated.resources.modify_account_availability_description
+import reskiume.composeapp.generated.resources.modify_account_available_label
+import reskiume.composeapp.generated.resources.modify_account_change_your_password_checkbox_label
+import reskiume.composeapp.generated.resources.modify_account_current_password_field_label
+import reskiume.composeapp.generated.resources.modify_account_describe_yourself_field_label
+import reskiume.composeapp.generated.resources.modify_account_email_field_label
+import reskiume.composeapp.generated.resources.modify_account_log_out_account_message
+import reskiume.composeapp.generated.resources.modify_account_log_out_text
+import reskiume.composeapp.generated.resources.modify_account_name_field_label
+import reskiume.composeapp.generated.resources.modify_account_new_password_field_label
+import reskiume.composeapp.generated.resources.modify_account_save_changes_button
+import reskiume.composeapp.generated.resources.modify_account_unavailable_label
+import reskiume.composeapp.generated.resources.modify_account_user_account_title
+import reskiume.composeapp.generated.resources.modify_account_verify_email_label
 
 @Composable
-fun PersonalInformationScreen(onBackPressed: () -> Unit) {
+fun ModifyAccountScreen(onBackPressed: () -> Unit) {
 
-    val personalInformationViewmodel: PersonalInformationViewmodel =
-        koinViewModel<PersonalInformationViewmodel>()
-    val uiState: UiState by personalInformationViewmodel.uiState.collectAsState()
+    val modifyAccountViewmodel: ModifyAccountViewmodel =
+        koinViewModel<ModifyAccountViewmodel>()
+    val uiState: UiState by modifyAccountViewmodel.uiState.collectAsState()
 
     val profileViewmodel: ProfileViewmodel = koinViewModel<ProfileViewmodel>()
     val profileUiState: ProfileViewmodel.ProfileUiState by profileViewmodel.state.collectAsState(
@@ -146,7 +146,7 @@ fun PersonalInformationScreen(onBackPressed: () -> Unit) {
     val scrollState = rememberScrollState()
 
     RmScaffold(
-        title = stringResource(Res.string.user_screen_user_account_title, user!!.username),
+        title = stringResource(Res.string.modify_account_user_account_title, user!!.username),
         onBackPressed = onBackPressed,
     ) { padding ->
         Column(
@@ -162,7 +162,7 @@ fun PersonalInformationScreen(onBackPressed: () -> Unit) {
             RmTextField(
                 modifier = Modifier.fillMaxWidth(),
                 text = name,
-                label = stringResource(Res.string.user_screen_name_field_label),
+                label = stringResource(Res.string.modify_account_name_field_label),
                 onValueChange = { name = it }
             )
 
@@ -170,7 +170,7 @@ fun PersonalInformationScreen(onBackPressed: () -> Unit) {
             RmTextField(
                 modifier = Modifier.fillMaxWidth().height(100.dp),
                 text = description,
-                label = stringResource(Res.string.user_screen_describe_yourself_field_label),
+                label = stringResource(Res.string.modify_account_describe_yourself_field_label),
                 onValueChange = { description = it }
             )
 
@@ -193,7 +193,7 @@ fun PersonalInformationScreen(onBackPressed: () -> Unit) {
                         )
                         Spacer(modifier = Modifier.width(5.dp))
                         RmText(
-                            text = stringResource(Res.string.user_screen_verify_email_label),
+                            text = stringResource(Res.string.modify_account_verify_email_label),
                             fontWeight = FontWeight.Bold,
                             color = primaryGreen
                         )
@@ -204,7 +204,7 @@ fun PersonalInformationScreen(onBackPressed: () -> Unit) {
             RmTextField(
                 modifier = Modifier.fillMaxWidth(),
                 text = email,
-                label = stringResource(Res.string.user_screen_email_field_label),
+                label = stringResource(Res.string.modify_account_email_field_label),
                 onValueChange = { email = it }
             )
 
@@ -217,7 +217,7 @@ fun PersonalInformationScreen(onBackPressed: () -> Unit) {
                 Column {
                     Spacer(modifier = Modifier.height(10.dp))
                     RmPasswordTextField(
-                        label = stringResource(Res.string.user_screen_current_password_field_label),
+                        label = stringResource(Res.string.modify_account_current_password_field_label),
                         modifier = Modifier.fillMaxWidth(),
                         password = currentPassword,
                         onValueChange = { currentPassword = it }
@@ -234,7 +234,7 @@ fun PersonalInformationScreen(onBackPressed: () -> Unit) {
                 Column {
                     Spacer(modifier = Modifier.height(10.dp))
                     RmPasswordTextField(
-                        label = stringResource(Res.string.user_screen_new_password_field_label),
+                        label = stringResource(Res.string.modify_account_new_password_field_label),
                         modifier = Modifier.fillMaxWidth(),
                         password = newPassword,
                         onValueChange = { newPassword = it }
@@ -245,11 +245,11 @@ fun PersonalInformationScreen(onBackPressed: () -> Unit) {
             Spacer(modifier = Modifier.height(10.dp))
             RmListSwitchItem(
                 title = if (isAvailable) {
-                    stringResource(Res.string.user_screen_available_label)
+                    stringResource(Res.string.modify_account_available_label)
                 } else {
-                    stringResource(Res.string.user_screen_unavailable_label)
+                    stringResource(Res.string.modify_account_unavailable_label)
                 },
-                description = stringResource(Res.string.user_screen_availability_description),
+                description = stringResource(Res.string.modify_account_availability_description),
                 containerColor = backgroundColor,
                 listAvatarType = RmListAvatarType.Icon(
                     backgroundColor = tertiaryGreen,
@@ -263,7 +263,7 @@ fun PersonalInformationScreen(onBackPressed: () -> Unit) {
             )
 
             Spacer(modifier = Modifier.height(10.dp))
-            RmCheckbox(stringResource(Res.string.user_screen_change_your_password_checkbox_label)) { isChecked ->
+            RmCheckbox(stringResource(Res.string.modify_account_change_your_password_checkbox_label)) { isChecked ->
                 isNewPassword = isChecked
             }
 
@@ -273,10 +273,10 @@ fun PersonalInformationScreen(onBackPressed: () -> Unit) {
 
             Spacer(modifier = Modifier.weight(1f))
             RmButton(
-                text = stringResource(Res.string.user_screen_save_changes_button),
+                text = stringResource(Res.string.modify_account_save_changes_button),
                 enabled = isUpdateUserButtonEnabled,
                 onClick = {
-                    personalInformationViewmodel.saveUserChanges(
+                    modifyAccountViewmodel.saveUserChanges(
                         isDifferentEmail = email != user!!.email,
                         isDifferentImage = imageUri != user!!.image,
                         user = user!!.copy(
@@ -294,10 +294,10 @@ fun PersonalInformationScreen(onBackPressed: () -> Unit) {
 
             Spacer(modifier = Modifier.height(15.dp))
             RmTextLink(
-                text = stringResource(Res.string.user_screen_log_out_account_message),
-                textToLink = stringResource(Res.string.user_screen_log_out_text),
+                text = stringResource(Res.string.modify_account_log_out_account_message),
+                textToLink = stringResource(Res.string.modify_account_log_out_text),
                 onClick = {
-                    personalInformationViewmodel.logOut()
+                    modifyAccountViewmodel.logOut()
                     onBackPressed()
                 }
             )

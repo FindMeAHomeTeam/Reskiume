@@ -36,8 +36,8 @@ fun BottomNavigationWrapper(
                 navigateToCreateAccountScreen = {
                     mainNavHostController.navigate(Routes.CREATE_ACCOUNT.route)
                 },
-                navigateToPersonalInformationScreen = {
-                    mainNavHostController.navigate(Routes.PERSONAL_INFORMATION.route)
+                navigateToModifyAccountScreen = {
+                    mainNavHostController.navigate(Routes.MODIFY_ACCOUNT.route)
                 },
                 navigateToDeleteAccountScreen = {
                     mainNavHostController.navigate(Routes.DELETE_ACCOUNT.route)

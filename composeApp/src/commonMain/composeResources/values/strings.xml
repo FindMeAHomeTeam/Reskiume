@@ -18,8 +18,8 @@
     <string name="profile_screen_my_account_section">My account</string>
     <string name="profile_screen_my_activism_section">My activism</string>
     <string name="profile_screen_settings_section">Settings</string>
-    <string name="profile_screen_personal_information_title">Personal information</string>
-    <string name="profile_screen_personal_information_description">Manage your personal information</string>
+    <string name="profile_screen_modify_account_title">Personal information</string>
+    <string name="profile_screen_modify_account_description">Manage your personal information</string>
     <string name="profile_screen_personal_create_account_title">Create an account</string>
     <string name="profile_screen_personal_create_account_description">Register to use the app fully</string>
     <string name="profile_screen_reviews_title">Reviews</string>
@@ -79,21 +79,21 @@
     <!-- Back arrow -->
     <string name="back_arrow_content_description">Back to the previous screen"</string>
 
-    <!-- User screen -->
-    <string name="user_screen_user_account_title">%1$s's account</string>
-    <string name="user_screen_log_out_account_message">Log out of your account</string>
-    <string name="user_screen_log_out_text">Log out</string>
-    <string name="user_screen_name_field_label">Name</string>
-    <string name="user_screen_describe_yourself_field_label">Describe yourself</string>
-    <string name="user_screen_email_field_label">Email</string>
-    <string name="user_screen_verify_email_label">After saving the changes, check your new email, including your spam folder, and accept the request. Then, log back in to the application to confirm the change.</string>
-    <string name="user_screen_available_label">Available</string>
-    <string name="user_screen_unavailable_label">Not available</string>
-    <string name="user_screen_availability_description">Update your availability to receive rescue notifications</string>
-    <string name="user_screen_change_your_password_checkbox_label">I want to change my password</string>
-    <string name="user_screen_current_password_field_label">Current password</string>
-    <string name="user_screen_new_password_field_label">New password</string>
-    <string name="user_screen_save_changes_button">Save your changes</string>
+    <!-- Modify account screen -->
+    <string name="modify_account_user_account_title">%1$s's account</string>
+    <string name="modify_account_log_out_account_message">Log out of your account</string>
+    <string name="modify_account_log_out_text">Log out</string>
+    <string name="modify_account_name_field_label">Name</string>
+    <string name="modify_account_describe_yourself_field_label">Describe yourself</string>
+    <string name="modify_account_email_field_label">Email</string>
+    <string name="modify_account_verify_email_label">After saving the changes, check your new email, including your spam folder, and accept the request. Then, log back in to the application to confirm the change.</string>
+    <string name="modify_account_available_label">Available</string>
+    <string name="modify_account_unavailable_label">Not available</string>
+    <string name="modify_account_availability_description">Update your availability to receive rescue notifications</string>
+    <string name="modify_account_change_your_password_checkbox_label">I want to change my password</string>
+    <string name="modify_account_current_password_field_label">Current password</string>
+    <string name="modify_account_new_password_field_label">New password</string>
+    <string name="modify_account_save_changes_button">Save your changes</string>
 
     <!-- Delete account screen -->
     <string name="delete_account_screen_delete_account_title">Delete your account</string>

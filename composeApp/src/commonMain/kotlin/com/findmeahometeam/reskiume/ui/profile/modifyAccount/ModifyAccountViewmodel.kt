@@ -1,4 +1,4 @@
-package com.findmeahometeam.reskiume.ui.profile.personalInformation
+package com.findmeahometeam.reskiume.ui.profile.modifyAccount
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
-class PersonalInformationViewmodel(
+class ModifyAccountViewmodel(
     observeAuthStateFromAuthDataSource: ObserveAuthStateFromAuthDataSource,
     private val getUserFromLocalDataSource: GetUserFromLocalDataSource,
     private val getUserFromRemoteDataSource: GetUserFromRemoteDataSource,

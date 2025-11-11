@@ -77,8 +77,8 @@ import reskiume.composeapp.generated.resources.profile_screen_non_human_animals_
 import reskiume.composeapp.generated.resources.profile_screen_non_human_animals_title
 import reskiume.composeapp.generated.resources.profile_screen_personal_create_account_description
 import reskiume.composeapp.generated.resources.profile_screen_personal_create_account_title
-import reskiume.composeapp.generated.resources.profile_screen_personal_information_description
-import reskiume.composeapp.generated.resources.profile_screen_personal_information_title
+import reskiume.composeapp.generated.resources.profile_screen_modify_account_description
+import reskiume.composeapp.generated.resources.profile_screen_modify_account_title
 import reskiume.composeapp.generated.resources.profile_screen_profile_image_content_description
 import reskiume.composeapp.generated.resources.profile_screen_reviews_description
 import reskiume.composeapp.generated.resources.profile_screen_reviews_title
@@ -89,7 +89,7 @@ import reskiume.composeapp.generated.resources.reskiume
 @Composable
 fun ProfileScreen(
     navigateToCreateAccountScreen: () -> Unit,
-    navigateToPersonalInformationScreen: () -> Unit,
+    navigateToModifyAccountScreen: () -> Unit,
     navigateToDeleteAccountScreen: () -> Unit
 ) {
     val profileViewmodel: ProfileViewmodel = koinViewModel<ProfileViewmodel>()
@@ -156,10 +156,10 @@ fun ProfileScreen(
         }
         if (user != null) {
 
-            // profile screen
+            // modify account screen
             RmListButtonItem(
-                title = stringResource(Res.string.profile_screen_personal_information_title),
-                description = stringResource(Res.string.profile_screen_personal_information_description),
+                title = stringResource(Res.string.profile_screen_modify_account_title),
+                description = stringResource(Res.string.profile_screen_modify_account_description),
                 containerColor = backgroundColor,
                 listAvatarType = RmListAvatarType.Icon(
                     backgroundColor = tertiaryGreen,
@@ -167,7 +167,7 @@ fun ProfileScreen(
                     iconColor = primaryGreen
                 ),
                 onClick = {
-                    navigateToPersonalInformationScreen()
+                    navigateToModifyAccountScreen()
                 }
             )
 

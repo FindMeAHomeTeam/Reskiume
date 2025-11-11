@@ -8,13 +8,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class AuthUserRepositoryForIosDelegateImpl: AuthUserRepositoryForIosDelegate {
+class AuthUserRepositoryForIosDelegateImpl(
+    private val log: Log
+): AuthUserRepositoryForIosDelegate {
     private val _authUserDelegateState: MutableStateFlow<AuthUser?> = MutableStateFlow(null)
 
     override val authUserDelegateState: Flow<AuthUser?> = _authUserDelegateState.asStateFlow()
 
     override fun updateAuthUserDelegate(delegate: AuthUser?) {
         _authUserDelegateState.update { delegate }
-        Log.d("AuthUserRepositoryForIosDelegateImpl", "updateAuthUserDelegate: $delegate")
+        log.d("AuthUserRepositoryForIosDelegateImpl", "updateAuthUserDelegate: $delegate")
     }
 }

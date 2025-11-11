@@ -16,7 +16,9 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 
-class RealtimeDatabaseRepositoryAndroidImpl : RealtimeDatabaseRepository {
+class RealtimeDatabaseRepositoryAndroidImpl(
+    private val log: Log
+) : RealtimeDatabaseRepository {
 
     private val databaseRef: DatabaseReference =
         Firebase.database.also { it.setPersistenceEnabled(true) }.reference
@@ -31,11 +33,11 @@ class RealtimeDatabaseRepositoryAndroidImpl : RealtimeDatabaseRepository {
                 .addOnSuccessListener {
                     onInsertRemoteUser(DatabaseResult.Success)
                 }.addOnFailureListener { e ->
-                    Log.e("RealtimeDatabaseRepositoryAndroidImpl", "insertRemoteUser: Error inserting the remote user ${remoteUser.uid}: ${e.message}")
+                    log.e("RealtimeDatabaseRepositoryAndroidImpl", "insertRemoteUser: Error inserting the remote user ${remoteUser.uid}: ${e.message}")
                     onInsertRemoteUser(DatabaseResult.Error(e.message ?: ""))
                 }
         } ?: onInsertRemoteUser(DatabaseResult.Error()).also {
-            Log.e("RealtimeDatabaseRepositoryAndroidImpl", "insertRemoteUser: Error inserting a remote user")
+            log.e("RealtimeDatabaseRepositoryAndroidImpl", "insertRemoteUser: Error inserting a remote user")
         }
     }
 
@@ -47,7 +49,7 @@ class RealtimeDatabaseRepositoryAndroidImpl : RealtimeDatabaseRepository {
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                Log.w(
+                log.w(
                     "RealtimeDatabaseRepositoryAndroid",
                     "getRemoteUser:onCancelled ${databaseError.toException()}"
                 )
@@ -70,7 +72,7 @@ class RealtimeDatabaseRepositoryAndroidImpl : RealtimeDatabaseRepository {
         databaseRef.updateChildren(childUpdates).addOnSuccessListener {
             onUpdateRemoteUser(DatabaseResult.Success)
         }.addOnFailureListener { e ->
-            Log.e("RealtimeDatabaseRepositoryAndroidImpl", "updateRemoteUser: Error updating the remote user ${remoteUser.uid}: ${e.message}")
+            log.e("RealtimeDatabaseRepositoryAndroidImpl", "updateRemoteUser: Error updating the remote user ${remoteUser.uid}: ${e.message}")
             onUpdateRemoteUser(DatabaseResult.Error(e.message ?: ""))
         }
     }
@@ -80,7 +82,7 @@ class RealtimeDatabaseRepositoryAndroidImpl : RealtimeDatabaseRepository {
             if (error == null) {
                 onDeleteRemoteUser(DatabaseResult.Success)
             } else {
-                Log.e("RealtimeDatabaseRepositoryAndroidImpl", "deleteRemoteUser: Error deleting the user $uid")
+                log.e("RealtimeDatabaseRepositoryAndroidImpl", "deleteRemoteUser: Error deleting the user $uid")
                 onDeleteRemoteUser(DatabaseResult.Error())
             }
         }

@@ -48,6 +48,7 @@ import com.findmeahometeam.reskiume.ui.core.secondaryRed
 import com.findmeahometeam.reskiume.ui.core.tertiaryGreen
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import reskiume.composeapp.generated.resources.Res
 import reskiume.composeapp.generated.resources.ic_advice
@@ -97,6 +98,7 @@ fun ProfileScreen(
     val profileUiState: ProfileViewmodel.ProfileUiState by profileViewmodel.state.collectAsState(
         initial = ProfileViewmodel.ProfileUiState.Idle
     )
+    val log: Log = koinInject<Log>()
     var user: User? by remember { mutableStateOf(null) }
     val scrollState: ScrollState = rememberScrollState()
 
@@ -106,7 +108,7 @@ fun ProfileScreen(
         }
 
         is ProfileViewmodel.ProfileUiState.Error -> {
-            Log.e(
+            log.e(
                 "ProfileScreen",
                 (profileUiState as ProfileViewmodel.ProfileUiState.Error).message
             )

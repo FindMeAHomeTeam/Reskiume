@@ -24,7 +24,10 @@ final class FirebaseAuthManager {
         authRepositoryIosHelper!.authUserRepositoryForIosDelegate
         
         authRepositoryForIosDelegate =
-        AuthRepositoryForIosDelegateImpl(authUserRepositoryForIosDelegate: authUserRepositoryForIosDelegate!)
+        AuthRepositoryForIosDelegateImpl(
+            authUserRepositoryForIosDelegate: authUserRepositoryForIosDelegate!,
+            log: authRepositoryIosHelper!.log
+        )
         
         authRepositoryIosHelper!.authRepositoryForIosDelegateWrapper.updateAuthRepositoryForIosDelegate(delegate: authRepositoryForIosDelegate)
     }

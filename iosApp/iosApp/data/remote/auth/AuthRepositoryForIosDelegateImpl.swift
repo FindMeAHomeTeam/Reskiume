@@ -11,7 +11,13 @@ class AuthRepositoryForIosDelegateImpl: AuthRepositoryForIosDelegate {
     
     var authUser: AuthUser?
     
-    init (authUserRepositoryForIosDelegate: AuthUserRepositoryForIosDelegate) {
+    var log: Log
+    
+    init (
+        authUserRepositoryForIosDelegate: AuthUserRepositoryForIosDelegate,
+        log: Log
+    ) {
+        self.log = log
         listenerHandle = auth.addStateDidChangeListener { [weak self] _, user in
             guard let self = self else { return }
             
@@ -59,7 +65,7 @@ class AuthRepositoryForIosDelegateImpl: AuthRepositoryForIosDelegate {
     
     private func reauthenticateUser(password: String, onReauthenticate: @escaping (FirebaseAuth.User?) -> Void) async throws {
         guard let user: FirebaseAuth.User = auth.currentUser, let email = user.email else {
-            Log().e(tag: "AuthRepositoryForIosDelegateImpl", message: "reauthenticateUser: Not signed in or user has no email", throwable: nil)
+            log.e(tag: "AuthRepositoryForIosDelegateImpl", message: "reauthenticateUser: Not signed in or user has no email", throwable: nil)
             onReauthenticate(nil)
             return
         }
@@ -69,7 +75,7 @@ class AuthRepositoryForIosDelegateImpl: AuthRepositoryForIosDelegate {
             try await user.reauthenticate(with: credential)
             onReauthenticate(user)
         } catch {
-            Log().e(tag: "AuthRepositoryForIosDelegateImpl", message: "reauthenticateUser: \(error.localizedDescription)", throwable: nil)
+            log.e(tag: "AuthRepositoryForIosDelegateImpl", message: "reauthenticateUser: \(error.localizedDescription)", throwable: nil)
             onReauthenticate(nil)
         }
     }
@@ -83,7 +89,7 @@ class AuthRepositoryForIosDelegateImpl: AuthRepositoryForIosDelegate {
                 }
                 user.delete { error in
                     if let error = error {
-                        Log().e(tag: "AuthRepositoryForIosDelegateImpl", message: "deleteUser: \(error.localizedDescription)", throwable: nil)
+                        self.log.e(tag: "AuthRepositoryForIosDelegateImpl", message: "deleteUser: \(error.localizedDescription)", throwable: nil)
                         onDeleteUser(error.localizedDescription)
                     } else {
                         onDeleteUser("")
@@ -91,7 +97,7 @@ class AuthRepositoryForIosDelegateImpl: AuthRepositoryForIosDelegate {
                 }
             }
         } catch {
-            Log().e(tag: "AuthRepositoryForIosDelegateImpl", message: "deleteUser: \(error.localizedDescription)", throwable: nil)
+            log.e(tag: "AuthRepositoryForIosDelegateImpl", message: "deleteUser: \(error.localizedDescription)", throwable: nil)
             onDeleteUser(error.localizedDescription)
         }
     }
@@ -105,7 +111,7 @@ class AuthRepositoryForIosDelegateImpl: AuthRepositoryForIosDelegate {
                 }
                 user.sendEmailVerification(beforeUpdatingEmail: newEmail) { error in
                     if let error = error {
-                        Log().e(tag: "AuthRepositoryForIosDelegateImpl", message: "updateUserEmail: \(error.localizedDescription)", throwable: nil)
+                        self.log.e(tag: "AuthRepositoryForIosDelegateImpl", message: "updateUserEmail: \(error.localizedDescription)", throwable: nil)
                         onUpdatedUserEmail(error.localizedDescription)
                     } else {
                         onUpdatedUserEmail("")
@@ -113,7 +119,7 @@ class AuthRepositoryForIosDelegateImpl: AuthRepositoryForIosDelegate {
                 }
             }
         } catch {
-            Log().e(tag: "AuthRepositoryForIosDelegateImpl", message: "updateUserEmail: \(error.localizedDescription)", throwable: nil)
+            log.e(tag: "AuthRepositoryForIosDelegateImpl", message: "updateUserEmail: \(error.localizedDescription)", throwable: nil)
             onUpdatedUserEmail(error.localizedDescription)
         }
     }
@@ -127,7 +133,7 @@ class AuthRepositoryForIosDelegateImpl: AuthRepositoryForIosDelegate {
                 }
                 user.updatePassword(to: newPassword) { error in
                     if let error = error {
-                        Log().e(tag: "AuthRepositoryForIosDelegateImpl", message: "updateUserPassword: \(error.localizedDescription)", throwable: nil)
+                        self.log.e(tag: "AuthRepositoryForIosDelegateImpl", message: "updateUserPassword: \(error.localizedDescription)", throwable: nil)
                         onUpdatedUserPassword(error.localizedDescription)
                     } else {
                         onUpdatedUserPassword("")
@@ -135,7 +141,7 @@ class AuthRepositoryForIosDelegateImpl: AuthRepositoryForIosDelegate {
                 }
             }
         } catch {
-            Log().e(tag: "AuthRepositoryForIosDelegateImpl", message: "updateUserPassword: \(error.localizedDescription)", throwable: nil)
+            log.e(tag: "AuthRepositoryForIosDelegateImpl", message: "updateUserPassword: \(error.localizedDescription)", throwable: nil)
             onUpdatedUserPassword(error.localizedDescription)
         }
     }

@@ -27,7 +27,8 @@ class CreateAccountViewmodel(
     private val insertUserToLocalDataSource: InsertUserToLocalDataSource,
     private val deleteUserFromAuthDataSource: DeleteUserFromAuthDataSource,
     private val deleteUserFromRemoteDataSource: DeleteUserFromRemoteDataSource,
-    private val deleteImageFromRemoteDataSource: DeleteImageFromRemoteDataSource
+    private val deleteImageFromRemoteDataSource: DeleteImageFromRemoteDataSource,
+    private val log: Log
 ) : ViewModel() {
     private var _state: MutableStateFlow<UiState> = MutableStateFlow(UiState.Idle)
     val state: StateFlow<UiState> = _state.asStateFlow()
@@ -44,7 +45,7 @@ class CreateAccountViewmodel(
             when (authResult) {
                 is AuthResult.Error -> {
                     _state.value = UiState.Error(authResult.message)
-                    Log.e(
+                    log.e(
                         "CreateAccountViewmodel",
                         "createUserUsingEmailAndPwd: ${authResult.message}"
                     )
@@ -64,13 +65,13 @@ class CreateAccountViewmodel(
             imageUri = user.image
         ) { imageDownloadUri: String ->
             val userWithPossibleImageDownloadUri: User = if (imageDownloadUri.isBlank()) {
-                Log.d(
+                log.d(
                     "CreateAccountViewmodel",
                     "saveUserToRemoteSource: Download URI is blank"
                 )
                 user
             } else {
-                Log.d(
+                log.d(
                     "CreateAccountViewmodel",
                     "saveUserToRemoteSource: Download URI saved successfully"
                 )
@@ -110,7 +111,7 @@ class CreateAccountViewmodel(
                 currentUserImage
             ) { imageDeleted: Boolean ->
                 if (!imageDeleted) {
-                    Log.e(
+                    log.e(
                         "DeleteAccountViewmodel",
                         "deleteImageFromRemoteDataSource: Error deleting user image from remote data source"
                     )
@@ -128,13 +129,13 @@ class CreateAccountViewmodel(
             deleteUserFromAuthDataSource(password) { errorMessage: String ->
                 if (errorMessage.isBlank()) {
                     _state.value = UiState.Error(errorMessageFromDataSource)
-                    Log.e(
+                    log.e(
                         "CreateAccountViewmodel",
                         "deleteAccountFromAuthDataSource: $errorMessageFromDataSource"
                     )
                 } else {
                     _state.value = UiState.Error("$errorMessageFromDataSource - $errorMessage")
-                    Log.e(
+                    log.e(
                         "CreateAccountViewmodel",
                         "deleteAccountFromAuthDataSource: $errorMessageFromDataSource - $errorMessage"
                     )
@@ -148,7 +149,7 @@ class CreateAccountViewmodel(
             insertUserToLocalDataSource(user) { rowId ->
                 if (rowId > 0) {
                     _state.value = UiState.Success
-                    Log.d(
+                    log.d(
                         "CreateAccountViewmodel",
                         "User created successfully"
                     )

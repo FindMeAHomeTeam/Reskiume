@@ -18,7 +18,7 @@ final class FirebaseStorageManager {
         didStart = true
         
         storageRepositoryForIosHelper = StorageRepositoryForIosHelper()
-        storageRepository = StorageRepositoryForIosDelegateImpl()
+        storageRepository = StorageRepositoryForIosDelegateImpl(log: storageRepositoryForIosHelper!.log)
         storageRepositoryForIosHelper!.storageRepositoryForIosDelegateWrapper.updateStorageRepositoryForIosDelegate(delegate: storageRepository)
     }
 }

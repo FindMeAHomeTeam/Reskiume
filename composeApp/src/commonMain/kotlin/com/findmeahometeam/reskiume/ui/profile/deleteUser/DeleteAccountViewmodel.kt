@@ -30,8 +30,8 @@ class DeleteAccountViewmodel(
     private val deleteUserFromRemoteDataSource: DeleteUserFromRemoteDataSource,
     private val deleteImageFromRemoteDataSource: DeleteImageFromRemoteDataSource,
     private val deleteImageInLocalDataSource: DeleteImageInLocalDataSource,
-    private val deleteUserFromLocalDataSource: DeleteUserFromLocalDataSource
-
+    private val deleteUserFromLocalDataSource: DeleteUserFromLocalDataSource,
+    private val log: Log
 ) : ViewModel() {
     private var _state: MutableStateFlow<UiState> = MutableStateFlow(UiState.Idle)
     val state: StateFlow<UiState> = _state.asStateFlow()
@@ -59,7 +59,7 @@ class DeleteAccountViewmodel(
             deleteUserFromRemoteDataSource(userUid) { result: DatabaseResult ->
                 if (result is DatabaseResult.Error) {
                     _state.value = UiState.Error(result.message)
-                    Log.e(
+                    log.e(
                         "DeleteAccountViewmodel",
                         "deleteUserFromRemoteDataSource: ${result.message}"
                     )
@@ -89,7 +89,7 @@ class DeleteAccountViewmodel(
             remoteImage
         ) { imageDeleted: Boolean ->
             if (!imageDeleted) {
-                Log.e(
+                log.e(
                     "DeleteAccountViewmodel",
                     "deleteImageFromRemoteDataSource: Error deleting user image from remote data source"
                 )
@@ -99,7 +99,7 @@ class DeleteAccountViewmodel(
                 currentImagePath = localImage
             ) { isDeleted: Boolean ->
                 if (!isDeleted) {
-                    Log.e(
+                    log.e(
                         "DeleteAccountViewmodel",
                         "deleteImageInLocalDataSource: failed to delete image in local data source"
                     )
@@ -132,13 +132,13 @@ class DeleteAccountViewmodel(
             deleteUserFromLocalDataSource(deletedUid) { rowsDeleted: Int ->
                 if (rowsDeleted == 0) {
                     _state.value = UiState.Error()
-                    Log.e(
+                    log.e(
                         "DeleteAccountViewmodel",
                         "deleteMyUserFromLocalDataSource: Error deleting user from local data source $errorMessageFromAuthDataSource"
                     )
                 } else {
                     _state.value = UiState.Success
-                    Log.d(
+                    log.d(
                         "DeleteAccountViewmodel",
                         "User deleted successfully"
                     )

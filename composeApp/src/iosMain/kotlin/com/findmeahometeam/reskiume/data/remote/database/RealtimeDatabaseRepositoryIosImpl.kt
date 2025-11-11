@@ -13,7 +13,8 @@ import kotlinx.coroutines.flow.Flow
 @OptIn(ExperimentalForeignApi::class)
 class RealtimeDatabaseRepositoryIosImpl(
     private val realtimeDatabaseRepositoryForIosDelegateWrapper: RealtimeDatabaseRepositoryForIosDelegateWrapper,
-    private val realtimeDatabaseRemoteUserRepositoryForIosDelegate: RealtimeDatabaseRemoteUserRepositoryForIosDelegate
+    private val realtimeDatabaseRemoteUserRepositoryForIosDelegate: RealtimeDatabaseRemoteUserRepositoryForIosDelegate,
+    private val log: Log
 ) : RealtimeDatabaseRepository {
 
     private suspend fun initialCheck(
@@ -40,7 +41,7 @@ class RealtimeDatabaseRepositoryIosImpl(
                 it.insertRemoteUser(remoteUser, onInsertRemoteUser)
             },
             onFailure = {
-                Log.e("RealtimeDatabaseRepositoryIosImpl", "insertRemoteUser: Error inserting the remote user ${remoteUser.uid?.ifBlank { "" }}")
+                log.e("RealtimeDatabaseRepositoryIosImpl", "insertRemoteUser: Error inserting the remote user ${remoteUser.uid?.ifBlank { "" }}")
                 onInsertRemoteUser(DatabaseResult.Error())
             }
         )
@@ -61,7 +62,7 @@ class RealtimeDatabaseRepositoryIosImpl(
                 it.updateRemoteUser(remoteUser, onUpdateRemoteUser)
             },
             onFailure = {
-                Log.e("RealtimeDatabaseRepositoryIosImpl", "updateRemoteUser: Error updating the remote user ${remoteUser.uid?.ifBlank { "" }}")
+                log.e("RealtimeDatabaseRepositoryIosImpl", "updateRemoteUser: Error updating the remote user ${remoteUser.uid?.ifBlank { "" }}")
                 onUpdateRemoteUser(DatabaseResult.Error())
             }
         )
@@ -76,7 +77,7 @@ class RealtimeDatabaseRepositoryIosImpl(
         if (value != null) {
             value.deleteRemoteUser(uid, onDeleteRemoteUser)
         } else {
-            Log.e("RealtimeDatabaseRepositoryIosImpl", "deleteRemoteUser: Error deleting the remote user ${uid.ifBlank { "" }}")
+            log.e("RealtimeDatabaseRepositoryIosImpl", "deleteRemoteUser: Error deleting the remote user ${uid.ifBlank { "" }}")
             onDeleteRemoteUser(DatabaseResult.Error())
         }
     }

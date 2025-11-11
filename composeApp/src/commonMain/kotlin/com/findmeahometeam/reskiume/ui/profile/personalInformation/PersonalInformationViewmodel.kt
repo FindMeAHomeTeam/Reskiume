@@ -38,7 +38,8 @@ class PersonalInformationViewmodel(
     private val uploadImageToRemoteDataSource: UploadImageToRemoteDataSource,
     private val modifyUserFromRemoteDataSource: ModifyUserFromRemoteDataSource,
     private val modifyUserFromLocalDataSource: ModifyUserFromLocalDataSource,
-    private val signOutFromAuthDataSource: SignOutFromAuthDataSource
+    private val signOutFromAuthDataSource: SignOutFromAuthDataSource,
+    private val log: Log
 ) : ViewModel() {
 
     private val authUserState: Flow<AuthUser?> = observeAuthStateFromAuthDataSource()
@@ -104,7 +105,7 @@ class PersonalInformationViewmodel(
         }
         modifyUserEmailInAuthDataSource(password, newEmail) { error ->
             if (error.isBlank()) {
-                Log.d(
+                log.d(
                     "PersonalInformationViewmodel",
                     "updateUserEmailInAuthDataSource: accepted request to update user email in auth data source"
                 )
@@ -112,7 +113,7 @@ class PersonalInformationViewmodel(
                     onSuccess()
                 }
             } else {
-                Log.e(
+                log.e(
                     "PersonalInformationViewmodel",
                     "updateUserEmailInAuthDataSource: failed to update user email in auth data source: $error"
                 )
@@ -132,7 +133,7 @@ class PersonalInformationViewmodel(
         }
         modifyUserPasswordInAuthDataSource(currentPassword, newPassword) { error ->
             if (error.isBlank()) {
-                Log.d(
+                log.d(
                     "PersonalInformationViewmodel",
                     "updateUserPasswordInAuthDataSource: User password updated successfully in auth data source"
                 )
@@ -140,7 +141,7 @@ class PersonalInformationViewmodel(
                     onSuccess()
                 }
             } else {
-                Log.e(
+                log.e(
                     "PersonalInformationViewmodel",
                     "updateUserPasswordInAuthDataSource: failed to update user password in auth data source: $error"
                 )
@@ -162,13 +163,13 @@ class PersonalInformationViewmodel(
             ) { isDeleted ->
 
                 if (isDeleted) {
-                    Log.d(
+                    log.d(
                         "PersonalInformationViewmodel",
                         "deleteCurrentImageInRemoteDataSource: Image deleted successfully in remote data source"
                     )
                     onSuccess()
                 } else {
-                    Log.e(
+                    log.e(
                         "PersonalInformationViewmodel",
                         "deleteCurrentImageInRemoteDataSource: failed to delete image in remote data source"
                     )
@@ -187,13 +188,13 @@ class PersonalInformationViewmodel(
             ) { isDeleted ->
 
                 if (isDeleted) {
-                    Log.d(
+                    log.d(
                         "PersonalInformationViewmodel",
                         "deleteCurrentImageInLocalDataSource: Image deleted successfully in local data source"
                     )
                     onSuccess()
                 } else {
-                    Log.e(
+                    log.e(
                         "PersonalInformationViewmodel",
                         "deleteCurrentImageInLocalDataSource: failed to delete image in local data source"
                     )
@@ -212,13 +213,13 @@ class PersonalInformationViewmodel(
             imageUri = user.image
         ) { imageDownloadUri: String ->
             val userWithPossibleImageDownloadUri: User = if (imageDownloadUri.isBlank()) {
-                Log.d(
+                log.d(
                     "PersonalInformationViewmodel",
                     "updateUserInRemoteDataSource: Download URI is blank"
                 )
                 user
             } else {
-                Log.d(
+                log.d(
                     "PersonalInformationViewmodel",
                     "updateUserInRemoteDataSource: Download URI saved successfully"
                 )
@@ -233,7 +234,7 @@ class PersonalInformationViewmodel(
     private suspend fun updateUserInRemoteDataSource(user: User, onSuccess: suspend () -> Unit) {
         modifyUserFromRemoteDataSource(user) { result ->
             if (result is DatabaseResult.Success) {
-                Log.d(
+                log.d(
                     "PersonalInformationViewmodel",
                     "updateUserInRemoteDataSource: User updated successfully in remote data source"
                 )
@@ -241,7 +242,7 @@ class PersonalInformationViewmodel(
                     onSuccess()
                 }
             } else {
-                Log.e(
+                log.e(
                     "PersonalInformationViewmodel",
                     "updateUserInRemoteDataSource: failed to update user in remote data source"
                 )
@@ -253,13 +254,13 @@ class PersonalInformationViewmodel(
     private suspend fun saveUserChangesInLocalDataSource(user: User) {
         modifyUserFromLocalDataSource(user) { rowsModified: Int ->
             if (rowsModified > 0) {
-                Log.d(
+                log.d(
                     "PersonalInformationViewmodel",
                     "saveUserChanges: User updated successfully in local data source"
                 )
                 _uiState.value = UiState.Success
             } else {
-                Log.e(
+                log.e(
                     "PersonalInformationViewmodel",
                     "saveUserChanges: failed to update user in local data source"
                 )
@@ -277,12 +278,12 @@ class PersonalInformationViewmodel(
                 val user: User = getUserFromLocalDataSource(authUser.uid)!!
                 modifyUserFromLocalDataSource(user.copy(lastLogout = Clock.System.now().epochSeconds)) { rowsModified: Int ->
                     if (rowsModified > 0) {
-                        Log.d(
+                        log.d(
                             "PersonalInformationViewmodel",
                             "logOut: lastLogout updated successfully in local data source"
                         )
                     } else {
-                        Log.e(
+                        log.e(
                             "PersonalInformationViewmodel",
                             "logOut: failed to update lastLogout in local data source"
                         )

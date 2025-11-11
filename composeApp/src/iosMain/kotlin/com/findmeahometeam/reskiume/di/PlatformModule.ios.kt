@@ -13,6 +13,8 @@ import com.findmeahometeam.reskiume.data.remote.storage.StorageRepositoryForIosD
 import com.findmeahometeam.reskiume.data.remote.storage.StorageRepositoryIosImpl
 import com.findmeahometeam.reskiume.data.util.analytics.AnalyticsForIosDelegateWrapperImpl
 import com.findmeahometeam.reskiume.data.util.log.CrashlyticsForIosDelegateWrapperImpl
+import com.findmeahometeam.reskiume.data.util.log.Log
+import com.findmeahometeam.reskiume.data.util.log.LogIosImpl
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthUserRepositoryForIosDelegate
 import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRemoteUserRepositoryForIosDelegate
@@ -28,6 +30,7 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 
 actual val platformModule: Module = module {
+    singleOf(::LogIosImpl) bind Log::class
     singleOf(::AuthRepositoryIosImpl) bind AuthRepository::class
     singleOf(::AuthUserRepositoryForIosDelegateImpl) bind AuthUserRepositoryForIosDelegate::class
     singleOf(::AuthRepositoryForIosDelegateWrapperImpl) bind AuthRepositoryForIosDelegateWrapper::class

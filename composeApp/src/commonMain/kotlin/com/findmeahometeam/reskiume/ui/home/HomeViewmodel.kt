@@ -15,17 +15,18 @@ import kotlinx.coroutines.flow.stateIn
 
 class HomeViewmodel(
     observeAuthStateFromAuthDataSource: ObserveAuthStateFromAuthDataSource,
+    private val log: Log,
     private val getUserFromLocalDataSource: GetUserFromLocalDataSource
 ) : ViewModel() {
 
     val state: StateFlow<UiState> = observeAuthStateFromAuthDataSource().map { authUser: AuthUser? ->
         if (authUser?.uid == null) {
-            Log.d("HomeViewmodel", "User not logged in")
+            log.d("HomeViewmodel", "User not logged in")
             UiState.Idle
         } else {
             val user: User? = getUserFromLocalDataSource(authUser.uid)
             if (user == null) {
-                Log.e("HomeViewmodel", "User data not found")
+                log.e("HomeViewmodel", "User data not found")
                 UiState.Idle
             } else {
                 UiState.Success

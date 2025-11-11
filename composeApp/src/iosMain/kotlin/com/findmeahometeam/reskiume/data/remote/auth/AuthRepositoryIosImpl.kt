@@ -15,12 +15,13 @@ import kotlinx.coroutines.flow.first
 @OptIn(ExperimentalForeignApi::class)
 class AuthRepositoryIosImpl(
     authUserRepositoryForIosDelegate: AuthUserRepositoryForIosDelegate,
-    private val authRepositoryForIosDelegateWrapper: AuthRepositoryForIosDelegateWrapper
+    private val authRepositoryForIosDelegateWrapper: AuthRepositoryForIosDelegateWrapper,
+    private val log: Log
 ) : AuthRepository {
 
     override val authState: Flow<AuthUser?> =
         authUserRepositoryForIosDelegate.authUserDelegateState.also {
-            Log.d("AuthRepositoryIosImpl", "authState: $it")
+            log.d("AuthRepositoryIosImpl", "authState: $it")
         }
 
     private suspend fun getDelegate(): AuthRepositoryForIosDelegate {

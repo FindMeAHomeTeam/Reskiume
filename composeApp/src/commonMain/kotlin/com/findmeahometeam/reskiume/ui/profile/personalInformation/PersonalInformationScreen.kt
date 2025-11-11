@@ -46,6 +46,7 @@ import com.findmeahometeam.reskiume.ui.core.primaryGreen
 import com.findmeahometeam.reskiume.ui.core.tertiaryGreen
 import com.findmeahometeam.reskiume.ui.profile.ProfileViewmodel
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import reskiume.composeapp.generated.resources.Res
 import reskiume.composeapp.generated.resources.ic_notifications
@@ -71,6 +72,7 @@ fun PersonalInformationScreen(onBackPressed: () -> Unit) {
     val personalInformationViewmodel: PersonalInformationViewmodel =
         koinViewModel<PersonalInformationViewmodel>()
     val uiState: UiState by personalInformationViewmodel.uiState.collectAsState()
+    val log: Log = koinInject<Log>()
 
     val profileViewmodel: ProfileViewmodel = koinViewModel<ProfileViewmodel>()
     val profileUiState: ProfileViewmodel.ProfileUiState by profileViewmodel.state.collectAsState(
@@ -86,7 +88,7 @@ fun PersonalInformationScreen(onBackPressed: () -> Unit) {
         }
 
         is ProfileViewmodel.ProfileUiState.Error -> {
-            Log.e(
+            log.e(
                 "PersonalInformationScreen",
                 (profileUiState as ProfileViewmodel.ProfileUiState.Error).message
             )

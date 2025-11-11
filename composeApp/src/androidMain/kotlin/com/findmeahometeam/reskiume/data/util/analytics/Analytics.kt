@@ -23,6 +23,6 @@ actual object Analytics {
             }
         }
         Firebase.analytics.logEvent(name, bundle)
-        Log.d("Analytics", "Event logged: $name with params: $params")
+        //Log.d("Analytics", "Event logged: $name with params: $params")
     }
 }

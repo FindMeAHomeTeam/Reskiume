@@ -27,8 +27,8 @@ class LoginViewmodel(
     private val getUserFromRemoteDataSource: GetUserFromRemoteDataSource,
     private val saveImageToLocalDataSource: SaveImageToLocalDataSource,
     private val insertUserToLocalDataSource: InsertUserToLocalDataSource,
-    private val modifyUserFromLocalDataSource: ModifyUserFromLocalDataSource
-
+    private val modifyUserFromLocalDataSource: ModifyUserFromLocalDataSource,
+    private val log: Log
 ) : ViewModel() {
     private var _state: MutableStateFlow<UiState> = MutableStateFlow(UiState.Idle)
     val state: StateFlow<UiState> = _state.asStateFlow()
@@ -58,13 +58,13 @@ class LoginViewmodel(
                     viewModelScope.launch {
                         insertUserToLocalDataSource(collectedUser) { rowId: Long ->
                             if (rowId > 0) {
-                                Log.d(
+                                log.d(
                                     "LoginViewmodel",
                                     "Inserted user with uid ${collectedUser.uid} into local data source."
                                 )
                                 _state.value = UiState.Success
                             } else {
-                                Log.e(
+                                log.e(
                                     "LoginViewmodel",
                                     "Failed to insert user with uid ${collectedUser.uid} into local data source."
                                 )
@@ -79,13 +79,13 @@ class LoginViewmodel(
                     viewModelScope.launch {
                         modifyUserFromLocalDataSource(collectedUser) { rowsModified: Int ->
                             if (rowsModified > 0) {
-                                Log.d(
+                                log.d(
                                     "LoginViewmodel",
                                     "Modified user with uid ${collectedUser.uid} into local data source."
                                 )
                                 _state.value = UiState.Success
                             } else {
-                                Log.e(
+                                log.e(
                                     "LoginViewmodel",
                                     "Failed to modify user with uid ${collectedUser.uid} in local data source."
                                 )
@@ -95,7 +95,7 @@ class LoginViewmodel(
                     }
                 }
             } else {
-                Log.d(
+                log.d(
                     "LoginViewmodel",
                     "User with uid ${user.uid} is up-to-date in local data source."
                 )
@@ -110,7 +110,7 @@ class LoginViewmodel(
     ) {
         getUserFromRemoteDataSource(userUid).collect { collectedUser: User? ->
             if (collectedUser == null) {
-                Log.d(
+                log.d(
                     "LoginViewmodel",
                     "Unless it is the default collectedUser value, it seems that the user $userUid was not found in the remote data source despite successful authentication."
                 )
@@ -122,7 +122,7 @@ class LoginViewmodel(
                     onSavedAvatar(collectedUser.copy(image = localImagePath.ifBlank { collectedUser.image }))
                 }
             } else {
-                Log.d(
+                log.d(
                     "LoginViewmodel",
                     "User ${collectedUser.uid} has no avatar image to save locally."
                 )

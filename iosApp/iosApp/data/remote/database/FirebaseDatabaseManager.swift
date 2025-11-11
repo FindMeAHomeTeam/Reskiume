@@ -24,7 +24,10 @@ final class FirebaseDatabaseManager {
         realtimeDatabaseRepositoryIosHelper!.realtimeDatabaseRemoteUserRepositoryForIosDelegate
         
         realtimeDatabaseRepositoryForIosDelegate =
-        RealtimeDatabaseRepositoryForIosDelegateImpl(realtimeDatabaseRemoteUserRepositoryForIosDelegate: realtimeDatabaseRemoteUserRepositoryForIosDelegate!)
+        RealtimeDatabaseRepositoryForIosDelegateImpl(
+            realtimeDatabaseRemoteUserRepositoryForIosDelegate: realtimeDatabaseRemoteUserRepositoryForIosDelegate!,
+            log: realtimeDatabaseRepositoryIosHelper!.log
+        )
         
         realtimeDatabaseRepositoryIosHelper!.realtimeDatabaseRepositoryForIosDelegateWrapper
             .updateRealtimeDatabaseRepositoryForIosDelegate(delegate: realtimeDatabaseRepositoryForIosDelegate)

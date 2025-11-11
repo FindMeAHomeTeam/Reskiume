@@ -3,6 +3,12 @@ import FirebaseStorage
 
 class StorageRepositoryForIosDelegateImpl: StorageRepository {
     
+    private var log: Log
+    
+    init(log: Log) {
+        self.log = log
+    }
+    
     private let storageRef: StorageReference = Storage.storage().reference()
 
     private func getStorageReference(imageType: Paths, userUid: String) -> StorageReference {
@@ -19,13 +25,13 @@ class StorageRepositoryForIosDelegateImpl: StorageRepository {
         
         imageRef.putFile(from: localFile, metadata: nil) { metadata, error in
             guard metadata != nil else {
-                Log().e(tag: "StorageRepositoryForIosDelegateImpl", message: "Error uploading image: \(String(describing: error))", throwable: nil)
+                self.log.e(tag: "StorageRepositoryForIosDelegateImpl", message: "Error uploading image: \(String(describing: error))", throwable: nil)
                 onImageUploaded("")
                 return
             }
             imageRef.downloadURL { (url, error) in
                 guard let downloadURL = url else {
-                    Log().e(tag: "StorageRepositoryForIosDelegateImpl", message: "Error downloading image: \(String(describing: error))", throwable: nil)
+                    self.log.e(tag: "StorageRepositoryForIosDelegateImpl", message: "Error downloading image: \(String(describing: error))", throwable: nil)
                     onImageUploaded("")
                     return
                 }
@@ -41,7 +47,7 @@ class StorageRepositoryForIosDelegateImpl: StorageRepository {
             try? FileManager.default.removeItem(at: absoluteFilePath)
             onImageDeleted(true)
         } else {
-            Log().e(tag: "StorageRepositoryForIosDelegateImpl", message: "deleteLocalImage: Error deleting the user avatar", throwable: nil)
+            log.e(tag: "StorageRepositoryForIosDelegateImpl", message: "deleteLocalImage: Error deleting the user avatar", throwable: nil)
             onImageDeleted(false)
         }
     }
@@ -61,7 +67,7 @@ class StorageRepositoryForIosDelegateImpl: StorageRepository {
             imageRef.write(toFile: absoluteFilePath) { url, error in
                 if error != nil {
                     onImageSaved("")
-                    Log().e(tag: "StorageRepositoryForIosDelegateImpl", message: "Error saving the user avatar \(String(describing: error!.localizedDescription))", throwable: nil)
+                    self.log.e(tag: "StorageRepositoryForIosDelegateImpl", message: "Error saving the user avatar \(String(describing: error!.localizedDescription))", throwable: nil)
                 } else {
                     onImageSaved(url?.absoluteString ?? "")
                 }
@@ -75,7 +81,7 @@ class StorageRepositoryForIosDelegateImpl: StorageRepository {
             try await imageRef.delete()
             onImageDeleted(true)
         } catch {
-            Log().e(
+            log.e(
                 tag: "StorageRepositoryForIosDelegateImpl",
                 message: "Error deleting the user avatar for user \(userUid): \(String(describing: error.localizedDescription))",
                 throwable: nil

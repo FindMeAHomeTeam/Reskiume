@@ -54,8 +54,8 @@ class ModifyAccountViewmodel(
         currentPassword: String,
         newPassword: String = ""
     ) {
-        _uiState.value = UiState.Loading
         viewModelScope.launch {
+            _uiState.value = UiState.Loading
 
             updateUserEmailInAuthDataSource(isDifferentEmail, currentPassword, user.email) {
 

@@ -173,6 +173,7 @@ class ModifyAccountViewmodel(
                         "PersonalInformationViewmodel",
                         "deleteCurrentImageInRemoteDataSource: failed to delete image in remote data source"
                     )
+                    _uiState.value = UiState.Error()
                 }
             }
         }
@@ -198,6 +199,7 @@ class ModifyAccountViewmodel(
                         "PersonalInformationViewmodel",
                         "deleteCurrentImageInLocalDataSource: failed to delete image in local data source"
                     )
+                    _uiState.value = UiState.Error()
                 }
             }
         }

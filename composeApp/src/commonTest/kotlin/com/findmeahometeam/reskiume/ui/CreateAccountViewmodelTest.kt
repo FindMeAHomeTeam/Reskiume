@@ -36,15 +36,15 @@ import kotlin.test.assertTrue
 
 class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
 
-    private val onDeleteUser = Capture.slot<(String) -> Unit>()
+    private val onDeleteUserFromAuth = Capture.slot<(String) -> Unit>()
 
     private val onImageUploaded = Capture.slot<(String) -> Unit>()
 
-    private val onImageDeleted = Capture.slot<(Boolean) -> Unit>()
+    private val onImageDeletedFromRemote = Capture.slot<(Boolean) -> Unit>()
 
     private val onSuccessRemoteUser = Capture.slot<(DatabaseResult) -> Unit>()
 
-    private val onInsertUser = Capture.slot<(Long) -> Unit>()
+    private val onInsertUserFromLocal = Capture.slot<(Long) -> Unit>()
 
     private fun getCreateAccountViewmodel(
         createUserWithEmailAndPasswordResult: AuthResult = AuthResult.Success(authUser),
@@ -62,8 +62,8 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
                 )
             } returns createUserWithEmailAndPasswordResult
 
-            everySuspend { deleteUser(any(), capture(onDeleteUser)) } calls {
-                onDeleteUser.get().invoke(onDeleteUserArg)
+            everySuspend { deleteUser(any(), capture(onDeleteUserFromAuth)) } calls {
+                onDeleteUserFromAuth.get().invoke(onDeleteUserArg)
             }
         }
 
@@ -81,9 +81,9 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
                 deleteRemoteImage(
                     any(),
                     any(),
-                    capture(onImageDeleted)
+                    capture(onImageDeletedFromRemote)
                 )
-            } calls { onImageDeleted.get().invoke(onImageDeletedArg) }
+            } calls { onImageDeletedFromRemote.get().invoke(onImageDeletedArg) }
         }
 
         val realtimeDatabaseRepository: RealtimeDatabaseRepository = mock {
@@ -103,8 +103,8 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
         }
 
         val localRepository: LocalRepository = mock {
-            everySuspend { insertUser(any(), capture(onInsertUser)) } calls {
-                onInsertUser.get().invoke(onInsertUserArg)
+            everySuspend { insertUser(any(), capture(onInsertUserFromLocal)) } calls {
+                onInsertUserFromLocal.get().invoke(onInsertUserArg)
             }
         }
 

@@ -53,7 +53,14 @@ class DeleteAccountViewmodel(
     private fun deleteMyUserFromRemoteDataSource(password: String) {
         retrieveUserUid { userUid: String ->
 
-            if (userUid.isBlank()) return@retrieveUserUid
+            if (userUid.isBlank()) {
+                _state.value = UiState.Error()
+                log.e(
+                    "DeleteAccountViewmodel",
+                    "deleteUserFromRemoteDataSource: User UID is blank"
+                )
+                return@retrieveUserUid
+            }
 
             _state.value = UiState.Loading
             deleteUserFromRemoteDataSource(userUid) { result: DatabaseResult ->

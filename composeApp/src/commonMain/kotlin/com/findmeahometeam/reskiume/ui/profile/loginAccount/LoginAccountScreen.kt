@@ -1,4 +1,4 @@
-package com.findmeahometeam.reskiume.ui.profile.login
+package com.findmeahometeam.reskiume.ui.profile.loginAccount
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -30,16 +30,16 @@ import com.findmeahometeam.reskiume.ui.core.components.UiState
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import reskiume.composeapp.generated.resources.Res
-import reskiume.composeapp.generated.resources.login_screen_email_field_label
-import reskiume.composeapp.generated.resources.login_screen_log_in_button
-import reskiume.composeapp.generated.resources.login_screen_log_in_title
+import reskiume.composeapp.generated.resources.login_account_screen_email_field_label
+import reskiume.composeapp.generated.resources.login_account_screen_log_in_button
+import reskiume.composeapp.generated.resources.login_account_screen_log_in_title
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(onBackPressed: () -> Unit, onLoginSuccessful: () -> Unit) {
+fun LoginAccountScreen(onBackPressed: () -> Unit, onLoginSuccessful: () -> Unit) {
 
-    val loginViewmodel: LoginViewmodel = koinViewModel<LoginViewmodel>()
-    val uiState: UiState by loginViewmodel.state.collectAsState()
+    val loginAccountViewmodel: LoginAccountViewmodel = koinViewModel<LoginAccountViewmodel>()
+    val uiState: UiState by loginAccountViewmodel.state.collectAsState()
 
     var email: String by rememberSaveable { mutableStateOf("") }
     val emailRegexPattern =
@@ -52,7 +52,7 @@ fun LoginScreen(onBackPressed: () -> Unit, onLoginSuccessful: () -> Unit) {
     }
 
     RmScaffold(
-        title = stringResource(Res.string.login_screen_log_in_title),
+        title = stringResource(Res.string.login_account_screen_log_in_title),
         onBackPressed = onBackPressed,
     ) { padding ->
         Column(
@@ -65,7 +65,7 @@ fun LoginScreen(onBackPressed: () -> Unit, onLoginSuccessful: () -> Unit) {
             RmTextField(
                 modifier = Modifier.fillMaxWidth(),
                 text = email,
-                label = stringResource(Res.string.login_screen_email_field_label),
+                label = stringResource(Res.string.login_account_screen_email_field_label),
                 onValueChange = { email = it }
             )
             Spacer(modifier = Modifier.height(5.dp))
@@ -79,10 +79,10 @@ fun LoginScreen(onBackPressed: () -> Unit, onLoginSuccessful: () -> Unit) {
 
             Spacer(modifier = Modifier.weight(1f))
             RmButton(
-                text = stringResource(Res.string.login_screen_log_in_button),
+                text = stringResource(Res.string.login_account_screen_log_in_button),
                 enabled = isLogInButtonEnabled,
                 onClick = {
-                    loginViewmodel.signInUsingEmail(email, pwd)
+                    loginAccountViewmodel.signInUsingEmail(email, pwd)
                 })
         }
     }

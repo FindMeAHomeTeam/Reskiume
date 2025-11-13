@@ -8,7 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import com.findmeahometeam.reskiume.ui.home.HomeScreen
 import com.findmeahometeam.reskiume.ui.profile.createAccount.CreateAccountScreen
 import com.findmeahometeam.reskiume.ui.profile.deleteAccount.DeleteAccountScreen
-import com.findmeahometeam.reskiume.ui.profile.login.LoginScreen
+import com.findmeahometeam.reskiume.ui.profile.loginAccount.LoginAccountScreen
 import com.findmeahometeam.reskiume.ui.profile.modifyAccount.ModifyAccountScreen
 
 @Composable
@@ -25,12 +25,12 @@ fun NavigationWrapper() {
         composable(route = Routes.CREATE_ACCOUNT.route) {
             CreateAccountScreen(
                 onBackPressed = { mainNavController.navigateUp() },
-                navigateToLoginScreen = { mainNavController.navigate(Routes.LOGIN.route) }
+                navigateToLoginScreen = { mainNavController.navigate(Routes.LOGIN_ACCOUNT.route) }
             )
         }
 
-        composable(route = Routes.LOGIN.route) {
-            LoginScreen(
+        composable(route = Routes.LOGIN_ACCOUNT.route) {
+            LoginAccountScreen(
                 onBackPressed = { mainNavController.navigateUp() },
                 onLoginSuccessful = {
                     mainNavController.popBackStack(Routes.CREATE_ACCOUNT.route, true)

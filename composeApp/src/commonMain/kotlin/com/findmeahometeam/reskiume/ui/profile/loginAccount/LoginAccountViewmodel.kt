@@ -1,4 +1,4 @@
-package com.findmeahometeam.reskiume.ui.profile.login
+package com.findmeahometeam.reskiume.ui.profile.loginAccount
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
-class LoginViewmodel(
+class LoginAccountViewmodel(
     private val signInWithEmailAndPasswordFromAuthDataSource: SignInWithEmailAndPasswordFromAuthDataSource,
     private val getUserFromLocalDataSource: GetUserFromLocalDataSource,
     private val getUserFromRemoteDataSource: GetUserFromRemoteDataSource,

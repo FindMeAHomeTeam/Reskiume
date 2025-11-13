@@ -65,11 +65,10 @@
     <string name="camera_picker_grant_in_settings_message">Camera permission is required to capture photos. Please grant it in settings</string>
     <string name="camera_picker_open_settings_button">Open settings</string>
 
-    <!-- Login screen -->
-    <string name="login_screen_log_in_title">Log in to your account</string>
-    <string name="login_screen_email_field_label">Email</string>
-    <string name="login_screen_log_in_button">Log in</string>
-    <string name="login_screen_incorrect_credentials_message">Your email or password are incorrect</string>
+    <!-- Login account screen -->
+    <string name="login_account_screen_log_in_title">Log in to your account</string>
+    <string name="login_account_screen_email_field_label">Email</string>
+    <string name="login_account_screen_log_in_button">Log in</string>
 
     <!-- Password text field -->
     <string name="password_text_field_label">Password</string>

@@ -35,8 +35,8 @@ class ProfileViewmodel(
             }
         }
 
-    fun logError(string: String, message: String) {
-        log.e(string, message)
+    fun logError(tag: String, message: String) {
+        log.e(tag, message)
     }
 
     sealed class ProfileUiState {

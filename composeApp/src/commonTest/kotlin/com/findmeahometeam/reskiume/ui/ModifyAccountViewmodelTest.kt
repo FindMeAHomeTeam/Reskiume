@@ -374,4 +374,45 @@ class ModifyAccountViewmodelTest: CoroutineTestDispatcher() {
                 ensureAllEventsConsumed()
             }
         }
+
+}
+
+class ModifyAccountLogOutViewmodelTest {
+
+    @OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
+    @Test
+    fun `given a registered user_when that user logs out_then the user is unregistered`() {
+
+        Dispatchers.setMain(UnconfinedTestDispatcher())
+
+        val modifyAccountViewmodelTest = ModifyAccountViewmodelTest()
+
+        val modifyAccountViewmodel = modifyAccountViewmodelTest.getModifyAccountViewmodel(
+            modifyUserArg = user.copy(lastLogout = Clock.System.now().epochSeconds)
+        )
+        modifyAccountViewmodel.logOut()
+        verify {
+            modifyAccountViewmodelTest.log.d(any(), any())
+        }
+        Dispatchers.resetMain()
+    }
+
+    @OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
+    @Test
+    fun `given a registered user_when that user logs out and the local datasource fails updating the last log out_then the app emit an error`() {
+
+        Dispatchers.setMain(UnconfinedTestDispatcher())
+
+        val modifyAccountViewmodelTest = ModifyAccountViewmodelTest()
+
+        val modifyAccountViewmodel = modifyAccountViewmodelTest.getModifyAccountViewmodel(
+            modifyUserArg = user.copy(lastLogout = Clock.System.now().epochSeconds),
+            onModifyUserArg = 0
+        )
+        modifyAccountViewmodel.logOut()
+        verify {
+            modifyAccountViewmodelTest.log.e(any(), any())
+        }
+        Dispatchers.resetMain()
+    }
 }

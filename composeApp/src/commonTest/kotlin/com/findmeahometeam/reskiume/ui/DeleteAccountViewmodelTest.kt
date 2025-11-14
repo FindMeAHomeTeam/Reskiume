@@ -52,19 +52,19 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
 
     private fun getDeleteAccountViewmodel(
         authStateResult: AuthUser? = authUser,
-        onDeleteUserFromAuthArg: String = "",
+        deleteUserFromAuthErrorArg: String = "",
         getUserResult: User = user,
         onDeleteUserFromLocalArg: Int = 1,
-        onSuccessRemoteUserArg: DatabaseResult = DatabaseResult.Success,
-        onRemoteImageDeletedArg: Boolean = true,
-        onLocalImageDeletedArg: Boolean = true
+        successRemoteUserArg: DatabaseResult = DatabaseResult.Success,
+        remoteImageDeletedArg: Boolean = true,
+        localImageDeletedArg: Boolean = true
     ): DeleteAccountViewmodel {
 
         val authRepository: AuthRepository = mock {
             every { authState } returns flowOf(authStateResult)
 
             everySuspend { deleteUser(any(), capture(onDeleteUserFromAuth)) } calls {
-                onDeleteUserFromAuth.get().invoke(onDeleteUserFromAuthArg)
+                onDeleteUserFromAuth.get().invoke(deleteUserFromAuthErrorArg)
             }
         }
 
@@ -88,7 +88,7 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
                     user.uid,
                     capture(onSuccessDeleteRemoteUser)
                 )
-            } calls { onSuccessDeleteRemoteUser.get().invoke(onSuccessRemoteUserArg) }
+            } calls { onSuccessDeleteRemoteUser.get().invoke(successRemoteUserArg) }
         }
 
         val storageRepository: StorageRepository = mock {
@@ -98,7 +98,7 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
                     Paths.USERS,
                     capture(onRemoteImageDeleted)
                 )
-            } calls { onRemoteImageDeleted.get().invoke(onRemoteImageDeletedArg) }
+            } calls { onRemoteImageDeleted.get().invoke(remoteImageDeletedArg) }
 
             every {
                 deleteLocalImage(
@@ -106,7 +106,7 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
                     user.image,
                     capture(onLocalImageDeleted)
                 )
-            } calls { onLocalImageDeleted.get().invoke(onLocalImageDeletedArg) }
+            } calls { onLocalImageDeleted.get().invoke(localImageDeletedArg) }
         }
 
         val observeAuthStateFromAuthDataSource =
@@ -182,7 +182,7 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
     fun `given a registered user_when that user deletes their account using their password but there is an error deleting their account on remote repository_then the app displays an error`() =
         runTest {
             val deleteAccountViewmodel = getDeleteAccountViewmodel(
-                onSuccessRemoteUserArg = DatabaseResult.Error("error")
+                successRemoteUserArg = DatabaseResult.Error("error")
             )
             deleteAccountViewmodel.deleteAccount(userPwd)
             deleteAccountViewmodel.state.test {
@@ -194,10 +194,27 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
         }
 
     @Test
-    fun `given a registered user_when that user deletes their account using their password but there is an error deleting their account on local repository_then the app displays an error`() =
+    fun `given a registered user_when that user deletes their account using their password but their avatar deletion fails in data sources_then their account is deleted`() =
+        runTest {
+            val deleteAccountViewmodel = getDeleteAccountViewmodel(
+                remoteImageDeletedArg = false,
+                localImageDeletedArg = false
+            )
+            deleteAccountViewmodel.deleteAccount(userPwd)
+            deleteAccountViewmodel.state.test {
+                assertTrue { awaitItem() is UiState.Idle }
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Success }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given a registered user_when that user deletes their account using their password but there is an error deleting their account on local and auth repositories_then the app displays an error`() =
         runTest {
             val deleteAccountViewmodel = getDeleteAccountViewmodel(
                 getUserResult = user.copy(image = ""),
+                deleteUserFromAuthErrorArg = "error",
                 onDeleteUserFromLocalArg = 0
             )
             deleteAccountViewmodel.deleteAccount(userPwd)

@@ -48,10 +48,11 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
 
     private fun getCreateAccountViewmodel(
         createUserWithEmailAndPasswordResult: AuthResult = AuthResult.Success(authUser),
-        onDeleteUserArg: String = "",
+        onDeleteUserErrorArg: String = "",
         onImageUploadedArg: String = user.image,
         onImageDeletedArg: Boolean = true,
-        onSuccessRemoteUserArg: DatabaseResult = DatabaseResult.Success,
+        insertRemoteUserArg: DatabaseResult = DatabaseResult.Success,
+        deleteRemoteUserArg: DatabaseResult = DatabaseResult.Success,
         onInsertUserArg: Long = 1L
     ): CreateAccountViewmodel {
         val authRepository: AuthRepository = mock {
@@ -63,7 +64,7 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
             } returns createUserWithEmailAndPasswordResult
 
             everySuspend { deleteUser(any(), capture(onDeleteUserFromAuth)) } calls {
-                onDeleteUserFromAuth.get().invoke(onDeleteUserArg)
+                onDeleteUserFromAuth.get().invoke(onDeleteUserErrorArg)
             }
         }
 
@@ -92,14 +93,14 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
                     any(),
                     capture(onSuccessRemoteUser)
                 )
-            } calls { onSuccessRemoteUser.get().invoke(onSuccessRemoteUserArg) }
+            } calls { onSuccessRemoteUser.get().invoke(insertRemoteUserArg) }
 
             every {
                 deleteRemoteUser(
                     any(),
                     capture(onSuccessRemoteUser)
                 )
-            } calls { onSuccessRemoteUser.get().invoke(onSuccessRemoteUserArg) }
+            } calls { onSuccessRemoteUser.get().invoke(deleteRemoteUserArg) }
         }
 
         val localRepository: LocalRepository = mock {
@@ -175,10 +176,12 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
         }
 
     @Test
-    fun `given an unregistered user_when that user creates an account using email but there is an error storing that user in the remote datasource_then the app displays an error`() =
+    fun `given an unregistered user_when that user creates an account using email but there is an error storing user data and deleting their avatar in the remote data sources_then the app displays an error`() =
         runTest {
             val createAccountViewmodel = getCreateAccountViewmodel(
-                onSuccessRemoteUserArg = DatabaseResult.Error("error")
+                onImageUploadedArg = "",
+                insertRemoteUserArg = DatabaseResult.Error("error"),
+                onImageDeletedArg = false
             )
             createAccountViewmodel.createUserUsingEmailAndPwd(user, userPwd)
             createAccountViewmodel.state.test {
@@ -190,10 +193,45 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
         }
 
     @Test
+    fun `given an unregistered user_when that user creates an account using email but there is an error storing user data and deleting their data in the remote data sources_then the app displays an error`() =
+        runTest {
+            val createAccountViewmodel = getCreateAccountViewmodel(
+                onImageUploadedArg = "",
+                insertRemoteUserArg = DatabaseResult.Error("error"),
+                onImageDeletedArg = false,
+                onDeleteUserErrorArg = "error"
+            )
+            createAccountViewmodel.createUserUsingEmailAndPwd(user, userPwd)
+            createAccountViewmodel.state.test {
+                assertTrue { awaitItem() is UiState.Idle }
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Error }
+                ensureAllEventsConsumed()
+            }
+        }
+
+
+    @Test
     fun `given an unregistered user_when that user creates an account using email but there is an error storing that user in the local datasource_then the app displays an error`() =
         runTest {
             val createAccountViewmodel = getCreateAccountViewmodel(
                 onInsertUserArg = 0
+            )
+            createAccountViewmodel.createUserUsingEmailAndPwd(user, userPwd)
+            createAccountViewmodel.state.test {
+                assertTrue { awaitItem() is UiState.Idle }
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Error }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given an unregistered user_when that user creates an account using email but there is an error storing that user in the local datasource and deleting their data in the remote datasource_then the app displays an error`() =
+        runTest {
+            val createAccountViewmodel = getCreateAccountViewmodel(
+                onInsertUserArg = 0,
+                deleteRemoteUserArg = DatabaseResult.Error("error")
             )
             createAccountViewmodel.createUserUsingEmailAndPwd(user, userPwd)
             createAccountViewmodel.state.test {

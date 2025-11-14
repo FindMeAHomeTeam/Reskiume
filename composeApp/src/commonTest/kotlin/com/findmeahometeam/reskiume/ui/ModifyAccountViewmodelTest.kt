@@ -38,13 +38,10 @@ import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
 import dev.mokkery.verify
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import kotlin.test.Test
 import kotlin.test.assertTrue
 import kotlin.time.Clock
@@ -66,12 +63,12 @@ class ModifyAccountViewmodelTest: CoroutineTestDispatcher() {
 
     private val onImageUploaded = Capture.slot<(String) -> Unit>()
 
-    val log: Log = mock {
+    private val log: Log = mock {
         every { d(any(), any()) } returns Unit
         every { e(any(), any()) } returns Unit
     }
 
-    fun getModifyAccountViewmodel(
+    private fun getModifyAccountViewmodel(
         authStateResult: AuthUser? = authUser,
         onUpdateUserEmailFromAuthErrorArg: String = "",
         onUpdateUserPwdFromAuthErrorArg: String = "",
@@ -375,15 +372,9 @@ class ModifyAccountViewmodelTest: CoroutineTestDispatcher() {
             }
         }
 
-}
-
-class ModifyAccountLogOutViewmodelTest {
-
     @OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
     @Test
-    fun `given a registered user_when that user logs out_then the user is unregistered`() {
-
-        Dispatchers.setMain(UnconfinedTestDispatcher())
+    fun `given a registered user_when that user logs out_then the user is unregistered`() = runTest {
 
         val modifyAccountViewmodelTest = ModifyAccountViewmodelTest()
 
@@ -391,17 +382,17 @@ class ModifyAccountLogOutViewmodelTest {
             modifyUserArg = user.copy(lastLogout = Clock.System.now().epochSeconds)
         )
         modifyAccountViewmodel.logOut()
+
+        runCurrent()
+
         verify {
             modifyAccountViewmodelTest.log.d(any(), any())
         }
-        Dispatchers.resetMain()
     }
 
     @OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
     @Test
-    fun `given a registered user_when that user logs out and the local datasource fails updating the last log out_then the app emit an error`() {
-
-        Dispatchers.setMain(UnconfinedTestDispatcher())
+    fun `given a registered user_when that user logs out and the local datasource fails updating the last log out_then the app emit an error`()  = runTest {
 
         val modifyAccountViewmodelTest = ModifyAccountViewmodelTest()
 
@@ -410,9 +401,11 @@ class ModifyAccountLogOutViewmodelTest {
             onModifyUserArg = 0
         )
         modifyAccountViewmodel.logOut()
+
+        runCurrent()
+
         verify {
             modifyAccountViewmodelTest.log.e(any(), any())
         }
-        Dispatchers.resetMain()
     }
 }

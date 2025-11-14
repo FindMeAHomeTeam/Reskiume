@@ -11,7 +11,7 @@ import kotlin.test.BeforeTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
 open class CoroutineTestDispatcher(
-    internal val testDispatcher: TestDispatcher = StandardTestDispatcher()
+    private val testDispatcher: TestDispatcher = StandardTestDispatcher()
 ) {
     @BeforeTest
     fun setUp() {

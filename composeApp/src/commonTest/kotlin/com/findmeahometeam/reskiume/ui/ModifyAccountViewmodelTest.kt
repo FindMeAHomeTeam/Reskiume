@@ -3,6 +3,7 @@ package com.findmeahometeam.reskiume.ui
 import app.cash.turbine.test
 import com.findmeahometeam.reskiume.CoroutineTestDispatcher
 import com.findmeahometeam.reskiume.authUser
+import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.remote.response.RemoteUser
 import com.findmeahometeam.reskiume.data.util.Paths
@@ -36,12 +37,20 @@ import dev.mokkery.matcher.capture.Capture
 import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
+import dev.mokkery.verify
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import kotlin.test.Test
 import kotlin.test.assertTrue
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
-class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
+class ModifyAccountViewmodelTest: CoroutineTestDispatcher() {
 
     private val onUpdateUserEmailFromAuth = Capture.slot<(String) -> Unit>()
 
@@ -57,12 +66,20 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
 
     private val onImageUploaded = Capture.slot<(String) -> Unit>()
 
-    private fun getModifyAccountViewmodel(
+    val log: Log = mock {
+        every { d(any(), any()) } returns Unit
+        every { e(any(), any()) } returns Unit
+    }
+
+    fun getModifyAccountViewmodel(
+        authStateResult: AuthUser? = authUser,
         onUpdateUserEmailFromAuthErrorArg: String = "",
         onUpdateUserPwdFromAuthErrorArg: String = "",
         getUserReturn: User? = user,
+        modifyUserArg: User = user,
         onModifyUserArg: Int = 1,
-        getRemoteUserArg: RemoteUser? = user.toData(),
+        getRemoteUserReturn: RemoteUser? = user.toData(),
+        updateRemoteUserArg: RemoteUser = user.toData(),
         onUpdateRemoteUserArg: DatabaseResult = DatabaseResult.Success,
         onLocalImageDeletedArg: Boolean = true,
         onRemoteImageDeletedArg: Boolean = true,
@@ -70,7 +87,7 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
     ): ModifyAccountViewmodel {
 
         val authRepository: AuthRepository = mock {
-            everySuspend { authState } returns (flowOf(authUser))
+            everySuspend { authState } returns (flowOf(authStateResult))
             everySuspend {
                 updateUserEmail(
                     userPwd,
@@ -92,7 +109,7 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
             everySuspend { getUser(user.uid) } returns getUserReturn
             everySuspend {
                 modifyUser(
-                    user,
+                    modifyUserArg,
                     capture(onModifyUserFromLocal)
                 )
             } calls { onModifyUserFromLocal.get().invoke(onModifyUserArg) }
@@ -101,10 +118,10 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
         val realtimeDatabaseRepository: RealtimeDatabaseRepository = mock {
             every {
                 getRemoteUser(user.uid)
-            } returns flowOf(getRemoteUserArg)
+            } returns flowOf(getRemoteUserReturn)
             everySuspend {
                 updateRemoteUser(
-                    user.toData(),
+                    updateRemoteUserArg,
                     capture(onUpdateRemoteUser)
                 )
             } calls { onUpdateRemoteUser.get().invoke(onUpdateRemoteUserArg) }
@@ -169,11 +186,6 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
 
         val signOutFromAuthDataSource =
             SignOutFromAuthDataSource(authRepository)
-
-        val log: Log = mock {
-            every { d(any(), any()) } returns Unit
-            every { e(any(), any()) } returns Unit
-        }
 
         return ModifyAccountViewmodel(
             observeAuthStateFromAuthDataSource,
@@ -295,6 +307,32 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
         }
 
     @Test
+    fun `given a registered user_when that user modifies their account with an empty avatar_then the account is updated`() =
+        runTest {
+            val user = user.copy(image = "")
+            val modifyAccountViewmodel = getModifyAccountViewmodel(
+                getUserReturn = user,
+                modifyUserArg = user,
+                getRemoteUserReturn = user.toData(),
+                updateRemoteUserArg = user.toData(),
+                onImageUploadedArg = ""
+            )
+            modifyAccountViewmodel.saveUserChanges(
+                isDifferentEmail = true,
+                isDifferentImage = true,
+                user = user,
+                currentPassword = userPwd,
+                newPassword = "123456"
+            )
+            modifyAccountViewmodel.uiState.test {
+                assertTrue { awaitItem() is UiState.Idle }
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Success }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
     fun `given a registered user_when that user modifies their account but the remote repository fails_then it displays an error`() =
         runTest {
             val modifyAccountViewmodel = getModifyAccountViewmodel(
@@ -302,7 +340,7 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
             )
             modifyAccountViewmodel.saveUserChanges(
                 isDifferentEmail = true,
-                isDifferentImage = true,
+                isDifferentImage = false,
                 user = user,
                 currentPassword = userPwd,
                 newPassword = "123456"
@@ -319,13 +357,13 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
     fun `given a registered user_when that user modifies their account but the local repository fails_then it displays an error`() =
         runTest {
             val modifyAccountViewmodel = getModifyAccountViewmodel(
+                getRemoteUserReturn = user.copy(image = "").toData(),
+                updateRemoteUserArg = user.copy(image = "").toData(),
                 onModifyUserArg = 0,
-                getRemoteUserArg = user.copy(image = "").toData(),
-                onImageUploadedArg = ""
             )
             modifyAccountViewmodel.saveUserChanges(
                 isDifferentEmail = false,
-                isDifferentImage = true,
+                isDifferentImage = false,
                 user = user,
                 currentPassword = userPwd
             )

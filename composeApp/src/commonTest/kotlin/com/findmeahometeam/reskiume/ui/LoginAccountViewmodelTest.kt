@@ -48,10 +48,10 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
     private fun getLoginAccountViewmodel(
         signInWithEmailAndPasswordResult: AuthResult = AuthResult.Success(authUser),
         userResult: User? = user,
-        onInsertUserArg: Long = 1L,
-        onModifyUserArg: Int = 1,
-        getRemoteUserArg: RemoteUser? = user.toData(),
-        onSaveImageErrorArg: String = "",
+        insertedRowIdArg: Long = 1L,
+        modifiedRowsArg: Int = 1,
+        remoteUserResult: RemoteUser? = user.toData(),
+        absolutePathArg: String = user.image,
     ): LoginAccountViewmodel {
         val authRepository: AuthRepository = mock {
             everySuspend {
@@ -65,15 +65,15 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
         val localRepository: LocalRepository = mock {
             everySuspend { getUser(user.uid) } returns userResult
             everySuspend { insertUser(any(), capture(onInsertUserFromLocal)) } calls {
-                onInsertUserFromLocal.get().invoke(onInsertUserArg)
+                onInsertUserFromLocal.get().invoke(insertedRowIdArg)
             }
             everySuspend { modifyUser(any(), capture(onModifyUserFromLocal)) } calls {
-                onModifyUserFromLocal.get().invoke(onModifyUserArg)
+                onModifyUserFromLocal.get().invoke(modifiedRowsArg)
             }
         }
 
         val realtimeDatabaseRepository: RealtimeDatabaseRepository = mock {
-            every { getRemoteUser(user.uid) } returns flowOf(getRemoteUserArg)
+            every { getRemoteUser(user.uid) } returns flowOf(remoteUserResult)
         }
 
         val storageRepository: StorageRepository = mock {
@@ -83,7 +83,7 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
                     Paths.USERS,
                     capture(onSaveImageToLocal)
                 )
-            } calls { onSaveImageToLocal.get().invoke(onSaveImageErrorArg) }
+            } calls { onSaveImageToLocal.get().invoke(absolutePathArg) }
         }
 
         val signInWithEmailAndPasswordFromAuthDataSource =
@@ -136,17 +136,47 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
         }
 
     @Test
-    fun `given an unregistered user_when they log in using their email with the local data source empty but fails inserting the data_then the app displays an error`() =
+    fun `given an unregistered user_when they log in using their email but the app fails retrieving the data from the auth repository_then the app displays an error`() =
         runTest {
             val loginAccountViewmodel = getLoginAccountViewmodel(
-                userResult = null,
-                onInsertUserArg = 0
+                signInWithEmailAndPasswordResult = AuthResult.Error("Error")
             )
             loginAccountViewmodel.signInUsingEmail(user.email!!, userPwd)
             loginAccountViewmodel.state.test {
                 assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Error }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given an unregistered user_when they log in using their email with the local data source empty but fails inserting the data_then the app displays an error`() =
+        runTest {
+            val loginAccountViewmodel = getLoginAccountViewmodel(
+                userResult = null,
+                insertedRowIdArg = 0
+            )
+            loginAccountViewmodel.signInUsingEmail(user.email!!, userPwd)
+            loginAccountViewmodel.state.test {
+                assertTrue { awaitItem() is UiState.Idle }
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Error }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given an unregistered user_when they log in using their email but fails retrieving the data from the remote data source_then the app displays an error`() =
+        runTest {
+            val loginAccountViewmodel = getLoginAccountViewmodel(
+                userResult = null,
+                remoteUserResult = null
+            )
+            loginAccountViewmodel.signInUsingEmail(user.email!!, userPwd)
+            loginAccountViewmodel.state.test {
+                assertTrue { awaitItem() is UiState.Idle }
+                assertTrue { awaitItem() is UiState.Loading }
                 ensureAllEventsConsumed()
             }
         }
@@ -159,7 +189,27 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
 
             val loginAccountViewmodel = getLoginAccountViewmodel(
                 userResult = user,
-                getRemoteUserArg = user.toData()
+                remoteUserResult = user.toData(),
+                absolutePathArg = ""
+            )
+            loginAccountViewmodel.signInUsingEmail(user.email!!, userPwd)
+            loginAccountViewmodel.state.test {
+                assertTrue { awaitItem() is UiState.Idle }
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Success }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @OptIn(ExperimentalTime::class)
+    @Test
+    fun `given an unregistered user_when they log in to their account with no avatar using their email after 24h_then they gain access to it`() =
+        runTest {
+            val user = user.copy(image = "", lastLogout = 1563041881L)
+
+            val loginAccountViewmodel = getLoginAccountViewmodel(
+                userResult = user,
+                remoteUserResult = user.toData(),
             )
             loginAccountViewmodel.signInUsingEmail(user.email!!, userPwd)
             loginAccountViewmodel.state.test {
@@ -176,8 +226,8 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
             val user = user.copy(lastLogout = 1563041881L)
             val loginAccountViewmodel = getLoginAccountViewmodel(
                 userResult = user,
-                getRemoteUserArg = user.toData(),
-                onModifyUserArg = 0
+                remoteUserResult = user.toData(),
+                modifiedRowsArg = 0
             )
             loginAccountViewmodel.signInUsingEmail(user.email!!, userPwd)
             loginAccountViewmodel.state.test {

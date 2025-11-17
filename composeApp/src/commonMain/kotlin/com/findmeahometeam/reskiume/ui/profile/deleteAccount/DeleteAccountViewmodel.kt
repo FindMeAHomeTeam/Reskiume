@@ -63,24 +63,41 @@ class DeleteAccountViewmodel(
             }
 
             _state.value = UiState.Loading
-            deleteUserFromRemoteDataSource(userUid) { result: DatabaseResult ->
-                if (result is DatabaseResult.Error) {
-                    _state.value = UiState.Error(result.message)
-                    log.e(
-                        "DeleteAccountViewmodel",
-                        "deleteUserFromRemoteDataSource: ${result.message}"
-                    )
-                } else {
+            viewModelScope.launch {
+                getUserFromRemoteDataSource(userUid).collect { remoteUser: User? ->
 
-                    // TODO delete user foster homes, events and non-human animals first
+                    if (remoteUser == null) {
+                        _state.value = UiState.Error("User not found in remote data source")
+                        log.e(
+                            "DeleteAccountViewmodel",
+                            "deleteUserFromRemoteDataSource: User not found in remote data source"
+                        )
+                        return@collect
+                    }
 
-                    viewModelScope.launch {
-                        val user: User? = getUserFromLocalDataSource(userUid)
-                        if (user?.image.isNullOrBlank()) {
-                            deleteMyUserFromAuthDataSource(userUid, password)
+                    deleteUserFromRemoteDataSource(remoteUser.uid) { result: DatabaseResult ->
+                        if (result is DatabaseResult.Error) {
+                            _state.value = UiState.Error(result.message)
+                            log.e(
+                                "DeleteAccountViewmodel",
+                                "deleteUserFromRemoteDataSource: ${result.message}"
+                            )
                         } else {
-                            getUserFromRemoteDataSource(userUid).collect { remoteUser: User? ->
-                                manageImageDeletion(userUid, password, user.image, remoteUser?.image ?: "")
+
+                            // TODO delete user foster homes, events and non-human animals first
+
+                            viewModelScope.launch {
+                                val user: User? = getUserFromLocalDataSource(userUid)
+                                if (user?.image.isNullOrBlank()) {
+                                    deleteMyUserFromAuthDataSource(userUid, password)
+                                } else {
+                                    manageImageDeletion(
+                                        userUid,
+                                        password,
+                                        user.image,
+                                        remoteUser.image
+                                    )
+                                }
                             }
                         }
                     }
@@ -89,7 +106,12 @@ class DeleteAccountViewmodel(
         }
     }
 
-    private suspend fun manageImageDeletion(userUid: String, password: String, localImage: String, remoteImage: String) {
+    private suspend fun manageImageDeletion(
+        userUid: String,
+        password: String,
+        localImage: String,
+        remoteImage: String
+    ) {
         deleteImageFromRemoteDataSource(
             userUid,
             Paths.USERS,

@@ -4,22 +4,27 @@ import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.repository.local.LocalRepository
 
 class FakeLocalRepository(
-    private var localUserList: MutableList<User?> = mutableListOf()
+    private var localUserList: MutableList<User> = mutableListOf()
 ): LocalRepository {
 
     override suspend fun insertUser(
         user: User,
         onInsertUser: (rowId: Long) -> Unit
     ) {
-        localUserList.add(user)
-        onInsertUser(1L)
+        val localUser = localUserList.firstOrNull{ it.uid == user.uid }
+        if (localUser == null) {
+            localUserList.add(user)
+            onInsertUser(1L)
+        } else {
+            onInsertUser(0)
+        }
     }
 
     override suspend fun modifyUser(
         user: User,
         onModifyUser: (rowsUpdated: Int) -> Unit
     ) {
-        val localUser = localUserList.firstOrNull{ it?.uid == user.uid }
+        val localUser = localUserList.firstOrNull{ it.uid == user.uid }
         if (localUser == null) {
             onModifyUser(0)
         } else {
@@ -32,7 +37,7 @@ class FakeLocalRepository(
         userUid: String,
         onDeletedUser: (rowsDeleted: Int) -> Unit
     ) {
-        val localUser = localUserList.firstOrNull{ it?.uid == userUid }
+        val localUser = localUserList.firstOrNull{ it.uid == userUid }
         if (localUser == null) {
             onDeletedUser(0)
         } else {
@@ -42,6 +47,6 @@ class FakeLocalRepository(
     }
 
     override suspend fun getUser(uid: String): User? {
-        return localUserList.firstOrNull{ it?.uid == uid }
+        return localUserList.firstOrNull{ it.uid == uid }
     }
 }

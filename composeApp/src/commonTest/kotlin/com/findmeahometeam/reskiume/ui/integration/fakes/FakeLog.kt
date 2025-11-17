@@ -12,6 +12,6 @@ class FakeLog: Log {
     }
 
     override fun e(tag: String, message: String, throwable: Throwable?) {
-        println("ERROR: [$tag] $message ${throwable?.printStackTrace()}")
+        println("ERROR: [$tag] $message ${throwable?.printStackTrace() ?: ""}")
     }
 }

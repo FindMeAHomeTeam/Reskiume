@@ -5,6 +5,7 @@ import com.findmeahometeam.reskiume.CoroutineTestDispatcher
 import com.findmeahometeam.reskiume.authUser
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
+import com.findmeahometeam.reskiume.data.remote.response.RemoteUser
 import com.findmeahometeam.reskiume.data.util.Paths
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.User
@@ -54,7 +55,8 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
         authStateResult: AuthUser? = authUser,
         deleteUserFromAuthErrorArg: String = "",
         getUserResult: User = user,
-        onDeleteUserFromLocalArg: Int = 1,
+        deleteUserFromLocalArg: Int = 1,
+        remoteUserResult: RemoteUser? = user.toData(),
         successRemoteUserArg: DatabaseResult = DatabaseResult.Success,
         remoteImageDeletedArg: Boolean = true,
         localImageDeletedArg: Boolean = true
@@ -75,13 +77,13 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
                     user.uid,
                     capture(onDeleteUserFromLocal)
                 )
-            } calls { onDeleteUserFromLocal.get().invoke(onDeleteUserFromLocalArg) }
+            } calls { onDeleteUserFromLocal.get().invoke(deleteUserFromLocalArg) }
         }
 
         val realtimeDatabaseRepository: RealtimeDatabaseRepository = mock {
             every {
                 getRemoteUser(user.uid)
-            } returns flowOf(user.toData())
+            } returns flowOf(remoteUserResult)
 
             every {
                 deleteRemoteUser(
@@ -165,7 +167,7 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
         }
 
     @Test
-    fun `given a registered user_when that user deletes their account using their password but there is an error retrieving their account on auth repository_then the app displays an error`() =
+    fun `given a registered user_when that user deletes their account using their password but there is an error retrieving their account on the auth repository_then the app displays an error`() =
         runTest {
             val deleteAccountViewmodel = getDeleteAccountViewmodel(
                 authStateResult = null
@@ -173,6 +175,21 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
             deleteAccountViewmodel.deleteAccount(userPwd)
             deleteAccountViewmodel.state.test {
                 assertTrue { awaitItem() is UiState.Idle }
+                assertTrue { awaitItem() is UiState.Error }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given a registered user_when that user deletes their account using their password but there is an error retrieving their account on the remote repository_then the app displays an error`() =
+        runTest {
+            val deleteAccountViewmodel = getDeleteAccountViewmodel(
+                remoteUserResult = null
+            )
+            deleteAccountViewmodel.deleteAccount(userPwd)
+            deleteAccountViewmodel.state.test {
+                assertTrue { awaitItem() is UiState.Idle }
+                assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Error }
                 ensureAllEventsConsumed()
             }
@@ -215,7 +232,7 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
             val deleteAccountViewmodel = getDeleteAccountViewmodel(
                 getUserResult = user.copy(image = ""),
                 deleteUserFromAuthErrorArg = "error",
-                onDeleteUserFromLocalArg = 0
+                deleteUserFromLocalArg = 0
             )
             deleteAccountViewmodel.deleteAccount(userPwd)
             deleteAccountViewmodel.state.test {

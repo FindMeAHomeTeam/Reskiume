@@ -88,6 +88,7 @@ class DeleteAccountViewmodel(
 
                             viewModelScope.launch {
                                 val user: User? = getUserFromLocalDataSource(userUid)
+
                                 if (user?.image.isNullOrBlank()) {
                                     deleteMyUserFromAuthDataSource(userUid, password)
                                 } else {

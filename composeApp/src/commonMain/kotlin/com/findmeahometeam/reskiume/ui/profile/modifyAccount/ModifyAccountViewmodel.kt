@@ -106,7 +106,7 @@ class ModifyAccountViewmodel(
         modifyUserEmailInAuthDataSource(password, newEmail) { error ->
             if (error.isBlank()) {
                 log.d(
-                    "PersonalInformationViewmodel",
+                    "ModifyAccountViewmodel",
                     "updateUserEmailInAuthDataSource: accepted request to update user email in auth data source"
                 )
                 viewModelScope.launch {
@@ -114,7 +114,7 @@ class ModifyAccountViewmodel(
                 }
             } else {
                 log.e(
-                    "PersonalInformationViewmodel",
+                    "ModifyAccountViewmodel",
                     "updateUserEmailInAuthDataSource: failed to update user email in auth data source: $error"
                 )
                 _uiState.value = UiState.Error(error)
@@ -134,7 +134,7 @@ class ModifyAccountViewmodel(
         modifyUserPasswordInAuthDataSource(currentPassword, newPassword) { error ->
             if (error.isBlank()) {
                 log.d(
-                    "PersonalInformationViewmodel",
+                    "ModifyAccountViewmodel",
                     "updateUserPasswordInAuthDataSource: User password updated successfully in auth data source"
                 )
                 viewModelScope.launch {
@@ -142,7 +142,7 @@ class ModifyAccountViewmodel(
                 }
             } else {
                 log.e(
-                    "PersonalInformationViewmodel",
+                    "ModifyAccountViewmodel",
                     "updateUserPasswordInAuthDataSource: failed to update user password in auth data source: $error"
                 )
                 _uiState.value = UiState.Error(error)
@@ -164,13 +164,13 @@ class ModifyAccountViewmodel(
 
                 if (isDeleted) {
                     log.d(
-                        "PersonalInformationViewmodel",
+                        "ModifyAccountViewmodel",
                         "deleteCurrentImageInRemoteDataSource: Image deleted successfully in remote data source"
                     )
                     onSuccess()
                 } else {
                     log.e(
-                        "PersonalInformationViewmodel",
+                        "ModifyAccountViewmodel",
                         "deleteCurrentImageInRemoteDataSource: failed to delete image in remote data source"
                     )
                     _uiState.value = UiState.Error()
@@ -190,13 +190,13 @@ class ModifyAccountViewmodel(
 
                 if (isDeleted) {
                     log.d(
-                        "PersonalInformationViewmodel",
+                        "ModifyAccountViewmodel",
                         "deleteCurrentImageInLocalDataSource: Image deleted successfully in local data source"
                     )
                     onSuccess()
                 } else {
                     log.e(
-                        "PersonalInformationViewmodel",
+                        "ModifyAccountViewmodel",
                         "deleteCurrentImageInLocalDataSource: failed to delete image in local data source"
                     )
                     _uiState.value = UiState.Error()
@@ -216,14 +216,14 @@ class ModifyAccountViewmodel(
         ) { imageDownloadUri: String ->
             val userWithPossibleImageDownloadUri: User = if (imageDownloadUri.isBlank()) {
                 log.d(
-                    "PersonalInformationViewmodel",
-                    "updateUserInRemoteDataSource: Download URI is blank"
+                    "ModifyAccountViewmodel",
+                    "uploadNewImageToRemoteDataSource: Download URI is blank"
                 )
                 user
             } else {
                 log.d(
-                    "PersonalInformationViewmodel",
-                    "updateUserInRemoteDataSource: Download URI saved successfully"
+                    "ModifyAccountViewmodel",
+                    "uploadNewImageToRemoteDataSource: Download URI saved successfully"
                 )
                 user.copy(image = imageDownloadUri)
             }
@@ -237,7 +237,7 @@ class ModifyAccountViewmodel(
         modifyUserFromRemoteDataSource(user) { result ->
             if (result is DatabaseResult.Success) {
                 log.d(
-                    "PersonalInformationViewmodel",
+                    "ModifyAccountViewmodel",
                     "updateUserInRemoteDataSource: User updated successfully in remote data source"
                 )
                 viewModelScope.launch {
@@ -245,7 +245,7 @@ class ModifyAccountViewmodel(
                 }
             } else {
                 log.e(
-                    "PersonalInformationViewmodel",
+                    "ModifyAccountViewmodel",
                     "updateUserInRemoteDataSource: failed to update user in remote data source"
                 )
                 _uiState.value = UiState.Error()
@@ -257,14 +257,14 @@ class ModifyAccountViewmodel(
         modifyUserFromLocalDataSource(user) { rowsModified: Int ->
             if (rowsModified > 0) {
                 log.d(
-                    "PersonalInformationViewmodel",
-                    "saveUserChanges: User updated successfully in local data source"
+                    "ModifyAccountViewmodel",
+                    "saveUserChangesInLocalDataSource: User updated successfully in local data source"
                 )
                 _uiState.value = UiState.Success
             } else {
                 log.e(
-                    "PersonalInformationViewmodel",
-                    "saveUserChanges: failed to update user in local data source"
+                    "ModifyAccountViewmodel",
+                    "saveUserChangesInLocalDataSource: failed to update user in local data source"
                 )
                 _uiState.value = UiState.Error()
             }
@@ -281,12 +281,12 @@ class ModifyAccountViewmodel(
                 modifyUserFromLocalDataSource(user.copy(lastLogout = Clock.System.now().epochSeconds)) { rowsModified: Int ->
                     if (rowsModified > 0) {
                         log.d(
-                            "PersonalInformationViewmodel",
+                            "ModifyAccountViewmodel",
                             "logOut: lastLogout updated successfully in local data source"
                         )
                     } else {
                         log.e(
-                            "PersonalInformationViewmodel",
+                            "ModifyAccountViewmodel",
                             "logOut: failed to update lastLogout in local data source"
                         )
                     }

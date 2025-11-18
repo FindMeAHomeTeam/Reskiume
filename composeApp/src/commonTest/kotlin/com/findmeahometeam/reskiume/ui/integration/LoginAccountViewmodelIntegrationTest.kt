@@ -6,7 +6,7 @@ import com.findmeahometeam.reskiume.authUser
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
-import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromRemoteDataSource
@@ -18,7 +18,7 @@ import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.integration.fakes.FakeAuthRepository
 import com.findmeahometeam.reskiume.ui.integration.fakes.FakeLocalUserRepository
 import com.findmeahometeam.reskiume.ui.integration.fakes.FakeLog
-import com.findmeahometeam.reskiume.ui.integration.fakes.FakeRealtimeDatabaseRepository
+import com.findmeahometeam.reskiume.ui.integration.fakes.FakeRealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.ui.integration.fakes.FakeStorageRepository
 import com.findmeahometeam.reskiume.ui.profile.loginAccount.LoginAccountViewmodel
 import com.findmeahometeam.reskiume.user
@@ -32,7 +32,7 @@ class LoginAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
     private fun getLoginAccountViewmodel(
         authRepository: AuthRepository = FakeAuthRepository(),
         localUserRepository: LocalUserRepository = FakeLocalUserRepository(),
-        realtimeDatabaseRepository: RealtimeDatabaseRepository = FakeRealtimeDatabaseRepository(),
+        realtimeDatabaseRemoteUserRepository: RealtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(),
         storageRepository: StorageRepository = FakeStorageRepository()
     ): LoginAccountViewmodel {
 
@@ -43,7 +43,7 @@ class LoginAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
             GetUserFromLocalDataSource(localUserRepository)
 
         val getUserFromRemoteDataSource =
-            GetUserFromRemoteDataSource(realtimeDatabaseRepository)
+            GetUserFromRemoteDataSource(realtimeDatabaseRemoteUserRepository)
 
         val saveImageToLocalDataSource =
             SaveImageToLocalDataSource(storageRepository)
@@ -76,7 +76,7 @@ class LoginAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     authEmail = user.email,
                     authPassword = userPwd
                 ),
-                realtimeDatabaseRepository = FakeRealtimeDatabaseRepository(mutableListOf(user.toData()))
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(mutableListOf(user.toData()))
             )
             loginAccountViewmodel.signInUsingEmail(user.email!!, userPwd)
             loginAccountViewmodel.state.test {
@@ -112,7 +112,7 @@ class LoginAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     authPassword = userPwd
                 ),
                 localUserRepository = FakeLocalUserRepository(mutableListOf(user)),
-                realtimeDatabaseRepository = FakeRealtimeDatabaseRepository(mutableListOf(user.toData()))
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(mutableListOf(user.toData()))
             )
             loginAccountViewmodel.signInUsingEmail(user.email!!, userPwd)
             loginAccountViewmodel.state.test {
@@ -133,7 +133,7 @@ class LoginAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     authPassword = userPwd
                 ),
                 localUserRepository = FakeLocalUserRepository(mutableListOf(user)),
-                realtimeDatabaseRepository = FakeRealtimeDatabaseRepository(mutableListOf(user.toData()))
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(mutableListOf(user.toData()))
             )
             loginAccountViewmodel.signInUsingEmail(user.email!!, userPwd)
             loginAccountViewmodel.state.test {

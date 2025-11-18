@@ -4,7 +4,7 @@ import FirebaseCore
 import KMPNativeCoroutinesAsync
 
 
-class RealtimeDatabaseRepositoryForIosDelegateImpl: RealtimeDatabaseRepositoryForIosDelegate {
+class RealtimeDatabaseRemoteUserRepositoryForIosDelegateImpl: RealtimeDatabaseRemoteUserRepositoryForIosDelegate {
     
     private var databaseReference: DatabaseReference?
     
@@ -13,7 +13,7 @@ class RealtimeDatabaseRepositoryForIosDelegateImpl: RealtimeDatabaseRepositoryFo
     private var log: Log
             
     init (
-        realtimeDatabaseRemoteUserRepositoryForIosDelegate: RealtimeDatabaseRemoteUserRepositoryForIosDelegate,
+        realtimeDatabaseRemoteUserFlowsRepositoryForIosDelegate: RealtimeDatabaseRemoteUserFlowsRepositoryForIosDelegate,
         log: Log
     ) {
         self.log = log
@@ -23,7 +23,7 @@ class RealtimeDatabaseRepositoryForIosDelegateImpl: RealtimeDatabaseRepositoryFo
         
         userUidTaskHandle = Task {
             do {
-                let emittedValues = asyncSequence(for: realtimeDatabaseRemoteUserRepositoryForIosDelegate.userUidFlow)
+                let emittedValues = asyncSequence(for: realtimeDatabaseRemoteUserFlowsRepositoryForIosDelegate.userUidFlow)
                 for try await userUid in emittedValues {
                     
                     if userUid != "" {
@@ -45,11 +45,11 @@ class RealtimeDatabaseRepositoryForIosDelegateImpl: RealtimeDatabaseRepositoryFo
                                 image: nSDictionary?["image"] as? String ?? "",
                                 available: KotlinBoolean(value: availableBool ?? false)
                             )
-                            realtimeDatabaseRemoteUserRepositoryForIosDelegate.updateRealtimeDatabaseRemoteUserRepositoryForIosDelegate(delegate: remoteUser)
+                            realtimeDatabaseRemoteUserFlowsRepositoryForIosDelegate.updateRealtimeDatabaseRemoteUserRepositoryForIosDelegate(delegate: remoteUser)
                             
                         }) { error in
                             log.e(tag: "RealtimeDatabaseRepositoryIos", message: "Error retrieving the remote user id \(userUid): \(error.localizedDescription)", throwable: nil)
-                            realtimeDatabaseRemoteUserRepositoryForIosDelegate.updateRealtimeDatabaseRemoteUserRepositoryForIosDelegate(delegate: nil)
+                            realtimeDatabaseRemoteUserFlowsRepositoryForIosDelegate.updateRealtimeDatabaseRemoteUserRepositoryForIosDelegate(delegate: nil)
                         }
                     }
                 }

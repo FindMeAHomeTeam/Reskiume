@@ -84,7 +84,8 @@ class AuthRepositoryForIosDelegateImpl: AuthRepositoryForIosDelegate {
         do {
             try await reauthenticateUser (password: password) { user in
                 guard let user = user else {
-                    onDeleteUser("AuthRepositoryForIosDelegateImpl - deleteUser: Error reauthenticating user")
+                    self.log.e(tag: "AuthRepositoryForIosDelegateImpl", message: "deleteUser: Error reauthenticating user", throwable: nil)
+                    onDeleteUser("Error reauthenticating user")
                     return
                 }
                 user.delete { error in
@@ -106,7 +107,8 @@ class AuthRepositoryForIosDelegateImpl: AuthRepositoryForIosDelegate {
         do {
             try await reauthenticateUser (password: password) { user in
                 guard let user = user else {
-                    onUpdatedUserEmail("AuthRepositoryForIosDelegateImpl - updateUserEmail: Error reauthenticating user")
+                    self.log.e(tag: "AuthRepositoryForIosDelegateImpl", message: "updateUserEmail: Error reauthenticating user", throwable: nil)
+                    onUpdatedUserEmail("Error reauthenticating user")
                     return
                 }
                 user.sendEmailVerification(beforeUpdatingEmail: newEmail) { error in
@@ -128,7 +130,8 @@ class AuthRepositoryForIosDelegateImpl: AuthRepositoryForIosDelegate {
         do {
             try await reauthenticateUser (password: currentPassword) { user in
                 guard let user = user else {
-                    onUpdatedUserPassword("AuthRepositoryForIosDelegateImpl - updateUserPassword: Error reauthenticating user")
+                    self.log.e(tag: "AuthRepositoryForIosDelegateImpl", message: "updateUserPassword: Error reauthenticating user", throwable: nil)
+                    onUpdatedUserPassword("Error reauthenticating user")
                     return
                 }
                 user.updatePassword(to: newPassword) { error in

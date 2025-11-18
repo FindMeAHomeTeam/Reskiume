@@ -4,7 +4,7 @@ import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.remote.response.RemoteUser
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.data.util.Paths
-import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRemoteUserRepository
 import com.google.firebase.Firebase
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -16,9 +16,9 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 
-class RealtimeDatabaseRepositoryAndroidImpl(
+class RealtimeDatabaseRemoteUserRepositoryAndroidImpl(
     private val log: Log
-) : RealtimeDatabaseRepository {
+) : RealtimeDatabaseRemoteUserRepository {
 
     private val databaseRef: DatabaseReference =
         Firebase.database.also { it.setPersistenceEnabled(true) }.reference

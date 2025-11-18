@@ -3,7 +3,7 @@ package com.findmeahometeam.reskiume.usecases
 import app.cash.turbine.test
 import com.findmeahometeam.reskiume.CoroutineTestDispatcher
 import com.findmeahometeam.reskiume.domain.model.User
-import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.user
 import dev.mokkery.answering.returns
@@ -17,12 +17,12 @@ import kotlin.test.assertNotNull
 
 class GetUserFromRemoteDataSourceTest: CoroutineTestDispatcher() {
 
-    val realtimeDatabaseRepository: RealtimeDatabaseRepository = mock {
+    val realtimeDatabaseRemoteUserRepository: RealtimeDatabaseRemoteUserRepository = mock {
         everySuspend { getRemoteUser(user.uid) } returns flowOf(user.toData())
     }
 
     private val getUserFromRemoteDataSource =
-        GetUserFromRemoteDataSource(realtimeDatabaseRepository)
+        GetUserFromRemoteDataSource(realtimeDatabaseRemoteUserRepository)
 
     @Test
     fun `given a user uid_when the app request a user by its uid from the remote data source_then it retrieves it`() =

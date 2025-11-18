@@ -3,27 +3,27 @@ package com.findmeahometeam.reskiume.data.remote.database
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.remote.response.RemoteUser
 import com.findmeahometeam.reskiume.data.util.log.Log
+import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRemoteUserFlowsRepositoryForIosDelegate
+import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRemoteUserRepositoryForIosDelegate
-import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRepository
-import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRepositoryForIosDelegate
-import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRepositoryForIosDelegateWrapper
+import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRemoteUserRepositoryForIosDelegateWrapper
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.flow.Flow
 
 @OptIn(ExperimentalForeignApi::class)
-class RealtimeDatabaseRepositoryIosImpl(
-    private val realtimeDatabaseRepositoryForIosDelegateWrapper: RealtimeDatabaseRepositoryForIosDelegateWrapper,
-    private val realtimeDatabaseRemoteUserRepositoryForIosDelegate: RealtimeDatabaseRemoteUserRepositoryForIosDelegate,
+class RealtimeDatabaseRemoteUserRepositoryIosImpl(
+    private val realtimeDatabaseRemoteUserRepositoryForIosDelegateWrapper: RealtimeDatabaseRemoteUserRepositoryForIosDelegateWrapper,
+    private val realtimeDatabaseRemoteUserFlowsRepositoryForIosDelegate: RealtimeDatabaseRemoteUserFlowsRepositoryForIosDelegate,
     private val log: Log
-) : RealtimeDatabaseRepository {
+) : RealtimeDatabaseRemoteUserRepository {
 
     private suspend fun initialCheck(
         remoteUserUid: String?,
-        onSuccess: suspend (RealtimeDatabaseRepositoryForIosDelegate) -> Unit,
+        onSuccess: suspend (RealtimeDatabaseRemoteUserRepositoryForIosDelegate) -> Unit,
         onFailure: () -> Unit
     ) {
         val value =
-            realtimeDatabaseRepositoryForIosDelegateWrapper.realtimeDatabaseRepositoryForIosDelegateState.value
+            realtimeDatabaseRemoteUserRepositoryForIosDelegateWrapper.realtimeDatabaseRemoteUserRepositoryForIosDelegateState.value
         if (remoteUserUid != null && value != null) {
             onSuccess(value)
         } else {
@@ -48,8 +48,8 @@ class RealtimeDatabaseRepositoryIosImpl(
     }
 
     override fun getRemoteUser(uid: String): Flow<RemoteUser?> {
-        realtimeDatabaseRemoteUserRepositoryForIosDelegate.updateUserUid(uid)
-        return realtimeDatabaseRemoteUserRepositoryForIosDelegate.realtimeDatabaseRemoteUserRepositoryForIosDelegateFlow
+        realtimeDatabaseRemoteUserFlowsRepositoryForIosDelegate.updateUserUid(uid)
+        return realtimeDatabaseRemoteUserFlowsRepositoryForIosDelegate.realtimeDatabaseRemoteUserRepositoryForIosDelegateFlow
     }
 
     override suspend fun updateRemoteUser(
@@ -73,7 +73,7 @@ class RealtimeDatabaseRepositoryIosImpl(
         onDeleteRemoteUser: (result: DatabaseResult) -> Unit
     ) {
         val value =
-            realtimeDatabaseRepositoryForIosDelegateWrapper.realtimeDatabaseRepositoryForIosDelegateState.value
+            realtimeDatabaseRemoteUserRepositoryForIosDelegateWrapper.realtimeDatabaseRemoteUserRepositoryForIosDelegateState.value
         if (value != null) {
             value.deleteRemoteUser(uid, onDeleteRemoteUser)
         } else {

@@ -9,27 +9,27 @@ final class FirebaseDatabaseManager {
 
     private init() {}
     
-    private var realtimeDatabaseRepositoryIosHelper: RealtimeDatabaseRepositoryIosHelper?
+    private var realtimeDatabaseRemoteUserRepositoryIosHelper: RealtimeDatabaseRemoteUserRepositoryIosHelper?
+    private var realtimeDatabaseRemoteUserFlowsRepositoryForIosDelegate: RealtimeDatabaseRemoteUserFlowsRepositoryForIosDelegate?
     private var realtimeDatabaseRemoteUserRepositoryForIosDelegate: RealtimeDatabaseRemoteUserRepositoryForIosDelegate?
-    private var realtimeDatabaseRepositoryForIosDelegate: RealtimeDatabaseRepositoryForIosDelegate?
 
     func startIfNeeded() {
         
         guard !didStart else { return }
         didStart = true
         
-        realtimeDatabaseRepositoryIosHelper = RealtimeDatabaseRepositoryIosHelper()
+        realtimeDatabaseRemoteUserRepositoryIosHelper = RealtimeDatabaseRemoteUserRepositoryIosHelper()
+        
+        realtimeDatabaseRemoteUserFlowsRepositoryForIosDelegate =
+        realtimeDatabaseRemoteUserRepositoryIosHelper!.realtimeDatabaseRemoteUserFlowsRepositoryForIosDelegate
         
         realtimeDatabaseRemoteUserRepositoryForIosDelegate =
-        realtimeDatabaseRepositoryIosHelper!.realtimeDatabaseRemoteUserRepositoryForIosDelegate
-        
-        realtimeDatabaseRepositoryForIosDelegate =
-        RealtimeDatabaseRepositoryForIosDelegateImpl(
-            realtimeDatabaseRemoteUserRepositoryForIosDelegate: realtimeDatabaseRemoteUserRepositoryForIosDelegate!,
-            log: realtimeDatabaseRepositoryIosHelper!.log
+        RealtimeDatabaseRemoteUserRepositoryForIosDelegateImpl(
+            realtimeDatabaseRemoteUserFlowsRepositoryForIosDelegate: realtimeDatabaseRemoteUserFlowsRepositoryForIosDelegate!,
+            log: realtimeDatabaseRemoteUserRepositoryIosHelper!.log
         )
         
-        realtimeDatabaseRepositoryIosHelper!.realtimeDatabaseRepositoryForIosDelegateWrapper
-            .updateRealtimeDatabaseRepositoryForIosDelegate(delegate: realtimeDatabaseRepositoryForIosDelegate)
+        realtimeDatabaseRemoteUserRepositoryIosHelper!.realtimeDatabaseRemoteUserRepositoryForIosDelegateWrapper
+            .updateRealtimeDatabaseRemoteUserRepositoryForIosDelegate(delegate_: realtimeDatabaseRemoteUserRepositoryForIosDelegate)
     }
 }

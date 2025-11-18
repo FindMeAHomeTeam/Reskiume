@@ -10,7 +10,7 @@ import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
-import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromRemoteDataSource
@@ -72,7 +72,7 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
             }
         }
 
-        val realtimeDatabaseRepository: RealtimeDatabaseRepository = mock {
+        val realtimeDatabaseRemoteUserRepository: RealtimeDatabaseRemoteUserRepository = mock {
             every { getRemoteUser(user.uid) } returns flowOf(remoteUserResult)
         }
 
@@ -93,7 +93,7 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
             GetUserFromLocalDataSource(localUserRepository)
 
         val getUserFromRemoteDataSource =
-            GetUserFromRemoteDataSource(realtimeDatabaseRepository)
+            GetUserFromRemoteDataSource(realtimeDatabaseRemoteUserRepository)
 
         val saveImageToLocalDataSource =
             SaveImageToLocalDataSource(storageRepository)

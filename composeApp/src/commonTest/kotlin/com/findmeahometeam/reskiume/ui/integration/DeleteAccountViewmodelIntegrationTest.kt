@@ -7,7 +7,7 @@ import com.findmeahometeam.reskiume.data.util.Paths
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
-import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.usecases.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteImageInLocalDataSource
@@ -21,7 +21,7 @@ import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.integration.fakes.FakeAuthRepository
 import com.findmeahometeam.reskiume.ui.integration.fakes.FakeLocalUserRepository
 import com.findmeahometeam.reskiume.ui.integration.fakes.FakeLog
-import com.findmeahometeam.reskiume.ui.integration.fakes.FakeRealtimeDatabaseRepository
+import com.findmeahometeam.reskiume.ui.integration.fakes.FakeRealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.ui.integration.fakes.FakeStorageRepository
 import com.findmeahometeam.reskiume.ui.profile.deleteAccount.DeleteAccountViewmodel
 import com.findmeahometeam.reskiume.user
@@ -35,7 +35,7 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
     private fun getDeleteAccountViewmodel(
         authRepository: AuthRepository = FakeAuthRepository(),
         localUserRepository: LocalUserRepository = FakeLocalUserRepository(),
-        realtimeDatabaseRepository: RealtimeDatabaseRepository = FakeRealtimeDatabaseRepository(),
+        realtimeDatabaseRemoteUserRepository: RealtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(),
         storageRepository: StorageRepository = FakeStorageRepository()
     ): DeleteAccountViewmodel {
 
@@ -46,13 +46,13 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
             GetUserFromLocalDataSource(localUserRepository)
 
         val getUserFromRemoteDataSource =
-            GetUserFromRemoteDataSource(realtimeDatabaseRepository)
+            GetUserFromRemoteDataSource(realtimeDatabaseRemoteUserRepository)
 
         val deleteUserFromAuthDataSource =
             DeleteUserFromAuthDataSource(authRepository)
 
         val deleteUserFromRemoteDataSource =
-            DeleteUserFromRemoteDataSource(realtimeDatabaseRepository)
+            DeleteUserFromRemoteDataSource(realtimeDatabaseRemoteUserRepository)
 
         val deleteImageFromRemoteDataSource =
             DeleteImageFromRemoteDataSource(storageRepository)
@@ -87,7 +87,7 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     authEmail = user.email,
                     authPassword = userPwd
                 ),
-                realtimeDatabaseRepository = FakeRealtimeDatabaseRepository(mutableListOf(user.toData())),
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(mutableListOf(user.toData())),
                 localUserRepository = FakeLocalUserRepository(mutableListOf(user)),
                 storageRepository = FakeStorageRepository(
                     remoteDatasourceList = mutableListOf(
@@ -150,7 +150,7 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     authEmail = user.email,
                     authPassword = userPwd
                 ),
-                realtimeDatabaseRepository = FakeRealtimeDatabaseRepository(mutableListOf(user.toData()))
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(mutableListOf(user.toData()))
             )
             deleteAccountViewmodel.deleteAccount(userPwd)
             deleteAccountViewmodel.state.test {

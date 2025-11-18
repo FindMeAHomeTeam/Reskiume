@@ -6,7 +6,7 @@ import com.findmeahometeam.reskiume.authUser
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
-import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.usecases.CreateUserWithEmailAndPasswordFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteImageFromRemoteDataSource
@@ -19,7 +19,7 @@ import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.integration.fakes.FakeAuthRepository
 import com.findmeahometeam.reskiume.ui.integration.fakes.FakeLocalUserRepository
 import com.findmeahometeam.reskiume.ui.integration.fakes.FakeLog
-import com.findmeahometeam.reskiume.ui.integration.fakes.FakeRealtimeDatabaseRepository
+import com.findmeahometeam.reskiume.ui.integration.fakes.FakeRealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.ui.integration.fakes.FakeStorageRepository
 import com.findmeahometeam.reskiume.ui.profile.createAccount.CreateAccountViewmodel
 import com.findmeahometeam.reskiume.user
@@ -33,7 +33,7 @@ class CreateAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
     private fun getCreateAccountViewmodel(
         authRepository: AuthRepository = FakeAuthRepository(),
         storageRepository: StorageRepository = FakeStorageRepository(),
-        realtimeDatabaseRepository: RealtimeDatabaseRepository = FakeRealtimeDatabaseRepository(),
+        realtimeDatabaseRemoteUserRepository: RealtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(),
         localUserRepository: LocalUserRepository = FakeLocalUserRepository()
     ): CreateAccountViewmodel {
 
@@ -41,7 +41,7 @@ class CreateAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
             CreateUserWithEmailAndPasswordFromAuthDataSource(authRepository)
 
         val insertUserToRemoteDataSource =
-            InsertUserToRemoteDataSource(realtimeDatabaseRepository)
+            InsertUserToRemoteDataSource(realtimeDatabaseRemoteUserRepository)
 
         val uploadImageToRemoteDataSource =
             UploadImageToRemoteDataSource(storageRepository)
@@ -53,7 +53,7 @@ class CreateAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
             DeleteUserFromAuthDataSource(authRepository)
 
         val deleteUserFromRemoteDataSource =
-            DeleteUserFromRemoteDataSource(realtimeDatabaseRepository)
+            DeleteUserFromRemoteDataSource(realtimeDatabaseRemoteUserRepository)
 
         val deleteImageFromRemoteDataSource =
             DeleteImageFromRemoteDataSource(storageRepository)
@@ -108,7 +108,7 @@ class CreateAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
         fun `given an unregistered user_when that user creates an account using email but there is an error storing user data in the remote data sources_then the app displays an error`() =
             runTest {
                 val createAccountViewmodel = getCreateAccountViewmodel(
-                    realtimeDatabaseRepository = FakeRealtimeDatabaseRepository(remoteUserList = mutableListOf(user.toData()))
+                    realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(remoteUserList = mutableListOf(user.toData()))
                 )
                 createAccountViewmodel.createUserUsingEmailAndPwd(user, userPwd)
                 createAccountViewmodel.state.test {

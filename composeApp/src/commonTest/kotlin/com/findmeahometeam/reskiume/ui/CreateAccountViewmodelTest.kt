@@ -8,7 +8,7 @@ import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
-import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.usecases.CreateUserWithEmailAndPasswordFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteImageFromRemoteDataSource
@@ -87,7 +87,7 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
             } calls { onImageDeletedFromRemote.get().invoke(onImageDeletedArg) }
         }
 
-        val realtimeDatabaseRepository: RealtimeDatabaseRepository = mock {
+        val realtimeDatabaseRemoteUserRepository: RealtimeDatabaseRemoteUserRepository = mock {
             everySuspend {
                 insertRemoteUser(
                     any(),
@@ -113,7 +113,7 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
             CreateUserWithEmailAndPasswordFromAuthDataSource(authRepository)
 
         val insertUserToRemoteDataSource =
-            InsertUserToRemoteDataSource(realtimeDatabaseRepository)
+            InsertUserToRemoteDataSource(realtimeDatabaseRemoteUserRepository)
 
         val uploadImageToRemoteDataSource =
             UploadImageToRemoteDataSource(storageRepository)
@@ -125,7 +125,7 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
             DeleteUserFromAuthDataSource(authRepository)
 
         val deleteUserFromRemoteDataSource =
-            DeleteUserFromRemoteDataSource(realtimeDatabaseRepository)
+            DeleteUserFromRemoteDataSource(realtimeDatabaseRemoteUserRepository)
 
         val deleteImageFromRemoteDataSource =
             DeleteImageFromRemoteDataSource(storageRepository)

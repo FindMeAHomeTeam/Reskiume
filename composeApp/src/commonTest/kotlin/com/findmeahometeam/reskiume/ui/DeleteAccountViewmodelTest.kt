@@ -11,7 +11,7 @@ import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
-import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.usecases.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteImageInLocalDataSource
@@ -80,7 +80,7 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
             } calls { onDeleteUserFromLocal.get().invoke(deleteUserFromLocalArg) }
         }
 
-        val realtimeDatabaseRepository: RealtimeDatabaseRepository = mock {
+        val realtimeDatabaseRemoteUserRepository: RealtimeDatabaseRemoteUserRepository = mock {
             every {
                 getRemoteUser(user.uid)
             } returns flowOf(remoteUserResult)
@@ -118,13 +118,13 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
             GetUserFromLocalDataSource(localUserRepository)
 
         val getUserFromRemoteDataSource =
-            GetUserFromRemoteDataSource(realtimeDatabaseRepository)
+            GetUserFromRemoteDataSource(realtimeDatabaseRemoteUserRepository)
 
         val deleteUserFromAuthDataSource =
             DeleteUserFromAuthDataSource(authRepository)
 
         val deleteUserFromRemoteDataSource =
-            DeleteUserFromRemoteDataSource(realtimeDatabaseRepository)
+            DeleteUserFromRemoteDataSource(realtimeDatabaseRemoteUserRepository)
 
         val deleteImageFromRemoteDataSource =
             DeleteImageFromRemoteDataSource(storageRepository)

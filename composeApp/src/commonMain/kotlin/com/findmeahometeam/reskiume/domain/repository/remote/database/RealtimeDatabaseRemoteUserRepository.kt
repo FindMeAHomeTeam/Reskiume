@@ -4,7 +4,7 @@ import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.remote.response.RemoteUser
 import kotlinx.coroutines.flow.Flow
 
-interface RealtimeDatabaseRepository {
+interface RealtimeDatabaseRemoteUserRepository {
     suspend fun insertRemoteUser(remoteUser: RemoteUser, onInsertRemoteUser: (result: DatabaseResult) -> Unit)
     fun getRemoteUser(uid: String): Flow<RemoteUser?>
     suspend fun updateRemoteUser(remoteUser: RemoteUser, onUpdateRemoteUser: (result: DatabaseResult) -> Unit)

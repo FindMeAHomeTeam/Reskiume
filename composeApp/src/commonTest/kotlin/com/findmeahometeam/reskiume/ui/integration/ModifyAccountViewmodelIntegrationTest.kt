@@ -7,7 +7,7 @@ import com.findmeahometeam.reskiume.data.util.Paths
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
-import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.usecases.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteImageInLocalDataSource
@@ -24,7 +24,7 @@ import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.integration.fakes.FakeAuthRepository
 import com.findmeahometeam.reskiume.ui.integration.fakes.FakeLocalUserRepository
 import com.findmeahometeam.reskiume.ui.integration.fakes.FakeLog
-import com.findmeahometeam.reskiume.ui.integration.fakes.FakeRealtimeDatabaseRepository
+import com.findmeahometeam.reskiume.ui.integration.fakes.FakeRealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.ui.integration.fakes.FakeStorageRepository
 import com.findmeahometeam.reskiume.ui.profile.modifyAccount.ModifyAccountViewmodel
 import com.findmeahometeam.reskiume.user
@@ -40,7 +40,7 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
     private fun getModifyAccountViewmodel(
         authRepository: AuthRepository = FakeAuthRepository(),
         localUserRepository: LocalUserRepository = FakeLocalUserRepository(),
-        realtimeDatabaseRepository: RealtimeDatabaseRepository = FakeRealtimeDatabaseRepository(),
+        realtimeDatabaseRemoteUserRepository: RealtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(),
         storageRepository: StorageRepository = FakeStorageRepository()
     ): ModifyAccountViewmodel {
 
@@ -51,7 +51,7 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
             GetUserFromLocalDataSource(localUserRepository)
 
         val getUserFromRemoteDataSource =
-            GetUserFromRemoteDataSource(realtimeDatabaseRepository)
+            GetUserFromRemoteDataSource(realtimeDatabaseRemoteUserRepository)
 
         val modifyUserEmailInAuthDataSource =
             ModifyUserEmailInAuthDataSource(authRepository)
@@ -69,7 +69,7 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
             UploadImageToRemoteDataSource(storageRepository)
 
         val modifyUserFromRemoteDataSource =
-            ModifyUserFromRemoteDataSource(realtimeDatabaseRepository)
+            ModifyUserFromRemoteDataSource(realtimeDatabaseRemoteUserRepository)
 
         val modifyUserFromLocalDataSource =
             ModifyUserFromLocalDataSource(localUserRepository)
@@ -102,7 +102,7 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     authEmail = user.email,
                     authPassword = userPwd
                 ),
-                realtimeDatabaseRepository = FakeRealtimeDatabaseRepository(mutableListOf(user.toData())),
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(mutableListOf(user.toData())),
                 storageRepository = FakeStorageRepository(
                     remoteDatasourceList = mutableListOf(
                         Pair("${user.uid}/${Paths.USERS.path}", user.image)
@@ -178,7 +178,7 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     authEmail = user.email,
                     authPassword = userPwd
                 ),
-                realtimeDatabaseRepository = FakeRealtimeDatabaseRepository(mutableListOf(user.toData()))
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(mutableListOf(user.toData()))
             )
             modifyAccountViewmodel.saveUserChanges(
                 isDifferentEmail = true,
@@ -204,7 +204,7 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     authEmail = user.email,
                     authPassword = userPwd
                 ),
-                realtimeDatabaseRepository = FakeRealtimeDatabaseRepository(mutableListOf(user.toData())),
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(mutableListOf(user.toData())),
                 storageRepository = FakeStorageRepository(
                     remoteDatasourceList = mutableListOf(
                         Pair("${user.uid}/${Paths.USERS.path}", user.image)
@@ -237,7 +237,7 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     authEmail = user.email,
                     authPassword = userPwd
                 ),
-                realtimeDatabaseRepository = FakeRealtimeDatabaseRepository(mutableListOf(user.toData())),
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(mutableListOf(user.toData())),
                 storageRepository = FakeStorageRepository(
                     remoteDatasourceList = mutableListOf(
                         Pair("${user.uid}/${Paths.USERS.path}", user.image)
@@ -275,7 +275,7 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     authEmail = user.email,
                     authPassword = userPwd
                 ),
-                realtimeDatabaseRepository = FakeRealtimeDatabaseRepository(mutableListOf(user.toData()))
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(mutableListOf(user.toData()))
             )
             modifyAccountViewmodel.saveUserChanges(
                 isDifferentEmail = false,

@@ -1,13 +1,13 @@
 package com.findmeahometeam.reskiume.data.remote.database
 
 import com.findmeahometeam.reskiume.data.remote.response.RemoteUser
-import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRemoteUserRepositoryForIosDelegate
+import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRemoteUserFlowsRepositoryForIosDelegate
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 
-class RealtimeDatabaseRemoteUserRepositoryForIosDelegateImpl :
-    RealtimeDatabaseRemoteUserRepositoryForIosDelegate {
+class RealtimeDatabaseRemoteUserFlowsRepositoryForIosDelegateImpl :
+    RealtimeDatabaseRemoteUserFlowsRepositoryForIosDelegate {
     private val _userUidState: MutableSharedFlow<String> = MutableSharedFlow(extraBufferCapacity = 1)
 
     override val userUidFlow: Flow<String> = _userUidState.asSharedFlow()

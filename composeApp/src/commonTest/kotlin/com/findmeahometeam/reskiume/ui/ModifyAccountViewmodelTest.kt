@@ -11,7 +11,7 @@ import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
-import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.usecases.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteImageInLocalDataSource
@@ -112,7 +112,7 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
             } calls { onModifyUserFromLocal.get().invoke(onModifyUserArg) }
         }
 
-        val realtimeDatabaseRepository: RealtimeDatabaseRepository = mock {
+        val realtimeDatabaseRemoteUserRepository: RealtimeDatabaseRemoteUserRepository = mock {
             every {
                 getRemoteUser(user.uid)
             } returns flowOf(getRemoteUserReturn)
@@ -158,7 +158,7 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
             GetUserFromLocalDataSource(localUserRepository)
 
         val getUserFromRemoteDataSource =
-            GetUserFromRemoteDataSource(realtimeDatabaseRepository)
+            GetUserFromRemoteDataSource(realtimeDatabaseRemoteUserRepository)
 
         val modifyUserEmailInAuthDataSource =
             ModifyUserEmailInAuthDataSource(authRepository)
@@ -176,7 +176,7 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
             UploadImageToRemoteDataSource(storageRepository)
 
         val modifyUserFromRemoteDataSource =
-            ModifyUserFromRemoteDataSource(realtimeDatabaseRepository)
+            ModifyUserFromRemoteDataSource(realtimeDatabaseRemoteUserRepository)
 
         val modifyUserFromLocalDataSource =
             ModifyUserFromLocalDataSource(localUserRepository)

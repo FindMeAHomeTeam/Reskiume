@@ -1,11 +1,11 @@
 package com.findmeahometeam.reskiume.data.database
 
 import com.findmeahometeam.reskiume.domain.model.User
-import com.findmeahometeam.reskiume.domain.repository.local.LocalRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 
-class LocalRepositoryImpl(
+class LocalUserRepositoryImpl(
     private val reskiumeDatabase: ReskiumeDatabase
-) : LocalRepository {
+) : LocalUserRepository {
     override suspend fun insertUser(user: User, onInsertUser: (rowId: Long) -> Unit) {
         onInsertUser(reskiumeDatabase.getUserDao().insertUser(user.toEntity()))
     }

@@ -1,6 +1,6 @@
 package com.findmeahometeam.reskiume.usecases
 
-import com.findmeahometeam.reskiume.domain.repository.local.LocalRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.user
 import dev.mokkery.answering.returns
@@ -12,12 +12,12 @@ import kotlin.test.assertEquals
 
 class GetUserFromLocalDataSourceTest {
 
-    val localRepository: LocalRepository = mock {
+    val localUserRepository: LocalUserRepository = mock {
         everySuspend { getUser(user.uid) } returns user
     }
 
     private val getUserFromLocalDataSource =
-        GetUserFromLocalDataSource(localRepository)
+        GetUserFromLocalDataSource(localUserRepository)
 
     @Test
     fun `given a user uid_when the app request a user from its uid in the local database_then it retrieves it`() =

@@ -5,7 +5,7 @@ import com.findmeahometeam.reskiume.CoroutineTestDispatcher
 import com.findmeahometeam.reskiume.authUser
 import com.findmeahometeam.reskiume.data.util.Paths
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.repository.local.LocalRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
@@ -22,7 +22,7 @@ import com.findmeahometeam.reskiume.domain.usecases.SignOutFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.integration.fakes.FakeAuthRepository
-import com.findmeahometeam.reskiume.ui.integration.fakes.FakeLocalRepository
+import com.findmeahometeam.reskiume.ui.integration.fakes.FakeLocalUserRepository
 import com.findmeahometeam.reskiume.ui.integration.fakes.FakeLog
 import com.findmeahometeam.reskiume.ui.integration.fakes.FakeRealtimeDatabaseRepository
 import com.findmeahometeam.reskiume.ui.integration.fakes.FakeStorageRepository
@@ -39,7 +39,7 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
 
     private fun getModifyAccountViewmodel(
         authRepository: AuthRepository = FakeAuthRepository(),
-        localRepository: LocalRepository = FakeLocalRepository(),
+        localUserRepository: LocalUserRepository = FakeLocalUserRepository(),
         realtimeDatabaseRepository: RealtimeDatabaseRepository = FakeRealtimeDatabaseRepository(),
         storageRepository: StorageRepository = FakeStorageRepository()
     ): ModifyAccountViewmodel {
@@ -48,7 +48,7 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
             ObserveAuthStateFromAuthDataSource(authRepository)
 
         val getUserFromLocalDataSource =
-            GetUserFromLocalDataSource(localRepository)
+            GetUserFromLocalDataSource(localUserRepository)
 
         val getUserFromRemoteDataSource =
             GetUserFromRemoteDataSource(realtimeDatabaseRepository)
@@ -72,7 +72,7 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
             ModifyUserFromRemoteDataSource(realtimeDatabaseRepository)
 
         val modifyUserFromLocalDataSource =
-            ModifyUserFromLocalDataSource(localRepository)
+            ModifyUserFromLocalDataSource(localUserRepository)
 
         val signOutFromAuthDataSource =
             SignOutFromAuthDataSource(authRepository)
@@ -114,7 +114,7 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                         )
                     )
                 ),
-                localRepository = FakeLocalRepository(mutableListOf(user))
+                localUserRepository = FakeLocalUserRepository(mutableListOf(user))
             )
             modifyAccountViewmodel.saveUserChanges(
                 isDifferentEmail = true,
@@ -210,7 +210,7 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                         Pair("${user.uid}/${Paths.USERS.path}", user.image)
                     )
                 ),
-                localRepository = FakeLocalRepository(mutableListOf(user))
+                localUserRepository = FakeLocalUserRepository(mutableListOf(user))
             )
             modifyAccountViewmodel.saveUserChanges(
                 isDifferentEmail = true,
@@ -249,7 +249,7 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                         )
                     )
                 ),
-                localRepository = FakeLocalRepository(mutableListOf(user))
+                localUserRepository = FakeLocalUserRepository(mutableListOf(user))
             )
             modifyAccountViewmodel.saveUserChanges(
                 isDifferentEmail = true,

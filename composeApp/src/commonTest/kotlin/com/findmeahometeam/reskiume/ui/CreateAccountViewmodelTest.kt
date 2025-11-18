@@ -6,7 +6,7 @@ import com.findmeahometeam.reskiume.authUser
 import com.findmeahometeam.reskiume.data.remote.response.AuthResult
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.repository.local.LocalRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
@@ -103,7 +103,7 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
             } calls { onSuccessRemoteUser.get().invoke(deleteRemoteUserArg) }
         }
 
-        val localRepository: LocalRepository = mock {
+        val localUserRepository: LocalUserRepository = mock {
             everySuspend { insertUser(any(), capture(onInsertUserFromLocal)) } calls {
                 onInsertUserFromLocal.get().invoke(onInsertUserArg)
             }
@@ -119,7 +119,7 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
             UploadImageToRemoteDataSource(storageRepository)
 
         val insertUserToLocalDataSource =
-            InsertUserToLocalDataSource(localRepository)
+            InsertUserToLocalDataSource(localUserRepository)
 
         val deleteUserFromAuthDataSource =
             DeleteUserFromAuthDataSource(authRepository)

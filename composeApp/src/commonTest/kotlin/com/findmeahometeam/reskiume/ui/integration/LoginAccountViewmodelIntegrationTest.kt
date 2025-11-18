@@ -4,7 +4,7 @@ import app.cash.turbine.test
 import com.findmeahometeam.reskiume.CoroutineTestDispatcher
 import com.findmeahometeam.reskiume.authUser
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.repository.local.LocalRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
@@ -16,7 +16,7 @@ import com.findmeahometeam.reskiume.domain.usecases.SaveImageToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.SignInWithEmailAndPasswordFromAuthDataSource
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.integration.fakes.FakeAuthRepository
-import com.findmeahometeam.reskiume.ui.integration.fakes.FakeLocalRepository
+import com.findmeahometeam.reskiume.ui.integration.fakes.FakeLocalUserRepository
 import com.findmeahometeam.reskiume.ui.integration.fakes.FakeLog
 import com.findmeahometeam.reskiume.ui.integration.fakes.FakeRealtimeDatabaseRepository
 import com.findmeahometeam.reskiume.ui.integration.fakes.FakeStorageRepository
@@ -31,7 +31,7 @@ class LoginAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
 
     private fun getLoginAccountViewmodel(
         authRepository: AuthRepository = FakeAuthRepository(),
-        localRepository: LocalRepository = FakeLocalRepository(),
+        localUserRepository: LocalUserRepository = FakeLocalUserRepository(),
         realtimeDatabaseRepository: RealtimeDatabaseRepository = FakeRealtimeDatabaseRepository(),
         storageRepository: StorageRepository = FakeStorageRepository()
     ): LoginAccountViewmodel {
@@ -40,7 +40,7 @@ class LoginAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
             SignInWithEmailAndPasswordFromAuthDataSource(authRepository)
 
         val getUserFromLocalDataSource =
-            GetUserFromLocalDataSource(localRepository)
+            GetUserFromLocalDataSource(localUserRepository)
 
         val getUserFromRemoteDataSource =
             GetUserFromRemoteDataSource(realtimeDatabaseRepository)
@@ -49,10 +49,10 @@ class LoginAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
             SaveImageToLocalDataSource(storageRepository)
 
         val insertUserToLocalDataSource =
-            InsertUserToLocalDataSource(localRepository)
+            InsertUserToLocalDataSource(localUserRepository)
 
         val modifyUserFromLocalDataSource =
-            ModifyUserFromLocalDataSource(localRepository)
+            ModifyUserFromLocalDataSource(localUserRepository)
 
         val log: Log = FakeLog()
 
@@ -111,7 +111,7 @@ class LoginAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     authEmail = user.email,
                     authPassword = userPwd
                 ),
-                localRepository = FakeLocalRepository(mutableListOf(user)),
+                localUserRepository = FakeLocalUserRepository(mutableListOf(user)),
                 realtimeDatabaseRepository = FakeRealtimeDatabaseRepository(mutableListOf(user.toData()))
             )
             loginAccountViewmodel.signInUsingEmail(user.email!!, userPwd)
@@ -132,7 +132,7 @@ class LoginAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     authEmail = user.email,
                     authPassword = userPwd
                 ),
-                localRepository = FakeLocalRepository(mutableListOf(user)),
+                localUserRepository = FakeLocalUserRepository(mutableListOf(user)),
                 realtimeDatabaseRepository = FakeRealtimeDatabaseRepository(mutableListOf(user.toData()))
             )
             loginAccountViewmodel.signInUsingEmail(user.email!!, userPwd)

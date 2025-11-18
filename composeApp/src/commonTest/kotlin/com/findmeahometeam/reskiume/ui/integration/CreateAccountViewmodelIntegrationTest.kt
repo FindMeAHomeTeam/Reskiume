@@ -4,7 +4,7 @@ import app.cash.turbine.test
 import com.findmeahometeam.reskiume.CoroutineTestDispatcher
 import com.findmeahometeam.reskiume.authUser
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.repository.local.LocalRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
@@ -17,7 +17,7 @@ import com.findmeahometeam.reskiume.domain.usecases.InsertUserToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.integration.fakes.FakeAuthRepository
-import com.findmeahometeam.reskiume.ui.integration.fakes.FakeLocalRepository
+import com.findmeahometeam.reskiume.ui.integration.fakes.FakeLocalUserRepository
 import com.findmeahometeam.reskiume.ui.integration.fakes.FakeLog
 import com.findmeahometeam.reskiume.ui.integration.fakes.FakeRealtimeDatabaseRepository
 import com.findmeahometeam.reskiume.ui.integration.fakes.FakeStorageRepository
@@ -34,7 +34,7 @@ class CreateAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
         authRepository: AuthRepository = FakeAuthRepository(),
         storageRepository: StorageRepository = FakeStorageRepository(),
         realtimeDatabaseRepository: RealtimeDatabaseRepository = FakeRealtimeDatabaseRepository(),
-        localRepository: LocalRepository = FakeLocalRepository()
+        localUserRepository: LocalUserRepository = FakeLocalUserRepository()
     ): CreateAccountViewmodel {
 
         val createUserWithEmailAndPasswordFromAuthDataSource =
@@ -47,7 +47,7 @@ class CreateAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
             UploadImageToRemoteDataSource(storageRepository)
 
         val insertUserToLocalDataSource =
-            InsertUserToLocalDataSource(localRepository)
+            InsertUserToLocalDataSource(localUserRepository)
 
         val deleteUserFromAuthDataSource =
             DeleteUserFromAuthDataSource(authRepository)
@@ -123,7 +123,7 @@ class CreateAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
         fun `given an unregistered user_when that user creates an account using email but there is an error storing that user in the local datasource_then the app displays an error`() =
             runTest {
                 val createAccountViewmodel = getCreateAccountViewmodel(
-                    localRepository = FakeLocalRepository(localUserList = mutableListOf(user))
+                    localUserRepository = FakeLocalUserRepository(localUserList = mutableListOf(user))
                 )
                 createAccountViewmodel.createUserUsingEmailAndPwd(user, userPwd)
                 createAccountViewmodel.state.test {

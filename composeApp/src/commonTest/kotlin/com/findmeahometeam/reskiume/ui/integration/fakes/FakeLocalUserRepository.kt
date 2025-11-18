@@ -1,11 +1,11 @@
 package com.findmeahometeam.reskiume.ui.integration.fakes
 
 import com.findmeahometeam.reskiume.domain.model.User
-import com.findmeahometeam.reskiume.domain.repository.local.LocalRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 
-class FakeLocalRepository(
+class FakeLocalUserRepository(
     private var localUserList: MutableList<User> = mutableListOf()
-): LocalRepository {
+): LocalUserRepository {
 
     override suspend fun insertUser(
         user: User,

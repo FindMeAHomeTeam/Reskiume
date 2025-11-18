@@ -8,7 +8,7 @@ import com.findmeahometeam.reskiume.data.remote.response.RemoteUser
 import com.findmeahometeam.reskiume.data.util.Paths
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.User
-import com.findmeahometeam.reskiume.domain.repository.local.LocalRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
@@ -62,7 +62,7 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
             } returns signInWithEmailAndPasswordResult
         }
 
-        val localRepository: LocalRepository = mock {
+        val localUserRepository: LocalUserRepository = mock {
             everySuspend { getUser(user.uid) } returns userResult
             everySuspend { insertUser(any(), capture(onInsertUserFromLocal)) } calls {
                 onInsertUserFromLocal.get().invoke(insertedRowIdArg)
@@ -90,7 +90,7 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
             SignInWithEmailAndPasswordFromAuthDataSource(authRepository)
 
         val getUserFromLocalDataSource =
-            GetUserFromLocalDataSource(localRepository)
+            GetUserFromLocalDataSource(localUserRepository)
 
         val getUserFromRemoteDataSource =
             GetUserFromRemoteDataSource(realtimeDatabaseRepository)
@@ -99,10 +99,10 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
             SaveImageToLocalDataSource(storageRepository)
 
         val insertUserToLocalDataSource =
-            InsertUserToLocalDataSource(localRepository)
+            InsertUserToLocalDataSource(localUserRepository)
 
         val modifyUserFromLocalDataSource =
-            ModifyUserFromLocalDataSource(localRepository)
+            ModifyUserFromLocalDataSource(localUserRepository)
 
         val log: Log = mock {
             every { d(any(), any()) } returns Unit

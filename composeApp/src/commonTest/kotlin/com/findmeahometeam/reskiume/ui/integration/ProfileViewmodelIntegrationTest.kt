@@ -4,12 +4,12 @@ import app.cash.turbine.test
 import com.findmeahometeam.reskiume.CoroutineTestDispatcher
 import com.findmeahometeam.reskiume.authUser
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.repository.local.LocalRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.ObserveAuthStateFromAuthDataSource
 import com.findmeahometeam.reskiume.ui.integration.fakes.FakeAuthRepository
-import com.findmeahometeam.reskiume.ui.integration.fakes.FakeLocalRepository
+import com.findmeahometeam.reskiume.ui.integration.fakes.FakeLocalUserRepository
 import com.findmeahometeam.reskiume.ui.integration.fakes.FakeLog
 import com.findmeahometeam.reskiume.ui.profile.ProfileViewmodel
 import com.findmeahometeam.reskiume.ui.profile.ProfileViewmodel.ProfileUiState
@@ -25,10 +25,10 @@ class ProfileViewmodelIntegrationTest : CoroutineTestDispatcher() {
 
     private fun getProfileViewmodel(
         authRepository: AuthRepository = FakeAuthRepository(),
-        localRepository: LocalRepository = FakeLocalRepository()
+        localUserRepository: LocalUserRepository = FakeLocalUserRepository()
     ): ProfileViewmodel {
         val observeAuthStateFromAuthDataSource = ObserveAuthStateFromAuthDataSource(authRepository)
-        val getUserFromLocalDataSource = GetUserFromLocalDataSource(localRepository)
+        val getUserFromLocalDataSource = GetUserFromLocalDataSource(localUserRepository)
         return ProfileViewmodel(
             observeAuthStateFromAuthDataSource,
             getUserFromLocalDataSource,
@@ -40,8 +40,8 @@ class ProfileViewmodelIntegrationTest : CoroutineTestDispatcher() {
     fun `given a registered user_when the user opens the profile section_then that user will see it populated`() =
         runTest {
             val authRepository: AuthRepository = FakeAuthRepository(authUser = authUser)
-            val localRepository: LocalRepository = FakeLocalRepository(mutableListOf(user))
-            getProfileViewmodel(authRepository, localRepository).state.test {
+            val localUserRepository: LocalUserRepository = FakeLocalUserRepository(mutableListOf(user))
+            getProfileViewmodel(authRepository, localUserRepository).state.test {
                 assertEquals(ProfileUiState.Success(user), awaitItem())
                 awaitComplete()
             }
@@ -51,8 +51,8 @@ class ProfileViewmodelIntegrationTest : CoroutineTestDispatcher() {
     fun `given a registered user on auth but not on the local data source_when the user opens the profile section_then that user will see the default profile`() =
         runTest {
             val authRepository: AuthRepository = FakeAuthRepository(authUser = authUser.copy(uid = "wrongUid"))
-            val localRepository: LocalRepository = FakeLocalRepository(mutableListOf(user))
-            getProfileViewmodel(authRepository, localRepository).state.test {
+            val localUserRepository: LocalUserRepository = FakeLocalUserRepository(mutableListOf(user))
+            getProfileViewmodel(authRepository, localUserRepository).state.test {
                 assertEquals(
                     ProfileUiState.Error("ProfileViewmodel - User data not found"),
                     awaitItem()

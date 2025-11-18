@@ -47,7 +47,7 @@ import kotlin.test.assertTrue
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
-class ModifyAccountViewmodelTest: CoroutineTestDispatcher() {
+class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
 
     private val onUpdateUserEmailFromAuth = Capture.slot<(String) -> Unit>()
 
@@ -262,7 +262,7 @@ class ModifyAccountViewmodelTest: CoroutineTestDispatcher() {
         }
 
     @Test
-    fun `given a registered user_when that user deletes their account but the remote data source fails deleting their avatar_then the app displays an error`() =
+    fun `given a registered user_when that user modifies their account but the remote data source fails to delete their avatar_then the app displays an error`() =
         runTest {
             val modifyAccountViewmodel = getModifyAccountViewmodel(
                 onRemoteImageDeletedArg = false
@@ -283,7 +283,7 @@ class ModifyAccountViewmodelTest: CoroutineTestDispatcher() {
         }
 
     @Test
-    fun `given a registered user_when that user deletes their account but the local data source fails deleting their avatar_then the app displays an error`() =
+    fun `given a registered user_when that user modifies their account but the local data source fails to delete their avatar_then the app displays an error`() =
         runTest {
             val modifyAccountViewmodel = getModifyAccountViewmodel(
                 onLocalImageDeletedArg = false
@@ -374,38 +374,34 @@ class ModifyAccountViewmodelTest: CoroutineTestDispatcher() {
 
     @OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
     @Test
-    fun `given a registered user_when that user logs out_then the user is unregistered`() = runTest {
+    fun `given a registered user_when that user logs out_then the user is unregistered`() =
+        runTest {
+            val modifyAccountViewmodel = getModifyAccountViewmodel(
+                modifyUserArg = user.copy(lastLogout = Clock.System.now().epochSeconds)
+            )
+            modifyAccountViewmodel.logOut()
 
-        val modifyAccountViewmodelTest = ModifyAccountViewmodelTest()
+            runCurrent()
 
-        val modifyAccountViewmodel = modifyAccountViewmodelTest.getModifyAccountViewmodel(
-            modifyUserArg = user.copy(lastLogout = Clock.System.now().epochSeconds)
-        )
-        modifyAccountViewmodel.logOut()
-
-        runCurrent()
-
-        verify {
-            modifyAccountViewmodelTest.log.d(any(), any())
+            verify {
+                log.d(any(), any())
+            }
         }
-    }
 
     @OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
     @Test
-    fun `given a registered user_when that user logs out and the local datasource fails updating the last log out_then the app emit an error`()  = runTest {
+    fun `given a registered user_when that user logs out and the local datasource fails updating the last log out_then the app emit an error`() =
+        runTest {
+            val modifyAccountViewmodel = getModifyAccountViewmodel(
+                modifyUserArg = user.copy(lastLogout = Clock.System.now().epochSeconds),
+                onModifyUserArg = 0
+            )
+            modifyAccountViewmodel.logOut()
 
-        val modifyAccountViewmodelTest = ModifyAccountViewmodelTest()
+            runCurrent()
 
-        val modifyAccountViewmodel = modifyAccountViewmodelTest.getModifyAccountViewmodel(
-            modifyUserArg = user.copy(lastLogout = Clock.System.now().epochSeconds),
-            onModifyUserArg = 0
-        )
-        modifyAccountViewmodel.logOut()
-
-        runCurrent()
-
-        verify {
-            modifyAccountViewmodelTest.log.e(any(), any())
+            verify {
+                log.e(any(), any())
+            }
         }
-    }
 }

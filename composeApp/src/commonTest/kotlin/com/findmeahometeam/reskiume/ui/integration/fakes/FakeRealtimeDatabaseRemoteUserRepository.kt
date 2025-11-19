@@ -2,7 +2,7 @@ package com.findmeahometeam.reskiume.ui.integration.fakes
 
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.remote.response.RemoteUser
-import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRemoteUserRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.user
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf

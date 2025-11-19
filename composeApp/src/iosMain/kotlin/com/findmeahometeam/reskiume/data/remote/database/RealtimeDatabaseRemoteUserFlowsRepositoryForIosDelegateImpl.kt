@@ -1,7 +1,7 @@
 package com.findmeahometeam.reskiume.data.remote.database
 
 import com.findmeahometeam.reskiume.data.remote.response.RemoteUser
-import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRemoteUserFlowsRepositoryForIosDelegate
+import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserFlowsRepositoryForIosDelegate
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow

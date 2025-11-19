@@ -1,6 +1,6 @@
 package com.findmeahometeam.reskiume.usecases
 
-import com.findmeahometeam.reskiume.domain.repository.remote.database.RealtimeDatabaseRemoteUserRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.usecases.ModifyUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.user
 import dev.mokkery.answering.returns

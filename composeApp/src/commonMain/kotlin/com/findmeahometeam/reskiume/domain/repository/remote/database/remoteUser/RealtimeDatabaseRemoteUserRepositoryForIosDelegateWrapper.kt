@@ -1,4 +1,4 @@
-package com.findmeahometeam.reskiume.domain.repository.remote.database
+package com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser
 
 import kotlinx.coroutines.flow.StateFlow
 

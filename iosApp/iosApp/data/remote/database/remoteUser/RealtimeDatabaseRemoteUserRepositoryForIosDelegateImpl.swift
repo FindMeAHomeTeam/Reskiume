@@ -48,7 +48,7 @@ class RealtimeDatabaseRemoteUserRepositoryForIosDelegateImpl: RealtimeDatabaseRe
                             realtimeDatabaseRemoteUserFlowsRepositoryForIosDelegate.updateRealtimeDatabaseRemoteUserRepositoryForIosDelegate(delegate: remoteUser)
                             
                         }) { error in
-                            log.e(tag: "RealtimeDatabaseRepositoryIos", message: "Error retrieving the remote user id \(userUid): \(error.localizedDescription)", throwable: nil)
+                            log.e(tag: "RealtimeDatabaseRemoteUserRepositoryForIosDelegateImpl", message: "Error retrieving the remote user id \(userUid): \(error.localizedDescription)", throwable: nil)
                             realtimeDatabaseRemoteUserFlowsRepositoryForIosDelegate.updateRealtimeDatabaseRemoteUserRepositoryForIosDelegate(delegate: nil)
                         }
                     }
@@ -78,7 +78,7 @@ class RealtimeDatabaseRemoteUserRepositoryForIosDelegateImpl: RealtimeDatabaseRe
             try await databaseReference!.child(Paths.users.path).child(remoteUser.uid!).setValue(getNSDictionaryFromRemoteUser(remoteUser: remoteUser))
             onInsertRemoteUser(DatabaseResult.Success())
         } catch {
-            log.e(tag: "RealtimeDatabaseRepositoryIos", message: "Error inserting the remote user \(String(describing: remoteUser.uid))", throwable: nil)
+            log.e(tag: "RealtimeDatabaseRemoteUserRepositoryForIosDelegateImpl", message: "Error inserting the remote user \(String(describing: remoteUser.uid))", throwable: nil)
             onInsertRemoteUser(DatabaseResult.Error(message: String(describing: error)))
         }
     }
@@ -91,7 +91,7 @@ class RealtimeDatabaseRemoteUserRepositoryForIosDelegateImpl: RealtimeDatabaseRe
             try await databaseReference?.updateChildValues(childUpdates)
             onUpdateRemoteUser(DatabaseResult.Success())
         } catch {
-            log.e(tag: "RealtimeDatabaseRepositoryIos", message: "Error updating the remote user \(String(describing: remoteUser.uid))", throwable: nil)
+            log.e(tag: "RealtimeDatabaseRemoteUserRepositoryForIosDelegateImpl", message: "Error updating the remote user \(String(describing: remoteUser.uid))", throwable: nil)
             onUpdateRemoteUser(DatabaseResult.Error(message: String(describing: error)))
         }
     }
@@ -101,7 +101,7 @@ class RealtimeDatabaseRemoteUserRepositoryForIosDelegateImpl: RealtimeDatabaseRe
             if (error == nil) {
                 onDeleteRemoteUser(DatabaseResult.Success())
             } else {
-                self.log.e(tag: "RealtimeDatabaseRepositoryIos", message: "Error deleting the remote user \(uid): \(String(describing: error))", throwable: nil)
+                self.log.e(tag: "RealtimeDatabaseRemoteUserRepositoryForIosDelegateImpl", message: "Error deleting the remote user \(uid): \(String(describing: error))", throwable: nil)
                 onDeleteRemoteUser(DatabaseResult.Error(message: String(describing: error)))
             }
         }

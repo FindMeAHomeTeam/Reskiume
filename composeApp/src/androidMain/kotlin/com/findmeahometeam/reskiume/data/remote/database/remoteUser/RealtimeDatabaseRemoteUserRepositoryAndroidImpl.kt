@@ -33,11 +33,11 @@ class RealtimeDatabaseRemoteUserRepositoryAndroidImpl(
                 .addOnSuccessListener {
                     onInsertRemoteUser(DatabaseResult.Success)
                 }.addOnFailureListener { e ->
-                    log.e("RealtimeDatabaseRepositoryAndroidImpl", "insertRemoteUser: Error inserting the remote user ${remoteUser.uid}: ${e.message}")
+                    log.e("RealtimeDatabaseRemoteUserRepositoryAndroidImpl", "insertRemoteUser: Error inserting the remote user ${remoteUser.uid}: ${e.message}")
                     onInsertRemoteUser(DatabaseResult.Error(e.message ?: ""))
                 }
         } ?: onInsertRemoteUser(DatabaseResult.Error()).also {
-            log.e("RealtimeDatabaseRepositoryAndroidImpl", "insertRemoteUser: Error inserting a remote user")
+            log.e("RealtimeDatabaseRemoteUserRepositoryAndroidImpl", "insertRemoteUser: Error inserting a remote user")
         }
     }
 
@@ -49,7 +49,7 @@ class RealtimeDatabaseRemoteUserRepositoryAndroidImpl(
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                log.w(
+                log.e(
                     "RealtimeDatabaseRepositoryAndroid",
                     "getRemoteUser:onCancelled ${databaseError.toException()}"
                 )
@@ -72,7 +72,7 @@ class RealtimeDatabaseRemoteUserRepositoryAndroidImpl(
         databaseRef.updateChildren(childUpdates).addOnSuccessListener {
             onUpdateRemoteUser(DatabaseResult.Success)
         }.addOnFailureListener { e ->
-            log.e("RealtimeDatabaseRepositoryAndroidImpl", "updateRemoteUser: Error updating the remote user ${remoteUser.uid}: ${e.message}")
+            log.e("RealtimeDatabaseRemoteUserRepositoryAndroidImpl", "updateRemoteUser: Error updating the remote user ${remoteUser.uid}: ${e.message}")
             onUpdateRemoteUser(DatabaseResult.Error(e.message ?: ""))
         }
     }
@@ -82,7 +82,7 @@ class RealtimeDatabaseRemoteUserRepositoryAndroidImpl(
             if (error == null) {
                 onDeleteRemoteUser(DatabaseResult.Success)
             } else {
-                log.e("RealtimeDatabaseRepositoryAndroidImpl", "deleteRemoteUser: Error deleting the user $uid")
+                log.e("RealtimeDatabaseRemoteUserRepositoryAndroidImpl", "deleteRemoteUser: Error deleting the user $uid")
                 onDeleteRemoteUser(DatabaseResult.Error())
             }
         }

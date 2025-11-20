@@ -38,7 +38,7 @@ class RealtimeDatabaseRemoteReviewRepositoryForIosDelegateImpl: RealtimeDatabase
                                     authorUid: reviewNsDictionary?["authorUid"] as? String ?? "",
                                     reviewedUid: reviewNsDictionary?["reviewedUid"] as? String ?? "",
                                     description: reviewNsDictionary?["description"] as? String ?? "",
-                                    rating: KotlinFloat(nonretainedObject: reviewNsDictionary?["rating"] as? Float ?? 0),
+                                    rating: KotlinFloat(nonretainedObject: reviewNsDictionary?["rating"] as? Float ?? 0)
                                 )
                                 remoteReviews.append(remoteReview)
                             }

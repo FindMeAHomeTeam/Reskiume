@@ -5,7 +5,7 @@ import ComposeApp
 final class FirebaseRemoteUserDatabaseManager {
     static let shared = FirebaseRemoteUserDatabaseManager()
     private var didStart = false
-    private let lock = DispatchQueue(label: "com.findmeahometeam.reskiume.FirebaseDatabaseManager")
+    private let lock = DispatchQueue(label: "com.findmeahometeam.reskiume.FirebaseRemoteUserDatabaseManager")
 
     private init() {}
     

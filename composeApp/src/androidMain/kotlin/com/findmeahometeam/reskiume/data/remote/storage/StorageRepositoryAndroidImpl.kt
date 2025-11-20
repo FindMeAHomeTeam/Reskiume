@@ -17,8 +17,9 @@ class StorageRepositoryAndroidImpl(
     private val storageRef: StorageReference = Firebase.storage.reference
 
     private fun getStorageReference(imageType: Paths, userUid: String): StorageReference {
-        return when (imageType) {
-            Paths.USERS -> storageRef.child(Paths.USERS.path).child(userUid).child("$userUid.webp")
+        return when {
+            imageType == Paths.USERS -> storageRef.child(Paths.USERS.path).child(userUid).child("$userUid.webp")
+            else -> storageRef.child(Paths.USERS.path).child(userUid).child("$userUid.webp")
         }
     }
 
@@ -48,8 +49,9 @@ class StorageRepositoryAndroidImpl(
 
     override fun saveImage(userUid: String, imageType: Paths, onImageSaved: (String) -> Unit) {
         val imageRef: StorageReference = getStorageReference(imageType, userUid)
-        val localFile = when (imageType) {
-            Paths.USERS -> File(context.filesDir, "$userUid.webp")
+        val localFile = when {
+            imageType == Paths.USERS -> File(context.filesDir, "$userUid.webp")
+            else -> File(context.filesDir, "$userUid.webp")
         }
 
         // Ensure the parent directory exists

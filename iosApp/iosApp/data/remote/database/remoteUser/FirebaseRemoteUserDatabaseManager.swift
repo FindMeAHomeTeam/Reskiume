@@ -2,8 +2,8 @@ import Foundation
 import ComposeApp
 
 @MainActor
-final class FirebaseDatabaseManager {
-    static let shared = FirebaseDatabaseManager()
+final class FirebaseRemoteUserDatabaseManager {
+    static let shared = FirebaseRemoteUserDatabaseManager()
     private var didStart = false
     private let lock = DispatchQueue(label: "com.findmeahometeam.reskiume.FirebaseDatabaseManager")
 

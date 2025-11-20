@@ -1,9 +1,9 @@
-package com.findmeahometeam.reskiume.data.remote.database
+package com.findmeahometeam.reskiume.data.remote.database.remoteUser
 
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.remote.response.RemoteUser
-import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.data.util.Paths
+import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
 import com.google.firebase.Firebase
 import com.google.firebase.database.DataSnapshot

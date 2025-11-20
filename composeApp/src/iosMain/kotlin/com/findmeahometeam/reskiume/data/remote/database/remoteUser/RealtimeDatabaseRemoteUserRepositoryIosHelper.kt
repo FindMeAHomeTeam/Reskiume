@@ -1,4 +1,4 @@
-package com.findmeahometeam.reskiume.data.remote.database
+package com.findmeahometeam.reskiume.data.remote.database.remoteUser
 
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserFlowsRepositoryForIosDelegate

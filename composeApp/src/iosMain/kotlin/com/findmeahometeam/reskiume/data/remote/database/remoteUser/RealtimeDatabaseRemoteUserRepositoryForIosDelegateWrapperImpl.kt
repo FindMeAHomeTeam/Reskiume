@@ -1,4 +1,4 @@
-package com.findmeahometeam.reskiume.data.remote.database
+package com.findmeahometeam.reskiume.data.remote.database.remoteUser
 
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepositoryForIosDelegate
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepositoryForIosDelegateWrapper

@@ -3,7 +3,7 @@ package com.findmeahometeam.reskiume.di
 import com.findmeahometeam.reskiume.data.remote.auth.AuthRepositoryAndroidImpl
 import com.findmeahometeam.reskiume.data.database.ReskiumeDatabase
 import com.findmeahometeam.reskiume.data.database.getDatabase
-import com.findmeahometeam.reskiume.data.remote.database.RealtimeDatabaseRemoteUserRepositoryAndroidImpl
+import com.findmeahometeam.reskiume.data.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepositoryAndroidImpl
 import com.findmeahometeam.reskiume.data.remote.storage.StorageRepositoryAndroidImpl
 import com.findmeahometeam.reskiume.data.util.analytics.Analytics
 import com.findmeahometeam.reskiume.data.util.analytics.AnalyticsAndroidImpl

@@ -1,4 +1,4 @@
-package com.findmeahometeam.reskiume.data.remote.database
+package com.findmeahometeam.reskiume.data.remote.database.remoteUser
 
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.remote.response.RemoteUser

@@ -1,0 +1,8 @@
+package com.findmeahometeam.reskiume.domain.repository.remote.database.remoteReview
+
+import kotlinx.coroutines.flow.StateFlow
+
+interface RealtimeDatabaseRemoteReviewRepositoryForIosDelegateWrapper {
+    val realtimeDatabaseRemoteReviewRepositoryForIosDelegateState: StateFlow<RealtimeDatabaseRemoteReviewRepositoryForIosDelegate?>
+    fun updateRealtimeDatabaseRemoteReviewRepositoryForIosDelegate(delegate: RealtimeDatabaseRemoteReviewRepositoryForIosDelegate?)
+}

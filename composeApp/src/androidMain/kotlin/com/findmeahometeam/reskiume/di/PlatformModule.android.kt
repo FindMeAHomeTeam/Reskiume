@@ -4,12 +4,14 @@ import com.findmeahometeam.reskiume.data.remote.auth.AuthRepositoryAndroidImpl
 import com.findmeahometeam.reskiume.data.database.ReskiumeDatabase
 import com.findmeahometeam.reskiume.data.database.getDatabase
 import com.findmeahometeam.reskiume.data.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepositoryAndroidImpl
+import com.findmeahometeam.reskiume.data.remote.database.remoteReview.RealtimeDatabaseRemoteReviewRepositoryAndroidImpl
 import com.findmeahometeam.reskiume.data.remote.storage.StorageRepositoryAndroidImpl
 import com.findmeahometeam.reskiume.data.util.analytics.Analytics
 import com.findmeahometeam.reskiume.data.util.analytics.AnalyticsAndroidImpl
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.data.util.log.LogAndroidImpl
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteReview.RealtimeDatabaseRemoteReviewRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import org.koin.core.module.Module
@@ -23,5 +25,6 @@ actual val platformModule: Module = module {
     singleOf(::AuthRepositoryAndroidImpl) bind AuthRepository::class
     single<ReskiumeDatabase> { getDatabase(get()) }
     singleOf(::RealtimeDatabaseRemoteUserRepositoryAndroidImpl) bind RealtimeDatabaseRemoteUserRepository::class
+    singleOf(::RealtimeDatabaseRemoteReviewRepositoryAndroidImpl) bind RealtimeDatabaseRemoteReviewRepository::class
     singleOf(::StorageRepositoryAndroidImpl) bind StorageRepository::class
 }

@@ -8,17 +8,17 @@ import kotlinx.coroutines.flow.map
 class LocalReviewRepositoryImpl(
     private val reskiumeDatabase: ReskiumeDatabase
 ): LocalReviewRepository {
-    override suspend fun insertUserReview(review: Review, onInsertReview: (rowId: Long) -> Unit) {
-        onInsertReview(reskiumeDatabase.getReviewDao().insertUserReview(review.toEntity()))
+    override suspend fun insertLocalReview(review: Review, onInsertReview: (rowId: Long) -> Unit) {
+        onInsertReview(reskiumeDatabase.getReviewDao().insertLocalReview(review.toEntity()))
     }
 
-    override fun getUserReviews(reviewedUserUid: String): Flow<List<Review>> =
-        reskiumeDatabase.getReviewDao().getUserReviews(reviewedUserUid).map {
+    override fun getLocalReviews(reviewedUserUid: String): Flow<List<Review>> =
+        reskiumeDatabase.getReviewDao().getLocalReviews(reviewedUserUid).map {
             reviewEntities -> reviewEntities.map { it.toDomain() }
         }
 
 
-    override suspend fun deleteUserReviews(reviewedUserUid: String, onDeletedReviews: (rowsDeleted: Int) -> Unit) {
-        onDeletedReviews(reskiumeDatabase.getReviewDao().deleteUserReviews(reviewedUserUid))
+    override suspend fun deleteLocalReviews(reviewedUserUid: String, onDeletedReviews: (rowsDeleted: Int) -> Unit) {
+        onDeletedReviews(reskiumeDatabase.getReviewDao().deleteLocalReviews(reviewedUserUid))
     }
 }

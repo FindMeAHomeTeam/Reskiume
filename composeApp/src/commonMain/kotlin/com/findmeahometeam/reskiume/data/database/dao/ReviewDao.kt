@@ -10,11 +10,11 @@ import kotlinx.coroutines.flow.Flow
 interface ReviewDao {
 
     @Insert
-    suspend fun insertUserReview(review: ReviewEntity): Long
+    suspend fun insertLocalReview(review: ReviewEntity): Long
 
     @Query("SELECT * FROM ReviewEntity WHERE reviewedUid = :reviewedUserUid")
-    fun getUserReviews(reviewedUserUid: String): Flow<List<ReviewEntity>>
+    fun getLocalReviews(reviewedUserUid: String): Flow<List<ReviewEntity>>
 
     @Query("DELETE FROM ReviewEntity WHERE reviewedUid = :reviewedUserUid")
-    suspend fun deleteUserReviews(reviewedUserUid: String): Int
+    suspend fun deleteLocalReviews(reviewedUserUid: String): Int
 }

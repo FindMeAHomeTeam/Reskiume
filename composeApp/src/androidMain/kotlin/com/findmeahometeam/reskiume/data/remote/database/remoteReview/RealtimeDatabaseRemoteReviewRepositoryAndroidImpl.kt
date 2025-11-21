@@ -2,7 +2,7 @@ package com.findmeahometeam.reskiume.data.remote.database.remoteReview
 
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.remote.response.RemoteReview
-import com.findmeahometeam.reskiume.data.util.Paths
+import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteReview.RealtimeDatabaseRemoteReviewRepository
 import com.google.firebase.Firebase
@@ -31,7 +31,7 @@ class RealtimeDatabaseRemoteReviewRepositoryAndroidImpl(
             && remoteReview.timestamp > 0L
             && remoteReview.reviewedUid != null
         ) {
-            databaseRef.child(Paths.REVIEWS.path).child(remoteReview.reviewedUid)
+            databaseRef.child(Section.REVIEWS.path).child(remoteReview.reviewedUid)
                 .setValue(remoteReview.toMap())
                 .addOnSuccessListener {
                     onInsertRemoteReview(DatabaseResult.Success)
@@ -68,10 +68,10 @@ class RealtimeDatabaseRemoteReviewRepositoryAndroidImpl(
                     )
                 }
             }
-            databaseRef.child(Paths.REVIEWS.path).child(reviewedUid)
+            databaseRef.child(Section.REVIEWS.path).child(reviewedUid)
                 .addListenerForSingleValueEvent(reviewListener)
             awaitClose {
-                databaseRef.child(Paths.REVIEWS.path).child(reviewedUid)
+                databaseRef.child(Section.REVIEWS.path).child(reviewedUid)
                     .removeEventListener(reviewListener)
             }
         }
@@ -80,7 +80,7 @@ class RealtimeDatabaseRemoteReviewRepositoryAndroidImpl(
         reviewedUid: String,
         onDeletedRemoteReviews: (result: DatabaseResult) -> Unit
     ) {
-        databaseRef.child(Paths.REVIEWS.path).child(reviewedUid).removeValue { error, _ ->
+        databaseRef.child(Section.REVIEWS.path).child(reviewedUid).removeValue { error, _ ->
             if (error == null) {
                 onDeletedRemoteReviews(DatabaseResult.Success)
             } else {

@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.findmeahometeam.reskiume.data.remote.response.AuthResult
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.data.util.Paths
+import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.usecases.CreateUserWithEmailAndPasswordFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteImageFromRemoteDataSource
@@ -61,7 +61,7 @@ class CreateAccountViewmodel(
     private fun saveUserToRemoteSource(user: User, password: String) {
         uploadImageToRemoteDataSource(
             userUid = user.uid,
-            imageType = Paths.USERS,
+            imageType = Section.USERS,
             imageUri = user.image
         ) { imageDownloadUri: String ->
             val userWithPossibleImageDownloadUri: User = if (imageDownloadUri.isBlank()) {
@@ -107,7 +107,7 @@ class CreateAccountViewmodel(
         viewModelScope.launch {
             deleteImageFromRemoteDataSource(
                 userUid,
-                Paths.USERS,
+                Section.USERS,
                 currentUserImage
             ) { imageDeleted: Boolean ->
                 if (!imageDeleted) {

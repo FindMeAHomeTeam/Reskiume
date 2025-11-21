@@ -2,7 +2,7 @@ package com.findmeahometeam.reskiume.data.remote.storage
 
 import android.content.Context
 import androidx.core.net.toUri
-import com.findmeahometeam.reskiume.data.util.Paths
+import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.google.firebase.Firebase
 import com.google.firebase.storage.StorageReference
@@ -16,20 +16,20 @@ class StorageRepositoryAndroidImpl(
 
     private val storageRef: StorageReference = Firebase.storage.reference
 
-    private fun getStorageReference(imageType: Paths, userUid: String): StorageReference {
+    private fun getStorageReference(section: Section, userUid: String): StorageReference {
         return when {
-            imageType == Paths.USERS -> storageRef.child(Paths.USERS.path).child(userUid).child("$userUid.webp")
-            else -> storageRef.child(Paths.USERS.path).child(userUid).child("$userUid.webp")
+            section == Section.USERS -> storageRef.child(Section.USERS.path).child(userUid).child("$userUid.webp")
+            else -> storageRef.child(Section.USERS.path).child(userUid).child("$userUid.webp")
         }
     }
 
     override fun uploadImage(
         userUid: String,
-        imageType: Paths,
+        section: Section,
         imageUri: String,
         onImageUploaded: (String) -> Unit
     ) {
-        val imageRef: StorageReference = getStorageReference(imageType, userUid)
+        val imageRef: StorageReference = getStorageReference(section, userUid)
         val uploadTask: UploadTask = imageRef.putFile(imageUri.toUri())
         uploadTask.continueWithTask { task ->
             if (!task.isSuccessful) {
@@ -47,10 +47,10 @@ class StorageRepositoryAndroidImpl(
         }
     }
 
-    override fun saveImage(userUid: String, imageType: Paths, onImageSaved: (String) -> Unit) {
-        val imageRef: StorageReference = getStorageReference(imageType, userUid)
+    override fun saveImage(userUid: String, section: Section, onImageSaved: (String) -> Unit) {
+        val imageRef: StorageReference = getStorageReference(section, userUid)
         val localFile = when {
-            imageType == Paths.USERS -> File(context.filesDir, "$userUid.webp")
+            section == Section.USERS -> File(context.filesDir, "$userUid.webp")
             else -> File(context.filesDir, "$userUid.webp")
         }
 
@@ -81,10 +81,10 @@ class StorageRepositoryAndroidImpl(
 
     override suspend fun deleteRemoteImage(
         userUid: String,
-        imageType: Paths,
+        section: Section,
         onImageDeleted: (Boolean) -> Unit
     ) {
-        val imageRef: StorageReference = getStorageReference(imageType, userUid)
+        val imageRef: StorageReference = getStorageReference(section, userUid)
         imageRef.delete().addOnSuccessListener {
             onImageDeleted(true)
         }.addOnFailureListener {

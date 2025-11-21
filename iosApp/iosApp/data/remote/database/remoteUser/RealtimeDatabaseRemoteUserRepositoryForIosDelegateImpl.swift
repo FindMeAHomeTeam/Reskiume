@@ -27,7 +27,7 @@ class RealtimeDatabaseRemoteUserRepositoryForIosDelegateImpl: RealtimeDatabaseRe
                 for try await userUid in emittedValues {
                     
                     if userUid != "" {
-                        database.reference().child(Paths.users.path).child(userUid).observeSingleEvent (of: .value, with: { snapshot in
+                        database.reference().child(Section.users.path).child(userUid).observeSingleEvent (of: .value, with: { snapshot in
                             let nSDictionary: NSDictionary? = snapshot.value as? NSDictionary
                             
                             let availableAny = nSDictionary?["available"]
@@ -75,7 +75,7 @@ class RealtimeDatabaseRemoteUserRepositoryForIosDelegateImpl: RealtimeDatabaseRe
     
     func insertRemoteUser(remoteUser: RemoteUser, onInsertRemoteUser: @escaping (DatabaseResult) -> Void) async {
         do {
-            try await databaseReference!.child(Paths.users.path).child(remoteUser.uid!).setValue(getNSDictionaryFromRemoteUser(remoteUser: remoteUser))
+            try await databaseReference!.child(Section.users.path).child(remoteUser.uid!).setValue(getNSDictionaryFromRemoteUser(remoteUser: remoteUser))
             onInsertRemoteUser(DatabaseResult.Success())
         } catch {
             log.e(tag: "RealtimeDatabaseRemoteUserRepositoryForIosDelegateImpl", message: "Error inserting the remote user \(String(describing: remoteUser.uid))", throwable: nil)
@@ -85,7 +85,7 @@ class RealtimeDatabaseRemoteUserRepositoryForIosDelegateImpl: RealtimeDatabaseRe
     
     func updateRemoteUser(remoteUser: RemoteUser, onUpdateRemoteUser: @escaping (DatabaseResult) -> Void) async {
         let remoteUserValues = getNSDictionaryFromRemoteUser(remoteUser: remoteUser)
-        let childUpdates = ["/\(Paths.users.path)/\(remoteUser.uid!)": remoteUserValues]
+        let childUpdates = ["/\(Section.users.path)/\(remoteUser.uid!)": remoteUserValues]
 
         do {
             try await databaseReference?.updateChildValues(childUpdates)
@@ -97,7 +97,7 @@ class RealtimeDatabaseRemoteUserRepositoryForIosDelegateImpl: RealtimeDatabaseRe
     }
     
     func deleteRemoteUser(uid: String, onDeleteRemoteUser: @escaping (DatabaseResult) -> Void) {
-        databaseReference!.child(Paths.users.path).child(uid).removeValue { error, _ in
+        databaseReference!.child(Section.users.path).child(uid).removeValue { error, _ in
             if (error == nil) {
                 onDeleteRemoteUser(DatabaseResult.Success())
             } else {

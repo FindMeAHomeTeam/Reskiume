@@ -1,6 +1,6 @@
 package com.findmeahometeam.reskiume.usecases
 
-import com.findmeahometeam.reskiume.data.util.Paths
+import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.usecases.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.user
@@ -16,7 +16,7 @@ import kotlin.test.Test
 class DeleteImageFromRemoteDataSourceTest {
 
     val storageRepository: StorageRepository = mock {
-        everySuspend { deleteRemoteImage(user.uid, Paths.USERS, any()) } returns Unit
+        everySuspend { deleteRemoteImage(user.uid, Section.USERS, any()) } returns Unit
     }
 
     private val deleteImageFromRemoteDataSource =
@@ -25,18 +25,18 @@ class DeleteImageFromRemoteDataSourceTest {
     @Test
     fun `given a remote user image_when the app deletes it_then it calls to deleteRemoteImage`() =
         runTest {
-            deleteImageFromRemoteDataSource(user.uid, Paths.USERS, user.image, {})
+            deleteImageFromRemoteDataSource(user.uid, Section.USERS, user.image, {})
             verifySuspend {
-                storageRepository.deleteRemoteImage(user.uid, Paths.USERS, any())
+                storageRepository.deleteRemoteImage(user.uid, Section.USERS, any())
             }
         }
 
     @Test
     fun `given an empty remote user image_when the app deletes it_then it doesn't call to deleteRemoteImage`() =
         runTest {
-            deleteImageFromRemoteDataSource(user.uid, Paths.USERS, "", {})
+            deleteImageFromRemoteDataSource(user.uid, Section.USERS, "", {})
             verifySuspend(exactly(0)) {
-                storageRepository.deleteRemoteImage(user.uid, Paths.USERS, any())
+                storageRepository.deleteRemoteImage(user.uid, Section.USERS, any())
             }
         }
 }

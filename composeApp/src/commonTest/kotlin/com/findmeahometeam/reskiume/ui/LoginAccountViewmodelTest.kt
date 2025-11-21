@@ -5,7 +5,7 @@ import com.findmeahometeam.reskiume.CoroutineTestDispatcher
 import com.findmeahometeam.reskiume.authUser
 import com.findmeahometeam.reskiume.data.remote.response.AuthResult
 import com.findmeahometeam.reskiume.data.remote.response.RemoteUser
-import com.findmeahometeam.reskiume.data.util.Paths
+import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
@@ -80,7 +80,7 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
             every {
                 saveImage(
                     user.uid,
-                    Paths.USERS,
+                    Section.USERS,
                     capture(onSaveImageToLocal)
                 )
             } calls { onSaveImageToLocal.get().invoke(absolutePathArg) }

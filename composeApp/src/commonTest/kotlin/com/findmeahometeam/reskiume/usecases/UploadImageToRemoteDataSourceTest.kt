@@ -1,6 +1,6 @@
 package com.findmeahometeam.reskiume.usecases
 
-import com.findmeahometeam.reskiume.data.util.Paths
+import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.usecases.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.user
@@ -16,7 +16,7 @@ import kotlin.test.Test
 class UploadImageToRemoteDataSourceTest {
 
     val storageRepository: StorageRepository = mock {
-        everySuspend { uploadImage(user.uid, Paths.USERS, user.image, any()) } returns Unit
+        everySuspend { uploadImage(user.uid, Section.USERS, user.image, any()) } returns Unit
     }
 
     private val uploadImageToRemoteDataSource =
@@ -25,18 +25,18 @@ class UploadImageToRemoteDataSourceTest {
     @Test
     fun `given a user image_when the app saves it in the remote data source_then it calls to uploadImage`() =
         runTest {
-            uploadImageToRemoteDataSource(user.uid, Paths.USERS, user.image, {})
+            uploadImageToRemoteDataSource(user.uid, Section.USERS, user.image, {})
             verifySuspend {
-                storageRepository.uploadImage(user.uid, Paths.USERS, user.image, any())
+                storageRepository.uploadImage(user.uid, Section.USERS, user.image, any())
             }
         }
 
     @Test
     fun `given an empty user image_when the app saves it in the remote data source_then it doesn't call to uploadImage`() =
         runTest {
-            uploadImageToRemoteDataSource(user.uid, Paths.USERS, "", {})
+            uploadImageToRemoteDataSource(user.uid, Section.USERS, "", {})
             verifySuspend(exactly(0)) {
-                storageRepository.uploadImage(user.uid, Paths.USERS, "", any())
+                storageRepository.uploadImage(user.uid, Section.USERS, "", any())
             }
         }
 }

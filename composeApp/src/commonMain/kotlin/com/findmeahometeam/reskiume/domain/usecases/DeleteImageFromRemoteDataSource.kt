@@ -1,13 +1,13 @@
 package com.findmeahometeam.reskiume.domain.usecases
 
-import com.findmeahometeam.reskiume.data.util.Paths
+import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 
 class DeleteImageFromRemoteDataSource(private val storageRepository: StorageRepository) {
 
     suspend operator fun invoke(
         userUid: String,
-        imageType: Paths,
+        imageType: Section,
         currentUserImage: String,
         onImageDeleted: (Boolean) -> Unit
     ) {

@@ -2,7 +2,7 @@ package com.findmeahometeam.reskiume.data.remote.database.remoteUser
 
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.remote.response.RemoteUser
-import com.findmeahometeam.reskiume.data.util.Paths
+import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
 import com.google.firebase.Firebase
@@ -29,7 +29,7 @@ class RealtimeDatabaseRemoteUserRepositoryAndroidImpl(
         onInsertRemoteUser: (result: DatabaseResult) -> Unit
     ) {
         remoteUser.uid?.let {
-            databaseRef.child(Paths.USERS.path).child(it).setValue(remoteUser.toMap())
+            databaseRef.child(Section.USERS.path).child(it).setValue(remoteUser.toMap())
                 .addOnSuccessListener {
                     onInsertRemoteUser(DatabaseResult.Success)
                 }.addOnFailureListener { e ->
@@ -55,9 +55,9 @@ class RealtimeDatabaseRemoteUserRepositoryAndroidImpl(
                 )
             }
         }
-        databaseRef.child(Paths.USERS.path).child(uid).addListenerForSingleValueEvent(userListener)
+        databaseRef.child(Section.USERS.path).child(uid).addListenerForSingleValueEvent(userListener)
         awaitClose {
-            databaseRef.child(Paths.USERS.path).child(uid).removeEventListener(userListener)
+            databaseRef.child(Section.USERS.path).child(uid).removeEventListener(userListener)
         }
     }
 
@@ -67,7 +67,7 @@ class RealtimeDatabaseRemoteUserRepositoryAndroidImpl(
     ) {
         val remoteUserValues: Map<String, Any?> = remoteUser.toMap()
         val childUpdates: HashMap<String, Any> =
-            hashMapOf("/${Paths.USERS.path}/${remoteUser.uid}" to remoteUserValues)
+            hashMapOf("/${Section.USERS.path}/${remoteUser.uid}" to remoteUserValues)
 
         databaseRef.updateChildren(childUpdates).addOnSuccessListener {
             onUpdateRemoteUser(DatabaseResult.Success)
@@ -78,7 +78,7 @@ class RealtimeDatabaseRemoteUserRepositoryAndroidImpl(
     }
 
     override fun deleteRemoteUser(uid: String, onDeleteRemoteUser: (result: DatabaseResult) -> Unit) {
-        databaseRef.child(Paths.USERS.path).child(uid).removeValue { error, _ ->
+        databaseRef.child(Section.USERS.path).child(uid).removeValue { error, _ ->
             if (error == null) {
                 onDeleteRemoteUser(DatabaseResult.Success)
             } else {

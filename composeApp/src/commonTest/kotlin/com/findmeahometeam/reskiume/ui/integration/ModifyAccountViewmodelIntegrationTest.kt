@@ -3,7 +3,7 @@ package com.findmeahometeam.reskiume.ui.integration
 import app.cash.turbine.test
 import com.findmeahometeam.reskiume.CoroutineTestDispatcher
 import com.findmeahometeam.reskiume.authUser
-import com.findmeahometeam.reskiume.data.util.Paths
+import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
@@ -105,12 +105,12 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(mutableListOf(user.toData())),
                 storageRepository = FakeStorageRepository(
                     remoteDatasourceList = mutableListOf(
-                        Pair("${user.uid}/${Paths.USERS.path}", user.image)
+                        Pair("${user.uid}/${Section.USERS.path}", user.image)
                     ),
                     localDatasourceList = mutableListOf(
                         Pair(
                             "${user.uid}/${user.image}",
-                            "local_path/${user.uid}/${Paths.USERS.path}"
+                            "local_path/${user.uid}/${Section.USERS.path}"
                         )
                     )
                 ),
@@ -207,7 +207,7 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(mutableListOf(user.toData())),
                 storageRepository = FakeStorageRepository(
                     remoteDatasourceList = mutableListOf(
-                        Pair("${user.uid}/${Paths.USERS.path}", user.image)
+                        Pair("${user.uid}/${Section.USERS.path}", user.image)
                     )
                 ),
                 localUserRepository = FakeLocalUserRepository(mutableListOf(user))
@@ -240,12 +240,12 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(mutableListOf(user.toData())),
                 storageRepository = FakeStorageRepository(
                     remoteDatasourceList = mutableListOf(
-                        Pair("${user.uid}/${Paths.USERS.path}", user.image)
+                        Pair("${user.uid}/${Section.USERS.path}", user.image)
                     ),
                     localDatasourceList = mutableListOf(
                         Pair(
                             "${user.uid}/${user.image}",
-                            "local_path/${user.uid}/${Paths.USERS.path}"
+                            "local_path/${user.uid}/${Section.USERS.path}"
                         )
                     )
                 ),

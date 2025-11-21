@@ -1,6 +1,6 @@
 package com.findmeahometeam.reskiume.data.remote.storage
 
-import com.findmeahometeam.reskiume.data.util.Paths
+import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepositoryForIosDelegateWrapper
 
@@ -22,13 +22,13 @@ class StorageRepositoryIosImpl(
 
     override fun uploadImage(
         userUid: String,
-        imageType: Paths,
+        section: Section,
         imageUri: String,
         onImageUploaded: (String) -> Unit
     ) {
         initialCheck(
             onSuccess = {
-                it.uploadImage(userUid, imageType, imageUri, onImageUploaded)
+                it.uploadImage(userUid, section, imageUri, onImageUploaded)
             },
             onFailure = {
                 onImageUploaded("")
@@ -38,12 +38,12 @@ class StorageRepositoryIosImpl(
 
     override fun saveImage(
         userUid: String,
-        imageType: Paths,
+        section: Section,
         onImageSaved: (String) -> Unit
     ) {
         initialCheck(
             onSuccess = {
-                it.saveImage(userUid, imageType, onImageSaved)
+                it.saveImage(userUid, section, onImageSaved)
             },
             onFailure = {
                 onImageSaved("")
@@ -68,12 +68,12 @@ class StorageRepositoryIosImpl(
 
     override suspend fun deleteRemoteImage(
         userUid: String,
-        imageType: Paths,
+        section: Section,
         onImageDeleted: (Boolean) -> Unit
     ) {
         val value: StorageRepository? = storageRepositoryForIosDelegateWrapper.storageRepositoryForIosDelegateState.value
         if (value != null) {
-            value.deleteRemoteImage(userUid, imageType, onImageDeleted)
+            value.deleteRemoteImage(userUid, section, onImageDeleted)
         } else {
             onImageDeleted(false)
         }

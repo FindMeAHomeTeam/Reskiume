@@ -1,6 +1,6 @@
 package com.findmeahometeam.reskiume.data.util
 
-enum class Paths(val path: String) {
+enum class Section(val path: String) {
     USERS("users"),
     REVIEWS("reviews")
 }

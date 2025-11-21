@@ -1,6 +1,6 @@
 package com.findmeahometeam.reskiume.ui.integration.fakes
 
-import com.findmeahometeam.reskiume.data.util.Paths
+import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 
 class FakeStorageRepository(
@@ -10,21 +10,21 @@ class FakeStorageRepository(
 
     override fun uploadImage(
         userUid: String,
-        imageType: Paths,
+        section: Section,
         imageUri: String,
         onImageUploaded: (String) -> Unit
     ) {
-        remoteDatasourceList.add(Pair("$userUid/${imageType.path}", imageUri))
+        remoteDatasourceList.add(Pair("$userUid/${section.path}", imageUri))
         onImageUploaded(imageUri)
     }
 
     override fun saveImage(
         userUid: String,
-        imageType: Paths,
+        section: Section,
         onImageSaved: (String) -> Unit
     ) {
-        val pathToLocalImage = "local_path/$userUid/${imageType.path}"
-        localDatasourceList.add(Pair("$userUid/${imageType.path}", pathToLocalImage))
+        val pathToLocalImage = "local_path/$userUid/${section.path}"
+        localDatasourceList.add(Pair("$userUid/${section.path}", pathToLocalImage))
         onImageSaved(pathToLocalImage)
     }
 
@@ -41,10 +41,10 @@ class FakeStorageRepository(
 
     override suspend fun deleteRemoteImage(
         userUid: String,
-        imageType: Paths,
+        section: Section,
         onImageDeleted: (Boolean) -> Unit
     ) {
-        remoteDatasourceList.firstOrNull { it.first == "$userUid/${imageType.path}" }?.let {
+        remoteDatasourceList.firstOrNull { it.first == "$userUid/${section.path}" }?.let {
             remoteDatasourceList.remove(it)
             onImageDeleted(true)
         } ?: onImageDeleted(false)

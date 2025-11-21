@@ -1,6 +1,6 @@
 package com.findmeahometeam.reskiume.usecases
 
-import com.findmeahometeam.reskiume.data.util.Paths
+import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.usecases.SaveImageToLocalDataSource
 import com.findmeahometeam.reskiume.user
@@ -15,7 +15,7 @@ import kotlin.test.Test
 class SaveImageToLocalDataSourceTest {
 
     val storageRepository: StorageRepository = mock {
-        everySuspend { saveImage(user.uid, Paths.USERS, any()) } returns Unit
+        everySuspend { saveImage(user.uid, Section.USERS, any()) } returns Unit
     }
 
     private val saveImageToLocalDataSource =
@@ -24,9 +24,9 @@ class SaveImageToLocalDataSourceTest {
     @Test
     fun `given a local user image_when the app saves it_then it calls to saveImage`() =
         runTest {
-            saveImageToLocalDataSource(user.uid, Paths.USERS, {})
+            saveImageToLocalDataSource(user.uid, Section.USERS, {})
             verifySuspend {
-                storageRepository.saveImage(user.uid, Paths.USERS, any())
+                storageRepository.saveImage(user.uid, Section.USERS, any())
             }
         }
 }

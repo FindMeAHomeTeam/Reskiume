@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.data.util.Paths
+import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.usecases.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteImageInLocalDataSource
@@ -115,7 +115,7 @@ class DeleteAccountViewmodel(
     ) {
         deleteImageFromRemoteDataSource(
             userUid,
-            Paths.USERS,
+            Section.USERS,
             remoteImage
         ) { imageDeleted: Boolean ->
             if (!imageDeleted) {

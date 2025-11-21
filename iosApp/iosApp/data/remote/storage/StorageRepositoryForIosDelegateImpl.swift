@@ -11,15 +11,15 @@ class StorageRepositoryForIosDelegateImpl: StorageRepository {
     
     private let storageRef: StorageReference = Storage.storage().reference()
 
-    private func getStorageReference(imageType: Paths, userUid: String) -> StorageReference {
-        return switch imageType {
-            case Paths.users: storageRef.child(Paths.users.path).child(userUid).child("\(userUid).webp")
+    private func getStorageReference(section: Section, userUid: String) -> StorageReference {
+        return switch section {
+            case Section.users: storageRef.child(Section.users.path).child(userUid).child("\(userUid).webp")
             default: storageRef
         }
     }
     
-    func uploadImage(userUid: String, imageType: Paths, imageUri: String, onImageUploaded: @escaping (String) -> Void) {
-        let imageRef: StorageReference = getStorageReference(imageType: imageType, userUid: userUid)
+    func uploadImage(userUid: String, section: Section, imageUri: String, onImageUploaded: @escaping (String) -> Void) {
+        let imageRef: StorageReference = getStorageReference(section: section, userUid: userUid)
         
         let localFile = URL(string: imageUri)!
         
@@ -52,11 +52,11 @@ class StorageRepositoryForIosDelegateImpl: StorageRepository {
         }
     }
     
-    func saveImage(userUid: String, imageType: Paths, onImageSaved: @escaping (String) -> Void) {
-        let imageRef: StorageReference = getStorageReference(imageType: imageType, userUid: userUid)
+    func saveImage(userUid: String, section: Section, onImageSaved: @escaping (String) -> Void) {
+        let imageRef: StorageReference = getStorageReference(section: section, userUid: userUid)
         
-        let fileName: String = switch imageType {
-            case Paths.users: "\(userUid).webp"
+        let fileName: String = switch section {
+            case Section.users: "\(userUid).webp"
             default: "\(userUid).webp"
         }
         if let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
@@ -75,8 +75,8 @@ class StorageRepositoryForIosDelegateImpl: StorageRepository {
         }
     }
     
-    func deleteRemoteImage(userUid: String, imageType: Paths, onImageDeleted: @escaping (KotlinBoolean) -> Void) async {
-        let imageRef: StorageReference = getStorageReference(imageType: imageType, userUid: userUid)
+    func deleteRemoteImage(userUid: String, section: Section, onImageDeleted: @escaping (KotlinBoolean) -> Void) async {
+        let imageRef: StorageReference = getStorageReference(section: section, userUid: userUid)
         do {
             try await imageRef.delete()
             onImageDeleted(true)

@@ -6,7 +6,7 @@ import com.findmeahometeam.reskiume.authUser
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.remote.response.RemoteUser
-import com.findmeahometeam.reskiume.data.util.Paths
+import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
@@ -97,7 +97,7 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
             everySuspend {
                 deleteRemoteImage(
                     user.uid,
-                    Paths.USERS,
+                    Section.USERS,
                     capture(onRemoteImageDeleted)
                 )
             } calls { onRemoteImageDeleted.get().invoke(remoteImageDeletedArg) }

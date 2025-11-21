@@ -27,7 +27,7 @@ class RealtimeDatabaseRemoteReviewRepositoryForIosDelegateImpl: RealtimeDatabase
                 for try await reviewedUid in emittedValues {
                     
                     if reviewedUid != "" {
-                        database.reference().child(Paths.reviews.path).child(reviewedUid).observeSingleEvent (of: .value, with: { snapshot in
+                        database.reference().child(Section.reviews.path).child(reviewedUid).observeSingleEvent (of: .value, with: { snapshot in
                             var remoteReviews: [RemoteReview] = []
                             
                             for review in snapshot.children {
@@ -72,7 +72,7 @@ class RealtimeDatabaseRemoteReviewRepositoryForIosDelegateImpl: RealtimeDatabase
     
     func insertRemoteReview(remoteReview: RemoteReview, onInsertRemoteReview: @escaping (DatabaseResult) -> Void) async {
         do {
-            try await databaseReference!.child(Paths.reviews.path).child(remoteReview.reviewedUid!).setValue(getNSDictionaryFromRemoteReview(remoteReview: remoteReview))
+            try await databaseReference!.child(Section.reviews.path).child(remoteReview.reviewedUid!).setValue(getNSDictionaryFromRemoteReview(remoteReview: remoteReview))
             onInsertRemoteReview(DatabaseResult.Success())
         } catch {
             log.e(tag: "RealtimeDatabaseRemoteReviewRepositoryForIosDelegateImpl", message: "Error inserting the remote review \(String(describing: remoteReview.timestamp))", throwable: nil)
@@ -81,7 +81,7 @@ class RealtimeDatabaseRemoteReviewRepositoryForIosDelegateImpl: RealtimeDatabase
     }
     
     func deleteRemoteReviews(reviewedUid: String, onDeletedRemoteReviews: @escaping (DatabaseResult) -> Void) {
-        databaseReference!.child(Paths.reviews.path).child(reviewedUid).removeValue { error, _ in
+        databaseReference!.child(Section.reviews.path).child(reviewedUid).removeValue { error, _ in
             if (error == nil) {
                 onDeletedRemoteReviews(DatabaseResult.Success())
             } else {

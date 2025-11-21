@@ -19,6 +19,12 @@ import com.findmeahometeam.reskiume.domain.usecases.SaveImageToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.SignInWithEmailAndPasswordFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.SignOutFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.UploadImageToRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.review.DeleteReviewsFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.review.DeleteReviewsFromRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.review.InsertReviewInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.review.InsertReviewInRemoteRepository
 import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
 
@@ -42,4 +48,12 @@ val domainModule = module {
     factoryOf(::SaveImageToLocalDataSource)
     factoryOf(::ModifyUserEmailInAuthDataSource)
     factoryOf(::ModifyUserPasswordInAuthDataSource)
+
+    // Review
+    factoryOf(::InsertReviewInLocalRepository)
+    factoryOf(::DeleteReviewsFromLocalRepository)
+    factoryOf(::GetReviewsFromLocalRepository)
+    factoryOf(::InsertReviewInRemoteRepository)
+    factoryOf(::DeleteReviewsFromRemoteRepository)
+    factoryOf(::GetReviewsFromRemoteRepository)
 }

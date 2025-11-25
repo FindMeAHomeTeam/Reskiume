@@ -17,22 +17,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.findmeahometeam.reskiume.ui.core.backgroundColorForItems
 
 @Composable
 fun RmListReviewItem(
     title: String,
     description: String,
     isEnabled: Boolean = true,
-    containerColor: Color = Color.White,
+    containerColor: Color = backgroundColorForItems,
     listAvatarType: RmListAvatarType,
     rating: Float,
     date: String,
-    onClick: () -> Unit
+    onClick: (() -> Unit)? = null
 ) {
     Card(
         enabled = isEnabled,
         colors = CardDefaults.cardColors().copy(containerColor = containerColor),
-        onClick = { onClick() }
+        onClick = { onClick?.invoke() }
     ) {
         Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
             RmAvatar(listAvatarType)

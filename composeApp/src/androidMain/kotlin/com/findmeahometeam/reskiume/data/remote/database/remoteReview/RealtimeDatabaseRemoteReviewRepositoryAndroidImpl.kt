@@ -5,23 +5,19 @@ import com.findmeahometeam.reskiume.data.remote.response.RemoteReview
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteReview.RealtimeDatabaseRemoteReviewRepository
-import com.google.firebase.Firebase
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.database
 import com.google.firebase.database.getValue
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 
 class RealtimeDatabaseRemoteReviewRepositoryAndroidImpl(
+    private val databaseRef: DatabaseReference,
     private val log: Log
 ) : RealtimeDatabaseRemoteReviewRepository {
-
-    private val databaseRef: DatabaseReference =
-        Firebase.database.also { it.setPersistenceEnabled(true) }.reference
 
     override suspend fun insertRemoteReview(
         remoteReview: RemoteReview,
@@ -31,7 +27,7 @@ class RealtimeDatabaseRemoteReviewRepositoryAndroidImpl(
             && remoteReview.timestamp > 0L
             && remoteReview.reviewedUid != null
         ) {
-            databaseRef.child(Section.REVIEWS.path).child(remoteReview.reviewedUid)
+            databaseRef.child(Section.REVIEWS.path).child(remoteReview.reviewedUid).child(remoteReview.id!!)
                 .setValue(remoteReview.toMap())
                 .addOnSuccessListener {
                     onInsertRemoteReview(DatabaseResult.Success)
@@ -56,9 +52,9 @@ class RealtimeDatabaseRemoteReviewRepositoryAndroidImpl(
         callbackFlow {
             val reviewListener: ValueEventListener = object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    val remoteReview: List<RemoteReview>? =
-                        dataSnapshot.getValue<List<RemoteReview>>()
-                    trySend(remoteReview ?: emptyList())
+                    val remoteReview: List<RemoteReview> =
+                        dataSnapshot.children.mapNotNull { it.getValue<RemoteReview>() }
+                    trySend(remoteReview)
                 }
 
                 override fun onCancelled(databaseError: DatabaseError) {

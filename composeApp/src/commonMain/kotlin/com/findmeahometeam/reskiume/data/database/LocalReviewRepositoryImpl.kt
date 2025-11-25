@@ -14,7 +14,6 @@ class LocalReviewRepositoryImpl(
     override fun getLocalReviews(reviewedUid: String): Flow<List<ReviewEntity>> =
         reskiumeDatabase.getReviewDao().getLocalReviews(reviewedUid)
 
-
     override suspend fun deleteLocalReviews(reviewedUid: String, onDeletedReviews: (rowsDeleted: Int) -> Unit) {
         onDeletedReviews(reskiumeDatabase.getReviewDao().deleteLocalReviews(reviewedUid))
     }

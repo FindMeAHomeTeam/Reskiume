@@ -14,6 +14,9 @@ import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteReview.RealtimeDatabaseRemoteReviewRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
+import com.google.firebase.Firebase
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.database
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
@@ -24,6 +27,7 @@ actual val platformModule: Module = module {
     singleOf(::AnalyticsAndroidImpl) bind Analytics::class
     singleOf(::AuthRepositoryAndroidImpl) bind AuthRepository::class
     single<ReskiumeDatabase> { getDatabase(get()) }
+    single<DatabaseReference>{ Firebase.database.also { it.setPersistenceEnabled(true) }.reference }
     singleOf(::RealtimeDatabaseRemoteUserRepositoryAndroidImpl) bind RealtimeDatabaseRemoteUserRepository::class
     singleOf(::RealtimeDatabaseRemoteReviewRepositoryAndroidImpl) bind RealtimeDatabaseRemoteReviewRepository::class
     singleOf(::StorageRepositoryAndroidImpl) bind StorageRepository::class

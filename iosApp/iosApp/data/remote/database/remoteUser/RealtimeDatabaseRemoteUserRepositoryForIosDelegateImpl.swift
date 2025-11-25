@@ -18,7 +18,6 @@ class RealtimeDatabaseRemoteUserRepositoryForIosDelegateImpl: RealtimeDatabaseRe
     ) {
         self.log = log
         let database: Database! = Database.database()
-        database.isPersistenceEnabled = true
         databaseReference = database.reference()
         
         userUidTaskHandle = Task {

@@ -1,5 +1,6 @@
 import UIKit
 import ComposeApp
+import FirebaseDatabaseInternal
 
 class KMPViewControllerWrapper: UIViewController {
     private var didInitialize = false
@@ -28,10 +29,15 @@ class KMPViewControllerWrapper: UIViewController {
         if !didInitialize {
             FirebaseAnalyticsManager.shared.startIfNeeded()
             FirebaseAuthManager.shared.startIfNeeded()
-            FirebaseRemoteUserDatabaseManager.shared.startIfNeeded()
-            FirebaseRemoteReviewDatabaseManager.shared.startIfNeeded()
             FirebaseStorageManager.shared.startIfNeeded()
             FirebaseCrashlyticsManager.shared.startIfNeeded()
+            
+            // Database
+            let database: Database! = Database.database()
+            database.isPersistenceEnabled = true
+            FirebaseRemoteUserDatabaseManager.shared.startIfNeeded()
+            FirebaseRemoteReviewDatabaseManager.shared.startIfNeeded()
+            
             didInitialize = true
         }
     }

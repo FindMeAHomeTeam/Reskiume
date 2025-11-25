@@ -8,6 +8,10 @@ val backgroundColor: Color
     @Composable
     get() = if (isSystemInDarkTheme()) backgroundDark else backgroundLight
 
+val backgroundColorForItems: Color
+    @Composable
+    get() = if (isSystemInDarkTheme()) backgroundDarkForItems else backgroundLightForItems
+
 val textColor: Color
     @Composable
     get() = if(isSystemInDarkTheme()) Color.White else Color.Black
@@ -18,7 +22,10 @@ val secondaryTextColor: Color
 
 
 val backgroundLight: Color = Color(0xFFF6F8F7)
+
+val backgroundLightForItems: Color = Color(0xFFFFFFFF)
 val backgroundDark: Color = Color(0xFF112117)
+val backgroundDarkForItems: Color = Color(0xFF1E2C2A)
 val lightGray: Color = Color(0xFF8EA0BA)
 val gray: Color = Color(0xFF4B5563)
 val primaryGreen: Color = Color(0xFF18AC53)

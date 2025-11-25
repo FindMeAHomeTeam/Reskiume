@@ -90,6 +90,7 @@ import reskiume.composeapp.generated.resources.reskiume
 fun ProfileScreen(
     navigateToCreateAccountScreen: () -> Unit,
     navigateToModifyAccountScreen: () -> Unit,
+    navigateToReviewAccountScreen: () -> Unit,
     navigateToDeleteAccountScreen: () -> Unit
 ) {
     val profileViewmodel: ProfileViewmodel = koinViewModel<ProfileViewmodel>()
@@ -171,7 +172,7 @@ fun ProfileScreen(
                 }
             )
 
-            // Reviews screen
+            // Review account screen
             RmListButtonItem(
                 title = stringResource(Res.string.profile_screen_reviews_title),
                 description = stringResource(Res.string.profile_screen_reviews_description),
@@ -182,7 +183,7 @@ fun ProfileScreen(
                     iconColor = primaryGreen
                 ),
                 onClick = {
-                    // TODO
+                    navigateToReviewAccountScreen()
                 }
             )
         }

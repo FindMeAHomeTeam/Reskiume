@@ -9,6 +9,7 @@ enum class Routes(val route: String) {
     CREATE_ACCOUNT("create account"),
     LOGIN_ACCOUNT("login account"),
     MODIFY_ACCOUNT("modify account"),
-    DELETE_ACCOUNT("delete account")
+    DELETE_ACCOUNT("delete account"),
+    REVIEW_ACCOUNT("review account"),
 
 }

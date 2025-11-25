@@ -29,16 +29,19 @@ class RealtimeDatabaseRemoteReviewRepositoryForIosDelegateImpl: RealtimeDatabase
                     if reviewedUid != "" {
                         database.reference().child(Section.reviews.path).child(reviewedUid).observeSingleEvent (of: .value, with: { snapshot in
                             var remoteReviews: [RemoteReview] = []
-                            
+
                             for review in snapshot.children {
-                                let reviewNsDictionary: NSDictionary? = review as? NSDictionary
-                                
-                                let remoteReview: RemoteReview = RemoteReview(
-                                    timestamp: reviewNsDictionary?["timestamp"] as? KotlinLong ?? 0,
-                                    authorUid: reviewNsDictionary?["authorUid"] as? String ?? "",
-                                    reviewedUid: reviewNsDictionary?["reviewedUid"] as? String ?? "",
-                                    description: reviewNsDictionary?["description"] as? String ?? "",
-                                    rating: KotlinFloat(nonretainedObject: reviewNsDictionary?["rating"] as? Float ?? 0)
+                                guard let reviewSnapshot = review as? DataSnapshot,
+                                      let reviewNsDictionary = reviewSnapshot.value as? [String: Any] else {
+                                    continue
+                                }
+                                let remoteReview = RemoteReview(
+                                    id: reviewNsDictionary["id"] as? String ?? "",
+                                    timestamp: KotlinLong(longLong: Int64(reviewNsDictionary["timestamp"] as? CLong ?? 0)),
+                                    authorUid: reviewNsDictionary["authorUid"] as? String ?? "",
+                                    reviewedUid: reviewNsDictionary["reviewedUid"] as? String ?? "",
+                                    description: reviewNsDictionary["description"] as? String ?? "",
+                                    rating: KotlinFloat(float: reviewNsDictionary["rating"] as? Float ?? 0)
                                 )
                                 remoteReviews.append(remoteReview)
                             }
@@ -62,6 +65,7 @@ class RealtimeDatabaseRemoteReviewRepositoryForIosDelegateImpl: RealtimeDatabase
     
     private func getNSDictionaryFromRemoteReview(remoteReview: RemoteReview) -> NSDictionary {
         return [
+            "id": remoteReview.id!,
             "timestamp": remoteReview.timestamp!,
             "authorUid": remoteReview.authorUid!,
             "reviewedUid": remoteReview.reviewedUid!,
@@ -72,7 +76,7 @@ class RealtimeDatabaseRemoteReviewRepositoryForIosDelegateImpl: RealtimeDatabase
     
     func insertRemoteReview(remoteReview: RemoteReview, onInsertRemoteReview: @escaping (DatabaseResult) -> Void) async {
         do {
-            try await databaseReference!.child(Section.reviews.path).child(remoteReview.reviewedUid!).setValue(getNSDictionaryFromRemoteReview(remoteReview: remoteReview))
+            try await databaseReference!.child(Section.reviews.path).child(remoteReview.reviewedUid!).child(remoteReview.id!).setValue(getNSDictionaryFromRemoteReview(remoteReview: remoteReview))
             onInsertRemoteReview(DatabaseResult.Success())
         } catch {
             log.e(tag: "RealtimeDatabaseRemoteReviewRepositoryForIosDelegateImpl", message: "Error inserting the remote review \(String(describing: remoteReview.timestamp))", throwable: nil)

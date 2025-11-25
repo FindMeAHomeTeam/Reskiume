@@ -23,7 +23,7 @@
     <string name="profile_screen_personal_create_account_title">Create an account</string>
     <string name="profile_screen_personal_create_account_description">Register to use the app fully</string>
     <string name="profile_screen_reviews_title">Reviews</string>
-    <string name="profile_screen_reviews_description">Manage your reviews</string>
+    <string name="profile_screen_reviews_description">Check your reviews</string>
     <string name="profile_screen_rescue_notifications_title">Nearby rescue notifications</string>
     <string name="profile_screen_rescue_notifications_description">Receive alerts when a rescue case is reported nearby</string>
     <string name="profile_screen_non_human_animals_title">Registered non-human animals</string>
@@ -104,5 +104,11 @@
     <!-- General error messages -->
     <string name="general_error_network_message">Network error. Please check your internet connection and try again</string>
     <string name="general_error_unknown_message">An unknown error occurred. Please try again later</string>
+
+    <!-- Review account screen -->
+    <string name="review_account_screen_my_reviews_title">My reviews</string>
+    <string name="review_account_screen_no_reviews">No one has evaluated you yet</string>
+    <string name="review_account_screen_user_deleted">User deleted</string>
+
 
 </resources>

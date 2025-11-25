@@ -2,6 +2,7 @@ package com.findmeahometeam.reskiume.data.database.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy.Companion.REPLACE
 import androidx.room.Query
 import com.findmeahometeam.reskiume.data.database.entity.ReviewEntity
 import kotlinx.coroutines.flow.Flow
@@ -9,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ReviewDao {
 
-    @Insert
+    @Insert(onConflict = REPLACE)
     suspend fun insertLocalReview(review: ReviewEntity): Long
 
     @Query("SELECT * FROM ReviewEntity WHERE reviewedUid = :reviewedUserUid")

@@ -13,7 +13,7 @@ class RealtimeDatabaseRemoteReviewRepositoryIosImpl(
     private val realtimeDatabaseRemoteReviewRepositoryForIosDelegateWrapper: RealtimeDatabaseRemoteReviewRepositoryForIosDelegateWrapper,
     private val realtimeDatabaseRemoteReviewRepositoryFlowForIosDelegate: RealtimeDatabaseRemoteReviewFlowsRepositoryForIosDelegate,
     private val log: Log
-): RealtimeDatabaseRemoteReviewRepository {
+) : RealtimeDatabaseRemoteReviewRepository {
 
     private suspend fun initialCheck(
         timestamp: Long?,
@@ -29,31 +29,43 @@ class RealtimeDatabaseRemoteReviewRepositoryIosImpl(
         }
     }
 
-    override suspend fun insertRemoteReview(remoteReview: RemoteReview, onInsertRemoteReview: (result: DatabaseResult) -> Unit){
+    override suspend fun insertRemoteReview(
+        remoteReview: RemoteReview,
+        onInsertRemoteReview: (result: DatabaseResult) -> Unit
+    ) {
         initialCheck(
             remoteReview.timestamp,
             onSuccess = {
                 it.insertRemoteReview(remoteReview, onInsertRemoteReview)
             },
             onFailure = {
-                log.e("RealtimeDatabaseRemoteReviewRepositoryIosImpl", "insertRemoteUser: Error inserting the review ${remoteReview.timestamp ?: 0L}")
+                log.e(
+                    "RealtimeDatabaseRemoteReviewRepositoryIosImpl",
+                    "insertRemoteUser: Error inserting the review ${remoteReview.timestamp ?: 0L}"
+                )
                 onInsertRemoteReview(DatabaseResult.Error())
             }
         )
     }
 
-    override fun getRemoteReviews(reviewedUid: String): Flow<List<RemoteReview>>{
+    override fun getRemoteReviews(reviewedUid: String): Flow<List<RemoteReview>> {
         realtimeDatabaseRemoteReviewRepositoryFlowForIosDelegate.updateReviewedUid(reviewedUid)
         return realtimeDatabaseRemoteReviewRepositoryFlowForIosDelegate.realtimeDatabaseRemoteReviewsRepositoryForIosDelegateFlow
     }
 
-    override fun deleteRemoteReviews(reviewedUid: String, onDeletedRemoteReviews: (result: DatabaseResult) -> Unit){
+    override fun deleteRemoteReviews(
+        reviewedUid: String,
+        onDeletedRemoteReviews: (result: DatabaseResult) -> Unit
+    ) {
         val value =
             realtimeDatabaseRemoteReviewRepositoryForIosDelegateWrapper.realtimeDatabaseRemoteReviewRepositoryForIosDelegateState.value
         if (value != null) {
             value.deleteRemoteReviews(reviewedUid, onDeletedRemoteReviews)
         } else {
-            log.e("RealtimeDatabaseRemoteReviewRepositoryIosImpl", "deleteRemoteReview: Error deleting the remote reviews for the user ${reviewedUid.ifBlank { "" }}")
+            log.e(
+                "RealtimeDatabaseRemoteReviewRepositoryIosImpl",
+                "deleteRemoteReview: Error deleting the remote reviews for the user ${reviewedUid.ifBlank { "" }}"
+            )
             onDeletedRemoteReviews(DatabaseResult.Error())
         }
     }

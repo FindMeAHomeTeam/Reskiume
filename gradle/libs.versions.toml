@@ -3,19 +3,20 @@ agp = "8.13.1"
 android-compileSdk = "36"
 android-minSdk = "24"
 android-targetSdk = "36"
-androidx-activity = "1.11.0"
+androidx-activity = "1.12.0"
 androidx-lifecycle = "2.9.6"
 coil = "3.3.0"
-composeHotReload = "1.0.0-rc03"
+composeHotReload = "1.0.0"
 composeMultiplatform = "1.9.3"
 coroutines = "1.10.2"
 crashlyticsPlugin = "3.0.6"
-firebase-bom = "34.4.0"
+firebase-bom = "34.6.0"
 googleServices = "4.4.4"
-imagepickerkmp = "1.0.28-beta2"
+imagepickerkmp = "1.0.28-beta3"
 junit = "4.13.2"
 koin-bom = "4.1.1"
 kotlin = "2.2.20"
+kotlinxDatetime = "0.7.1-0.6.x-compat"
 ksp = "2.2.20-2.0.2" #2.0.3 gives ksp.gradle.KspAATask issues
 mokkery-plugin = "2.10.2"
 nativecoroutines = "1.0.0-ALPHA-47"
@@ -37,6 +38,7 @@ androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigation" }
 
 #tests

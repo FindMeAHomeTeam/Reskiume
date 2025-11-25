@@ -3,6 +3,7 @@ package com.findmeahometeam.reskiume.data.remote.response
 import com.findmeahometeam.reskiume.domain.model.Review
 
 data class RemoteReview(
+    val id: String? = "",
     val timestamp: Long? = 0L,
     val authorUid: String? = "",
     val reviewedUid: String? = "",
@@ -11,6 +12,7 @@ data class RemoteReview(
 ) {
     fun toMap(): Map<String, Any?> {
         return mapOf(
+            "id" to id,
             "timestamp" to timestamp,
             "authorUid" to authorUid,
             "reviewedUid" to reviewedUid,
@@ -21,6 +23,7 @@ data class RemoteReview(
 
     fun toData(): Review {
         return Review(
+            id = id ?: "",
             timestamp = timestamp ?: 0L,
             authorUid = authorUid ?: "",
             reviewedUid = reviewedUid ?: "",

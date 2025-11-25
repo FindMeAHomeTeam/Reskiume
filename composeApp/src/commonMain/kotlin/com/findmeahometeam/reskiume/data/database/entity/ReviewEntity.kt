@@ -6,7 +6,8 @@ import com.findmeahometeam.reskiume.domain.model.Review
 
 @Entity
 data class ReviewEntity(
-    @PrimaryKey val timestamp: Long,
+    @PrimaryKey val id: String,
+    val timestamp: Long,
     val authorUid: String,
     val reviewedUid: String,
     val description: String,
@@ -15,6 +16,7 @@ data class ReviewEntity(
 
     fun toDomain(): Review {
         return Review(
+            id = id,
             timestamp = timestamp,
             authorUid = authorUid,
             reviewedUid = reviewedUid,

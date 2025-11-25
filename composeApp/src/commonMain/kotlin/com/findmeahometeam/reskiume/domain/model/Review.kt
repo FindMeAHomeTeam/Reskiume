@@ -4,14 +4,18 @@ import com.findmeahometeam.reskiume.data.database.entity.ReviewEntity
 import com.findmeahometeam.reskiume.data.remote.response.RemoteReview
 
 data class Review(
+    val id: String = "",
     val timestamp: Long,
     val authorUid: String,
     val reviewedUid: String,
     val description: String,
     val rating: Float
 ) {
+    fun setId(): String = timestamp.toString() + authorUid
+
     fun toEntity(): ReviewEntity {
         return ReviewEntity(
+            id = id.ifBlank { setId() },
             timestamp = timestamp,
             authorUid = authorUid,
             reviewedUid = reviewedUid,
@@ -22,6 +26,7 @@ data class Review(
 
     fun toData(): RemoteReview {
         return RemoteReview(
+            id = id.ifBlank { setId() },
             timestamp = timestamp,
             authorUid = authorUid,
             reviewedUid = reviewedUid,

@@ -140,7 +140,7 @@ fun ModifyAccountScreen(onBackPressed: () -> Unit) {
                     || imageUri != user!!.image
                     || email != user!!.email
                     || isAvailable != user!!.isAvailable
-                    || (newPassword.isNotBlank() && newPassword == currentPassword))
+                    || newPassword != currentPassword)
         }
     }
     val scrollState = rememberScrollState()

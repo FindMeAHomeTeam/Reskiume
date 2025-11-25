@@ -1,0 +1,14 @@
+package com.findmeahometeam.reskiume.domain.repository.local
+
+import com.findmeahometeam.reskiume.data.database.entity.LocalCacheEntity
+import com.findmeahometeam.reskiume.data.util.Section
+
+interface LocalCacheRepository {
+    suspend fun insertLocalCacheEntity(localCacheEntity: LocalCacheEntity, onInsertLocalCache: (rowId: Long) -> Unit)
+
+    suspend fun getLocalCacheEntity(uid: String, section: Section): LocalCacheEntity?
+
+    suspend fun modifyLocalCacheEntity(localCacheEntity: LocalCacheEntity, onModifyUser: (rowsUpdated: Int) -> Unit)
+
+    suspend fun deleteLocalCacheEntity(uid: String, onDeleteLocalCache: (rowsDeleted: Int) -> Unit)
+}

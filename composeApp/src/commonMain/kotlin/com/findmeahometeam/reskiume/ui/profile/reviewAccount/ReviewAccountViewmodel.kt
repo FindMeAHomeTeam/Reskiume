@@ -39,7 +39,7 @@ class ReviewAccountViewmodel(
     private val insertReviewInLocalRepository: InsertReviewInLocalRepository,
     private val getUserFromLocalDataSource: GetUserFromLocalDataSource,
     private val getUserFromRemoteDataSource: GetUserFromRemoteDataSource,
-    val log: Log
+    private val log: Log
 ) : ViewModel() {
 
     // Flow of UiReview list to be observed by the UI

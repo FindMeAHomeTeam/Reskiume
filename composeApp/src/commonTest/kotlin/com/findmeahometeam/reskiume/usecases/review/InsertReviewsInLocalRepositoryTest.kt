@@ -23,7 +23,7 @@ class InsertReviewsInLocalRepositoryTest {
         InsertReviewInLocalRepository(localReviewRepository)
 
     @Test
-    fun `given a local review_when the app inserts it_then insertLocalReview is called`() =
+    fun `given a review_when the app inserts it in the local data source_then insertLocalReview is called`() =
         runTest {
             insertReviewInLocalRepository(review, {})
             verifySuspend {

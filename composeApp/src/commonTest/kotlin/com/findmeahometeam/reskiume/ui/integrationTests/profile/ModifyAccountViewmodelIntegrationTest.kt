@@ -1,14 +1,10 @@
-package com.findmeahometeam.reskiume.ui
+package com.findmeahometeam.reskiume.ui.integrationTests.profile
 
 import app.cash.turbine.test
 import com.findmeahometeam.reskiume.CoroutineTestDispatcher
 import com.findmeahometeam.reskiume.authUser
-import com.findmeahometeam.reskiume.data.remote.response.AuthUser
-import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
-import com.findmeahometeam.reskiume.data.remote.response.RemoteUser
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
@@ -25,131 +21,28 @@ import com.findmeahometeam.reskiume.domain.usecases.ObserveAuthStateFromAuthData
 import com.findmeahometeam.reskiume.domain.usecases.SignOutFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.ui.core.components.UiState
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeAuthRepository
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalUserRepository
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLog
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeRealtimeDatabaseRemoteUserRepository
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeStorageRepository
 import com.findmeahometeam.reskiume.ui.profile.modifyAccount.ModifyAccountViewmodel
 import com.findmeahometeam.reskiume.user
 import com.findmeahometeam.reskiume.userPwd
-import dev.mokkery.answering.calls
-import dev.mokkery.answering.returns
-import dev.mokkery.every
-import dev.mokkery.everySuspend
-import dev.mokkery.matcher.any
-import dev.mokkery.matcher.capture.Capture
-import dev.mokkery.matcher.capture.capture
-import dev.mokkery.matcher.capture.get
-import dev.mokkery.mock
-import dev.mokkery.verify
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertTrue
-import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
 
-class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
+class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
 
-    private val onUpdateUserEmailFromAuth = Capture.slot<(String) -> Unit>()
-
-    private val onUpdateUserPwdFromAuth = Capture.slot<(String) -> Unit>()
-
-    private val onModifyUserFromLocal = Capture.slot<(Int) -> Unit>()
-
-    private val onUpdateRemoteUser = Capture.slot<(DatabaseResult) -> Unit>()
-
-    private val onLocalImageDeleted = Capture.slot<(Boolean) -> Unit>()
-
-    private val onRemoteImageDeleted = Capture.slot<(Boolean) -> Unit>()
-
-    private val onImageUploaded = Capture.slot<(String) -> Unit>()
-
-    private val log: Log = mock {
-        every { d(any(), any()) } returns Unit
-        every { e(any(), any()) } returns Unit
-    }
+    private val log: Log = FakeLog()
 
     private fun getModifyAccountViewmodel(
-        authStateResult: AuthUser? = authUser,
-        onUpdateUserEmailFromAuthErrorArg: String = "",
-        onUpdateUserPwdFromAuthErrorArg: String = "",
-        getUserReturn: User? = user,
-        modifyUserArg: User = user,
-        onModifyUserArg: Int = 1,
-        getRemoteUserReturn: RemoteUser? = user.toData(),
-        updateRemoteUserArg: RemoteUser = user.toData(),
-        onUpdateRemoteUserArg: DatabaseResult = DatabaseResult.Success,
-        onLocalImageDeletedArg: Boolean = true,
-        onRemoteImageDeletedArg: Boolean = true,
-        onImageUploadedArg: String = user.image,
+        authRepository: AuthRepository = FakeAuthRepository(),
+        localUserRepository: LocalUserRepository = FakeLocalUserRepository(),
+        realtimeDatabaseRemoteUserRepository: RealtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(),
+        storageRepository: StorageRepository = FakeStorageRepository()
     ): ModifyAccountViewmodel {
-
-        val authRepository: AuthRepository = mock {
-            everySuspend { authState } returns (flowOf(authStateResult))
-            everySuspend {
-                updateUserEmail(
-                    userPwd,
-                    user.email!!,
-                    capture(onUpdateUserEmailFromAuth)
-                )
-            } calls { onUpdateUserEmailFromAuth.get().invoke(onUpdateUserEmailFromAuthErrorArg) }
-            everySuspend {
-                updateUserPassword(
-                    userPwd,
-                    "123456",
-                    capture(onUpdateUserPwdFromAuth)
-                )
-            } calls { onUpdateUserPwdFromAuth.get().invoke(onUpdateUserPwdFromAuthErrorArg) }
-            everySuspend { signOut() } returns true
-        }
-
-        val localUserRepository: LocalUserRepository = mock {
-            everySuspend { getUser(user.uid) } returns getUserReturn
-            everySuspend {
-                modifyUser(
-                    modifyUserArg,
-                    capture(onModifyUserFromLocal)
-                )
-            } calls { onModifyUserFromLocal.get().invoke(onModifyUserArg) }
-        }
-
-        val realtimeDatabaseRemoteUserRepository: RealtimeDatabaseRemoteUserRepository = mock {
-            every {
-                getRemoteUser(user.uid)
-            } returns flowOf(getRemoteUserReturn)
-            everySuspend {
-                updateRemoteUser(
-                    updateRemoteUserArg,
-                    capture(onUpdateRemoteUser)
-                )
-            } calls { onUpdateRemoteUser.get().invoke(onUpdateRemoteUserArg) }
-        }
-
-        val storageRepository: StorageRepository = mock {
-            every {
-                deleteLocalImage(
-                    user.uid,
-                    user.image,
-                    capture(onLocalImageDeleted)
-                )
-            } calls { onLocalImageDeleted.get().invoke(onLocalImageDeletedArg) }
-
-            everySuspend {
-                deleteRemoteImage(
-                    user.uid,
-                    Section.USERS,
-                    capture(onRemoteImageDeleted)
-                )
-            } calls { onRemoteImageDeleted.get().invoke(onRemoteImageDeletedArg) }
-
-            every {
-                uploadImage(
-                    user.uid,
-                    Section.USERS,
-                    user.image,
-                    capture(onImageUploaded)
-                )
-            } calls { onImageUploaded.get().invoke(onImageUploadedArg) }
-        }
 
         val observeAuthStateFromAuthDataSource =
             ObserveAuthStateFromAuthDataSource(authRepository)
@@ -203,7 +96,26 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
     @Test
     fun `given a registered user_when that user modifies their account_then the account is updated`() =
         runTest {
-            val modifyAccountViewmodel = getModifyAccountViewmodel()
+            val modifyAccountViewmodel = getModifyAccountViewmodel(
+                authRepository = FakeAuthRepository(
+                    authUser = authUser,
+                    authEmail = user.email,
+                    authPassword = userPwd
+                ),
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(mutableListOf(user.toData())),
+                storageRepository = FakeStorageRepository(
+                    remoteDatasourceList = mutableListOf(
+                        Pair("${user.uid}/${Section.USERS.path}", user.image)
+                    ),
+                    localDatasourceList = mutableListOf(
+                        Pair(
+                            "${user.uid}/${user.image}",
+                            "local_path/${user.uid}/${Section.USERS.path}"
+                        )
+                    )
+                ),
+                localUserRepository = FakeLocalUserRepository(mutableListOf(user))
+            )
             modifyAccountViewmodel.saveUserChanges(
                 isDifferentEmail = true,
                 isDifferentImage = true,
@@ -222,9 +134,7 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
     @Test
     fun `given a registered user_when that user modifies their email but the app fails_then it displays an error`() =
         runTest {
-            val modifyAccountViewmodel = getModifyAccountViewmodel(
-                onUpdateUserEmailFromAuthErrorArg = "Error updating email"
-            )
+            val modifyAccountViewmodel = getModifyAccountViewmodel()
             modifyAccountViewmodel.saveUserChanges(
                 isDifferentEmail = true,
                 isDifferentImage = true,
@@ -243,11 +153,9 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
     @Test
     fun `given a registered user_when that user modifies their password but the app fails_then it displays an error`() =
         runTest {
-            val modifyAccountViewmodel = getModifyAccountViewmodel(
-                onUpdateUserPwdFromAuthErrorArg = "Error updating password"
-            )
+            val modifyAccountViewmodel = getModifyAccountViewmodel()
             modifyAccountViewmodel.saveUserChanges(
-                isDifferentEmail = true,
+                isDifferentEmail = false,
                 isDifferentImage = true,
                 user = user,
                 currentPassword = userPwd,
@@ -265,7 +173,12 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
     fun `given a registered user_when that user modifies their account but the remote data source fails to delete their avatar_then the app displays an error`() =
         runTest {
             val modifyAccountViewmodel = getModifyAccountViewmodel(
-                onRemoteImageDeletedArg = false
+                authRepository = FakeAuthRepository(
+                    authUser = authUser,
+                    authEmail = user.email,
+                    authPassword = userPwd
+                ),
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(mutableListOf(user.toData()))
             )
             modifyAccountViewmodel.saveUserChanges(
                 isDifferentEmail = true,
@@ -286,7 +199,18 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
     fun `given a registered user_when that user modifies their account but the local data source fails to delete their avatar_then the app displays an error`() =
         runTest {
             val modifyAccountViewmodel = getModifyAccountViewmodel(
-                onLocalImageDeletedArg = false
+                authRepository = FakeAuthRepository(
+                    authUser = authUser,
+                    authEmail = user.email,
+                    authPassword = userPwd
+                ),
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(mutableListOf(user.toData())),
+                storageRepository = FakeStorageRepository(
+                    remoteDatasourceList = mutableListOf(
+                        Pair("${user.uid}/${Section.USERS.path}", user.image)
+                    )
+                ),
+                localUserRepository = FakeLocalUserRepository(mutableListOf(user))
             )
             modifyAccountViewmodel.saveUserChanges(
                 isDifferentEmail = true,
@@ -308,11 +232,24 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
         runTest {
             val user = user.copy(image = "")
             val modifyAccountViewmodel = getModifyAccountViewmodel(
-                getUserReturn = user,
-                modifyUserArg = user,
-                getRemoteUserReturn = user.toData(),
-                updateRemoteUserArg = user.toData(),
-                onImageUploadedArg = ""
+                authRepository = FakeAuthRepository(
+                    authUser = authUser.copy(photoUrl = user.image),
+                    authEmail = user.email,
+                    authPassword = userPwd
+                ),
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(mutableListOf(user.toData())),
+                storageRepository = FakeStorageRepository(
+                    remoteDatasourceList = mutableListOf(
+                        Pair("${user.uid}/${Section.USERS.path}", user.image)
+                    ),
+                    localDatasourceList = mutableListOf(
+                        Pair(
+                            "${user.uid}/${user.image}",
+                            "local_path/${user.uid}/${Section.USERS.path}"
+                        )
+                    )
+                ),
+                localUserRepository = FakeLocalUserRepository(mutableListOf(user))
             )
             modifyAccountViewmodel.saveUserChanges(
                 isDifferentEmail = true,
@@ -330,33 +267,15 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
         }
 
     @Test
-    fun `given a registered user_when that user modifies their account but the remote repository fails_then it displays an error`() =
-        runTest {
-            val modifyAccountViewmodel = getModifyAccountViewmodel(
-                onUpdateRemoteUserArg = DatabaseResult.Error("Error updating remote user")
-            )
-            modifyAccountViewmodel.saveUserChanges(
-                isDifferentEmail = true,
-                isDifferentImage = false,
-                user = user,
-                currentPassword = userPwd,
-                newPassword = "123456"
-            )
-            modifyAccountViewmodel.uiState.test {
-                assertTrue { awaitItem() is UiState.Idle }
-                assertTrue { awaitItem() is UiState.Loading }
-                assertTrue { awaitItem() is UiState.Error }
-                ensureAllEventsConsumed()
-            }
-        }
-
-    @Test
     fun `given a registered user_when that user modifies their account but the local repository fails_then it displays an error`() =
         runTest {
             val modifyAccountViewmodel = getModifyAccountViewmodel(
-                getRemoteUserReturn = user.copy(image = "").toData(),
-                updateRemoteUserArg = user.copy(image = "").toData(),
-                onModifyUserArg = 0,
+                authRepository = FakeAuthRepository(
+                    authUser = authUser.copy(photoUrl = user.image),
+                    authEmail = user.email,
+                    authPassword = userPwd
+                ),
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(mutableListOf(user.toData()))
             )
             modifyAccountViewmodel.saveUserChanges(
                 isDifferentEmail = false,
@@ -369,39 +288,6 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Error }
                 ensureAllEventsConsumed()
-            }
-        }
-
-    @OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
-    @Test
-    fun `given a registered user_when that user logs out_then the user is unregistered`() =
-        runTest {
-            val modifyAccountViewmodel = getModifyAccountViewmodel(
-                modifyUserArg = user.copy(lastLogout = Clock.System.now().epochSeconds)
-            )
-            modifyAccountViewmodel.logOut()
-
-            runCurrent()
-
-            verify {
-                log.d(any(), any())
-            }
-        }
-
-    @OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
-    @Test
-    fun `given a registered user_when that user logs out and the local datasource fails updating the last log out_then the app emit an error`() =
-        runTest {
-            val modifyAccountViewmodel = getModifyAccountViewmodel(
-                modifyUserArg = user.copy(lastLogout = Clock.System.now().epochSeconds),
-                onModifyUserArg = 0
-            )
-            modifyAccountViewmodel.logOut()
-
-            runCurrent()
-
-            verify {
-                log.e(any(), any())
             }
         }
 }

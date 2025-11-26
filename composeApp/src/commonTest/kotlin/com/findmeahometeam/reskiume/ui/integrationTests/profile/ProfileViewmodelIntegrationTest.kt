@@ -1,4 +1,4 @@
-package com.findmeahometeam.reskiume.ui.integration
+package com.findmeahometeam.reskiume.ui.integrationTests.profile
 
 import app.cash.turbine.test
 import com.findmeahometeam.reskiume.CoroutineTestDispatcher
@@ -8,9 +8,9 @@ import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.ObserveAuthStateFromAuthDataSource
-import com.findmeahometeam.reskiume.ui.integration.fakes.FakeAuthRepository
-import com.findmeahometeam.reskiume.ui.integration.fakes.FakeLocalUserRepository
-import com.findmeahometeam.reskiume.ui.integration.fakes.FakeLog
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeAuthRepository
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalUserRepository
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLog
 import com.findmeahometeam.reskiume.ui.profile.ProfileViewmodel
 import com.findmeahometeam.reskiume.ui.profile.ProfileViewmodel.ProfileUiState
 import com.findmeahometeam.reskiume.user

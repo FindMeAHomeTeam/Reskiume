@@ -1,4 +1,4 @@
-package com.findmeahometeam.reskiume.ui
+package com.findmeahometeam.reskiume.ui.unitTests.profile
 
 import app.cash.turbine.test
 import com.findmeahometeam.reskiume.CoroutineTestDispatcher

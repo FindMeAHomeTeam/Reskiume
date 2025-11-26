@@ -1,4 +1,4 @@
-package com.findmeahometeam.reskiume.ui.integration.fakes
+package com.findmeahometeam.reskiume.ui.integrationTests.fakes
 
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository

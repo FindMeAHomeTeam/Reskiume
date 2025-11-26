@@ -1,4 +1,4 @@
-package com.findmeahometeam.reskiume.ui.integration.fakes
+package com.findmeahometeam.reskiume.ui.integrationTests.fakes
 
 import com.findmeahometeam.reskiume.data.database.entity.LocalCacheEntity
 import com.findmeahometeam.reskiume.data.util.Section

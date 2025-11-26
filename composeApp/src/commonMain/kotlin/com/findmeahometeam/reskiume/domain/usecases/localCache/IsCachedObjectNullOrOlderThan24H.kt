@@ -14,6 +14,6 @@ class IsCachedObjectNullOrOlderThan24H(private val repository: LocalCacheReposit
     @OptIn(ExperimentalTime::class)
     private fun hasPassed24Hours(savedEpochSeconds: Long): Boolean {
         val nowEpoch: Long = Clock.System.now().epochSeconds
-        return (nowEpoch - savedEpochSeconds) >= 1
+        return (nowEpoch - savedEpochSeconds) >= 24 * 60 * 60
     }
 }

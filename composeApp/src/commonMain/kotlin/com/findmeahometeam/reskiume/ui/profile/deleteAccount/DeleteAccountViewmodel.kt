@@ -18,6 +18,7 @@ import com.findmeahometeam.reskiume.domain.usecases.ObserveAuthStateFromAuthData
 import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteCacheFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.DeleteReviewsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.DeleteReviewsFromRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromRemoteRepository
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,6 +28,7 @@ import kotlinx.coroutines.launch
 
 class DeleteAccountViewmodel(
     observeAuthStateFromAuthDataSource: ObserveAuthStateFromAuthDataSource,
+    private val getReviewsFromRemoteRepository: GetReviewsFromRemoteRepository,
     private val deleteReviewsFromRemoteRepository: DeleteReviewsFromRemoteRepository,
     private val deleteReviewsFromLocalRepository: DeleteReviewsFromLocalRepository,
     private val deleteCacheFromLocalRepository: DeleteCacheFromLocalRepository,
@@ -49,41 +51,56 @@ class DeleteAccountViewmodel(
 
             // TODO delete foster homes, events and non-human animals first
 
-            deleteUserReviewsFromRemoteRepository(user.uid) {
+            manageUserReviewsDeletion(user.uid) {
 
-                deleteUserReviewsFromLocalRepository(user.uid) {
+                deleteUserCacheFromLocalRepository(user.uid) {
 
-                    deleteUserCacheFromLocalRepository(user.uid) {
+                    deleteAvatarFromRemoteDataSource(
+                        uid = user.uid,
+                        remoteImage = user.image,
+                        onEmptyImage = {
+                            manageUserDeletion(user.uid, password)
+                        },
+                        onDeletedRemoteImage = {
 
-                        deleteAvatarFromRemoteDataSource(
-                            uid = user.uid,
-                            remoteImage = user.image,
-                            onEmptyImage = {
+                            deleteAvatarFromLocalDataSource(user.uid) {
 
-                                deleteUserFromRemoteRepository(user.uid) {
-
-                                    deleteMyUserFromAuthDataSource(password) {
-
-                                        deleteMyUserFromLocalDataSource(user.uid)
-                                    }
-                                }
-                            },
-                            onDeletedRemoteImage = {
-
-                                deleteAvatarFromLocalDataSource(user.uid) {
-
-                                    deleteUserFromRemoteRepository(user.uid) {
-
-                                        deleteMyUserFromAuthDataSource(password) {
-
-                                            deleteMyUserFromLocalDataSource(user.uid)
-                                        }
-                                    }
-                                }
+                                manageUserDeletion(user.uid, password)
                             }
-                        )
+                        }
+                    )
+                }
+            }
+        }
+    }
+
+    private fun manageUserReviewsDeletion(uid: String, onComplete: () -> Unit) {
+        viewModelScope.launch {
+
+            getReviewsFromRemoteRepository(uid).collect { reviewList ->
+
+                if (reviewList.isEmpty()) {
+
+                    onComplete()
+                } else {
+                    deleteUserReviewsFromRemoteRepository(uid) {
+
+                        deleteUserReviewsFromLocalRepository(uid) {
+
+                            onComplete()
+                        }
                     }
                 }
+            }
+        }
+    }
+
+    private fun manageUserDeletion(uid: String, password: String) {
+        deleteUserFromRemoteRepository(uid) {
+
+            deleteMyUserFromAuthDataSource(password) {
+
+                deleteMyUserFromLocalDataSource(uid)
             }
         }
     }
@@ -117,26 +134,26 @@ class DeleteAccountViewmodel(
         }
     }
 
-    private fun deleteUserReviewsFromRemoteRepository(uid: String, onSuccess: () -> Unit) {
+    private fun deleteUserReviewsFromRemoteRepository(uid: String, onCompletion: () -> Unit) {
         viewModelScope.launch {
             deleteReviewsFromRemoteRepository(uid) { result: DatabaseResult ->
-                if (result is DatabaseResult.Error) {
-                    log.e(
-                        "DeleteAccountViewmodel",
-                        "deleteUserReviewsFromRemoteRepository: ${result.message}"
-                    )
-                } else {
+                if (result is DatabaseResult.Success) {
                     log.d(
                         "DeleteAccountViewmodel",
                         "deleteUserReviewsFromRemoteRepository: Deleted reviews from remote repository"
                     )
+                } else {
+                    log.e(
+                        "DeleteAccountViewmodel",
+                        "deleteUserReviewsFromRemoteRepository: ${(result as DatabaseResult.Error).message}"
+                    )
                 }
-                onSuccess()
+                onCompletion()
             }
         }
     }
 
-    private fun deleteUserReviewsFromLocalRepository(uid: String, onSuccess: () -> Unit) {
+    private fun deleteUserReviewsFromLocalRepository(uid: String, onCompletion: () -> Unit) {
         viewModelScope.launch {
             deleteReviewsFromLocalRepository(uid) { rowsDeleted ->
                 if (rowsDeleted > 0) {
@@ -145,17 +162,17 @@ class DeleteAccountViewmodel(
                         "deleteUserReviewsFromLocalRepository: Deleted $rowsDeleted reviews from local repository"
                     )
                 } else {
-                    log.d(
+                    log.e(
                         "DeleteAccountViewmodel",
                         "deleteUserReviewsFromLocalRepository: No reviews to delete from local repository"
                     )
                 }
-                onSuccess()
+                onCompletion()
             }
         }
     }
 
-    private fun deleteUserCacheFromLocalRepository(uid: String, onSuccess: () -> Unit) {
+    private fun deleteUserCacheFromLocalRepository(uid: String, onCompletion: () -> Unit) {
 
         viewModelScope.launch {
             deleteCacheFromLocalRepository(uid) { rowsDeleted ->
@@ -170,7 +187,7 @@ class DeleteAccountViewmodel(
                         "deleteUserCacheInLocalRepository: No cache entries to delete from local repository"
                     )
                 }
-                onSuccess()
+                onCompletion()
             }
         }
     }

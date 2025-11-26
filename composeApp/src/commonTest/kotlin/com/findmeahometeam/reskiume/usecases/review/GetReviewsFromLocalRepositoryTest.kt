@@ -6,7 +6,7 @@ import com.findmeahometeam.reskiume.domain.repository.local.LocalReviewRepositor
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromLocalRepository
 import com.findmeahometeam.reskiume.review
 import dev.mokkery.answering.returns
-import dev.mokkery.everySuspend
+import dev.mokkery.every
 import dev.mokkery.mock
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -16,7 +16,7 @@ import kotlin.test.assertEquals
 class GetReviewsFromLocalRepositoryTest: CoroutineTestDispatcher() {
 
     val localReviewRepository: LocalReviewRepository = mock {
-        everySuspend {
+        every {
             getLocalReviews(review.reviewedUid)
         } returns flowOf(listOf(review.toEntity()))
     }
@@ -25,7 +25,7 @@ class GetReviewsFromLocalRepositoryTest: CoroutineTestDispatcher() {
         GetReviewsFromLocalRepository(localReviewRepository)
 
     @Test
-    fun `given a local review_when the app inserts it_then insertLocalReview is called`() =
+    fun `given local reviews_when the app retrieves them_then app gets a flow of list of Review`() =
         runTest {
             getReviewsFromLocalRepository(review.reviewedUid).test {
                 val actualReviews = awaitItem()

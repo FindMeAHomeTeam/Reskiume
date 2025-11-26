@@ -8,9 +8,13 @@ import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.remote.response.RemoteUser
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
+import com.findmeahometeam.reskiume.domain.model.Review
 import com.findmeahometeam.reskiume.domain.model.User
+import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalReviewRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteReview.RealtimeDatabaseRemoteReviewRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.usecases.DeleteImageFromRemoteDataSource
@@ -21,6 +25,11 @@ import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromRemoteDataSour
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.ObserveAuthStateFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteCacheFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.review.DeleteReviewsFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.review.DeleteReviewsFromRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromRemoteRepository
+import com.findmeahometeam.reskiume.review
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.profile.deleteAccount.DeleteAccountViewmodel
 import com.findmeahometeam.reskiume.user
@@ -34,16 +43,26 @@ import dev.mokkery.matcher.capture.Capture
 import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
+import dev.mokkery.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
 
     private val onDeleteUserFromAuth = Capture.slot<(String) -> Unit>()
 
     private val onDeleteUserFromLocal = Capture.slot<(Int) -> Unit>()
+
+    private val onDeleteRemoteReviews = Capture.slot<(DatabaseResult) -> Unit>()
+
+    private val onDeleteLocalReviews = Capture.slot<(Int) -> Unit>()
+
+    private val onDeleteLocalCacheEntity = Capture.slot<(Int) -> Unit>()
 
     private val onSuccessDeleteRemoteUser = Capture.slot<(DatabaseResult) -> Unit>()
 
@@ -51,12 +70,21 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
 
     private val onLocalImageDeleted = Capture.slot<(Boolean) -> Unit>()
 
+    private val log: Log = mock {
+        every { d(any(), any()) } returns Unit
+        every { e(any(), any()) } returns Unit
+    }
+
     private fun getDeleteAccountViewmodel(
         authStateResult: AuthUser? = authUser,
         deleteUserFromAuthErrorArg: String = "",
         getUserResult: User = user,
         deleteUserFromLocalArg: Int = 1,
         remoteUserResult: RemoteUser? = user.toData(),
+        getRemoteReviewsResult: List<Review> = listOf(review),
+        deleteRemoteReviewsArg: DatabaseResult = DatabaseResult.Success,
+        deleteLocalReviewsArg: Int = 1,
+        deleteLocalCacheEntityArg: Int = 1,
         successRemoteUserArg: DatabaseResult = DatabaseResult.Success,
         remoteImageDeletedArg: Boolean = true,
         localImageDeletedArg: Boolean = true
@@ -78,6 +106,34 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
                     capture(onDeleteUserFromLocal)
                 )
             } calls { onDeleteUserFromLocal.get().invoke(deleteUserFromLocalArg) }
+        }
+
+        val realtimeDatabaseRemoteReviewRepository: RealtimeDatabaseRemoteReviewRepository = mock {
+            every { getRemoteReviews(user.uid) } returns flowOf(getRemoteReviewsResult.map { it.toData() })
+            every {
+                deleteRemoteReviews(
+                    user.uid,
+                    capture(onDeleteRemoteReviews)
+                )
+            } calls { onDeleteRemoteReviews.get().invoke(deleteRemoteReviewsArg) }
+        }
+
+        val localReviewRepository: LocalReviewRepository = mock {
+            everySuspend {
+                deleteLocalReviews(
+                    user.uid,
+                    capture(onDeleteLocalReviews)
+                )
+            } calls { onDeleteLocalReviews.get().invoke(deleteLocalReviewsArg) }
+        }
+
+        val localCacheRepository: LocalCacheRepository = mock {
+            everySuspend {
+                deleteLocalCacheEntity(
+                    user.uid,
+                    capture(onDeleteLocalCacheEntity)
+                )
+            } calls { onDeleteLocalCacheEntity.get().invoke(deleteLocalCacheEntityArg) }
         }
 
         val realtimeDatabaseRemoteUserRepository: RealtimeDatabaseRemoteUserRepository = mock {
@@ -114,6 +170,17 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
         val observeAuthStateFromAuthDataSource =
             ObserveAuthStateFromAuthDataSource(authRepository)
 
+        val getReviewsFromRemoteRepository =
+            GetReviewsFromRemoteRepository(realtimeDatabaseRemoteReviewRepository)
+
+        val deleteReviewsFromRemoteRepository =
+            DeleteReviewsFromRemoteRepository(realtimeDatabaseRemoteReviewRepository)
+
+        val deleteReviewsFromLocalRepository =
+            DeleteReviewsFromLocalRepository(localReviewRepository)
+
+        val deleteCacheFromLocalRepository = DeleteCacheFromLocalRepository(localCacheRepository)
+
         val getUserFromLocalDataSource =
             GetUserFromLocalDataSource(localUserRepository)
 
@@ -135,13 +202,12 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
         val deleteUserFromLocalDataSource =
             DeleteUserFromLocalDataSource(localUserRepository)
 
-        val log: Log = mock {
-            every { d(any(), any()) } returns Unit
-            every { e(any(), any()) } returns Unit
-        }
-
         return DeleteAccountViewmodel(
             observeAuthStateFromAuthDataSource,
+            getReviewsFromRemoteRepository,
+            deleteReviewsFromRemoteRepository,
+            deleteReviewsFromLocalRepository,
+            deleteCacheFromLocalRepository,
             getUserFromLocalDataSource,
             getUserFromRemoteDataSource,
             deleteUserFromAuthDataSource,
@@ -167,6 +233,67 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
         }
 
     @Test
+    fun `given a registered user_when that user deletes their account using their password and have no reviews_then their account is deleted`() =
+        runTest {
+            val deleteAccountViewmodel = getDeleteAccountViewmodel(
+                getRemoteReviewsResult = emptyList()
+            )
+            deleteAccountViewmodel.deleteAccount(userPwd)
+            deleteAccountViewmodel.state.test {
+                assertTrue { awaitItem() is UiState.Idle }
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Success }
+                ensureAllEventsConsumed()
+            }
+        }
+
+
+    @Test
+    fun `given a registered user_when that user deletes their account using their password but there is an error deleting their reviews from remote repository_then an error is logged`() =
+        runTest {
+            val deleteAccountViewmodel = getDeleteAccountViewmodel(
+                deleteRemoteReviewsArg = DatabaseResult.Error("error"),
+            )
+            deleteAccountViewmodel.deleteAccount(userPwd)
+
+            runCurrent()
+
+            verify {
+                log.e(any(), any())
+            }
+        }
+
+    @Test
+    fun `given a registered user_when that user deletes their account using their password but there is an error deleting their reviews from local repository_then an error is logged`() =
+        runTest {
+            val deleteAccountViewmodel = getDeleteAccountViewmodel(
+                deleteLocalReviewsArg = 0
+            )
+            deleteAccountViewmodel.deleteAccount(userPwd)
+
+            runCurrent()
+
+            verify {
+                log.e(any(), any())
+            }
+        }
+
+    @Test
+    fun `given a registered user_when that user deletes their account using their password but there is an error deleting their cache from local repository_then an error is logged`() =
+        runTest {
+            val deleteAccountViewmodel = getDeleteAccountViewmodel(
+                deleteLocalCacheEntityArg = 0
+            )
+            deleteAccountViewmodel.deleteAccount(userPwd)
+
+            runCurrent()
+
+            verify {
+                log.e(any(), any())
+            }
+        }
+
+    @Test
     fun `given a registered user_when that user deletes their account using their password but there is an error retrieving their account on the auth repository_then the app displays an error`() =
         runTest {
             val deleteAccountViewmodel = getDeleteAccountViewmodel(
@@ -176,6 +303,22 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
             deleteAccountViewmodel.state.test {
                 assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Error }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given a registered user_when that user deletes their account using their password but their avatar deletion fails in data sources_then their account is deleted`() =
+        runTest {
+            val deleteAccountViewmodel = getDeleteAccountViewmodel(
+                remoteImageDeletedArg = false,
+                localImageDeletedArg = false
+            )
+            deleteAccountViewmodel.deleteAccount(userPwd)
+            deleteAccountViewmodel.state.test {
+                assertTrue { awaitItem() is UiState.Idle }
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Success }
                 ensureAllEventsConsumed()
             }
         }
@@ -206,22 +349,6 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
                 assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Error }
-                ensureAllEventsConsumed()
-            }
-        }
-
-    @Test
-    fun `given a registered user_when that user deletes their account using their password but their avatar deletion fails in data sources_then their account is deleted`() =
-        runTest {
-            val deleteAccountViewmodel = getDeleteAccountViewmodel(
-                remoteImageDeletedArg = false,
-                localImageDeletedArg = false
-            )
-            deleteAccountViewmodel.deleteAccount(userPwd)
-            deleteAccountViewmodel.state.test {
-                assertTrue { awaitItem() is UiState.Idle }
-                assertTrue { awaitItem() is UiState.Loading }
-                assertTrue { awaitItem() is UiState.Success }
                 ensureAllEventsConsumed()
             }
         }

@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.findmeahometeam.reskiume.ui.chats.ChatsScreen
+import com.findmeahometeam.reskiume.ui.core.navigation.CheckReviews
 import com.findmeahometeam.reskiume.ui.core.navigation.Routes
 import com.findmeahometeam.reskiume.ui.fosterHomes.FosterHomesScreen
 import com.findmeahometeam.reskiume.ui.profile.ProfileScreen
@@ -39,8 +40,8 @@ fun BottomNavigationWrapper(
                 navigateToModifyAccountScreen = {
                     mainNavHostController.navigate(Routes.MODIFY_ACCOUNT.route)
                 },
-                navigateToReviewAccountScreen = {
-                    mainNavHostController.navigate(Routes.REVIEW_ACCOUNT.route)
+                navigateToCheckReviewsScreen = { uid ->
+                    mainNavHostController.navigate(CheckReviews(uid))
                 },
                 navigateToDeleteAccountScreen = {
                     mainNavHostController.navigate(Routes.DELETE_ACCOUNT.route)

@@ -1,5 +1,7 @@
 package com.findmeahometeam.reskiume.ui.core.navigation
 
+import kotlinx.serialization.Serializable
+
 enum class Routes(val route: String) {
     HOME_SCREEN("homeScreen"),
     FOSTER_HOMES("fosterHomes"),
@@ -10,6 +12,8 @@ enum class Routes(val route: String) {
     LOGIN_ACCOUNT("login account"),
     MODIFY_ACCOUNT("modify account"),
     DELETE_ACCOUNT("delete account"),
-    REVIEW_ACCOUNT("review account"),
 
 }
+
+@Serializable
+class CheckReviews(val uid: String)

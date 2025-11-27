@@ -10,7 +10,7 @@ import com.findmeahometeam.reskiume.ui.profile.createAccount.CreateAccountScreen
 import com.findmeahometeam.reskiume.ui.profile.deleteAccount.DeleteAccountScreen
 import com.findmeahometeam.reskiume.ui.profile.loginAccount.LoginAccountScreen
 import com.findmeahometeam.reskiume.ui.profile.modifyAccount.ModifyAccountScreen
-import com.findmeahometeam.reskiume.ui.profile.reviewAccount.ReviewAccountScreen
+import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsScreen
 
 @Composable
 fun NavigationWrapper() {
@@ -45,10 +45,15 @@ fun NavigationWrapper() {
             })
         }
 
-        composable(route = Routes.REVIEW_ACCOUNT.route) {
-            ReviewAccountScreen(onBackPressed =  {
-                mainNavController.navigateUp()
-            })
+        composable<CheckReviews> {
+            CheckReviewsScreen(
+                onBackPressed = {
+                    mainNavController.navigateUp()
+                },
+                onReviewClick = { uid ->
+                    mainNavController.navigate(CheckReviews(uid))
+                }
+            )
         }
 
         composable(route = Routes.DELETE_ACCOUNT.route) {

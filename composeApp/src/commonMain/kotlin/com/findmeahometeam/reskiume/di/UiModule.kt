@@ -6,7 +6,7 @@ import com.findmeahometeam.reskiume.ui.profile.createAccount.CreateAccountViewmo
 import com.findmeahometeam.reskiume.ui.profile.deleteAccount.DeleteAccountViewmodel
 import com.findmeahometeam.reskiume.ui.profile.loginAccount.LoginAccountViewmodel
 import com.findmeahometeam.reskiume.ui.profile.modifyAccount.ModifyAccountViewmodel
-import com.findmeahometeam.reskiume.ui.profile.reviewAccount.ReviewAccountViewmodel
+import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsViewmodel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
@@ -17,5 +17,5 @@ val uiModule = module {
     viewModelOf(::LoginAccountViewmodel)
     viewModelOf(::ModifyAccountViewmodel)
     viewModelOf(::DeleteAccountViewmodel)
-    viewModelOf(::ReviewAccountViewmodel)
+    viewModelOf(::CheckReviewsViewmodel)
 }

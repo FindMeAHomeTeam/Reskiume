@@ -105,10 +105,12 @@
     <string name="general_error_network_message">Network error. Please check your internet connection and try again</string>
     <string name="general_error_unknown_message">An unknown error occurred. Please try again later</string>
 
-    <!-- Review account screen -->
-    <string name="review_account_screen_my_reviews_title">My reviews</string>
-    <string name="review_account_screen_no_reviews">No one has evaluated you yet</string>
-    <string name="review_account_screen_user_deleted">User deleted</string>
+    <!-- Check reviews screen -->
+    <string name="check_reviews_screen_my_reviews_title">My reviews</string>
+    <string name="check_reviews_screen_user_profile_title">%1$s's profile</string>
+    <string name="check_reviews_screen_user_reviews_title">Reviews</string>
+    <string name="check_reviews_screen_no_reviews">No reviews at the moment</string>
+    <string name="check_reviews_screen_user_deleted">User deleted</string>
 
 
 </resources>

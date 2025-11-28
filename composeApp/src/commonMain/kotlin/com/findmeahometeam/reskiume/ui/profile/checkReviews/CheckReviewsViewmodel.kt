@@ -6,15 +6,12 @@ import androidx.navigation.toRoute
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.model.LocalCache
 import com.findmeahometeam.reskiume.domain.model.Review
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.ObserveAuthStateFromAuthDataSource
-import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
-import com.findmeahometeam.reskiume.domain.usecases.localCache.IsCachedObjectNullOrOlderThan24H
-import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.InsertReviewInLocalRepository
@@ -29,18 +26,15 @@ import kotlinx.datetime.format
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.DateTimeFormat
 import kotlinx.datetime.format.char
-import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
 class CheckReviewsViewmodel(
     savedStateHandle: SavedStateHandle,
     private val observeAuthStateFromAuthDataSource: ObserveAuthStateFromAuthDataSource,
-    isCachedObjectNullOrOlderThan24H: IsCachedObjectNullOrOlderThan24H,
-    insertCacheInLocalRepository: InsertCacheInLocalRepository,
-    modifyCacheInLocalRepository: ModifyCacheInLocalRepository,
+    getDataByManagingObjectLocalCacheTimestamp: GetDataByManagingObjectLocalCacheTimestamp,
     getReviewsFromRemoteRepository: GetReviewsFromRemoteRepository,
-    private val getReviewsFromLocalRepository: GetReviewsFromLocalRepository,
+    getReviewsFromLocalRepository: GetReviewsFromLocalRepository,
     private val insertReviewInLocalRepository: InsertReviewInLocalRepository,
     private val getUserFromLocalDataSource: GetUserFromLocalDataSource,
     private val getUserFromRemoteDataSource: GetUserFromRemoteDataSource,
@@ -63,59 +57,20 @@ class CheckReviewsViewmodel(
     @OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
     val reviewListFlow: Flow<List<UiReview>> =
         flowOf(uid).flatMapConcat { uid: String ->
-            val isNullOrOlder: Boolean? =
-                isCachedObjectNullOrOlderThan24H(uid, Section.REVIEWS)
-            when (isNullOrOlder) {
-                null -> {
-                    insertCacheInLocalRepository(
-                        LocalCache(
-                            uid = uid,
-                            section = Section.REVIEWS,
-                            timestamp = Clock.System.now().epochSeconds
-                        )
-                    ) { rowId ->
-                        if (rowId > 0) {
-                            log.d(
-                                "ReviewAccountViewmodel",
-                                "$uid added to local cache in section ${Section.REVIEWS}"
-                            )
-                        } else {
-                            log.e(
-                                "ReviewAccountViewmodel",
-                                "Error adding $uid to local cache in section ${Section.REVIEWS}"
-                            )
-                        }
-                    }
-                    getReviewsFromRemoteRepository(uid).insertRemoteReviewsAndMapThemToUiReview()
-                }
 
-                true -> {
-                    modifyCacheInLocalRepository(
-                        LocalCache(
-                            uid = uid,
-                            section = Section.REVIEWS,
-                            timestamp = Clock.System.now().epochSeconds
-                        )
-                    ) { rowsUpdated ->
-                        if (rowsUpdated > 0) {
-                            log.d(
-                                "ReviewAccountViewmodel",
-                                "$uid updated in local cache in section ${Section.REVIEWS}"
-                            )
-                        } else {
-                            log.e(
-                                "ReviewAccountViewmodel",
-                                "Error updating $uid in local cache in section ${Section.REVIEWS}"
-                            )
-                        }
-                    }
+            getDataByManagingObjectLocalCacheTimestamp(
+                uid = uid,
+                section = Section.REVIEWS,
+                onCompletionInsertCache = {
                     getReviewsFromRemoteRepository(uid).insertRemoteReviewsAndMapThemToUiReview()
-                }
-
-                false -> {
+                },
+                onCompletionUpdateCache = {
+                    getReviewsFromRemoteRepository(uid).insertRemoteReviewsAndMapThemToUiReview()
+                },
+                onVerifyCacheIsRecent = {
                     getReviewsFromLocalRepository(uid).mapLocalReviewsToUiReview()
                 }
-            }
+            )
         }
 
     private fun Flow<List<Review>>.insertRemoteReviewsAndMapThemToUiReview(): Flow<List<UiReview>> =
@@ -134,32 +89,28 @@ class CheckReviewsViewmodel(
                         )
                     }
                 }
-                val user: User? = getReviewAuthor(review.authorUid)
-                UiReview(
-                    date = getFormattedDateFromEpochSeconds(review.timestamp),
-                    authorUid = user?.uid ?: "",
-                    authorName = user?.username ?: "",
-                    authorUri = user?.image ?: "",
-                    description = review.description,
-                    rating = review.rating
-                )
+                review.toUiReview()
             }
         }
 
     private fun Flow<List<Review>>.mapLocalReviewsToUiReview(): Flow<List<UiReview>> =
         this.map { list ->
             list.map { review ->
-                val user: User? = getReviewAuthor(review.authorUid)
-                UiReview(
-                    date = getFormattedDateFromEpochSeconds(review.timestamp),
-                    authorUid = user?.uid ?: "",
-                    authorName = user?.username ?: "",
-                    authorUri = user?.image ?: "",
-                    description = review.description,
-                    rating = review.rating
-                )
+                review.toUiReview()
             }
         }
+
+    private suspend fun Review.toUiReview(): UiReview {
+        val author: User? = getReviewAuthor(authorUid)
+        return UiReview(
+            date = getFormattedDateFromEpochSeconds(timestamp),
+            authorUid = author?.uid ?: "",
+            authorName = author?.username ?: "",
+            authorUri = author?.image ?: "",
+            description = description,
+            rating = rating
+        )
+    }
 
     private suspend fun getReviewAuthor(uid: String): User? { //TODO change user cache
         val user: User? = getUserFromLocalDataSource(uid)

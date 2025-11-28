@@ -3,9 +3,9 @@ package com.findmeahometeam.reskiume.di
 import com.findmeahometeam.reskiume.domain.usecases.CreateUserWithEmailAndPasswordFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteImageInLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromRemoteDataSource
-import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.InsertUserToLocalDataSource
@@ -20,9 +20,7 @@ import com.findmeahometeam.reskiume.domain.usecases.SignInWithEmailAndPasswordFr
 import com.findmeahometeam.reskiume.domain.usecases.SignOutFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteCacheFromLocalRepository
-import com.findmeahometeam.reskiume.domain.usecases.localCache.IsCachedObjectNullOrOlderThan24H
-import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
-import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.domain.usecases.review.DeleteReviewsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.DeleteReviewsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromLocalRepository
@@ -35,9 +33,7 @@ import org.koin.dsl.module
 val domainModule = module {
 
     // localCache
-    factoryOf(::InsertCacheInLocalRepository)
-    factoryOf(::IsCachedObjectNullOrOlderThan24H)
-    factoryOf(::ModifyCacheInLocalRepository)
+    factoryOf(::GetDataByManagingObjectLocalCacheTimestamp)
     factoryOf(::DeleteCacheFromLocalRepository)
 
     factoryOf(::ObserveAuthStateFromAuthDataSource)

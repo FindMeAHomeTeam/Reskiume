@@ -1,0 +1,93 @@
+package com.findmeahometeam.reskiume.domain.usecases.localCache
+
+import com.findmeahometeam.reskiume.data.database.entity.LocalCacheEntity
+import com.findmeahometeam.reskiume.data.util.Section
+import com.findmeahometeam.reskiume.data.util.log.Log
+import com.findmeahometeam.reskiume.domain.model.LocalCache
+import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
+
+
+// Use case to manage local cache based on timestamp for a specific managing object.
+// It checks if the cache exists and whether it is older than 24 hours,
+// and performs actions accordingly.
+class GetDataByManagingObjectLocalCacheTimestamp(
+    private val repository: LocalCacheRepository,
+    private val log: Log
+) {
+    @OptIn(ExperimentalTime::class)
+    suspend operator fun <T> invoke(
+        uid: String,
+        section: Section,
+        onCompletionInsertCache: () -> T,
+        onCompletionUpdateCache: () -> T,
+        onVerifyCacheIsRecent: () -> T
+    ): T {
+        val localCacheEntity: LocalCacheEntity? = repository.getLocalCacheEntity(uid, section)
+        return when (localCacheEntity) {
+            null -> {
+                repository.insertLocalCacheEntity(
+                    LocalCache(
+                        uid = uid,
+                        section = section,
+                        timestamp = Clock.System.now().epochSeconds
+                    ).toEntity()
+                ) { rowId ->
+                    if (rowId > 0) {
+                        log.d(
+                            "ManageCachedObjectIfNullOrOlderThan24H",
+                            "$uid added to local cache in section $section"
+                        )
+                    } else {
+                        log.e(
+                            "ManageCachedObjectIfNullOrOlderThan24H",
+                            "Error adding $uid to local cache in section $section"
+                        )
+                    }
+                }
+                onCompletionInsertCache()
+            }
+
+            else -> {
+
+                if (hasPassed24Hours(localCacheEntity.timestamp)) {
+
+                    repository.modifyLocalCacheEntity(
+                        LocalCache(
+                            id = localCacheEntity.id,
+                            uid = uid,
+                            section = section,
+                            timestamp = Clock.System.now().epochSeconds
+                        ).toEntity()
+                    ) { rowsUpdated ->
+                        if (rowsUpdated > 0) {
+                            log.d(
+                                "ManageCachedObjectIfNullOrOlderThan24H",
+                                "$uid updated in local cache in section $section"
+                            )
+                        } else {
+                            log.e(
+                                "ManageCachedObjectIfNullOrOlderThan24H",
+                                "Error updating $uid in local cache in section $section"
+                            )
+                        }
+                    }
+                    onCompletionUpdateCache()
+                } else {
+                    log.d(
+                        "ManageCachedObjectIfNullOrOlderThan24H",
+                        "Cache for $uid in section $section is up-to-date."
+                    )
+                    onVerifyCacheIsRecent()
+                }
+            }
+        }
+    }
+
+    @OptIn(ExperimentalTime::class)
+    private fun hasPassed24Hours(savedEpochSeconds: Long): Boolean {
+        val nowEpoch: Long = Clock.System.now().epochSeconds
+        return (nowEpoch - savedEpochSeconds) >= 24 * 60 * 60
+    }
+}

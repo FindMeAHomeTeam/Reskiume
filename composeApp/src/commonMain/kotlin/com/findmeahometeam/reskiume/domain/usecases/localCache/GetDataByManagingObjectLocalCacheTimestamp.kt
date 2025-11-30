@@ -19,10 +19,11 @@ class GetDataByManagingObjectLocalCacheTimestamp(
     @OptIn(ExperimentalTime::class)
     suspend operator fun <T> invoke(
         uid: String,
+        savedBy: String = "", // Indicate who saved the cache. Except for the user and reviews section, this is the same as uid.
         section: Section,
-        onCompletionInsertCache: () -> T,
-        onCompletionUpdateCache: () -> T,
-        onVerifyCacheIsRecent: () -> T
+        onCompletionInsertCache: suspend () -> T,
+        onCompletionUpdateCache: suspend () -> T,
+        onVerifyCacheIsRecent: suspend () -> T
     ): T {
         val localCacheEntity: LocalCacheEntity? = repository.getLocalCacheEntity(uid, section)
         return when (localCacheEntity) {
@@ -30,6 +31,7 @@ class GetDataByManagingObjectLocalCacheTimestamp(
                 repository.insertLocalCacheEntity(
                     LocalCache(
                         uid = uid,
+                        savedBy = savedBy.ifBlank { uid },
                         section = section,
                         timestamp = Clock.System.now().epochSeconds
                     ).toEntity()
@@ -57,6 +59,7 @@ class GetDataByManagingObjectLocalCacheTimestamp(
                         LocalCache(
                             id = localCacheEntity.id,
                             uid = uid,
+                            savedBy = savedBy.ifBlank { uid },
                             section = section,
                             timestamp = Clock.System.now().epochSeconds
                         ).toEntity()

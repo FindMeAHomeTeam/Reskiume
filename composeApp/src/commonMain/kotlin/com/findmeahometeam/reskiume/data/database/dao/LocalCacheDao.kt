@@ -19,6 +19,6 @@ interface LocalCacheDao {
     @Update
     suspend fun updateLocalCacheEntity(localCacheEntity: LocalCacheEntity): Int
 
-    @Query("DELETE FROM LocalCacheEntity WHERE uid = :uid")
+    @Query("DELETE FROM LocalCacheEntity WHERE savedBy = :uid")
     suspend fun deleteLocalCacheEntity(uid: String): Int
 }

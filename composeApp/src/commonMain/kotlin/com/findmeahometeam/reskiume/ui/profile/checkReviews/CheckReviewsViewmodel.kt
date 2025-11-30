@@ -38,19 +38,22 @@ class CheckReviewsViewmodel(
     private val insertReviewInLocalRepository: InsertReviewInLocalRepository,
     private val getUserFromLocalDataSource: GetUserFromLocalDataSource,
     private val getUserFromRemoteDataSource: GetUserFromRemoteDataSource,
+    private val insertUserToLocalDataSource: InsertUserToLocalDataSource,
     private val log: Log
 ) : ViewModel() {
 
     private val uid = savedStateHandle.toRoute<CheckReviews>().uid
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun getUserDataIfNotMine(): Flow<User?> = observeAuthStateFromAuthDataSource().flatMapConcat { authUser: AuthUser? ->
-        if (authUser == null || authUser.uid == uid) {
-            flowOf(null)
-        } else {
-            getUserFromRemoteDataSource(uid)
+    fun getUserDataIfNotMine(): Flow<User?> =
+        observeAuthStateFromAuthDataSource().flatMapConcat { authUser: AuthUser? ->
+
+            if (authUser == null || authUser.uid == uid) {
+                flowOf(null)
+            } else {
+                flowOf(getActivist(uid, authUser.uid))
+            }
         }
-    }
 
     // Flow of UiReview list to be observed by the UI
     // Decides whether to fetch from remote or local based on cache status, and updates the cache accordingly
@@ -112,10 +115,46 @@ class CheckReviewsViewmodel(
         )
     }
 
-    private suspend fun getReviewAuthor(uid: String): User? { //TODO change user cache
-        val user: User? = getUserFromLocalDataSource(uid)
-        return user ?: getUserFromRemoteDataSource(uid).firstOrNull()
+    private suspend fun getActivist(activistUid: String, myUserUid: String): User? {
+
+        return getDataByManagingObjectLocalCacheTimestamp(
+            uid = activistUid,
+            savedBy = myUserUid,
+            section = Section.USERS,
+            onCompletionInsertCache = {
+                getUserFromRemoteDataSource(activistUid)
+                    .insertRemoteUserInLocalRepository()
+                    .firstOrNull()
+            },
+            onCompletionUpdateCache = {
+                getUserFromRemoteDataSource(activistUid)
+                    .insertRemoteUserInLocalRepository()
+                    .firstOrNull()
+            },
+            onVerifyCacheIsRecent = {
+                getUserFromLocalDataSource(activistUid)
+            }
+        )
     }
+
+    private fun Flow<User?>.insertRemoteUserInLocalRepository(): Flow<User?> =
+        this.map { user ->
+            user?.also {
+                insertUserToLocalDataSource(it) { rowId ->
+                    if (rowId > 0) {
+                        log.d(
+                            "CheckReviewsViewmodel",
+                            "Inserted user with uid ${user.uid} into local data source."
+                        )
+                    } else {
+                        log.e(
+                            "CheckReviewsViewmodel",
+                            "Failed to insert user with uid ${user.uid} into local data source."
+                        )
+                    }
+                }
+            }
+        }
 
     @OptIn(ExperimentalTime::class)
     private fun getFormattedDateFromEpochSeconds(epochSeconds: Long): String {

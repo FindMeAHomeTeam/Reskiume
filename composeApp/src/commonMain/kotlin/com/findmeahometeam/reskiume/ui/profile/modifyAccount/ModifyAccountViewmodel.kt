@@ -6,6 +6,7 @@ import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
+import com.findmeahometeam.reskiume.domain.model.LocalCache
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.usecases.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteImageInLocalDataSource
@@ -18,6 +19,7 @@ import com.findmeahometeam.reskiume.domain.usecases.ModifyUserPasswordInAuthData
 import com.findmeahometeam.reskiume.domain.usecases.ObserveAuthStateFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.SignOutFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.UploadImageToRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,6 +40,7 @@ class ModifyAccountViewmodel(
     private val uploadImageToRemoteDataSource: UploadImageToRemoteDataSource,
     private val modifyUserFromRemoteDataSource: ModifyUserFromRemoteDataSource,
     private val modifyUserFromLocalDataSource: ModifyUserFromLocalDataSource,
+    private val modifyCacheInLocalRepository: ModifyCacheInLocalRepository,
     private val signOutFromAuthDataSource: SignOutFromAuthDataSource,
     private val log: Log
 ) : ViewModel() {
@@ -277,17 +280,22 @@ class ModifyAccountViewmodel(
             authUserState.collect { authUser: AuthUser? ->
                 if (authUser == null) return@collect
 
-                val user: User = getUserFromLocalDataSource(authUser.uid)!!
-                modifyUserFromLocalDataSource(user.copy(lastLogout = Clock.System.now().epochSeconds)) { rowsModified: Int ->
-                    if (rowsModified > 0) {
+                modifyCacheInLocalRepository(
+                    LocalCache(
+                        uid = authUser.uid,
+                        section = Section.USERS,
+                        timestamp = Clock.System.now().epochSeconds
+                    )
+                ) { rowsUpdated: Int ->
+                    if (rowsUpdated > 0) {
                         log.d(
                             "ModifyAccountViewmodel",
-                            "logOut: lastLogout updated successfully in local data source"
+                            "logOut: lastLogout updated successfully in local cache"
                         )
                     } else {
                         log.e(
                             "ModifyAccountViewmodel",
-                            "logOut: failed to update lastLogout in local data source"
+                            "logOut: failed to update lastLogout in local cache"
                         )
                     }
                     signOutFromAuthDataSource()

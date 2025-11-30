@@ -10,8 +10,7 @@ data class UserEntity(
     val username: String,
     val description: String,
     val image: String,
-    val isAvailable: Boolean,
-    val lastLogout: Long
+    val isAvailable: Boolean
 ) {
     fun toDomain(): User {
         return User(
@@ -19,8 +18,7 @@ data class UserEntity(
             username = username,
             description = description,
             image = image,
-            isAvailable = isAvailable,
-            lastLogout = lastLogout
+            isAvailable = isAvailable
         )
     }
 }

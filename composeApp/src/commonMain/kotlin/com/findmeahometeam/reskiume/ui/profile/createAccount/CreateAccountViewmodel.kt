@@ -6,6 +6,7 @@ import com.findmeahometeam.reskiume.data.remote.response.AuthResult
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.data.util.Section
+import com.findmeahometeam.reskiume.domain.model.LocalCache
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.usecases.CreateUserWithEmailAndPasswordFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteImageFromRemoteDataSource
@@ -14,16 +15,20 @@ import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromRemoteDataSour
 import com.findmeahometeam.reskiume.domain.usecases.InsertUserToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.InsertUserToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.UploadImageToRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 class CreateAccountViewmodel(
     private val createUserWithEmailAndPasswordFromAuthDataSource: CreateUserWithEmailAndPasswordFromAuthDataSource,
     private val insertUserToRemoteDataSource: InsertUserToRemoteDataSource,
     private val uploadImageToRemoteDataSource: UploadImageToRemoteDataSource,
+    private val insertCacheInLocalRepository: InsertCacheInLocalRepository,
     private val insertUserToLocalDataSource: InsertUserToLocalDataSource,
     private val deleteUserFromAuthDataSource: DeleteUserFromAuthDataSource,
     private val deleteUserFromRemoteDataSource: DeleteUserFromRemoteDataSource,
@@ -148,11 +153,11 @@ class CreateAccountViewmodel(
         viewModelScope.launch {
             insertUserToLocalDataSource(user) { rowId ->
                 if (rowId > 0) {
-                    _state.value = UiState.Success
                     log.d(
                         "CreateAccountViewmodel",
                         "User created successfully"
                     )
+                    saveUserCacheLocally(user.uid)
                 } else {
                     deleteAccountFromRemoteDataSource(
                         user.uid,
@@ -191,6 +196,32 @@ class CreateAccountViewmodel(
                             errorMessage = errorMessageFromLocalDataSource
                         )
                     }
+                }
+            }
+        }
+    }
+
+    @OptIn(ExperimentalTime::class)
+    private fun saveUserCacheLocally(uid: String) {
+        viewModelScope.launch {
+            insertCacheInLocalRepository(
+                LocalCache(
+                    uid = uid,
+                    section = Section.USERS,
+                    timestamp = Clock.System.now().epochSeconds
+                )
+            ) { rowId ->
+                if (rowId > 0) {
+                    _state.value = UiState.Success
+                    log.d(
+                        "CreateAccountViewmodel",
+                        "User $uid cache added to local repository"
+                    )
+                } else {
+                    log.e(
+                        "CreateAccountViewmodel",
+                        "Error adding user $uid cache to local repository"
+                    )
                 }
             }
         }

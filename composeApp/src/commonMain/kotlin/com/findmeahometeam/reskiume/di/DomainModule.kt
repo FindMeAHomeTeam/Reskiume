@@ -21,6 +21,8 @@ import com.findmeahometeam.reskiume.domain.usecases.SignOutFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteCacheFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
+import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.DeleteReviewsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.DeleteReviewsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromLocalRepository
@@ -33,6 +35,8 @@ import org.koin.dsl.module
 val domainModule = module {
 
     // localCache
+    factoryOf(::InsertCacheInLocalRepository)
+    factoryOf(::ModifyCacheInLocalRepository)
     factoryOf(::GetDataByManagingObjectLocalCacheTimestamp)
     factoryOf(::DeleteCacheFromLocalRepository)
 

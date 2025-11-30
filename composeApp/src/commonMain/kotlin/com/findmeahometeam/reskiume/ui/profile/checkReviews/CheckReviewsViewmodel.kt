@@ -10,6 +10,7 @@ import com.findmeahometeam.reskiume.domain.model.Review
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.InsertUserToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.ObserveAuthStateFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromLocalRepository
@@ -32,7 +33,7 @@ import kotlin.time.Instant
 class CheckReviewsViewmodel(
     savedStateHandle: SavedStateHandle,
     private val observeAuthStateFromAuthDataSource: ObserveAuthStateFromAuthDataSource,
-    getDataByManagingObjectLocalCacheTimestamp: GetDataByManagingObjectLocalCacheTimestamp,
+    private val getDataByManagingObjectLocalCacheTimestamp: GetDataByManagingObjectLocalCacheTimestamp,
     getReviewsFromRemoteRepository: GetReviewsFromRemoteRepository,
     getReviewsFromLocalRepository: GetReviewsFromLocalRepository,
     private val insertReviewInLocalRepository: InsertReviewInLocalRepository,
@@ -56,55 +57,64 @@ class CheckReviewsViewmodel(
         }
 
     // Flow of UiReview list to be observed by the UI
-    // Decides whether to fetch from remote or local based on cache status, and updates the cache accordingly
+    // Decides whether to fetch from remote or local based on cache status
     @OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
     val reviewListFlow: Flow<List<UiReview>> =
-        flowOf(uid).flatMapConcat { uid: String ->
+        observeAuthStateFromAuthDataSource().flatMapConcat { authUser: AuthUser? ->
 
             getDataByManagingObjectLocalCacheTimestamp(
                 uid = uid,
+                savedBy = authUser!!.uid,
                 section = Section.REVIEWS,
                 onCompletionInsertCache = {
-                    getReviewsFromRemoteRepository(uid).insertRemoteReviewsAndMapThemToUiReview()
+                    getReviewsFromRemoteRepository(uid).insertRemoteReviewsInLocalRepositoryAndMapThemToUiReview(
+                        authUser.uid
+                    )
                 },
                 onCompletionUpdateCache = {
-                    getReviewsFromRemoteRepository(uid).insertRemoteReviewsAndMapThemToUiReview()
+                    getReviewsFromRemoteRepository(uid).insertRemoteReviewsInLocalRepositoryAndMapThemToUiReview(
+                        authUser.uid
+                    )
                 },
                 onVerifyCacheIsRecent = {
-                    getReviewsFromLocalRepository(uid).mapLocalReviewsToUiReview()
+                    getReviewsFromLocalRepository(uid).mapLocalReviewsToUiReview(
+                        authUser.uid
+                    )
                 }
             )
         }
 
-    private fun Flow<List<Review>>.insertRemoteReviewsAndMapThemToUiReview(): Flow<List<UiReview>> =
+    private fun Flow<List<Review>>.insertRemoteReviewsInLocalRepositoryAndMapThemToUiReview(
+        authUserUid: String
+    ): Flow<List<UiReview>> =
         this.map { list ->
             list.map { review ->
                 insertReviewInLocalRepository(review) {
                     if (it > 0) {
                         log.d(
-                            "ReviewAccountViewmodel",
+                            "CheckReviewsViewmodel",
                             "Review ${review.timestamp} added to local database"
                         )
                     } else {
                         log.e(
-                            "ReviewAccountViewmodel",
+                            "CheckReviewsViewmodel",
                             "Error adding review ${review.timestamp} to local database"
                         )
                     }
                 }
-                review.toUiReview()
+                review.toUiReview(authUserUid)
             }
         }
 
-    private fun Flow<List<Review>>.mapLocalReviewsToUiReview(): Flow<List<UiReview>> =
+    private fun Flow<List<Review>>.mapLocalReviewsToUiReview(authUserUid: String): Flow<List<UiReview>> =
         this.map { list ->
             list.map { review ->
-                review.toUiReview()
+                review.toUiReview(authUserUid)
             }
         }
 
-    private suspend fun Review.toUiReview(): UiReview {
-        val author: User? = getReviewAuthor(authorUid)
+    private suspend fun Review.toUiReview(myUserUid: String): UiReview {
+        val author: User? = getActivist(authorUid, myUserUid)
         return UiReview(
             date = getFormattedDateFromEpochSeconds(timestamp),
             authorUid = author?.uid ?: "",

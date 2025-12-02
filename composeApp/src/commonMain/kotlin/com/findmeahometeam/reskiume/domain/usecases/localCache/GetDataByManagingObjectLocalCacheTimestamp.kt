@@ -25,7 +25,9 @@ class GetDataByManagingObjectLocalCacheTimestamp(
         onCompletionUpdateCache: suspend () -> T,
         onVerifyCacheIsRecent: suspend () -> T
     ): T {
-        val localCacheEntity: LocalCacheEntity? = repository.getLocalCacheEntity(uid, section)
+        val localCacheEntity: LocalCacheEntity? =
+            repository.getLocalCacheEntity(uid, section)
+
         return when (localCacheEntity) {
             null -> {
                 repository.insertLocalCacheEntity(
@@ -38,12 +40,12 @@ class GetDataByManagingObjectLocalCacheTimestamp(
                 ) { rowId ->
                     if (rowId > 0) {
                         log.d(
-                            "ManageCachedObjectIfNullOrOlderThan24H",
+                            "GetDataByManagingObjectLocalCacheTimestamp",
                             "$uid added to local cache in section $section"
                         )
                     } else {
                         log.e(
-                            "ManageCachedObjectIfNullOrOlderThan24H",
+                            "GetDataByManagingObjectLocalCacheTimestamp",
                             "Error adding $uid to local cache in section $section"
                         )
                     }
@@ -66,12 +68,12 @@ class GetDataByManagingObjectLocalCacheTimestamp(
                     ) { rowsUpdated ->
                         if (rowsUpdated > 0) {
                             log.d(
-                                "ManageCachedObjectIfNullOrOlderThan24H",
+                                "GetDataByManagingObjectLocalCacheTimestamp",
                                 "$uid updated in local cache in section $section"
                             )
                         } else {
                             log.e(
-                                "ManageCachedObjectIfNullOrOlderThan24H",
+                                "GetDataByManagingObjectLocalCacheTimestamp",
                                 "Error updating $uid in local cache in section $section"
                             )
                         }
@@ -79,7 +81,7 @@ class GetDataByManagingObjectLocalCacheTimestamp(
                     onCompletionUpdateCache()
                 } else {
                     log.d(
-                        "ManageCachedObjectIfNullOrOlderThan24H",
+                        "GetDataByManagingObjectLocalCacheTimestamp",
                         "Cache for $uid in section $section is up-to-date."
                     )
                     onVerifyCacheIsRecent()

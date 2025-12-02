@@ -3,21 +3,24 @@ package com.findmeahometeam.reskiume.ui.unitTests.profile
 import app.cash.turbine.test
 import com.findmeahometeam.reskiume.CoroutineTestDispatcher
 import com.findmeahometeam.reskiume.authUser
+import com.findmeahometeam.reskiume.data.database.entity.LocalCacheEntity
 import com.findmeahometeam.reskiume.data.remote.response.AuthResult
 import com.findmeahometeam.reskiume.data.remote.response.RemoteUser
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.model.User
+import com.findmeahometeam.reskiume.domain.model.LocalCache
+import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
-import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.InsertUserToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.ModifyUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.SaveImageToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.SignInWithEmailAndPasswordFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
+import com.findmeahometeam.reskiume.localCache
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.profile.loginAccount.LoginAccountViewmodel
 import com.findmeahometeam.reskiume.user
@@ -35,9 +38,12 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertTrue
-import kotlin.time.ExperimentalTime
 
 class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
+
+    private val onInsertLocalCache = Capture.slot<(rowId: Long) -> Unit>()
+
+    private val onModifyLocalCache = Capture.slot<(rowsUpdated: Int) -> Unit>()
 
     private val onInsertUserFromLocal = Capture.slot<(Long) -> Unit>()
 
@@ -47,13 +53,21 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
 
     private fun getLoginAccountViewmodel(
         signInWithEmailAndPasswordResult: AuthResult = AuthResult.Success(authUser),
-        userResult: User? = user,
-        insertedRowIdArg: Long = 1L,
-        modifiedRowsArg: Int = 1,
+        cacheArg: LocalCache = localCache.copy(section = Section.USERS),
+        getLocalCacheEntityReturn: LocalCacheEntity? = localCache.copy(section = Section.USERS).toEntity(),
+        rowIdInsertedCacheArg: Long = 1L,
+        rowsUpdatedCacheArg: Int = 1,
+        rowIdInsertedUserArg: Long = 1L,
+        rowsUpdatedUserArg: Int = 1,
         remoteUserResult: RemoteUser? = user.toData(),
         absolutePathArg: String = user.image,
     ): LoginAccountViewmodel {
         val authRepository: AuthRepository = mock {
+
+            every {
+                authState
+            } returns flowOf(authUser)
+
             everySuspend {
                 signInWithEmailAndPassword(
                     user.email!!,
@@ -62,13 +76,37 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
             } returns signInWithEmailAndPasswordResult
         }
 
+        val localCacheRepository: LocalCacheRepository = mock {
+
+            everySuspend {
+                getLocalCacheEntity(
+                    cacheArg.uid,
+                    cacheArg.section
+                )
+            } returns getLocalCacheEntityReturn
+
+            everySuspend {
+                insertLocalCacheEntity(
+                    any(),
+                    capture(onInsertLocalCache)
+                )
+            } calls { onInsertLocalCache.get().invoke(rowIdInsertedCacheArg) }
+
+            everySuspend {
+                modifyLocalCacheEntity(
+                    any(),
+                    capture(onModifyLocalCache)
+                )
+            } calls { onModifyLocalCache.get().invoke(rowsUpdatedCacheArg) }
+        }
+
         val localUserRepository: LocalUserRepository = mock {
-            everySuspend { getUser(user.uid) } returns userResult
+
             everySuspend { insertUser(any(), capture(onInsertUserFromLocal)) } calls {
-                onInsertUserFromLocal.get().invoke(insertedRowIdArg)
+                onInsertUserFromLocal.get().invoke(rowIdInsertedUserArg)
             }
             everySuspend { modifyUser(any(), capture(onModifyUserFromLocal)) } calls {
-                onModifyUserFromLocal.get().invoke(modifiedRowsArg)
+                onModifyUserFromLocal.get().invoke(rowsUpdatedUserArg)
             }
         }
 
@@ -77,6 +115,7 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
         }
 
         val storageRepository: StorageRepository = mock {
+
             every {
                 saveImage(
                     user.uid,
@@ -86,11 +125,16 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
             } calls { onSaveImageToLocal.get().invoke(absolutePathArg) }
         }
 
+        val log: Log = mock {
+            every { d(any(), any()) } returns Unit
+            every { e(any(), any()) } returns Unit
+        }
+
         val signInWithEmailAndPasswordFromAuthDataSource =
             SignInWithEmailAndPasswordFromAuthDataSource(authRepository)
 
-        val getUserFromLocalDataSource =
-            GetUserFromLocalDataSource(localUserRepository)
+        val getDataByManagingObjectLocalCacheTimestamp =
+            GetDataByManagingObjectLocalCacheTimestamp(localCacheRepository, log)
 
         val getUserFromRemoteDataSource =
             GetUserFromRemoteDataSource(realtimeDatabaseRemoteUserRepository)
@@ -99,19 +143,15 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
             SaveImageToLocalDataSource(storageRepository)
 
         val insertUserToLocalDataSource =
-            InsertUserToLocalDataSource(localUserRepository)
+            InsertUserToLocalDataSource(localUserRepository, authRepository)
 
         val modifyUserFromLocalDataSource =
-            ModifyUserFromLocalDataSource(localUserRepository)
+            ModifyUserFromLocalDataSource(localUserRepository, authRepository)
 
-        val log: Log = mock {
-            every { d(any(), any()) } returns Unit
-            every { e(any(), any()) } returns Unit
-        }
 
         return LoginAccountViewmodel(
             signInWithEmailAndPasswordFromAuthDataSource,
-            getUserFromLocalDataSource,
+            getDataByManagingObjectLocalCacheTimestamp,
             getUserFromRemoteDataSource,
             saveImageToLocalDataSource,
             insertUserToLocalDataSource,
@@ -124,7 +164,7 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
     fun `given an unregistered user_when they log in using their email with the local data source empty_then they gain access to their account`() =
         runTest {
             val loginAccountViewmodel = getLoginAccountViewmodel(
-                userResult = null
+                getLocalCacheEntityReturn = null
             )
             loginAccountViewmodel.signInUsingEmail(user.email!!, userPwd)
             loginAccountViewmodel.state.test {
@@ -154,8 +194,8 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
     fun `given an unregistered user_when they log in using their email with the local data source empty but fails inserting the data_then the app displays an error`() =
         runTest {
             val loginAccountViewmodel = getLoginAccountViewmodel(
-                userResult = null,
-                insertedRowIdArg = 0
+                getLocalCacheEntityReturn = null,
+                rowIdInsertedUserArg = 0
             )
             loginAccountViewmodel.signInUsingEmail(user.email!!, userPwd)
             loginAccountViewmodel.state.test {
@@ -170,7 +210,7 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
     fun `given an unregistered user_when they log in using their email but fails retrieving the data from the remote data source_then the app displays an error`() =
         runTest {
             val loginAccountViewmodel = getLoginAccountViewmodel(
-                userResult = null,
+                getLocalCacheEntityReturn = null,
                 remoteUserResult = null
             )
             loginAccountViewmodel.signInUsingEmail(user.email!!, userPwd)
@@ -181,15 +221,12 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
             }
         }
 
-    @OptIn(ExperimentalTime::class)
     @Test
     fun `given an unregistered user_when they log in using their email after 24h_then they gain access to their account`() =
         runTest {
-            val user = user.copy(lastLogout = 1563041881L)
 
             val loginAccountViewmodel = getLoginAccountViewmodel(
-                userResult = user,
-                remoteUserResult = user.toData(),
+                getLocalCacheEntityReturn = localCache.copy(section = Section.USERS, timestamp = 123L).toEntity(),
                 absolutePathArg = ""
             )
             loginAccountViewmodel.signInUsingEmail(user.email!!, userPwd)
@@ -201,15 +238,13 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
             }
         }
 
-    @OptIn(ExperimentalTime::class)
     @Test
     fun `given an unregistered user_when they log in to their account with no avatar using their email after 24h_then they gain access to it`() =
         runTest {
-            val user = user.copy(image = "", lastLogout = 1563041881L)
 
             val loginAccountViewmodel = getLoginAccountViewmodel(
-                userResult = user,
-                remoteUserResult = user.toData(),
+                remoteUserResult = user.copy(image = "").toData(),
+                getLocalCacheEntityReturn = localCache.copy(section = Section.USERS, timestamp = 123L).toEntity()
             )
             loginAccountViewmodel.signInUsingEmail(user.email!!, userPwd)
             loginAccountViewmodel.state.test {
@@ -223,11 +258,11 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
     @Test
     fun `given an unregistered user_when they log in using their email after 24h but fails modifying the data_then the app displays an error`() =
         runTest {
-            val user = user.copy(lastLogout = 1563041881L)
+
             val loginAccountViewmodel = getLoginAccountViewmodel(
-                userResult = user,
                 remoteUserResult = user.toData(),
-                modifiedRowsArg = 0
+                getLocalCacheEntityReturn = localCache.copy(section = Section.USERS, timestamp = 123L).toEntity(),
+                rowsUpdatedUserArg = 0
             )
             loginAccountViewmodel.signInUsingEmail(user.email!!, userPwd)
             loginAccountViewmodel.state.test {

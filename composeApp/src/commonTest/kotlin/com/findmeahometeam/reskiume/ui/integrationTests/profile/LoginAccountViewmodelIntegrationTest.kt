@@ -3,19 +3,23 @@ package com.findmeahometeam.reskiume.ui.integrationTests.profile
 import app.cash.turbine.test
 import com.findmeahometeam.reskiume.CoroutineTestDispatcher
 import com.findmeahometeam.reskiume.authUser
+import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
+import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
-import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.InsertUserToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.ModifyUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.SaveImageToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.SignInWithEmailAndPasswordFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
+import com.findmeahometeam.reskiume.localCache
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeAuthRepository
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalCacheRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalUserRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLog
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeRealtimeDatabaseRemoteUserRepository
@@ -31,6 +35,8 @@ class LoginAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
 
     private fun getLoginAccountViewmodel(
         authRepository: AuthRepository = FakeAuthRepository(),
+        localCacheRepository: LocalCacheRepository = FakeLocalCacheRepository(),
+        log: Log = FakeLog(),
         localUserRepository: LocalUserRepository = FakeLocalUserRepository(),
         realtimeDatabaseRemoteUserRepository: RealtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(),
         storageRepository: StorageRepository = FakeStorageRepository()
@@ -39,8 +45,8 @@ class LoginAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
         val signInWithEmailAndPasswordFromAuthDataSource =
             SignInWithEmailAndPasswordFromAuthDataSource(authRepository)
 
-        val getUserFromLocalDataSource =
-            GetUserFromLocalDataSource(localUserRepository)
+        val getDataByManagingObjectLocalCacheTimestamp =
+            GetDataByManagingObjectLocalCacheTimestamp(localCacheRepository, log)
 
         val getUserFromRemoteDataSource =
             GetUserFromRemoteDataSource(realtimeDatabaseRemoteUserRepository)
@@ -49,16 +55,16 @@ class LoginAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
             SaveImageToLocalDataSource(storageRepository)
 
         val insertUserToLocalDataSource =
-            InsertUserToLocalDataSource(localUserRepository)
+            InsertUserToLocalDataSource(localUserRepository, authRepository)
 
         val modifyUserFromLocalDataSource =
-            ModifyUserFromLocalDataSource(localUserRepository)
+            ModifyUserFromLocalDataSource(localUserRepository, authRepository)
 
         val log: Log = FakeLog()
 
         return LoginAccountViewmodel(
             signInWithEmailAndPasswordFromAuthDataSource,
-            getUserFromLocalDataSource,
+            getDataByManagingObjectLocalCacheTimestamp,
             getUserFromRemoteDataSource,
             saveImageToLocalDataSource,
             insertUserToLocalDataSource,
@@ -76,7 +82,9 @@ class LoginAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     authEmail = user.email,
                     authPassword = userPwd
                 ),
-                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(mutableListOf(user.toData()))
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
+                    mutableListOf(user.toData())
+                )
             )
             loginAccountViewmodel.signInUsingEmail(user.email!!, userPwd)
             loginAccountViewmodel.state.test {
@@ -103,7 +111,6 @@ class LoginAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
     @Test
     fun `given an unregistered user_when they log in using their email after 24h_then they gain access to their account`() =
         runTest {
-            val user = user.copy(lastLogout = 1563041881L)
 
             val loginAccountViewmodel = getLoginAccountViewmodel(
                 authRepository = FakeAuthRepository(
@@ -111,8 +118,15 @@ class LoginAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     authEmail = user.email,
                     authPassword = userPwd
                 ),
+                localCacheRepository = FakeLocalCacheRepository(
+                    mutableListOf(
+                        localCache.copy(section = Section.USERS, timestamp = 123L).toEntity()
+                    )
+                ),
                 localUserRepository = FakeLocalUserRepository(mutableListOf(user)),
-                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(mutableListOf(user.toData()))
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
+                    mutableListOf(user.toData())
+                )
             )
             loginAccountViewmodel.signInUsingEmail(user.email!!, userPwd)
             loginAccountViewmodel.state.test {
@@ -132,8 +146,15 @@ class LoginAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     authEmail = user.email,
                     authPassword = userPwd
                 ),
+                localCacheRepository = FakeLocalCacheRepository(
+                    mutableListOf(
+                        localCache.copy(section = Section.USERS).toEntity()
+                    )
+                ),
                 localUserRepository = FakeLocalUserRepository(mutableListOf(user)),
-                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(mutableListOf(user.toData()))
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
+                    mutableListOf(user.toData())
+                )
             )
             loginAccountViewmodel.signInUsingEmail(user.email!!, userPwd)
             loginAccountViewmodel.state.test {

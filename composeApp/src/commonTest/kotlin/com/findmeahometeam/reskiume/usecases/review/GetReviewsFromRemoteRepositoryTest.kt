@@ -29,7 +29,7 @@ class GetReviewsFromRemoteRepositoryTest: CoroutineTestDispatcher() {
         runTest {
             getReviewsFromRemoteRepository(review.reviewedUid).test {
                 val actualReviews = awaitItem()
-                assertEquals(listOf(review), actualReviews)
+                assertEquals(listOf(review.copy(savedBy = "")), actualReviews)
                 awaitComplete()
             }
         }

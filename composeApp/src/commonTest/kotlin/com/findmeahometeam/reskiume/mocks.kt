@@ -5,17 +5,18 @@ import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.domain.model.LocalCache
 import com.findmeahometeam.reskiume.domain.model.Review
 import com.findmeahometeam.reskiume.domain.model.User
+import com.findmeahometeam.reskiume.ui.profile.checkReviews.UiReview
 
 // Mocked user data for testing
 
 val user = User(
     uid = "userUid123",
+    savedBy = "userUid123",
     username = "Juan Antonio",
     description = "Hello, this is Juan Antonio's profile.",
     email = "juan@email.com",
     image = "image_uri_juan_antonio.jpg",
-    isAvailable = true,
-    lastLogout = 1625155200000L
+    isAvailable = true
 )
 
 const val userPwd: String = "myPwd123"
@@ -33,8 +34,9 @@ val authUser = AuthUser(
 // Mocked cache data for testing
 
 val localCache = LocalCache(
-    id = 1,
+    id = 0,
     uid = user.uid,
+    savedBy = user.uid,
     section = Section.REVIEWS,
     timestamp = 1625328000000L
 )
@@ -42,12 +44,31 @@ val localCache = LocalCache(
 
 // Mocked review data for testing
 
+val author = User(
+    uid = "luckyUid123",
+    savedBy = user.uid,
+    username = "Lucky",
+    description = "Hello, this is Lucky's profile.",
+    email = "lucky@email.com",
+    image = "image_uri_lucky.jpg",
+    isAvailable = true
+)
+
 val review = Review(
-    id = "1625241600000authorUid456",
+    id = "1625241600000 + ${author.uid}",
+    savedBy = user.uid,
     timestamp = 1625241600000L,
-    authorUid = "authorUid456",
+    authorUid = author.uid,
     reviewedUid = user.uid,
     description = "Great experience working with Juan!",
     rating = 4.5f
 )
 
+val uiReview = UiReview(
+    date = "+53471-11-09",
+    authorUid = author.uid,
+    authorName = author.username,
+    authorUri = author.image,
+    description = review.description,
+    rating = review.rating
+)

@@ -2,6 +2,7 @@ package com.findmeahometeam.reskiume.ui.profile.checkReviews
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.util.Section
@@ -11,7 +12,9 @@ import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.InsertUserToLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.ModifyUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.ObserveAuthStateFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.SaveImageToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromRemoteRepository
@@ -23,6 +26,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.datetime.format
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.DateTimeFormat
@@ -39,7 +43,9 @@ class CheckReviewsViewmodel(
     private val insertReviewInLocalRepository: InsertReviewInLocalRepository,
     private val getUserFromLocalDataSource: GetUserFromLocalDataSource,
     private val getUserFromRemoteDataSource: GetUserFromRemoteDataSource,
+    private val saveImageToLocalDataSource: SaveImageToLocalDataSource,
     private val insertUserToLocalDataSource: InsertUserToLocalDataSource,
+    private val modifyUserFromLocalDataSource: ModifyUserFromLocalDataSource,
     private val log: Log
 ) : ViewModel() {
 
@@ -133,12 +139,12 @@ class CheckReviewsViewmodel(
             section = Section.USERS,
             onCompletionInsertCache = {
                 getUserFromRemoteDataSource(activistUid)
-                    .insertRemoteUserInLocalRepository()
+                    .saveImageAndInsertUserInLocalRepository()
                     .firstOrNull()
             },
             onCompletionUpdateCache = {
                 getUserFromRemoteDataSource(activistUid)
-                    .insertRemoteUserInLocalRepository()
+                    .saveImageAndModifyUserInLocalRepository()
                     .firstOrNull()
             },
             onVerifyCacheIsRecent = {
@@ -147,24 +153,95 @@ class CheckReviewsViewmodel(
         )
     }
 
-    private fun Flow<User?>.insertRemoteUserInLocalRepository(): Flow<User?> =
+    private fun Flow<User?>.saveImageAndInsertUserInLocalRepository(): Flow<User?> =
         this.map { user ->
-            user?.also {
-                insertUserToLocalDataSource(it) { rowId ->
-                    if (rowId > 0) {
-                        log.d(
-                            "CheckReviewsViewmodel",
-                            "Inserted user with uid ${user.uid} into local data source."
-                        )
-                    } else {
-                        log.e(
-                            "CheckReviewsViewmodel",
-                            "Failed to insert user with uid ${user.uid} into local data source."
-                        )
+
+            user?.also { activist ->
+                if (activist.image.isNotBlank()) {
+
+                    saveImageToLocalDataSource(
+                        userUid = activist.uid,
+                        imageType = Section.USERS
+                    ) { localImagePath: String ->
+
+                        val activistWithLocalImage = activist.copy(image = localImagePath.ifBlank { activist.image })
+                        insertUserInLocalRepository(activistWithLocalImage)
                     }
+                } else {
+                    log.d(
+                        "CheckReviewsViewmodel",
+                        "User ${activist.uid} has no avatar image to save locally."
+                    )
+                    insertUserInLocalRepository(activist)
                 }
             }
         }
+
+    private fun insertUserInLocalRepository(user: User) {
+
+        viewModelScope.launch {
+
+            insertUserToLocalDataSource(user) { rowId ->
+
+                if (rowId > 0) {
+                    log.d(
+                        "CheckReviewsViewmodel",
+                        "User ${user.uid} added to local database"
+                    )
+                } else {
+                    log.e(
+                        "CheckReviewsViewmodel",
+                        "Error adding user ${user.uid} to local database"
+                    )
+                }
+            }
+        }
+    }
+
+    private fun Flow<User?>.saveImageAndModifyUserInLocalRepository(): Flow<User?> =
+        this.map { user ->
+
+            user?.also { activist ->
+                if (activist.image.isNotBlank()) {
+
+                    saveImageToLocalDataSource(
+                        userUid = activist.uid,
+                        imageType = Section.USERS
+                    ) { localImagePath: String ->
+
+                        val activistWithLocalImage = activist.copy(image = localImagePath.ifBlank { activist.image })
+                        modifyUserInLocalRepository(activistWithLocalImage)
+                    }
+                } else {
+                    log.d(
+                        "CheckReviewsViewmodel",
+                        "User ${activist.uid} has no avatar image to save locally."
+                    )
+                    modifyUserInLocalRepository(activist)
+                }
+            }
+        }
+
+    private fun modifyUserInLocalRepository(user: User) {
+
+        viewModelScope.launch {
+
+            modifyUserFromLocalDataSource(user) { rowsUpdated: Int ->
+
+                if (rowsUpdated > 0) {
+                    log.d(
+                        "CheckReviewsViewmodel",
+                        "Modified user with uid ${user.uid} into local data source."
+                    )
+                } else {
+                    log.e(
+                        "CheckReviewsViewmodel",
+                        "Failed to modify user with uid ${user.uid} in local data source."
+                    )
+                }
+            }
+        }
+    }
 
     @OptIn(ExperimentalTime::class)
     private fun getFormattedDateFromEpochSeconds(epochSeconds: Long): String {

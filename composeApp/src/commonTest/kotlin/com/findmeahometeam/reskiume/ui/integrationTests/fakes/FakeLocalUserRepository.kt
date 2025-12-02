@@ -33,7 +33,7 @@ class FakeLocalUserRepository(
         }
     }
 
-    override suspend fun deleteUser(
+    override suspend fun deleteUsers(
         userUid: String,
         onDeletedUser: (rowsDeleted: Int) -> Unit
     ) {

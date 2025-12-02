@@ -5,6 +5,6 @@ import com.findmeahometeam.reskiume.domain.model.User
 interface LocalUserRepository {
     suspend fun insertUser(user: User, onInsertUser: (rowId: Long) -> Unit)
     suspend fun modifyUser(user: User, onModifyUser: (rowsUpdated: Int) -> Unit)
-    suspend fun deleteUser(userUid: String, onDeletedUser: (rowsDeleted: Int) -> Unit)
+    suspend fun deleteUsers(userUid: String, onDeletedUser: (rowsDeleted: Int) -> Unit)
     suspend fun getUser(uid: String): User?
 }

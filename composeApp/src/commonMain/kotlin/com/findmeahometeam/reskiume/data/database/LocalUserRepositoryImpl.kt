@@ -14,8 +14,8 @@ class LocalUserRepositoryImpl(
         onModifyUser(reskiumeDatabase.getUserDao().modifyUser(user.toEntity()))
     }
 
-    override suspend fun deleteUser(userUid: String, onDeletedUser: (Int) -> Unit) {
-        onDeletedUser(reskiumeDatabase.getUserDao().deleteUser(userUid))
+    override suspend fun deleteUsers(userUid: String, onDeletedUser: (Int) -> Unit) {
+        onDeletedUser(reskiumeDatabase.getUserDao().deleteUsers(userUid))
     }
 
     override suspend fun getUser(uid: String): User? =

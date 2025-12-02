@@ -10,7 +10,7 @@ import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.usecases.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteImageInLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromAuthDataSource
-import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.DeleteUsersFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromRemoteDataSource
@@ -38,7 +38,7 @@ class DeleteAccountViewmodel(
     private val deleteUserFromRemoteDataSource: DeleteUserFromRemoteDataSource,
     private val deleteImageFromRemoteDataSource: DeleteImageFromRemoteDataSource,
     private val deleteImageInLocalDataSource: DeleteImageInLocalDataSource,
-    private val deleteUserFromLocalDataSource: DeleteUserFromLocalDataSource,
+    private val deleteUsersFromLocalDataSource: DeleteUsersFromLocalDataSource,
     private val log: Log
 ) : ViewModel() {
     private var _state: MutableStateFlow<UiState> = MutableStateFlow(UiState.Idle)
@@ -175,6 +175,7 @@ class DeleteAccountViewmodel(
     private fun deleteUserCacheFromLocalRepository(uid: String, onCompletion: () -> Unit) {
 
         viewModelScope.launch {
+
             deleteCacheFromLocalRepository(uid) { rowsDeleted ->
                 if (rowsDeleted > 0) {
                     log.d(
@@ -280,7 +281,9 @@ class DeleteAccountViewmodel(
 
     private fun deleteMyUserFromLocalDataSource(deletedUid: String) {
         viewModelScope.launch {
-            deleteUserFromLocalDataSource(deletedUid) { rowsDeleted: Int ->
+
+            deleteUsersFromLocalDataSource(deletedUid) { rowsDeleted: Int ->
+
                 if (rowsDeleted == 0) {
                     _state.value = UiState.Error()
                     log.e(

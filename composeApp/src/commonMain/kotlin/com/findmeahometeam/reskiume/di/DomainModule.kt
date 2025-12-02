@@ -4,7 +4,7 @@ import com.findmeahometeam.reskiume.domain.usecases.CreateUserWithEmailAndPasswo
 import com.findmeahometeam.reskiume.domain.usecases.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteImageInLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromAuthDataSource
-import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.DeleteUsersFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromRemoteDataSource
@@ -51,7 +51,7 @@ val domainModule = module {
     factoryOf(::GetUserFromRemoteDataSource)
     factoryOf(::ModifyUserFromLocalDataSource)
     factoryOf(::ModifyUserFromRemoteDataSource)
-    factoryOf(::DeleteUserFromLocalDataSource)
+    factoryOf(::DeleteUsersFromLocalDataSource)
     factoryOf(::DeleteUserFromRemoteDataSource)
     factoryOf(::UploadImageToRemoteDataSource)
     factoryOf(::DeleteImageFromRemoteDataSource)

@@ -207,6 +207,7 @@ class CreateAccountViewmodel(
             insertCacheInLocalRepository(
                 LocalCache(
                     uid = uid,
+                    savedBy = uid,
                     section = Section.USERS,
                     timestamp = Clock.System.now().epochSeconds
                 )

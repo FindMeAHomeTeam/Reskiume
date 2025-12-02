@@ -5,6 +5,7 @@ import com.findmeahometeam.reskiume.data.remote.response.RemoteReview
 
 data class Review(
     val id: String = "",
+    val savedBy : String,
     val timestamp: Long,
     val authorUid: String,
     val reviewedUid: String,
@@ -16,6 +17,7 @@ data class Review(
     fun toEntity(): ReviewEntity {
         return ReviewEntity(
             id = id.ifBlank { setId() },
+            savedBy = savedBy,
             timestamp = timestamp,
             authorUid = authorUid,
             reviewedUid = reviewedUid,

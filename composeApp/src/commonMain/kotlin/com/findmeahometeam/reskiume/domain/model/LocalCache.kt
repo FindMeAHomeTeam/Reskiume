@@ -6,7 +6,7 @@ import com.findmeahometeam.reskiume.data.util.Section
 data class LocalCache(
     val id: Int = 0,
     val uid: String,
-    val savedBy: String = "",
+    val savedBy: String,
     val section: Section,
     val timestamp: Long,
 ) {

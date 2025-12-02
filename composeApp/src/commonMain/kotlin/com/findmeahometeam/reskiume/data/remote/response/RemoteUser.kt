@@ -22,6 +22,7 @@ data class RemoteUser(
     fun toData(): User {
         return User(
             uid = uid ?: "",
+            savedBy = "",
             username = username ?: "",
             description = description ?: "",
             image = image ?: "",

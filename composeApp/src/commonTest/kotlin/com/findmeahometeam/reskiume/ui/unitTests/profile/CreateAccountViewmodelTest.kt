@@ -6,6 +6,7 @@ import com.findmeahometeam.reskiume.authUser
 import com.findmeahometeam.reskiume.data.remote.response.AuthResult
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.util.log.Log
+import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
@@ -17,6 +18,7 @@ import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromRemoteDataSour
 import com.findmeahometeam.reskiume.domain.usecases.InsertUserToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.InsertUserToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.UploadImageToRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.profile.createAccount.CreateAccountViewmodel
 import com.findmeahometeam.reskiume.user
@@ -30,6 +32,10 @@ import dev.mokkery.matcher.capture.Capture
 import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
+import dev.mokkery.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertTrue
@@ -42,20 +48,33 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
 
     private val onImageDeletedFromRemote = Capture.slot<(Boolean) -> Unit>()
 
+    private val onInsertLocalCache = Capture.slot<(rowId: Long) -> Unit>()
+
     private val onSuccessRemoteUser = Capture.slot<(DatabaseResult) -> Unit>()
 
     private val onInsertUserFromLocal = Capture.slot<(Long) -> Unit>()
+
+    private val log: Log = mock {
+        every { d(any(), any()) } returns Unit
+        every { e(any(), any()) } returns Unit
+    }
 
     private fun getCreateAccountViewmodel(
         createUserWithEmailAndPasswordResult: AuthResult = AuthResult.Success(authUser),
         onDeleteUserErrorArg: String = "",
         onImageUploadedArg: String = user.image,
         onImageDeletedArg: Boolean = true,
+        rowIdInsertedCacheArg : Long = 1L,
         insertRemoteUserArg: DatabaseResult = DatabaseResult.Success,
         deleteRemoteUserArg: DatabaseResult = DatabaseResult.Success,
         onInsertUserArg: Long = 1L
     ): CreateAccountViewmodel {
         val authRepository: AuthRepository = mock {
+
+            every {
+                authState
+            } returns flowOf(authUser)
+
             everySuspend {
                 createUserWithEmailAndPassword(
                     user.email!!,
@@ -85,6 +104,15 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
                     capture(onImageDeletedFromRemote)
                 )
             } calls { onImageDeletedFromRemote.get().invoke(onImageDeletedArg) }
+        }
+
+        val localCacheRepository: LocalCacheRepository = mock {
+            everySuspend {
+                insertLocalCacheEntity(
+                    any(),
+                    capture(onInsertLocalCache)
+                )
+            } calls { onInsertLocalCache.get().invoke(rowIdInsertedCacheArg) }
         }
 
         val realtimeDatabaseRemoteUserRepository: RealtimeDatabaseRemoteUserRepository = mock {
@@ -118,8 +146,11 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
         val uploadImageToRemoteDataSource =
             UploadImageToRemoteDataSource(storageRepository)
 
+        val insertCacheInLocalRepository =
+            InsertCacheInLocalRepository(localCacheRepository)
+
         val insertUserToLocalDataSource =
-            InsertUserToLocalDataSource(localUserRepository)
+            InsertUserToLocalDataSource(localUserRepository, authRepository)
 
         val deleteUserFromAuthDataSource =
             DeleteUserFromAuthDataSource(authRepository)
@@ -130,15 +161,11 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
         val deleteImageFromRemoteDataSource =
             DeleteImageFromRemoteDataSource(storageRepository)
 
-        val log: Log = mock {
-            every { d(any(), any()) } returns Unit
-            every { e(any(), any()) } returns Unit
-        }
-
         return CreateAccountViewmodel(
             createUserWithEmailAndPasswordFromAuthDataSource,
             insertUserToRemoteDataSource,
             uploadImageToRemoteDataSource,
+            insertCacheInLocalRepository,
             insertUserToLocalDataSource,
             deleteUserFromAuthDataSource,
             deleteUserFromRemoteDataSource,
@@ -239,6 +266,30 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Error }
                 ensureAllEventsConsumed()
+            }
+        }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `given an unregistered user_when that user creates an account using email but there is an error storing the cache in the local datasource_then logE is called`() =
+        runTest {
+            val createAccountViewmodel = getCreateAccountViewmodel(
+                rowIdInsertedCacheArg = 0
+            )
+            createAccountViewmodel.createUserUsingEmailAndPwd(user, userPwd)
+
+            createAccountViewmodel.state.test {
+                assertTrue { awaitItem() is UiState.Idle }
+                assertTrue { awaitItem() is UiState.Loading }
+                ensureAllEventsConsumed()
+            }
+            runCurrent()
+
+            verify {
+                log.e(
+                    "CreateAccountViewmodel",
+                    "Error adding user ${user.uid} cache to local repository"
+                )
             }
         }
 }

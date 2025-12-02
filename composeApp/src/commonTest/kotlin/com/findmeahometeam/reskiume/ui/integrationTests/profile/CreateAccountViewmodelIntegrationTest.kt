@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.findmeahometeam.reskiume.CoroutineTestDispatcher
 import com.findmeahometeam.reskiume.authUser
 import com.findmeahometeam.reskiume.data.util.log.Log
+import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
@@ -15,8 +16,10 @@ import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromRemoteDataSour
 import com.findmeahometeam.reskiume.domain.usecases.InsertUserToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.InsertUserToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.UploadImageToRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeAuthRepository
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalCacheRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalUserRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLog
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeRealtimeDatabaseRemoteUserRepository
@@ -33,6 +36,7 @@ class CreateAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
     private fun getCreateAccountViewmodel(
         authRepository: AuthRepository = FakeAuthRepository(),
         storageRepository: StorageRepository = FakeStorageRepository(),
+        localCacheRepository: LocalCacheRepository = FakeLocalCacheRepository(),
         realtimeDatabaseRemoteUserRepository: RealtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(),
         localUserRepository: LocalUserRepository = FakeLocalUserRepository()
     ): CreateAccountViewmodel {
@@ -46,8 +50,11 @@ class CreateAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
         val uploadImageToRemoteDataSource =
             UploadImageToRemoteDataSource(storageRepository)
 
+        val insertCacheInLocalRepository =
+            InsertCacheInLocalRepository(localCacheRepository)
+
         val insertUserToLocalDataSource =
-            InsertUserToLocalDataSource(localUserRepository)
+            InsertUserToLocalDataSource(localUserRepository, authRepository)
 
         val deleteUserFromAuthDataSource =
             DeleteUserFromAuthDataSource(authRepository)
@@ -64,6 +71,7 @@ class CreateAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
             createUserWithEmailAndPasswordFromAuthDataSource,
             insertUserToRemoteDataSource,
             uploadImageToRemoteDataSource,
+            insertCacheInLocalRepository,
             insertUserToLocalDataSource,
             deleteUserFromAuthDataSource,
             deleteUserFromRemoteDataSource,

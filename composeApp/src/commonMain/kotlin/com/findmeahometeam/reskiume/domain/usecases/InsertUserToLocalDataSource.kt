@@ -13,5 +13,5 @@ class InsertUserToLocalDataSource(
         localUserRepository.insertUser(user.copy(savedBy = getMyUid()), onInsertUser)
     }
 
-    private suspend fun getMyUid(): String = authRepository.authState.firstOrNull()?.uid!!
+    private suspend fun getMyUid(): String = authRepository.authState.firstOrNull()?.uid ?: ""
 }

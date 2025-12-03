@@ -13,5 +13,5 @@ class ModifyUserFromLocalDataSource(
         localUserRepository.modifyUser(user.copy(savedBy = getMyUid()), onModifyUser)
     }
 
-    private suspend fun getMyUid(): String = authRepository.authState.firstOrNull()?.uid!!
+    private suspend fun getMyUid(): String = authRepository.authState.firstOrNull()?.uid ?: ""
 }

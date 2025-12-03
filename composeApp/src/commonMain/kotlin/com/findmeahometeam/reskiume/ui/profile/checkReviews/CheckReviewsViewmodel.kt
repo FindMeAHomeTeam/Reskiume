@@ -54,10 +54,10 @@ class CheckReviewsViewmodel(
     fun getUserDataIfNotMine(): Flow<User?> =
         observeAuthStateFromAuthDataSource().flatMapConcat { authUser: AuthUser? ->
 
-            if (authUser == null || authUser.uid == uid) {
+            if (authUser?.uid == uid) {
                 flowOf(null)
             } else {
-                flowOf(getActivist(uid, authUser.uid))
+                flowOf(getActivist(uid, authUser?.uid ?: ""))
             }
         }
 

@@ -1,9 +1,7 @@
 package com.findmeahometeam.reskiume.ui.profile.checkReviews
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.toRoute
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
@@ -20,6 +18,7 @@ import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromLocalRe
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.InsertReviewInLocalRepository
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckReviews
+import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
@@ -35,7 +34,7 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
 class CheckReviewsViewmodel(
-    savedStateHandle: SavedStateHandle,
+    saveStateHandleProvider: SaveStateHandleProvider,
     private val observeAuthStateFromAuthDataSource: ObserveAuthStateFromAuthDataSource,
     private val getDataByManagingObjectLocalCacheTimestamp: GetDataByManagingObjectLocalCacheTimestamp,
     getReviewsFromRemoteRepository: GetReviewsFromRemoteRepository,
@@ -49,7 +48,7 @@ class CheckReviewsViewmodel(
     private val log: Log
 ) : ViewModel() {
 
-    private val uid = savedStateHandle.toRoute<CheckReviews>().uid
+    private val uid = saveStateHandleProvider.provideObjectRoute(CheckReviews::class).uid
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun getUserDataIfNotMine(): Flow<User?> =
@@ -164,7 +163,8 @@ class CheckReviewsViewmodel(
                         imageType = Section.USERS
                     ) { localImagePath: String ->
 
-                        val activistWithLocalImage = activist.copy(image = localImagePath.ifBlank { activist.image })
+                        val activistWithLocalImage =
+                            activist.copy(image = localImagePath.ifBlank { activist.image })
                         insertUserInLocalRepository(activistWithLocalImage)
                     }
                 } else {
@@ -209,7 +209,8 @@ class CheckReviewsViewmodel(
                         imageType = Section.USERS
                     ) { localImagePath: String ->
 
-                        val activistWithLocalImage = activist.copy(image = localImagePath.ifBlank { activist.image })
+                        val activistWithLocalImage =
+                            activist.copy(image = localImagePath.ifBlank { activist.image })
                         modifyUserInLocalRepository(activistWithLocalImage)
                     }
                 } else {

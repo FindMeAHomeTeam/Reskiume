@@ -5,6 +5,7 @@ import com.findmeahometeam.reskiume.CoroutineTestDispatcher
 import com.findmeahometeam.reskiume.authUser
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
+import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
@@ -20,8 +21,11 @@ import com.findmeahometeam.reskiume.domain.usecases.ModifyUserPasswordInAuthData
 import com.findmeahometeam.reskiume.domain.usecases.ObserveAuthStateFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.SignOutFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.UploadImageToRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
+import com.findmeahometeam.reskiume.localCache
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeAuthRepository
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalCacheRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalUserRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLog
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeRealtimeDatabaseRemoteUserRepository
@@ -29,8 +33,11 @@ import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeStorageReposit
 import com.findmeahometeam.reskiume.ui.profile.modifyAccount.ModifyAccountViewmodel
 import com.findmeahometeam.reskiume.user
 import com.findmeahometeam.reskiume.userPwd
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
+import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
 class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
@@ -41,7 +48,8 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
         authRepository: AuthRepository = FakeAuthRepository(),
         localUserRepository: LocalUserRepository = FakeLocalUserRepository(),
         realtimeDatabaseRemoteUserRepository: RealtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(),
-        storageRepository: StorageRepository = FakeStorageRepository()
+        storageRepository: StorageRepository = FakeStorageRepository(),
+        localCacheRepository: LocalCacheRepository = FakeLocalCacheRepository()
     ): ModifyAccountViewmodel {
 
         val observeAuthStateFromAuthDataSource =
@@ -72,7 +80,10 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
             ModifyUserFromRemoteDataSource(realtimeDatabaseRemoteUserRepository)
 
         val modifyUserFromLocalDataSource =
-            ModifyUserFromLocalDataSource(localUserRepository)
+            ModifyUserFromLocalDataSource(localUserRepository, authRepository)
+
+        val modifyCacheInLocalRepository =
+            ModifyCacheInLocalRepository(localCacheRepository)
 
         val signOutFromAuthDataSource =
             SignOutFromAuthDataSource(authRepository)
@@ -88,6 +99,7 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
             uploadImageToRemoteDataSource,
             modifyUserFromRemoteDataSource,
             modifyUserFromLocalDataSource,
+            modifyCacheInLocalRepository,
             signOutFromAuthDataSource,
             log
         )
@@ -289,5 +301,28 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 assertTrue { awaitItem() is UiState.Error }
                 ensureAllEventsConsumed()
             }
+        }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `given a registered user_when that user logs out_then the user cache is modified`() =
+        runTest {
+            val fakeLocalCacheRepository = FakeLocalCacheRepository(mutableListOf(localCache.copy(section = Section.USERS).toEntity()))
+
+            val modifyAccountViewmodel = getModifyAccountViewmodel(
+                authRepository = FakeAuthRepository(
+                    authUser = authUser.copy(photoUrl = user.image),
+                    authEmail = user.email,
+                    authPassword = userPwd
+                ),
+                localCacheRepository = fakeLocalCacheRepository
+            )
+            modifyAccountViewmodel.logOut()
+
+            runCurrent()
+
+            val actualFakeLocalCacheEntity = fakeLocalCacheRepository.getLocalCacheEntity(user.uid, Section.USERS)
+
+            assertNotEquals(localCache.toEntity(), actualFakeLocalCacheEntity)
         }
 }

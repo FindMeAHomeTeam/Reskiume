@@ -3,12 +3,15 @@ package com.findmeahometeam.reskiume.ui.unitTests.profile
 import app.cash.turbine.test
 import com.findmeahometeam.reskiume.CoroutineTestDispatcher
 import com.findmeahometeam.reskiume.authUser
+import com.findmeahometeam.reskiume.data.database.entity.LocalCacheEntity
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.remote.response.RemoteUser
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
+import com.findmeahometeam.reskiume.domain.model.LocalCache
 import com.findmeahometeam.reskiume.domain.model.User
+import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
@@ -24,6 +27,8 @@ import com.findmeahometeam.reskiume.domain.usecases.ModifyUserPasswordInAuthData
 import com.findmeahometeam.reskiume.domain.usecases.ObserveAuthStateFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.SignOutFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.UploadImageToRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
+import com.findmeahometeam.reskiume.localCache
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.profile.modifyAccount.ModifyAccountViewmodel
 import com.findmeahometeam.reskiume.user
@@ -44,8 +49,6 @@ import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertTrue
-import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
 
 class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
 
@@ -62,6 +65,9 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
     private val onRemoteImageDeleted = Capture.slot<(Boolean) -> Unit>()
 
     private val onImageUploaded = Capture.slot<(String) -> Unit>()
+
+    private val onModifyLocalCache = Capture.slot<(rowsUpdated: Int) -> Unit>()
+
 
     private val log: Log = mock {
         every { d(any(), any()) } returns Unit
@@ -81,6 +87,9 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
         onLocalImageDeletedArg: Boolean = true,
         onRemoteImageDeletedArg: Boolean = true,
         onImageUploadedArg: String = user.image,
+        updatedRowsCacheArg: Int = 1,
+        cacheArg: LocalCache = localCache.copy(section = Section.USERS),
+        getLocalCacheEntityReturn: LocalCacheEntity? = localCache.copy(section = Section.USERS).toEntity()
     ): ModifyAccountViewmodel {
 
         val authRepository: AuthRepository = mock {
@@ -151,6 +160,22 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
             } calls { onImageUploaded.get().invoke(onImageUploadedArg) }
         }
 
+        val localCacheRepository: LocalCacheRepository = mock {
+            everySuspend {
+                modifyLocalCacheEntity(
+                    any(),
+                    capture(onModifyLocalCache)
+                )
+            } calls { onModifyLocalCache.get().invoke(updatedRowsCacheArg) }
+
+            everySuspend {
+                getLocalCacheEntity(
+                    cacheArg.uid,
+                    cacheArg.section
+                )
+            } returns getLocalCacheEntityReturn
+        }
+
         val observeAuthStateFromAuthDataSource =
             ObserveAuthStateFromAuthDataSource(authRepository)
 
@@ -179,7 +204,10 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
             ModifyUserFromRemoteDataSource(realtimeDatabaseRemoteUserRepository)
 
         val modifyUserFromLocalDataSource =
-            ModifyUserFromLocalDataSource(localUserRepository)
+            ModifyUserFromLocalDataSource(localUserRepository, authRepository)
+
+        val modifyCacheInLocalRepository =
+            ModifyCacheInLocalRepository(localCacheRepository)
 
         val signOutFromAuthDataSource =
             SignOutFromAuthDataSource(authRepository)
@@ -195,6 +223,7 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
             uploadImageToRemoteDataSource,
             modifyUserFromRemoteDataSource,
             modifyUserFromLocalDataSource,
+            modifyCacheInLocalRepository,
             signOutFromAuthDataSource,
             log
         )
@@ -372,13 +401,11 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
             }
         }
 
-    @OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `given a registered user_when that user logs out_then the user is unregistered`() =
+    fun `given a registered user_when that user logs out_then logD is called`() =
         runTest {
-            val modifyAccountViewmodel = getModifyAccountViewmodel(
-                modifyUserArg = user.copy(lastLogout = Clock.System.now().epochSeconds)
-            )
+            val modifyAccountViewmodel = getModifyAccountViewmodel()
             modifyAccountViewmodel.logOut()
 
             runCurrent()
@@ -388,13 +415,12 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
             }
         }
 
-    @OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `given a registered user_when that user logs out and the local datasource fails updating the last log out_then the app emit an error`() =
+    fun `given a registered user_when that user logs out and the local cache fails updating the last log out_then logE is called`() =
         runTest {
             val modifyAccountViewmodel = getModifyAccountViewmodel(
-                modifyUserArg = user.copy(lastLogout = Clock.System.now().epochSeconds),
-                onModifyUserArg = 0
+                updatedRowsCacheArg = 0
             )
             modifyAccountViewmodel.logOut()
 

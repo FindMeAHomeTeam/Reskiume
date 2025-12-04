@@ -12,5 +12,5 @@ class InsertReviewInLocalRepository(
     suspend operator fun invoke(review: Review, onInsertReview: (rowId: Long) -> Unit) =
         localReviewRepository.insertLocalReview(review.copy(savedBy = getMyUid()).toEntity(), onInsertReview)
 
-    private suspend fun getMyUid(): String = authRepository.authState.firstOrNull()?.uid!!
+    private suspend fun getMyUid(): String = authRepository.authState.firstOrNull()?.uid ?: ""
 }

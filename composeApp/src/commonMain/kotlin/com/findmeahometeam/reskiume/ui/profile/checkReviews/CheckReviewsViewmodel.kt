@@ -69,21 +69,21 @@ class CheckReviewsViewmodel(
 
             getDataByManagingObjectLocalCacheTimestamp(
                 uid = uid,
-                savedBy = authUser!!.uid,
+                savedBy = authUser?.uid ?: "",
                 section = Section.REVIEWS,
                 onCompletionInsertCache = {
                     getReviewsFromRemoteRepository(uid).insertRemoteReviewsInLocalRepositoryAndMapThemToUiReview(
-                        authUser.uid
+                        authUser?.uid ?: ""
                     )
                 },
                 onCompletionUpdateCache = {
                     getReviewsFromRemoteRepository(uid).insertRemoteReviewsInLocalRepositoryAndMapThemToUiReview(
-                        authUser.uid
+                        authUser?.uid ?: ""
                     )
                 },
                 onVerifyCacheIsRecent = {
                     getReviewsFromLocalRepository(uid).mapLocalReviewsToUiReview(
-                        authUser.uid
+                        authUser?.uid ?: ""
                     )
                 }
             )

@@ -29,7 +29,8 @@ class FakeLocalReviewRepository(
         reviewedUid: String,
         onDeletedReviews: (rowsDeleted: Int) -> Unit
     ) {
-        val reviewList = reviews.filter { it.reviewedUid == reviewedUid }
+        val reviewList =
+            reviews.filter { it.reviewedUid == reviewedUid || it.savedBy == reviewedUid || it.savedBy == "" }
         if (reviewList.isEmpty()) {
             onDeletedReviews(0)
         } else {

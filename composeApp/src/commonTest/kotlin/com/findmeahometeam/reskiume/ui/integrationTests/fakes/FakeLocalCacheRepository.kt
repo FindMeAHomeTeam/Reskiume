@@ -44,7 +44,8 @@ class FakeLocalCacheRepository(
         uid: String,
         onDeleteLocalCache: (rowsDeleted: Int) -> Unit
     ) {
-        val cacheList = localCacheList.filter { it.uid == uid }
+        val cacheList =
+            localCacheList.filter { it.uid == uid || it.savedBy == uid || it.savedBy == "" }
         if (cacheList.isEmpty()) {
             onDeleteLocalCache(0)
         } else {

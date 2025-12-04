@@ -6,13 +6,14 @@ import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
 
 class FakeLocalCacheRepository(
     private var localCacheList: MutableList<LocalCacheEntity> = mutableListOf()
-): LocalCacheRepository {
+) : LocalCacheRepository {
 
     override suspend fun insertLocalCacheEntity(
         localCacheEntity: LocalCacheEntity,
         onInsertLocalCache: (rowId: Long) -> Unit
     ) {
-        val localCache = localCacheList.firstOrNull{ it.id == localCacheEntity.id }
+        val localCache =
+            localCacheList.firstOrNull { it.uid == localCacheEntity.uid && it.section == localCacheEntity.section }
         if (localCache == null) {
             localCacheList.add(localCacheEntity)
             onInsertLocalCache(1L)
@@ -25,13 +26,14 @@ class FakeLocalCacheRepository(
         uid: String,
         section: Section
     ): LocalCacheEntity? =
-        localCacheList.firstOrNull{ it.uid == uid && it.section == section }
+        localCacheList.firstOrNull { it.uid == uid && it.section == section }
 
     override suspend fun modifyLocalCacheEntity(
         localCacheEntity: LocalCacheEntity,
         onModifyUser: (rowsUpdated: Int) -> Unit
     ) {
-        val localCache = localCacheList.firstOrNull{ it.id == localCacheEntity.id }
+        val localCache =
+            localCacheList.firstOrNull { it.id == localCacheEntity.id && it.section == localCacheEntity.section }
         if (localCache == null) {
             onModifyUser(0)
         } else {

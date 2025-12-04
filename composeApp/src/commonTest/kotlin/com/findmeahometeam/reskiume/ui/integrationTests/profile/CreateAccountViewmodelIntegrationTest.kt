@@ -12,9 +12,9 @@ import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepo
 import com.findmeahometeam.reskiume.domain.usecases.authUser.CreateUserWithEmailAndPasswordInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.DeleteUserFromAuthDataSource
-import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromRemoteDataSource
-import com.findmeahometeam.reskiume.domain.usecases.InsertUserToLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.InsertUserToRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.DeleteUserFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.ui.core.components.UiState
@@ -44,8 +44,8 @@ class CreateAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
         val createUserWithEmailAndPasswordInAuthDataSource =
             CreateUserWithEmailAndPasswordInAuthDataSource(authRepository)
 
-        val insertUserToRemoteDataSource =
-            InsertUserToRemoteDataSource(realtimeDatabaseRemoteUserRepository)
+        val insertUserInRemoteDataSource =
+            InsertUserInRemoteDataSource(realtimeDatabaseRemoteUserRepository)
 
         val uploadImageToRemoteDataSource =
             UploadImageToRemoteDataSource(storageRepository)
@@ -53,8 +53,8 @@ class CreateAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
         val insertCacheInLocalRepository =
             InsertCacheInLocalRepository(localCacheRepository)
 
-        val insertUserToLocalDataSource =
-            InsertUserToLocalDataSource(localUserRepository, authRepository)
+        val insertUserInLocalDataSource =
+            InsertUserInLocalDataSource(localUserRepository, authRepository)
 
         val deleteUserFromAuthDataSource =
             DeleteUserFromAuthDataSource(authRepository)
@@ -69,10 +69,10 @@ class CreateAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
 
         return CreateAccountViewmodel(
             createUserWithEmailAndPasswordInAuthDataSource,
-            insertUserToRemoteDataSource,
+            insertUserInRemoteDataSource,
             uploadImageToRemoteDataSource,
             insertCacheInLocalRepository,
-            insertUserToLocalDataSource,
+            insertUserInLocalDataSource,
             deleteUserFromAuthDataSource,
             deleteUserFromRemoteDataSource,
             deleteImageFromRemoteDataSource,

@@ -7,10 +7,10 @@ import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.Review
 import com.findmeahometeam.reskiume.domain.model.User
-import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.GetUserFromRemoteDataSource
-import com.findmeahometeam.reskiume.domain.usecases.InsertUserToLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.ModifyUserFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
@@ -43,8 +43,8 @@ class CheckReviewsViewmodel(
     private val getUserFromLocalDataSource: GetUserFromLocalDataSource,
     private val getUserFromRemoteDataSource: GetUserFromRemoteDataSource,
     private val downloadImageToLocalDataSource: DownloadImageToLocalDataSource,
-    private val insertUserToLocalDataSource: InsertUserToLocalDataSource,
-    private val modifyUserFromLocalDataSource: ModifyUserFromLocalDataSource,
+    private val insertUserInLocalDataSource: InsertUserInLocalDataSource,
+    private val modifyUserInLocalDataSource: ModifyUserInLocalDataSource,
     private val log: Log
 ) : ViewModel() {
 
@@ -181,7 +181,7 @@ class CheckReviewsViewmodel(
 
         viewModelScope.launch {
 
-            insertUserToLocalDataSource(user) { rowId ->
+            insertUserInLocalDataSource(user) { rowId ->
 
                 if (rowId > 0) {
                     log.d(
@@ -227,7 +227,7 @@ class CheckReviewsViewmodel(
 
         viewModelScope.launch {
 
-            modifyUserFromLocalDataSource(user) { rowsUpdated: Int ->
+            modifyUserInLocalDataSource(user) { rowsUpdated: Int ->
 
                 if (rowsUpdated > 0) {
                     log.d(

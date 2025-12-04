@@ -1,10 +1,10 @@
-package com.findmeahometeam.reskiume.usecases
+package com.findmeahometeam.reskiume.usecases.user
 
 import app.cash.turbine.test
 import com.findmeahometeam.reskiume.CoroutineTestDispatcher
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
-import com.findmeahometeam.reskiume.domain.usecases.GetUserFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.user
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend

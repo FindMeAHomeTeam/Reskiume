@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.User
-import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import kotlinx.coroutines.flow.SharingStarted

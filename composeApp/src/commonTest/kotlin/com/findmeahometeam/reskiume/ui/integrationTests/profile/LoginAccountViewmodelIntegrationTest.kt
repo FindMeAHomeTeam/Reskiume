@@ -10,9 +10,9 @@ import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
-import com.findmeahometeam.reskiume.domain.usecases.GetUserFromRemoteDataSource
-import com.findmeahometeam.reskiume.domain.usecases.InsertUserToLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.ModifyUserFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.SignInWithEmailAndPasswordFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
@@ -54,11 +54,11 @@ class LoginAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
         val downloadImageToLocalDataSource =
             DownloadImageToLocalDataSource(storageRepository)
 
-        val insertUserToLocalDataSource =
-            InsertUserToLocalDataSource(localUserRepository, authRepository)
+        val insertUserInLocalDataSource =
+            InsertUserInLocalDataSource(localUserRepository, authRepository)
 
-        val modifyUserFromLocalDataSource =
-            ModifyUserFromLocalDataSource(localUserRepository, authRepository)
+        val modifyUserInLocalDataSource =
+            ModifyUserInLocalDataSource(localUserRepository, authRepository)
 
         val log: Log = FakeLog()
 
@@ -67,8 +67,8 @@ class LoginAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
             getDataByManagingObjectLocalCacheTimestamp,
             getUserFromRemoteDataSource,
             downloadImageToLocalDataSource,
-            insertUserToLocalDataSource,
-            modifyUserFromLocalDataSource,
+            insertUserInLocalDataSource,
+            modifyUserInLocalDataSource,
             log
         )
     }

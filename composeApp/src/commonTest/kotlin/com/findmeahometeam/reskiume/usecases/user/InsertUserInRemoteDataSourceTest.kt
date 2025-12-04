@@ -1,7 +1,7 @@
-package com.findmeahometeam.reskiume.usecases
+package com.findmeahometeam.reskiume.usecases.user
 
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
-import com.findmeahometeam.reskiume.domain.usecases.InsertUserToRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInRemoteDataSource
 import com.findmeahometeam.reskiume.user
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
@@ -11,19 +11,19 @@ import dev.mokkery.verifySuspend
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
-class InsertUserToRemoteDataSourceTest {
+class InsertUserInRemoteDataSourceTest {
 
     val realtimeDatabaseRemoteUserRepository: RealtimeDatabaseRemoteUserRepository = mock {
         everySuspend { insertRemoteUser(user.toData(), any()) } returns Unit
     }
 
-    private val insertUserToRemoteDataSource =
-        InsertUserToRemoteDataSource(realtimeDatabaseRemoteUserRepository)
+    private val insertUserInRemoteDataSource =
+        InsertUserInRemoteDataSource(realtimeDatabaseRemoteUserRepository)
 
     @Test
     fun `given a user_when the app saves it in the remote data source_then it calls to insertRemoteUser`() =
         runTest {
-            insertUserToRemoteDataSource(user, {})
+            insertUserInRemoteDataSource(user, {})
             verifySuspend {
                 realtimeDatabaseRemoteUserRepository.insertRemoteUser(user.toData(), any())
             }

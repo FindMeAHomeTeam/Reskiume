@@ -4,15 +4,15 @@ import com.findmeahometeam.reskiume.domain.usecases.authUser.CreateUserWithEmail
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.DeleteUserFromAuthDataSource
-import com.findmeahometeam.reskiume.domain.usecases.DeleteUsersFromLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromRemoteDataSource
-import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.GetUserFromRemoteDataSource
-import com.findmeahometeam.reskiume.domain.usecases.InsertUserToLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.InsertUserToRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.DeleteUsersFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.DeleteUserFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ModifyUserEmailInAuthDataSource
-import com.findmeahometeam.reskiume.domain.usecases.ModifyUserFromLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.ModifyUserFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ModifyUserPasswordInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
@@ -45,12 +45,12 @@ val domainModule = module {
     factoryOf(::SignInWithEmailAndPasswordFromAuthDataSource)
     factoryOf(::SignOutFromAuthDataSource)
     factoryOf(::DeleteUserFromAuthDataSource)
-    factoryOf(::InsertUserToLocalDataSource)
-    factoryOf(::InsertUserToRemoteDataSource)
+    factoryOf(::InsertUserInLocalDataSource)
+    factoryOf(::InsertUserInRemoteDataSource)
     factoryOf(::GetUserFromLocalDataSource)
     factoryOf(::GetUserFromRemoteDataSource)
-    factoryOf(::ModifyUserFromLocalDataSource)
-    factoryOf(::ModifyUserFromRemoteDataSource)
+    factoryOf(::ModifyUserInLocalDataSource)
+    factoryOf(::ModifyUserInRemoteDataSource)
     factoryOf(::DeleteUsersFromLocalDataSource)
     factoryOf(::DeleteUserFromRemoteDataSource)
     factoryOf(::UploadImageToRemoteDataSource)

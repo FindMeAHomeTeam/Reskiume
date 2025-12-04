@@ -1,4 +1,4 @@
-package com.findmeahometeam.reskiume.domain.usecases
+package com.findmeahometeam.reskiume.domain.usecases.user
 
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository

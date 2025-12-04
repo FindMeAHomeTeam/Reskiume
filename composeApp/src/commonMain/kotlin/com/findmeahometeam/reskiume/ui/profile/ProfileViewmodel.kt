@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.User
-import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

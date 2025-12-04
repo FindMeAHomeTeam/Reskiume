@@ -20,10 +20,10 @@ import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepo
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.DeleteUserFromAuthDataSource
-import com.findmeahometeam.reskiume.domain.usecases.DeleteUsersFromLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromRemoteDataSource
-import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.GetUserFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.DeleteUsersFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.DeleteUserFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteCacheFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.DeleteReviewsFromLocalRepository

@@ -11,9 +11,9 @@ import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.usecases.authUser.CreateUserWithEmailAndPasswordInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.DeleteUserFromAuthDataSource
-import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromRemoteDataSource
-import com.findmeahometeam.reskiume.domain.usecases.InsertUserToLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.InsertUserToRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.DeleteUserFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.ui.core.components.UiState
@@ -26,10 +26,10 @@ import kotlin.time.ExperimentalTime
 
 class CreateAccountViewmodel(
     private val createUserWithEmailAndPasswordInAuthDataSource: CreateUserWithEmailAndPasswordInAuthDataSource,
-    private val insertUserToRemoteDataSource: InsertUserToRemoteDataSource,
+    private val insertUserInRemoteDataSource: InsertUserInRemoteDataSource,
     private val uploadImageToRemoteDataSource: UploadImageToRemoteDataSource,
     private val insertCacheInLocalRepository: InsertCacheInLocalRepository,
-    private val insertUserToLocalDataSource: InsertUserToLocalDataSource,
+    private val insertUserInLocalDataSource: InsertUserInLocalDataSource,
     private val deleteUserFromAuthDataSource: DeleteUserFromAuthDataSource,
     private val deleteUserFromRemoteDataSource: DeleteUserFromRemoteDataSource,
     private val deleteImageFromRemoteDataSource: DeleteImageFromRemoteDataSource,
@@ -83,7 +83,7 @@ class CreateAccountViewmodel(
                 user.copy(image = imageDownloadUri)
             }
             viewModelScope.launch {
-                insertUserToRemoteDataSource(userWithPossibleImageDownloadUri) { databaseResult ->
+                insertUserInRemoteDataSource(userWithPossibleImageDownloadUri) { databaseResult ->
                     when (databaseResult) {
                         is DatabaseResult.Error -> {
                             removeImageFromRemoteDataSource(
@@ -151,7 +151,7 @@ class CreateAccountViewmodel(
 
     private fun saveUserToLocalSource(user: User, password: String, remoteImageUri: String) {
         viewModelScope.launch {
-            insertUserToLocalDataSource(user) { rowId ->
+            insertUserInLocalDataSource(user) { rowId ->
                 if (rowId > 0) {
                     log.d(
                         "CreateAccountViewmodel",

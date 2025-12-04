@@ -10,11 +10,11 @@ import com.findmeahometeam.reskiume.domain.model.LocalCache
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.GetUserFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ModifyUserEmailInAuthDataSource
-import com.findmeahometeam.reskiume.domain.usecases.ModifyUserFromLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.ModifyUserFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ModifyUserPasswordInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.SignOutFromAuthDataSource
@@ -38,8 +38,8 @@ class ModifyAccountViewmodel(
     private val deleteImageFromLocalDataSource: DeleteImageFromLocalDataSource,
     private val deleteImageFromRemoteDataSource: DeleteImageFromRemoteDataSource,
     private val uploadImageToRemoteDataSource: UploadImageToRemoteDataSource,
-    private val modifyUserFromRemoteDataSource: ModifyUserFromRemoteDataSource,
-    private val modifyUserFromLocalDataSource: ModifyUserFromLocalDataSource,
+    private val modifyUserInRemoteDataSource: ModifyUserInRemoteDataSource,
+    private val modifyUserInLocalDataSource: ModifyUserInLocalDataSource,
     private val modifyCacheInLocalRepository: ModifyCacheInLocalRepository,
     private val signOutFromAuthDataSource: SignOutFromAuthDataSource,
     private val log: Log
@@ -237,7 +237,7 @@ class ModifyAccountViewmodel(
     }
 
     private suspend fun updateUserInRemoteDataSource(user: User, onSuccess: suspend () -> Unit) {
-        modifyUserFromRemoteDataSource(user) { result ->
+        modifyUserInRemoteDataSource(user) { result ->
             if (result is DatabaseResult.Success) {
                 log.d(
                     "ModifyAccountViewmodel",
@@ -257,7 +257,7 @@ class ModifyAccountViewmodel(
     }
 
     private suspend fun saveUserChangesInLocalDataSource(user: User) {
-        modifyUserFromLocalDataSource(user) { rowsModified: Int ->
+        modifyUserInLocalDataSource(user) { rowsModified: Int ->
             if (rowsModified > 0) {
                 log.d(
                     "ModifyAccountViewmodel",

@@ -18,10 +18,10 @@ import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteReview.RealtimeDatabaseRemoteReviewRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
-import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.GetUserFromRemoteDataSource
-import com.findmeahometeam.reskiume.domain.usecases.InsertUserToLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.ModifyUserFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
@@ -226,11 +226,11 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
         val downloadImageToLocalDataSource =
             DownloadImageToLocalDataSource(storageRepository)
 
-        val insertUserToLocalDataSource =
-            InsertUserToLocalDataSource(localUserRepository, authRepository)
+        val insertUserInLocalDataSource =
+            InsertUserInLocalDataSource(localUserRepository, authRepository)
 
-        val modifyUserFromLocalDataSource =
-            ModifyUserFromLocalDataSource(localUserRepository, authRepository)
+        val modifyUserInLocalDataSource =
+            ModifyUserInLocalDataSource(localUserRepository, authRepository)
 
         return CheckReviewsViewmodel(
             saveStateHandleProvider,
@@ -242,8 +242,8 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
             getUserFromLocalDataSource,
             getUserFromRemoteDataSource,
             downloadImageToLocalDataSource,
-            insertUserToLocalDataSource,
-            modifyUserFromLocalDataSource,
+            insertUserInLocalDataSource,
+            modifyUserInLocalDataSource,
             log
         )
     }

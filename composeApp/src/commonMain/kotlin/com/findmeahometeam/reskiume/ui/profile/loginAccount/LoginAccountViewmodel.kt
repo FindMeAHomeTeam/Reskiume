@@ -7,9 +7,9 @@ import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.User
-import com.findmeahometeam.reskiume.domain.usecases.GetUserFromRemoteDataSource
-import com.findmeahometeam.reskiume.domain.usecases.InsertUserToLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.ModifyUserFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.SignInWithEmailAndPasswordFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
@@ -24,8 +24,8 @@ class LoginAccountViewmodel(
     private val getDataByManagingObjectLocalCacheTimestamp: GetDataByManagingObjectLocalCacheTimestamp,
     private val getUserFromRemoteDataSource: GetUserFromRemoteDataSource,
     private val downloadImageToLocalDataSource: DownloadImageToLocalDataSource,
-    private val insertUserToLocalDataSource: InsertUserToLocalDataSource,
-    private val modifyUserFromLocalDataSource: ModifyUserFromLocalDataSource,
+    private val insertUserInLocalDataSource: InsertUserInLocalDataSource,
+    private val modifyUserInLocalDataSource: ModifyUserInLocalDataSource,
     private val log: Log
 ) : ViewModel() {
     private var _state: MutableStateFlow<UiState> = MutableStateFlow(UiState.Idle)
@@ -59,7 +59,7 @@ class LoginAccountViewmodel(
 
                         viewModelScope.launch {
 
-                            insertUserToLocalDataSource(collectedUser) { rowId: Long ->
+                            insertUserInLocalDataSource(collectedUser) { rowId: Long ->
 
                                 if (rowId > 0) {
                                     log.d(
@@ -84,7 +84,7 @@ class LoginAccountViewmodel(
 
                         viewModelScope.launch {
 
-                            modifyUserFromLocalDataSource(collectedUser) { rowsModified: Int ->
+                            modifyUserInLocalDataSource(collectedUser) { rowsModified: Int ->
 
                                 if (rowsModified > 0) {
                                     log.d(

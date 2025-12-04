@@ -372,7 +372,7 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `given a registered user with an outdated cache_when the user opens the reviews section but there is an error updating the reviews in local repository_then the review section is populated but the reviews not updated`() =
+    fun `given a registered user with an outdated cache_when the user opens the reviews section but there is an error inserting reviews in local repository_then the review section is populated but not updated`() =
         runTest {
             getCheckReviewsViewmodel(
                 getUserReviewsLocalCacheEntityReturn = localCache.copy(timestamp = 123L).toEntity(),
@@ -401,7 +401,7 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
         }
 
     @Test
-    fun `given a registered user with recent cache_when the user opens the reviews section_then the app retrieves them and the user will see them`() =
+    fun `given a registered user with recent cache_when the user opens the reviews section_then the user will see them`() =
         runTest {
             getCheckReviewsViewmodel().reviewListFlow.test {
                 val actualUiReviewList = awaitItem()

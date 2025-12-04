@@ -9,12 +9,12 @@ import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.authUser.DeleteUserFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteUsersFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromRemoteDataSource
-import com.findmeahometeam.reskiume.domain.usecases.ObserveAuthStateFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteCacheFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.DeleteReviewsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.DeleteReviewsFromRemoteRepository
@@ -27,7 +27,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class DeleteAccountViewmodel(
-    observeAuthStateFromAuthDataSource: ObserveAuthStateFromAuthDataSource,
+    observeAuthStateInAuthDataSource: ObserveAuthStateInAuthDataSource,
     private val getReviewsFromRemoteRepository: GetReviewsFromRemoteRepository,
     private val deleteReviewsFromRemoteRepository: DeleteReviewsFromRemoteRepository,
     private val deleteReviewsFromLocalRepository: DeleteReviewsFromLocalRepository,
@@ -44,7 +44,7 @@ class DeleteAccountViewmodel(
     private var _state: MutableStateFlow<UiState> = MutableStateFlow(UiState.Idle)
     val state: StateFlow<UiState> = _state.asStateFlow()
 
-    private val authUserState: Flow<AuthUser?> = observeAuthStateFromAuthDataSource()
+    private val authUserState: Flow<AuthUser?> = observeAuthStateInAuthDataSource()
 
     fun deleteAccount(password: String) {
         getUserFromRemoteDatasource { user ->

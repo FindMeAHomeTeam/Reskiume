@@ -19,12 +19,12 @@ import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.authUser.DeleteUserFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteUsersFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromRemoteDataSource
-import com.findmeahometeam.reskiume.domain.usecases.ObserveAuthStateFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteCacheFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.DeleteReviewsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.DeleteReviewsFromRemoteRepository
@@ -167,8 +167,8 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
             } calls { onLocalImageDeleted.get().invoke(localImageDeletedArg) }
         }
 
-        val observeAuthStateFromAuthDataSource =
-            ObserveAuthStateFromAuthDataSource(authRepository)
+        val observeAuthStateInAuthDataSource =
+            ObserveAuthStateInAuthDataSource(authRepository)
 
         val getReviewsFromRemoteRepository =
             GetReviewsFromRemoteRepository(realtimeDatabaseRemoteReviewRepository)
@@ -203,7 +203,7 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
             DeleteUsersFromLocalDataSource(localUserRepository)
 
         return DeleteAccountViewmodel(
-            observeAuthStateFromAuthDataSource,
+            observeAuthStateInAuthDataSource,
             getReviewsFromRemoteRepository,
             deleteReviewsFromRemoteRepository,
             deleteReviewsFromLocalRepository,

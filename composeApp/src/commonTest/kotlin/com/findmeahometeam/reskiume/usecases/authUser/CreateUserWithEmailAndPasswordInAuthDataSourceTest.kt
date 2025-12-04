@@ -1,10 +1,10 @@
-package com.findmeahometeam.reskiume.usecases
+package com.findmeahometeam.reskiume.usecases.authUser
 
 import com.findmeahometeam.reskiume.authUser
 import com.findmeahometeam.reskiume.data.remote.response.AuthResult
 import com.findmeahometeam.reskiume.data.remote.response.AuthResult.Success
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
-import com.findmeahometeam.reskiume.domain.usecases.CreateUserWithEmailAndPasswordFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.authUser.CreateUserWithEmailAndPasswordInAuthDataSource
 import com.findmeahometeam.reskiume.user
 import com.findmeahometeam.reskiume.userPwd
 import com.findmeahometeam.reskiume.wrongEmail
@@ -16,7 +16,7 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class CreateUserWithEmailAndPasswordFromAuthDataSourceTest {
+class CreateUserWithEmailAndPasswordInAuthDataSourceTest {
 
     val authRepository: AuthRepository = mock {
         everySuspend { createUserWithEmailAndPassword(user.email!!, userPwd) } returns Success(
@@ -30,13 +30,13 @@ class CreateUserWithEmailAndPasswordFromAuthDataSourceTest {
         } returns AuthResult.Error(message = "The email address is badly formatted.")
     }
 
-    private val createUserWithEmailAndPasswordFromAuthDataSource =
-        CreateUserWithEmailAndPasswordFromAuthDataSource(authRepository)
+    private val createUserWithEmailAndPasswordInAuthDataSource =
+        CreateUserWithEmailAndPasswordInAuthDataSource(authRepository)
 
     @Test
     fun `given a correct email_when the user creates a new account_then createUserWithEmailAndPassword is called`() =
         runTest {
-            createUserWithEmailAndPasswordFromAuthDataSource(user.email!!, userPwd)
+            createUserWithEmailAndPasswordInAuthDataSource(user.email!!, userPwd)
             verifySuspend {
                 authRepository.createUserWithEmailAndPassword(user.email, userPwd)
             }
@@ -45,14 +45,14 @@ class CreateUserWithEmailAndPasswordFromAuthDataSourceTest {
     @Test
     fun `given a correct email_when the user creates a new account_then createUserWithEmailAndPassword returns an AuthUser`() =
         runTest {
-            val result = createUserWithEmailAndPasswordFromAuthDataSource(user.email!!, userPwd)
+            val result = createUserWithEmailAndPasswordInAuthDataSource(user.email!!, userPwd)
             assertEquals(expected = Success(authUser), actual = result)
         }
 
     @Test
     fun `given an incorrect email_when the user creates a new account_then createUserWithEmailAndPassword returns an error`() =
         runTest {
-            val result = createUserWithEmailAndPasswordFromAuthDataSource(wrongEmail, userPwd)
+            val result = createUserWithEmailAndPasswordInAuthDataSource(wrongEmail, userPwd)
             assertEquals(
                 expected = AuthResult.Error(message = "The email address is badly formatted."),
                 actual = result

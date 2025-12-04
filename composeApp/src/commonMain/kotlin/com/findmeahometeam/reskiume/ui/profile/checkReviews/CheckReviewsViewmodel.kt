@@ -11,7 +11,7 @@ import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.InsertUserToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.ModifyUserFromLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.ObserveAuthStateFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromLocalRepository
@@ -35,7 +35,7 @@ import kotlin.time.Instant
 
 class CheckReviewsViewmodel(
     saveStateHandleProvider: SaveStateHandleProvider,
-    private val observeAuthStateFromAuthDataSource: ObserveAuthStateFromAuthDataSource,
+    private val observeAuthStateInAuthDataSource: ObserveAuthStateInAuthDataSource,
     private val getDataByManagingObjectLocalCacheTimestamp: GetDataByManagingObjectLocalCacheTimestamp,
     getReviewsFromRemoteRepository: GetReviewsFromRemoteRepository,
     getReviewsFromLocalRepository: GetReviewsFromLocalRepository,
@@ -52,7 +52,7 @@ class CheckReviewsViewmodel(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun getUserDataIfNotMine(): Flow<User?> =
-        observeAuthStateFromAuthDataSource().flatMapConcat { authUser: AuthUser? ->
+        observeAuthStateInAuthDataSource().flatMapConcat { authUser: AuthUser? ->
 
             if (authUser?.uid == uid) {
                 flowOf(null)
@@ -65,7 +65,7 @@ class CheckReviewsViewmodel(
     // Decides whether to fetch from remote or local based on cache status
     @OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
     val reviewListFlow: Flow<List<UiReview>> =
-        observeAuthStateFromAuthDataSource().flatMapConcat { authUser: AuthUser? ->
+        observeAuthStateInAuthDataSource().flatMapConcat { authUser: AuthUser? ->
 
             getDataByManagingObjectLocalCacheTimestamp(
                 uid = uid,

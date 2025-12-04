@@ -11,9 +11,9 @@ import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
-import com.findmeahometeam.reskiume.domain.usecases.CreateUserWithEmailAndPasswordFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.authUser.CreateUserWithEmailAndPasswordInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
-import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.authUser.DeleteUserFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.InsertUserToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.InsertUserToRemoteDataSource
@@ -137,8 +137,8 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
             }
         }
 
-        val createUserWithEmailAndPasswordFromAuthDataSource =
-            CreateUserWithEmailAndPasswordFromAuthDataSource(authRepository)
+        val createUserWithEmailAndPasswordInAuthDataSource =
+            CreateUserWithEmailAndPasswordInAuthDataSource(authRepository)
 
         val insertUserToRemoteDataSource =
             InsertUserToRemoteDataSource(realtimeDatabaseRemoteUserRepository)
@@ -162,7 +162,7 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
             DeleteImageFromRemoteDataSource(storageRepository)
 
         return CreateAccountViewmodel(
-            createUserWithEmailAndPasswordFromAuthDataSource,
+            createUserWithEmailAndPasswordInAuthDataSource,
             insertUserToRemoteDataSource,
             uploadImageToRemoteDataSource,
             insertCacheInLocalRepository,

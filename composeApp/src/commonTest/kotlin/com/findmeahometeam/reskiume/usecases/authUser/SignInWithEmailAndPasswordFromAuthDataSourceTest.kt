@@ -1,10 +1,10 @@
-package com.findmeahometeam.reskiume.usecases
+package com.findmeahometeam.reskiume.usecases.authUser
 
 import com.findmeahometeam.reskiume.authUser
 import com.findmeahometeam.reskiume.data.remote.response.AuthResult
 import com.findmeahometeam.reskiume.data.remote.response.AuthResult.Success
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
-import com.findmeahometeam.reskiume.domain.usecases.SignInWithEmailAndPasswordFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.authUser.SignInWithEmailAndPasswordFromAuthDataSource
 import com.findmeahometeam.reskiume.user
 import com.findmeahometeam.reskiume.userPwd
 import dev.mokkery.answering.returns

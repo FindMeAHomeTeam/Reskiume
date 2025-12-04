@@ -22,7 +22,7 @@ import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.InsertUserToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.ModifyUserFromLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.ObserveAuthStateFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromLocalRepository
@@ -202,8 +202,8 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
             } calls { onSaveImageToLocal.get().invoke(absolutePathAuthorArg) }
         }
 
-        val observeAuthStateFromAuthDataSource =
-            ObserveAuthStateFromAuthDataSource(authRepository)
+        val observeAuthStateInAuthDataSource =
+            ObserveAuthStateInAuthDataSource(authRepository)
 
         val getDataByManagingObjectLocalCacheTimestamp =
             GetDataByManagingObjectLocalCacheTimestamp(localCacheRepository, log)
@@ -234,7 +234,7 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
 
         return CheckReviewsViewmodel(
             saveStateHandleProvider,
-            observeAuthStateFromAuthDataSource,
+            observeAuthStateInAuthDataSource,
             getDataByManagingObjectLocalCacheTimestamp,
             getReviewsFromRemoteRepository,
             getReviewsFromLocalRepository,

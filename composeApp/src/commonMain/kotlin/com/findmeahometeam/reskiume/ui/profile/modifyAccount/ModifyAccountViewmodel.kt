@@ -12,12 +12,12 @@ import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteD
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromRemoteDataSource
-import com.findmeahometeam.reskiume.domain.usecases.ModifyUserEmailInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.authUser.ModifyUserEmailInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.ModifyUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.ModifyUserFromRemoteDataSource
-import com.findmeahometeam.reskiume.domain.usecases.ModifyUserPasswordInAuthDataSource
-import com.findmeahometeam.reskiume.domain.usecases.ObserveAuthStateFromAuthDataSource
-import com.findmeahometeam.reskiume.domain.usecases.SignOutFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.authUser.ModifyUserPasswordInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.authUser.SignOutFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
 import com.findmeahometeam.reskiume.ui.core.components.UiState
@@ -30,7 +30,7 @@ import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 class ModifyAccountViewmodel(
-    observeAuthStateFromAuthDataSource: ObserveAuthStateFromAuthDataSource,
+    observeAuthStateInAuthDataSource: ObserveAuthStateInAuthDataSource,
     private val getUserFromLocalDataSource: GetUserFromLocalDataSource,
     private val getUserFromRemoteDataSource: GetUserFromRemoteDataSource,
     private val modifyUserEmailInAuthDataSource: ModifyUserEmailInAuthDataSource,
@@ -45,7 +45,7 @@ class ModifyAccountViewmodel(
     private val log: Log
 ) : ViewModel() {
 
-    private val authUserState: Flow<AuthUser?> = observeAuthStateFromAuthDataSource()
+    private val authUserState: Flow<AuthUser?> = observeAuthStateInAuthDataSource()
 
     private val _uiState: MutableStateFlow<UiState> = MutableStateFlow(UiState.Idle)
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()

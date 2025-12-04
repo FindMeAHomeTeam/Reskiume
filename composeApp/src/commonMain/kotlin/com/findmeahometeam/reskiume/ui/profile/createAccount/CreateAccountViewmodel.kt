@@ -8,9 +8,9 @@ import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.domain.model.LocalCache
 import com.findmeahometeam.reskiume.domain.model.User
-import com.findmeahometeam.reskiume.domain.usecases.CreateUserWithEmailAndPasswordFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.authUser.CreateUserWithEmailAndPasswordInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
-import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.authUser.DeleteUserFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.InsertUserToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.InsertUserToRemoteDataSource
@@ -25,7 +25,7 @@ import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 class CreateAccountViewmodel(
-    private val createUserWithEmailAndPasswordFromAuthDataSource: CreateUserWithEmailAndPasswordFromAuthDataSource,
+    private val createUserWithEmailAndPasswordInAuthDataSource: CreateUserWithEmailAndPasswordInAuthDataSource,
     private val insertUserToRemoteDataSource: InsertUserToRemoteDataSource,
     private val uploadImageToRemoteDataSource: UploadImageToRemoteDataSource,
     private val insertCacheInLocalRepository: InsertCacheInLocalRepository,
@@ -46,7 +46,7 @@ class CreateAccountViewmodel(
 
         viewModelScope.launch {
             _state.value = UiState.Loading
-            val authResult = createUserWithEmailAndPasswordFromAuthDataSource(user.email, password)
+            val authResult = createUserWithEmailAndPasswordInAuthDataSource(user.email, password)
             when (authResult) {
                 is AuthResult.Error -> {
                     _state.value = UiState.Error(authResult.message)

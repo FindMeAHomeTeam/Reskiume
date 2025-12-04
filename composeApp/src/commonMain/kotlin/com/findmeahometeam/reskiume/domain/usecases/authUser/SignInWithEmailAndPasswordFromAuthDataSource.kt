@@ -1,4 +1,4 @@
-package com.findmeahometeam.reskiume.domain.usecases
+package com.findmeahometeam.reskiume.domain.usecases.authUser
 
 import com.findmeahometeam.reskiume.data.remote.response.AuthResult
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository

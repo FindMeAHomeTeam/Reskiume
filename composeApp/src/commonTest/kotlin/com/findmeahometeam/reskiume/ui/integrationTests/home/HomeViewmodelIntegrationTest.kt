@@ -7,7 +7,7 @@ import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.ObserveAuthStateFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.home.HomeViewmodel
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeAuthRepository
@@ -26,10 +26,10 @@ class HomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
         authRepository: AuthRepository = FakeAuthRepository(),
         localUserRepository: LocalUserRepository = FakeLocalUserRepository()
     ): HomeViewmodel {
-        val observeAuthStateFromAuthDataSource = ObserveAuthStateFromAuthDataSource(authRepository)
+        val observeAuthStateInAuthDataSource = ObserveAuthStateInAuthDataSource(authRepository)
         val getUserFromLocalDataSource = GetUserFromLocalDataSource(localUserRepository)
         return HomeViewmodel(
-            observeAuthStateFromAuthDataSource,
+            observeAuthStateInAuthDataSource,
             log,
             getUserFromLocalDataSource
         )

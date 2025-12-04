@@ -1,7 +1,7 @@
-package com.findmeahometeam.reskiume.usecases
+package com.findmeahometeam.reskiume.usecases.authUser
 
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
-import com.findmeahometeam.reskiume.domain.usecases.SignOutFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.authUser.SignOutFromAuthDataSource
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.mock

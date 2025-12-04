@@ -20,12 +20,12 @@ import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteD
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromRemoteDataSource
-import com.findmeahometeam.reskiume.domain.usecases.ModifyUserEmailInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.authUser.ModifyUserEmailInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.ModifyUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.ModifyUserFromRemoteDataSource
-import com.findmeahometeam.reskiume.domain.usecases.ModifyUserPasswordInAuthDataSource
-import com.findmeahometeam.reskiume.domain.usecases.ObserveAuthStateFromAuthDataSource
-import com.findmeahometeam.reskiume.domain.usecases.SignOutFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.authUser.ModifyUserPasswordInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.authUser.SignOutFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
 import com.findmeahometeam.reskiume.localCache
@@ -176,8 +176,8 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
             } returns getLocalCacheEntityReturn
         }
 
-        val observeAuthStateFromAuthDataSource =
-            ObserveAuthStateFromAuthDataSource(authRepository)
+        val observeAuthStateInAuthDataSource =
+            ObserveAuthStateInAuthDataSource(authRepository)
 
         val getUserFromLocalDataSource =
             GetUserFromLocalDataSource(localUserRepository)
@@ -213,7 +213,7 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
             SignOutFromAuthDataSource(authRepository)
 
         return ModifyAccountViewmodel(
-            observeAuthStateFromAuthDataSource,
+            observeAuthStateInAuthDataSource,
             getUserFromLocalDataSource,
             getUserFromRemoteDataSource,
             modifyUserEmailInAuthDataSource,

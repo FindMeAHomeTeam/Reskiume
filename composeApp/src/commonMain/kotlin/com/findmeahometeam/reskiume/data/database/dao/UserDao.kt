@@ -16,7 +16,7 @@ interface UserDao {
     @Update
     suspend fun modifyUser(user: UserEntity): Int
 
-    @Query("DELETE FROM UserEntity WHERE uid = :uid OR savedBy = :uid")
+    @Query("DELETE FROM UserEntity WHERE uid = :uid OR savedBy = :uid OR savedBy = '' ")
     suspend fun deleteUsers(uid: String): Int
 
     @Query("SELECT * FROM UserEntity WHERE uid = :uid")

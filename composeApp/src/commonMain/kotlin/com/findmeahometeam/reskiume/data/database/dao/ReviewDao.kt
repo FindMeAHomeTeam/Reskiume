@@ -16,6 +16,6 @@ interface ReviewDao {
     @Query("SELECT * FROM ReviewEntity WHERE reviewedUid = :reviewedUserUid")
     fun getLocalReviews(reviewedUserUid: String): Flow<List<ReviewEntity>>
 
-    @Query("DELETE FROM ReviewEntity WHERE reviewedUid = :reviewedUserUid OR savedBy = :reviewedUserUid")
+    @Query("DELETE FROM ReviewEntity WHERE reviewedUid = :reviewedUserUid OR savedBy = :reviewedUserUid OR savedBy = '' ")
     suspend fun deleteLocalReviews(reviewedUserUid: String): Int
 }

@@ -3,7 +3,6 @@ package com.findmeahometeam.reskiume.ui.integrationTests.fakes
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.remote.response.RemoteUser
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
-import com.findmeahometeam.reskiume.user
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
@@ -25,17 +24,17 @@ class FakeRealtimeDatabaseRemoteUserRepository(
     }
 
     override fun getRemoteUser(uid: String): Flow<RemoteUser?> =
-        flowOf(remoteUserList.firstOrNull{ it.uid == user.uid })
+        flowOf(remoteUserList.firstOrNull{ it.uid == uid })
 
     override suspend fun updateRemoteUser(
         remoteUser: RemoteUser,
         onUpdateRemoteUser: (result: DatabaseResult) -> Unit
     ) {
-        val remoteUser = remoteUserList.firstOrNull{ it.uid == user.uid }
-        if (remoteUser == null) {
+        val user = remoteUserList.firstOrNull{ it.uid == remoteUser.uid }
+        if (user == null) {
             onUpdateRemoteUser(DatabaseResult.Error("User not found"))
         } else {
-            remoteUserList[remoteUserList.indexOf(remoteUser)] = user.toData()
+            remoteUserList[remoteUserList.indexOf(user)] = remoteUser
             onUpdateRemoteUser(DatabaseResult.Success)
         }
     }
@@ -44,7 +43,7 @@ class FakeRealtimeDatabaseRemoteUserRepository(
         uid: String,
         onDeleteRemoteUser: (result: DatabaseResult) -> Unit
     ) {
-        val remoteUser = remoteUserList.firstOrNull{ it.uid == user.uid }
+        val remoteUser = remoteUserList.firstOrNull{ it.uid == uid }
         if (remoteUser == null) {
             onDeleteRemoteUser(DatabaseResult.Error("User not deleted"))
         } else {

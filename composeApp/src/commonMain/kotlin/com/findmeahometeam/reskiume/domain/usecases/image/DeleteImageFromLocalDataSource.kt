@@ -1,8 +1,8 @@
-package com.findmeahometeam.reskiume.domain.usecases
+package com.findmeahometeam.reskiume.domain.usecases.image
 
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 
-class DeleteImageInLocalDataSource(private val storageRepository: StorageRepository) {
+class DeleteImageFromLocalDataSource(private val storageRepository: StorageRepository) {
 
     operator fun invoke(
         userUid: String,

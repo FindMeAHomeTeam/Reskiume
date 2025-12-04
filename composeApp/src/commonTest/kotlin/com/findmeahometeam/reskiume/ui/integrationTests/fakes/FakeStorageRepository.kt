@@ -18,7 +18,7 @@ class FakeStorageRepository(
         onImageUploaded(imageUri)
     }
 
-    override fun saveImage(
+    override fun downloadImage(
         userUid: String,
         section: Section,
         onImageSaved: (String) -> Unit

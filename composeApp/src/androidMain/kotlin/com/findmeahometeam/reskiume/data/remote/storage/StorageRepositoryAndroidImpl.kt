@@ -47,7 +47,7 @@ class StorageRepositoryAndroidImpl(
         }
     }
 
-    override fun saveImage(userUid: String, section: Section, onImageSaved: (String) -> Unit) {
+    override fun downloadImage(userUid: String, section: Section, onImageSaved: (String) -> Unit) {
         val imageRef: StorageReference = getStorageReference(section, userUid)
         val localFile = when {
             section == Section.USERS -> File(context.filesDir, "$userUid.webp")

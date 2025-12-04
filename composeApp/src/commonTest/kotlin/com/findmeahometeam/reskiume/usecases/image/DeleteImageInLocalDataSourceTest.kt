@@ -1,7 +1,7 @@
-package com.findmeahometeam.reskiume.usecases
+package com.findmeahometeam.reskiume.usecases.image
 
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
-import com.findmeahometeam.reskiume.domain.usecases.DeleteImageInLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.user
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
@@ -18,13 +18,13 @@ class DeleteImageInLocalDataSourceTest {
         everySuspend { deleteLocalImage(user.uid, user.image, any()) } returns Unit
     }
 
-    private val deleteImageInLocalDataSource =
-        DeleteImageInLocalDataSource(storageRepository)
+    private val deleteImageFromLocalDataSource =
+        DeleteImageFromLocalDataSource(storageRepository)
 
     @Test
     fun `given a local user image_when the app deletes it_then it calls to deleteLocalImage`() =
         runTest {
-            deleteImageInLocalDataSource(user.uid, user.image, {})
+            deleteImageFromLocalDataSource(user.uid, user.image, {})
             verifySuspend {
                 storageRepository.deleteLocalImage(user.uid, user.image, any())
             }
@@ -33,7 +33,7 @@ class DeleteImageInLocalDataSourceTest {
     @Test
     fun `given an empty local user image_when the app deletes it_then it doesn't call to deleteLocalImage`() =
         runTest {
-            deleteImageInLocalDataSource(user.uid, "", {})
+            deleteImageFromLocalDataSource(user.uid, "", {})
             verifySuspend(exactly(0)) {
                 storageRepository.deleteLocalImage(user.uid, user.image, any())
             }

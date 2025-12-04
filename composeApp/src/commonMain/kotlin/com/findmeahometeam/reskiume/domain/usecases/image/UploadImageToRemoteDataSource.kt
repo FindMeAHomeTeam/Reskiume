@@ -1,4 +1,4 @@
-package com.findmeahometeam.reskiume.domain.usecases
+package com.findmeahometeam.reskiume.domain.usecases.image
 
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository

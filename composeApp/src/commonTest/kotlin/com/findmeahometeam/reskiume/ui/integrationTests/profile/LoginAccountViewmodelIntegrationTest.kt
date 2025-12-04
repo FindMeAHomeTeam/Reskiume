@@ -13,7 +13,7 @@ import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepo
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.InsertUserToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.ModifyUserFromLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.SaveImageToLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.SignInWithEmailAndPasswordFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.localCache
@@ -51,8 +51,8 @@ class LoginAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
         val getUserFromRemoteDataSource =
             GetUserFromRemoteDataSource(realtimeDatabaseRemoteUserRepository)
 
-        val saveImageToLocalDataSource =
-            SaveImageToLocalDataSource(storageRepository)
+        val downloadImageToLocalDataSource =
+            DownloadImageToLocalDataSource(storageRepository)
 
         val insertUserToLocalDataSource =
             InsertUserToLocalDataSource(localUserRepository, authRepository)
@@ -66,7 +66,7 @@ class LoginAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
             signInWithEmailAndPasswordFromAuthDataSource,
             getDataByManagingObjectLocalCacheTimestamp,
             getUserFromRemoteDataSource,
-            saveImageToLocalDataSource,
+            downloadImageToLocalDataSource,
             insertUserToLocalDataSource,
             modifyUserFromLocalDataSource,
             log

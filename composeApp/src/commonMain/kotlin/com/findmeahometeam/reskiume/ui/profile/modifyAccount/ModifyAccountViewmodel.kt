@@ -8,8 +8,8 @@ import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.LocalCache
 import com.findmeahometeam.reskiume.domain.model.User
-import com.findmeahometeam.reskiume.domain.usecases.DeleteImageFromRemoteDataSource
-import com.findmeahometeam.reskiume.domain.usecases.DeleteImageInLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.ModifyUserEmailInAuthDataSource
@@ -18,7 +18,7 @@ import com.findmeahometeam.reskiume.domain.usecases.ModifyUserFromRemoteDataSour
 import com.findmeahometeam.reskiume.domain.usecases.ModifyUserPasswordInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.ObserveAuthStateFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.SignOutFromAuthDataSource
-import com.findmeahometeam.reskiume.domain.usecases.UploadImageToRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import kotlinx.coroutines.flow.Flow
@@ -35,7 +35,7 @@ class ModifyAccountViewmodel(
     private val getUserFromRemoteDataSource: GetUserFromRemoteDataSource,
     private val modifyUserEmailInAuthDataSource: ModifyUserEmailInAuthDataSource,
     private val modifyUserPasswordInAuthDataSource: ModifyUserPasswordInAuthDataSource,
-    private val deleteImageInLocalDataSource: DeleteImageInLocalDataSource,
+    private val deleteImageFromLocalDataSource: DeleteImageFromLocalDataSource,
     private val deleteImageFromRemoteDataSource: DeleteImageFromRemoteDataSource,
     private val uploadImageToRemoteDataSource: UploadImageToRemoteDataSource,
     private val modifyUserFromRemoteDataSource: ModifyUserFromRemoteDataSource,
@@ -186,7 +186,7 @@ class ModifyAccountViewmodel(
         viewModelScope.launch {
             val previousUserData: User = getUserFromLocalDataSource(user.uid)!!
 
-            deleteImageInLocalDataSource(
+            deleteImageFromLocalDataSource(
                 userUid = user.uid,
                 currentImagePath = previousUserData.image
             ) { isDeleted ->

@@ -36,14 +36,14 @@ class StorageRepositoryIosImpl(
         )
     }
 
-    override fun saveImage(
+    override fun downloadImage(
         userUid: String,
         section: Section,
         onImageSaved: (String) -> Unit
     ) {
         initialCheck(
             onSuccess = {
-                it.saveImage(userUid, section, onImageSaved)
+                it.downloadImage(userUid, section, onImageSaved)
             },
             onFailure = {
                 onImageSaved("")

@@ -16,8 +16,8 @@ import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
-import com.findmeahometeam.reskiume.domain.usecases.DeleteImageFromRemoteDataSource
-import com.findmeahometeam.reskiume.domain.usecases.DeleteImageInLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.ModifyUserEmailInAuthDataSource
@@ -26,7 +26,7 @@ import com.findmeahometeam.reskiume.domain.usecases.ModifyUserFromRemoteDataSour
 import com.findmeahometeam.reskiume.domain.usecases.ModifyUserPasswordInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.ObserveAuthStateFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.SignOutFromAuthDataSource
-import com.findmeahometeam.reskiume.domain.usecases.UploadImageToRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
 import com.findmeahometeam.reskiume.localCache
 import com.findmeahometeam.reskiume.ui.core.components.UiState
@@ -191,8 +191,8 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
         val modifyUserPasswordInAuthDataSource =
             ModifyUserPasswordInAuthDataSource(authRepository)
 
-        val deleteImageInLocalDataSource =
-            DeleteImageInLocalDataSource(storageRepository)
+        val deleteImageFromLocalDataSource =
+            DeleteImageFromLocalDataSource(storageRepository)
 
         val deleteImageFromRemoteDataSource =
             DeleteImageFromRemoteDataSource(storageRepository)
@@ -218,7 +218,7 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
             getUserFromRemoteDataSource,
             modifyUserEmailInAuthDataSource,
             modifyUserPasswordInAuthDataSource,
-            deleteImageInLocalDataSource,
+            deleteImageFromLocalDataSource,
             deleteImageFromRemoteDataSource,
             uploadImageToRemoteDataSource,
             modifyUserFromRemoteDataSource,

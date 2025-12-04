@@ -18,7 +18,7 @@ import com.findmeahometeam.reskiume.domain.usecases.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.InsertUserToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.ModifyUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.ObserveAuthStateFromAuthDataSource
-import com.findmeahometeam.reskiume.domain.usecases.SaveImageToLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromRemoteRepository
@@ -79,8 +79,8 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
         val getUserFromRemoteDataSource =
             GetUserFromRemoteDataSource(realtimeDatabaseRemoteUserRepository)
 
-        val saveImageToLocalDataSource =
-            SaveImageToLocalDataSource(storageRepository)
+        val downloadImageToLocalDataSource =
+            DownloadImageToLocalDataSource(storageRepository)
 
         val insertUserToLocalDataSource =
             InsertUserToLocalDataSource(localUserRepository, authRepository)
@@ -97,7 +97,7 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
             insertReviewInLocalRepository,
             getUserFromLocalDataSource,
             getUserFromRemoteDataSource,
-            saveImageToLocalDataSource,
+            downloadImageToLocalDataSource,
             insertUserToLocalDataSource,
             modifyUserFromLocalDataSource,
             log

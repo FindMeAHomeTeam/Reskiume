@@ -12,7 +12,7 @@ import com.findmeahometeam.reskiume.domain.usecases.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.InsertUserToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.ModifyUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.ObserveAuthStateFromAuthDataSource
-import com.findmeahometeam.reskiume.domain.usecases.SaveImageToLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromRemoteRepository
@@ -42,7 +42,7 @@ class CheckReviewsViewmodel(
     private val insertReviewInLocalRepository: InsertReviewInLocalRepository,
     private val getUserFromLocalDataSource: GetUserFromLocalDataSource,
     private val getUserFromRemoteDataSource: GetUserFromRemoteDataSource,
-    private val saveImageToLocalDataSource: SaveImageToLocalDataSource,
+    private val downloadImageToLocalDataSource: DownloadImageToLocalDataSource,
     private val insertUserToLocalDataSource: InsertUserToLocalDataSource,
     private val modifyUserFromLocalDataSource: ModifyUserFromLocalDataSource,
     private val log: Log
@@ -158,7 +158,7 @@ class CheckReviewsViewmodel(
             user?.also { activist ->
                 if (activist.image.isNotBlank()) {
 
-                    saveImageToLocalDataSource(
+                    downloadImageToLocalDataSource(
                         userUid = activist.uid,
                         imageType = Section.USERS
                     ) { localImagePath: String ->
@@ -204,7 +204,7 @@ class CheckReviewsViewmodel(
             user?.also { activist ->
                 if (activist.image.isNotBlank()) {
 
-                    saveImageToLocalDataSource(
+                    downloadImageToLocalDataSource(
                         userUid = activist.uid,
                         imageType = Section.USERS
                     ) { localImagePath: String ->

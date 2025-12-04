@@ -10,7 +10,7 @@ import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.usecases.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.InsertUserToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.ModifyUserFromLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.SaveImageToLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.SignInWithEmailAndPasswordFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.ui.core.components.UiState
@@ -23,7 +23,7 @@ class LoginAccountViewmodel(
     private val signInWithEmailAndPasswordFromAuthDataSource: SignInWithEmailAndPasswordFromAuthDataSource,
     private val getDataByManagingObjectLocalCacheTimestamp: GetDataByManagingObjectLocalCacheTimestamp,
     private val getUserFromRemoteDataSource: GetUserFromRemoteDataSource,
-    private val saveImageToLocalDataSource: SaveImageToLocalDataSource,
+    private val downloadImageToLocalDataSource: DownloadImageToLocalDataSource,
     private val insertUserToLocalDataSource: InsertUserToLocalDataSource,
     private val modifyUserFromLocalDataSource: ModifyUserFromLocalDataSource,
     private val log: Log
@@ -129,7 +129,7 @@ class LoginAccountViewmodel(
                     )
                 } else if (collectedUser.image.isNotBlank()) {
 
-                    saveImageToLocalDataSource(
+                    downloadImageToLocalDataSource(
                         userUid = collectedUser.uid,
                         imageType = Section.USERS
                     ) { localImagePath: String ->

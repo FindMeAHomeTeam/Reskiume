@@ -12,8 +12,8 @@ import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteReview.RealtimeDatabaseRemoteReviewRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
-import com.findmeahometeam.reskiume.domain.usecases.DeleteImageFromRemoteDataSource
-import com.findmeahometeam.reskiume.domain.usecases.DeleteImageInLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteUsersFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromRemoteDataSource
@@ -83,8 +83,8 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
         val deleteImageFromRemoteDataSource =
             DeleteImageFromRemoteDataSource(storageRepository)
 
-        val deleteImageInLocalDataSource =
-            DeleteImageInLocalDataSource(storageRepository)
+        val deleteImageFromLocalDataSource =
+            DeleteImageFromLocalDataSource(storageRepository)
 
         val deleteUsersFromLocalDataSource =
             DeleteUsersFromLocalDataSource(localUserRepository)
@@ -102,7 +102,7 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
             deleteUserFromAuthDataSource,
             deleteUserFromRemoteDataSource,
             deleteImageFromRemoteDataSource,
-            deleteImageInLocalDataSource,
+            deleteImageFromLocalDataSource,
             deleteUsersFromLocalDataSource,
             log
         )

@@ -1,8 +1,8 @@
-package com.findmeahometeam.reskiume.usecases
+package com.findmeahometeam.reskiume.usecases.image
 
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
-import com.findmeahometeam.reskiume.domain.usecases.SaveImageToLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
 import com.findmeahometeam.reskiume.user
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
@@ -12,21 +12,21 @@ import dev.mokkery.verifySuspend
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
-class SaveImageToLocalDataSourceTest {
+class DownloadImageToLocalDataSourceTest {
 
     val storageRepository: StorageRepository = mock {
-        everySuspend { saveImage(user.uid, Section.USERS, any()) } returns Unit
+        everySuspend { downloadImage(user.uid, Section.USERS, any()) } returns Unit
     }
 
-    private val saveImageToLocalDataSource =
-        SaveImageToLocalDataSource(storageRepository)
+    private val downloadImageToLocalDataSource =
+        DownloadImageToLocalDataSource(storageRepository)
 
     @Test
     fun `given a local user image_when the app saves it_then it calls to saveImage`() =
         runTest {
-            saveImageToLocalDataSource(user.uid, Section.USERS, {})
+            downloadImageToLocalDataSource(user.uid, Section.USERS, {})
             verifySuspend {
-                storageRepository.saveImage(user.uid, Section.USERS, any())
+                storageRepository.downloadImage(user.uid, Section.USERS, any())
             }
         }
 }

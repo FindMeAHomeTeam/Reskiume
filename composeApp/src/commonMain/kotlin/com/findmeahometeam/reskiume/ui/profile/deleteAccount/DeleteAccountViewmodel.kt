@@ -7,8 +7,8 @@ import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.domain.model.User
-import com.findmeahometeam.reskiume.domain.usecases.DeleteImageFromRemoteDataSource
-import com.findmeahometeam.reskiume.domain.usecases.DeleteImageInLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteUsersFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.DeleteUserFromRemoteDataSource
@@ -37,7 +37,7 @@ class DeleteAccountViewmodel(
     private val deleteUserFromAuthDataSource: DeleteUserFromAuthDataSource,
     private val deleteUserFromRemoteDataSource: DeleteUserFromRemoteDataSource,
     private val deleteImageFromRemoteDataSource: DeleteImageFromRemoteDataSource,
-    private val deleteImageInLocalDataSource: DeleteImageInLocalDataSource,
+    private val deleteImageFromLocalDataSource: DeleteImageFromLocalDataSource,
     private val deleteUsersFromLocalDataSource: DeleteUsersFromLocalDataSource,
     private val log: Log
 ) : ViewModel() {
@@ -234,7 +234,7 @@ class DeleteAccountViewmodel(
                 onSuccess()
                 return@launch
             }
-            deleteImageInLocalDataSource(
+            deleteImageFromLocalDataSource(
                 userUid = uid,
                 currentImagePath = user.image
             ) { isDeleted: Boolean ->

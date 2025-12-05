@@ -25,7 +25,7 @@ data class RemoteNonHumanAnimal(
         )
     }
 
-    fun toData(): NonHumanAnimal {
+    fun toDomain(): NonHumanAnimal {
         return NonHumanAnimal(
             id = id,
             caregiverId = caregiverId,

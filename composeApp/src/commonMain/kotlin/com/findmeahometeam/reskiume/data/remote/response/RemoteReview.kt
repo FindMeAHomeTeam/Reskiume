@@ -21,7 +21,7 @@ data class RemoteReview(
         )
     }
 
-    fun toData(): Review {
+    fun toDomain(): Review {
         return Review(
             id = id ?: "",
             savedBy = "",

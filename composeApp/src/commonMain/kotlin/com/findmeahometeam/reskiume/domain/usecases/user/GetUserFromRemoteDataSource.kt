@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class GetUserFromRemoteDataSource(private val repository: RealtimeDatabaseRemoteUserRepository) {
-    operator fun invoke(userUid: String): Flow<User?> = repository.getRemoteUser(userUid).map { it?.toData() }
+    operator fun invoke(userUid: String): Flow<User?> = repository.getRemoteUser(userUid).map { it?.toDomain() }
 }

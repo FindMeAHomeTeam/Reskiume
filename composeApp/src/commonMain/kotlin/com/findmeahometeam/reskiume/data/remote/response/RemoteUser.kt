@@ -19,7 +19,7 @@ data class RemoteUser(
         )
     }
 
-    fun toData(): User {
+    fun toDomain(): User {
         return User(
             uid = uid ?: "",
             savedBy = "",

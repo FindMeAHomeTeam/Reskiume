@@ -8,6 +8,6 @@ import kotlinx.coroutines.flow.map
 class GetReviewsFromRemoteRepository(private val repository: RealtimeDatabaseRemoteReviewRepository) {
     operator fun invoke(reviewedUid: String): Flow<List<Review>> =
         repository.getRemoteReviews(reviewedUid).map { remoteReviews ->
-            remoteReviews.map { it.toData() }
+            remoteReviews.map { it.toDomain() }
         }
 }

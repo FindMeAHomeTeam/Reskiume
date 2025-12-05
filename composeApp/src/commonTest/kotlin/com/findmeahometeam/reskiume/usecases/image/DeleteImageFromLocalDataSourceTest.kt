@@ -12,7 +12,7 @@ import dev.mokkery.verifySuspend
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
-class DeleteImageInLocalDataSourceTest {
+class DeleteImageFromLocalDataSourceTest {
 
     val storageRepository: StorageRepository = mock {
         everySuspend { deleteLocalImage(user.uid, user.image, any()) } returns Unit

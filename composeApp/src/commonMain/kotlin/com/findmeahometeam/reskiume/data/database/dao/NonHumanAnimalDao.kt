@@ -25,4 +25,7 @@ interface NonHumanAnimalDao {
 
     @Query("SELECT * FROM NonHumanAnimalEntity WHERE id = :id AND caregiverId = :caregiverId")
     fun getNonHumanAnimal(id: String, caregiverId: String): Flow<NonHumanAnimalEntity?>
+
+    @Query("SELECT * FROM NonHumanAnimalEntity WHERE caregiverId = :caregiverId")
+    fun getAllNonHumanAnimals(caregiverId: String): Flow<List<NonHumanAnimalEntity>>
 }

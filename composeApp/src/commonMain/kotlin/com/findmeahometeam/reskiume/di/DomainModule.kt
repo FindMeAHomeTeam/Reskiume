@@ -25,6 +25,7 @@ import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLoca
 import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.DeleteAllNonHumanAnimalsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.DeleteNonHumanAnimalFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetNonHumanAnimalFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.InsertNonHumanAnimalInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.ModifyNonHumanAnimalInLocalRepository
@@ -63,6 +64,7 @@ val domainModule = module {
     // nonHumanAnimal
     factoryOf(::DeleteAllNonHumanAnimalsFromLocalRepository)
     factoryOf(::DeleteNonHumanAnimalFromLocalRepository)
+    factoryOf(::GetAllNonHumanAnimalsFromLocalRepository)
     factoryOf(::GetNonHumanAnimalFromLocalRepository)
     factoryOf(::InsertNonHumanAnimalInLocalRepository)
     factoryOf(::ModifyNonHumanAnimalInLocalRepository)

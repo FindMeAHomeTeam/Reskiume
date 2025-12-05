@@ -24,11 +24,17 @@ import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManaging
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.DeleteAllNonHumanAnimalsFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.DeleteAllNonHumanAnimalsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.DeleteNonHumanAnimalFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.DeleteNonHumanAnimalFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetNonHumanAnimalFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetNonHumanAnimalFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.InsertNonHumanAnimalInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.InsertNonHumanAnimalInRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.ModifyNonHumanAnimalInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.ModifyNonHumanAnimalInRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.DeleteReviewsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.DeleteReviewsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromLocalRepository
@@ -63,11 +69,17 @@ val domainModule = module {
 
     // nonHumanAnimal
     factoryOf(::DeleteAllNonHumanAnimalsFromLocalRepository)
+    factoryOf(::DeleteAllNonHumanAnimalsFromRemoteRepository)
     factoryOf(::DeleteNonHumanAnimalFromLocalRepository)
+    factoryOf(::DeleteNonHumanAnimalFromRemoteRepository)
     factoryOf(::GetAllNonHumanAnimalsFromLocalRepository)
+    factoryOf(::GetAllNonHumanAnimalsFromRemoteRepository)
     factoryOf(::GetNonHumanAnimalFromLocalRepository)
+    factoryOf(::GetNonHumanAnimalFromRemoteRepository)
     factoryOf(::InsertNonHumanAnimalInLocalRepository)
+    factoryOf(::InsertNonHumanAnimalInRemoteRepository)
     factoryOf(::ModifyNonHumanAnimalInLocalRepository)
+    factoryOf(::ModifyNonHumanAnimalInRemoteRepository)
 
     // review
     factoryOf(::InsertReviewInLocalRepository)

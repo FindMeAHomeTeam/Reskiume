@@ -23,6 +23,11 @@ import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteCacheFromLo
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.DeleteAllNonHumanAnimalsFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.DeleteNonHumanAnimalFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetNonHumanAnimalFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.InsertNonHumanAnimalInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.ModifyNonHumanAnimalInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.DeleteReviewsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.DeleteReviewsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromLocalRepository
@@ -54,6 +59,13 @@ val domainModule = module {
     factoryOf(::ModifyCacheInLocalRepository)
     factoryOf(::GetDataByManagingObjectLocalCacheTimestamp)
     factoryOf(::DeleteCacheFromLocalRepository)
+
+    // nonHumanAnimal
+    factoryOf(::DeleteAllNonHumanAnimalsFromLocalRepository)
+    factoryOf(::DeleteNonHumanAnimalFromLocalRepository)
+    factoryOf(::GetNonHumanAnimalFromLocalRepository)
+    factoryOf(::InsertNonHumanAnimalInLocalRepository)
+    factoryOf(::ModifyNonHumanAnimalInLocalRepository)
 
     // review
     factoryOf(::InsertReviewInLocalRepository)

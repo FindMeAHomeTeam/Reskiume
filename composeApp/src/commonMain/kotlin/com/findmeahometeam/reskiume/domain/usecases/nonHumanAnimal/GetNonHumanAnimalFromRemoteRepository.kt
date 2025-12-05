@@ -11,8 +11,8 @@ class GetNonHumanAnimalFromRemoteRepository(
     operator fun invoke(
         id: String,
         caregiverId: String
-    ): Flow<NonHumanAnimal> =
+    ): Flow<NonHumanAnimal?> =
         realtimeDatabaseRemoteNonHumanAnimalRepository.getRemoteNonHumanAnimal(id, caregiverId).map {
-            it.toDomain()
+            it?.toDomain()
         }
 }

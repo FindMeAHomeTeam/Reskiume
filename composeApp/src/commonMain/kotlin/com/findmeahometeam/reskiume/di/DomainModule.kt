@@ -34,31 +34,26 @@ import org.koin.dsl.module
 
 val domainModule = module {
 
+    // auth user
+    factoryOf(::CreateUserWithEmailAndPasswordInAuthDataSource)
+    factoryOf(::DeleteUserFromAuthDataSource)
+    factoryOf(::ModifyUserEmailInAuthDataSource)
+    factoryOf(::ModifyUserPasswordInAuthDataSource)
+    factoryOf(::ObserveAuthStateInAuthDataSource)
+    factoryOf(::SignInWithEmailAndPasswordFromAuthDataSource)
+    factoryOf(::SignOutFromAuthDataSource)
+
+    // image
+    factoryOf(::DeleteImageFromLocalDataSource)
+    factoryOf(::DeleteImageFromRemoteDataSource)
+    factoryOf(::DownloadImageToLocalDataSource)
+    factoryOf(::UploadImageToRemoteDataSource)
+
     // localCache
     factoryOf(::InsertCacheInLocalRepository)
     factoryOf(::ModifyCacheInLocalRepository)
     factoryOf(::GetDataByManagingObjectLocalCacheTimestamp)
     factoryOf(::DeleteCacheFromLocalRepository)
-
-    factoryOf(::ObserveAuthStateInAuthDataSource)
-    factoryOf(::CreateUserWithEmailAndPasswordInAuthDataSource)
-    factoryOf(::SignInWithEmailAndPasswordFromAuthDataSource)
-    factoryOf(::SignOutFromAuthDataSource)
-    factoryOf(::DeleteUserFromAuthDataSource)
-    factoryOf(::InsertUserInLocalDataSource)
-    factoryOf(::InsertUserInRemoteDataSource)
-    factoryOf(::GetUserFromLocalDataSource)
-    factoryOf(::GetUserFromRemoteDataSource)
-    factoryOf(::ModifyUserInLocalDataSource)
-    factoryOf(::ModifyUserInRemoteDataSource)
-    factoryOf(::DeleteUsersFromLocalDataSource)
-    factoryOf(::DeleteUserFromRemoteDataSource)
-    factoryOf(::UploadImageToRemoteDataSource)
-    factoryOf(::DeleteImageFromRemoteDataSource)
-    factoryOf(::DeleteImageFromLocalDataSource)
-    factoryOf(::DownloadImageToLocalDataSource)
-    factoryOf(::ModifyUserEmailInAuthDataSource)
-    factoryOf(::ModifyUserPasswordInAuthDataSource)
 
     // review
     factoryOf(::InsertReviewInLocalRepository)
@@ -67,4 +62,14 @@ val domainModule = module {
     factoryOf(::InsertReviewInRemoteRepository)
     factoryOf(::DeleteReviewsFromRemoteRepository)
     factoryOf(::GetReviewsFromRemoteRepository)
+
+    // user
+    factoryOf(::DeleteUserFromRemoteDataSource)
+    factoryOf(::DeleteUsersFromLocalDataSource)
+    factoryOf(::GetUserFromLocalDataSource)
+    factoryOf(::GetUserFromRemoteDataSource)
+    factoryOf(::InsertUserInLocalDataSource)
+    factoryOf(::InsertUserInRemoteDataSource)
+    factoryOf(::ModifyUserInLocalDataSource)
+    factoryOf(::ModifyUserInRemoteDataSource)
 }

@@ -11,7 +11,7 @@ interface LocalNonHumanAnimalRepository {
 
     suspend fun deleteNonHumanAnimal(id: String, caregiverId: String, onDeleteNonHumanAnimal: (rowsDeleted: Int) -> Unit)
 
-    suspend fun deleteAllNonHumanAnimals(id: String, caregiverId: String, onDeleteAllNonHumanAnimals: (rowsDeleted: Int) -> Unit)
+    suspend fun deleteAllNonHumanAnimals(caregiverId: String, onDeleteAllNonHumanAnimals: (rowsDeleted: Int) -> Unit)
 
     fun getNonHumanAnimal(id: String, caregiverId: String): Flow<NonHumanAnimalEntity?>
 

@@ -4,10 +4,9 @@ import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalR
 
 class DeleteAllNonHumanAnimalsFromLocalRepository(private val localNonHumanAnimalRepository: LocalNonHumanAnimalRepository) {
     suspend operator fun invoke(
-        id: String,
         caregiverId: String,
         onDeleteAllNonHumanAnimals: (rowsDeleted: Int) -> Unit
     ) {
-        localNonHumanAnimalRepository.deleteAllNonHumanAnimals(id, caregiverId, onDeleteAllNonHumanAnimals)
+        localNonHumanAnimalRepository.deleteAllNonHumanAnimals(caregiverId, onDeleteAllNonHumanAnimals)
     }
 }

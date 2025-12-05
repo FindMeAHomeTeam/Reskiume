@@ -3,7 +3,7 @@ package com.findmeahometeam.reskiume.domain.repository.local
 import com.findmeahometeam.reskiume.data.database.entity.NonHumanAnimalEntity
 import kotlinx.coroutines.flow.Flow
 
-interface NonHumanAnimalRepository {
+interface LocalNonHumanAnimalRepository {
 
     suspend fun insertNonHumanAnimal(nonHumanAnimalEntity: NonHumanAnimalEntity, onInsertNonHumanAnimal: (rowId: Long) -> Unit)
 

@@ -1,13 +1,13 @@
 package com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal
 
-import com.findmeahometeam.reskiume.domain.repository.local.NonHumanAnimalRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
 
-class DeleteNonHumanAnimalFromLocalRepository(private val nonHumanAnimalRepository: NonHumanAnimalRepository) {
+class DeleteNonHumanAnimalFromLocalRepository(private val localNonHumanAnimalRepository: LocalNonHumanAnimalRepository) {
     suspend operator fun invoke(
         id: String,
         caregiverId: String,
         onDeleteNonHumanAnimal: (rowsDeleted: Int) -> Unit
     ) {
-        nonHumanAnimalRepository.deleteNonHumanAnimal(id, caregiverId, onDeleteNonHumanAnimal)
+        localNonHumanAnimalRepository.deleteNonHumanAnimal(id, caregiverId, onDeleteNonHumanAnimal)
     }
 }

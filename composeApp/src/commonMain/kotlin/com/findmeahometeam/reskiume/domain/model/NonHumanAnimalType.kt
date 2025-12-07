@@ -1,11 +1,12 @@
 package com.findmeahometeam.reskiume.domain.model
 
 enum class NonHumanAnimalType {
-    CANINE,
-    FELINE,
+    DOG,
+    CAT,
     BIRD,
-    HARE,
+    RABBIT,
     RODENT,
+    FERRET,
     REPTILE,
     FISH,
     EQUID,

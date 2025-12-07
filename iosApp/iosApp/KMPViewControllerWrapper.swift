@@ -37,6 +37,7 @@ class KMPViewControllerWrapper: UIViewController {
             database.isPersistenceEnabled = true
             FirebaseRemoteUserDatabaseManager.shared.startIfNeeded()
             FirebaseRemoteReviewDatabaseManager.shared.startIfNeeded()
+            FirebaseRemoteNonHumanAnimalDatabaseManager.shared.startIfNeeded()
             
             didInitialize = true
         }

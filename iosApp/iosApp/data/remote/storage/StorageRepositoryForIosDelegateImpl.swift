@@ -52,7 +52,7 @@ class StorageRepositoryForIosDelegateImpl: StorageRepository {
         }
     }
     
-    func saveImage(userUid: String, section: Section, onImageSaved: @escaping (String) -> Void) {
+    func downloadImage(userUid: String, section: Section, onImageSaved: @escaping (String) -> Void) {
         let imageRef: StorageReference = getStorageReference(section: section, userUid: userUid)
         
         let fileName: String = switch section {

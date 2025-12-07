@@ -4,7 +4,7 @@ import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.remote.response.RemoteNonHumanAnimal
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.repository.remote.database.nonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepository
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -23,11 +23,14 @@ class RealtimeDatabaseRemoteNonHumanAnimalRepositoryAndroidImpl(
         remoteNonHumanAnimal: RemoteNonHumanAnimal,
         onInsertRemoteNonHumanAnimal: (DatabaseResult) -> Unit
     ) {
-        if (remoteNonHumanAnimal.id.isNotEmpty()) {
+        if (remoteNonHumanAnimal.id != null
+            && remoteNonHumanAnimal.id != 0
+            && remoteNonHumanAnimal.caregiverId?.isNotBlank() == true
+        ) {
             databaseRef
                 .child(Section.NON_HUMAN_ANIMALS.path)
                 .child(remoteNonHumanAnimal.caregiverId)
-                .child(remoteNonHumanAnimal.id)
+                .child(remoteNonHumanAnimal.id.toString())
                 .setValue(remoteNonHumanAnimal.toMap())
                 .addOnSuccessListener {
                     onInsertRemoteNonHumanAnimal(DatabaseResult.Success)
@@ -67,15 +70,15 @@ class RealtimeDatabaseRemoteNonHumanAnimalRepositoryAndroidImpl(
         }
     }
 
-    override suspend fun deleteRemoteNonHumanAnimal(
-        id: String,
+    override fun deleteRemoteNonHumanAnimal(
+        id: Int,
         caregiverId: String,
         onDeleteRemoteNonHumanAnimal: (DatabaseResult) -> Unit
     ) {
         databaseRef
             .child(Section.NON_HUMAN_ANIMALS.path)
             .child(caregiverId)
-            .child(id)
+            .child(id.toString())
             .removeValue { error, _ ->
 
                 if (error == null) {
@@ -90,7 +93,7 @@ class RealtimeDatabaseRemoteNonHumanAnimalRepositoryAndroidImpl(
             }
     }
 
-    override suspend fun deleteAllRemoteNonHumanAnimals(
+    override fun deleteAllRemoteNonHumanAnimals(
         caregiverId: String,
         onDeleteAllRemoteNonHumanAnimals: (DatabaseResult) -> Unit
     ) {
@@ -112,7 +115,7 @@ class RealtimeDatabaseRemoteNonHumanAnimalRepositoryAndroidImpl(
     }
 
     override fun getRemoteNonHumanAnimal(
-        id: String,
+        id: Int,
         caregiverId: String
     ): Flow<RemoteNonHumanAnimal?> =
         callbackFlow {
@@ -136,14 +139,14 @@ class RealtimeDatabaseRemoteNonHumanAnimalRepositoryAndroidImpl(
             databaseRef
                 .child(Section.NON_HUMAN_ANIMALS.path)
                 .child(caregiverId)
-                .child(id)
+                .child(id.toString())
                 .addListenerForSingleValueEvent(nonHumanAnimalListener)
 
             awaitClose {
                 databaseRef
                     .child(Section.NON_HUMAN_ANIMALS.path)
                     .child(caregiverId)
-                    .child(id)
+                    .child(id.toString())
                     .removeEventListener(nonHumanAnimalListener)
             }
         }

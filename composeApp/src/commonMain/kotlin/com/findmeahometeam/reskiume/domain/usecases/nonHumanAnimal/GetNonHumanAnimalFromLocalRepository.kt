@@ -7,8 +7,10 @@ import kotlinx.coroutines.flow.map
 
 class GetNonHumanAnimalFromLocalRepository(private val localNonHumanAnimalRepository: LocalNonHumanAnimalRepository) {
     operator fun invoke(
-        id: String,
+        id: Int,
         caregiverId: String
     ): Flow<NonHumanAnimal?> =
-        localNonHumanAnimalRepository.getNonHumanAnimal(id, caregiverId).map { it?.toDomain() }
+        localNonHumanAnimalRepository
+            .getNonHumanAnimal(id, caregiverId)
+            .map { it?.toDomain() }
 }

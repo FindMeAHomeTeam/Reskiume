@@ -1,4 +1,4 @@
-package com.findmeahometeam.reskiume.domain.repository.remote.database.nonHumanAnimal
+package com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonHumanAnimal
 
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.remote.response.RemoteNonHumanAnimal
@@ -15,17 +15,17 @@ interface RealtimeDatabaseRemoteNonHumanAnimalRepository {
         onModifyRemoteNonHumanAnimal: (result: DatabaseResult) -> Unit
     )
 
-    suspend fun deleteRemoteNonHumanAnimal(
-        id: String,
+    fun deleteRemoteNonHumanAnimal(
+        id: Int,
         caregiverId: String,
         onDeleteRemoteNonHumanAnimal: (result: DatabaseResult) -> Unit
     )
 
-    suspend fun deleteAllRemoteNonHumanAnimals(
+    fun deleteAllRemoteNonHumanAnimals(
         caregiverId: String,
         onDeleteAllRemoteNonHumanAnimals: (result: DatabaseResult) -> Unit
     )
 
-    fun getRemoteNonHumanAnimal(id: String, caregiverId: String): Flow<RemoteNonHumanAnimal?>
+    fun getRemoteNonHumanAnimal(id: Int, caregiverId: String): Flow<RemoteNonHumanAnimal?>
     fun getAllRemoteNonHumanAnimals(caregiverId: String): Flow<List<RemoteNonHumanAnimal>>
 }

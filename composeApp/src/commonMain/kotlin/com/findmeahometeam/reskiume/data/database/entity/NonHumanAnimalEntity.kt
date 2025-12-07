@@ -8,7 +8,7 @@ import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
 
 @Entity
 data class NonHumanAnimalEntity(
-    @PrimaryKey(autoGenerate = true) val id: String,
+    @PrimaryKey(autoGenerate = true) val id: Int,
     val caregiverId: String,
     val savedBy: String,
     val name: String,

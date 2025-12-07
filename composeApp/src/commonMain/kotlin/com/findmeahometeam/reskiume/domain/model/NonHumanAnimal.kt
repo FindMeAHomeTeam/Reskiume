@@ -4,7 +4,7 @@ import com.findmeahometeam.reskiume.data.database.entity.NonHumanAnimalEntity
 import com.findmeahometeam.reskiume.data.remote.response.RemoteNonHumanAnimal
 
 data class NonHumanAnimal(
-    val id: String,
+    val id: Int,
     val caregiverId: String,
     val savedBy: String,
     val name: String,

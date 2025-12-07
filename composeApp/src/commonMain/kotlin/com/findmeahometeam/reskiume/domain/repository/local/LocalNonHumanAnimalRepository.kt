@@ -9,11 +9,11 @@ interface LocalNonHumanAnimalRepository {
 
     suspend fun modifyNonHumanAnimal(nonHumanAnimalEntity: NonHumanAnimalEntity, onModifyNonHumanAnimal: (rowsUpdated: Int) -> Unit)
 
-    suspend fun deleteNonHumanAnimal(id: String, caregiverId: String, onDeleteNonHumanAnimal: (rowsDeleted: Int) -> Unit)
+    suspend fun deleteNonHumanAnimal(id: Int, caregiverId: String, onDeleteNonHumanAnimal: (rowsDeleted: Int) -> Unit)
 
     suspend fun deleteAllNonHumanAnimals(caregiverId: String, onDeleteAllNonHumanAnimals: (rowsDeleted: Int) -> Unit)
 
-    fun getNonHumanAnimal(id: String, caregiverId: String): Flow<NonHumanAnimalEntity?>
+    fun getNonHumanAnimal(id: Int, caregiverId: String): Flow<NonHumanAnimalEntity?>
 
     fun getAllNonHumanAnimals(caregiverId: String): Flow<List<NonHumanAnimalEntity>>
 }

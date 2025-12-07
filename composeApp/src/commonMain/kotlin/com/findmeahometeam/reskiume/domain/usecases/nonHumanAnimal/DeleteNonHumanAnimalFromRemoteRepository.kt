@@ -7,7 +7,7 @@ class DeleteNonHumanAnimalFromRemoteRepository(
     private val realtimeDatabaseRemoteNonHumanAnimalRepository: RealtimeDatabaseRemoteNonHumanAnimalRepository
 ) {
     suspend operator fun invoke(
-        id: String,
+        id: Int,
         caregiverId: String,
         onDeleteRemoteNonHumanAnimal: (result: DatabaseResult) -> Unit
     ) {

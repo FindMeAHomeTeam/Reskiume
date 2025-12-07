@@ -1,0 +1,8 @@
+package com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonHumanAnimal
+
+import kotlinx.coroutines.flow.StateFlow
+
+interface RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateWrapper {
+    val realtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateState: StateFlow<RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegate?>
+    fun updateRealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegate(delegate: RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegate?)
+}

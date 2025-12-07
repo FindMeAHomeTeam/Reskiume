@@ -5,13 +5,13 @@ import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
 
 data class RemoteNonHumanAnimal(
-    val id: String,
-    val caregiverId: String,
-    val name: String,
-    val ageCategory: AgeCategory,
-    val description: String,
-    val imageUrl: String,
-    val nonHumanAnimalType: NonHumanAnimalType
+    val id: Int? = 0,
+    val caregiverId: String? = "",
+    val name: String? = "",
+    val ageCategory: AgeCategory? = AgeCategory.BABY,
+    val description: String? = "",
+    val imageUrl: String? = "",
+    val nonHumanAnimalType: NonHumanAnimalType? = NonHumanAnimalType.OTHER
 ) {
     fun toMap(): Map<String, Any?> {
         return mapOf(
@@ -27,14 +27,14 @@ data class RemoteNonHumanAnimal(
 
     fun toDomain(): NonHumanAnimal {
         return NonHumanAnimal(
-            id = id,
-            caregiverId = caregiverId,
+            id = id ?: 0,
+            caregiverId = caregiverId ?: "",
             savedBy = "",
-            name = name,
-            ageCategory = ageCategory,
-            description = description,
-            imageUrl = imageUrl,
-            nonHumanAnimalType = nonHumanAnimalType
+            name = name ?: "",
+            ageCategory = ageCategory ?: AgeCategory.BABY,
+            description = description ?: "",
+            imageUrl = imageUrl ?: "",
+            nonHumanAnimalType = nonHumanAnimalType ?: NonHumanAnimalType.OTHER
         )
     }
 }

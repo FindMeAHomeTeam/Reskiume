@@ -60,4 +60,7 @@ actual val platformModule: Module = module {
     singleOf(::StorageRepositoryIosImpl) bind StorageRepository::class
     singleOf(::CrashlyticsForIosDelegateWrapperImpl) bind CrashlyticsForIosWrapper::class
     singleOf(::AnalyticsForIosDelegateWrapperImpl) bind AnalyticsForIosWrapper::class
+    singleOf(::RealtimeDatabaseRemoteNonHumanAnimalRepositoryIosImpl) bind RealtimeDatabaseRemoteNonHumanAnimalRepository::class
+    singleOf(::RealtimeDatabaseRemoteNonHumanAnimalFlowsRepositoryForIosDelegateImpl) bind RealtimeDatabaseRemoteNonHumanAnimalFlowsRepositoryForIosDelegate::class
+    singleOf(::RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateWrapperImpl) bind RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateWrapper::class
 }

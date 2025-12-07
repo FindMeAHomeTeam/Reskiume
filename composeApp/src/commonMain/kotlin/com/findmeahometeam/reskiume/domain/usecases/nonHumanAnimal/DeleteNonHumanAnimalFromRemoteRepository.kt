@@ -6,7 +6,7 @@ import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonH
 class DeleteNonHumanAnimalFromRemoteRepository(
     private val realtimeDatabaseRemoteNonHumanAnimalRepository: RealtimeDatabaseRemoteNonHumanAnimalRepository
 ) {
-    suspend operator fun invoke(
+    operator fun invoke(
         id: Int,
         caregiverId: String,
         onDeleteRemoteNonHumanAnimal: (result: DatabaseResult) -> Unit

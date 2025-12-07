@@ -9,6 +9,7 @@ import com.findmeahometeam.reskiume.data.database.dao.NonHumanAnimalDao
 import com.findmeahometeam.reskiume.data.database.dao.ReviewDao
 import com.findmeahometeam.reskiume.data.database.dao.UserDao
 import com.findmeahometeam.reskiume.data.database.entity.LocalCacheEntity
+import com.findmeahometeam.reskiume.data.database.entity.NonHumanAnimalEntity
 import com.findmeahometeam.reskiume.data.database.entity.ReviewEntity
 import com.findmeahometeam.reskiume.data.database.entity.UserEntity
 
@@ -19,7 +20,7 @@ const val DATABASE_NAME = "reskiume_database.db"
         LocalCacheEntity::class,
         UserEntity::class,
         ReviewEntity::class,
-        NonHumanAnimalDao::class
+        NonHumanAnimalEntity::class
     ], version = 1
 )
 @ConstructedBy(ReskiumeConstructor::class)

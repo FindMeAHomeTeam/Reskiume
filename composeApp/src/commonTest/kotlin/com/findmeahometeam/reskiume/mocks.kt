@@ -2,7 +2,10 @@ package com.findmeahometeam.reskiume
 
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.util.Section
+import com.findmeahometeam.reskiume.domain.model.AgeCategory
 import com.findmeahometeam.reskiume.domain.model.LocalCache
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
 import com.findmeahometeam.reskiume.domain.model.Review
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.UiReview
@@ -45,12 +48,12 @@ val localCache = LocalCache(
 // Mocked review data for testing
 
 val author = User(
-    uid = "luckyUid123",
+    uid = "PatryUid123",
     savedBy = user.uid,
-    username = "Lucky",
-    description = "Hello, this is Lucky's profile.",
-    email = "lucky@email.com",
-    image = "image_uri_lucky.jpg",
+    username = "Patry",
+    description = "Hello, this is Patry's profile.",
+    email = "patry@email.com",
+    image = "image_uri_patry.jpg",
     isAvailable = true
 )
 
@@ -72,3 +75,17 @@ val uiReview = UiReview(
     description = review.description,
     rating = review.rating
 )
+
+// Mocked nonHumanAnimal data for testing
+
+val nonHumanAnimal = NonHumanAnimal(
+    id = 1,
+    caregiverId = user.uid,
+    savedBy = user.uid,
+    name = "Lucky",
+    ageCategory = AgeCategory.ADULT,
+    description = "Lucky is wonderfully peaceful and calm",
+    imageUrl = "image_uri_lucky.jpg",
+    nonHumanAnimalType = NonHumanAnimalType.DOG,
+)
+

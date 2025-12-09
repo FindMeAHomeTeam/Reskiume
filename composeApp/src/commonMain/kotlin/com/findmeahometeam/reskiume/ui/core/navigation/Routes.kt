@@ -17,3 +17,9 @@ enum class Routes(val route: String) {
 
 @Serializable
 class CheckReviews(val uid: String)
+
+@Serializable
+class CheckAllNonHumanAnimals(val uid: String)
+
+@Serializable
+class CheckNonHumanAnimal(val nonHumanAnimalId: Int)

@@ -72,6 +72,7 @@ fun ProfileScreen(
     navigateToCreateAccountScreen: () -> Unit,
     navigateToModifyAccountScreen: () -> Unit,
     navigateToCheckReviewsScreen: (uid: String) -> Unit,
+    navigateToCheckNonHumanAnimalsScreen: (uid: String) -> Unit,
     navigateToDeleteAccountScreen: () -> Unit
 ) {
     val profileViewmodel: ProfileViewmodel = koinViewModel<ProfileViewmodel>()
@@ -192,7 +193,7 @@ fun ProfileScreen(
                     iconColor = primaryGreen
                 ),
                 onClick = {
-                    // TODO
+                    navigateToCheckNonHumanAnimalsScreen(user!!.uid)
                 }
             )
 

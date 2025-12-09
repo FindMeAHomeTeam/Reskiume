@@ -135,7 +135,7 @@ class GetDataByManagingObjectLocalCacheTimestampTest {
         }
 
     @Test
-    fun `given an older local cache_when the app checks data and it was set more than a day ago but there is an error updating it_then getLocalCacheEntity modifyLocalCacheEntity and logE are called`() =
+    fun `given an older local cache_when the app checks data and it was set more than a day ago but there is an error updating it_then getLCE modifyLCE and logE are called`() =
         runTest {
             val localCache = localCache.copy(timestamp = 123L)
             val getDataByManagingObjectLocalCacheTimestamp =

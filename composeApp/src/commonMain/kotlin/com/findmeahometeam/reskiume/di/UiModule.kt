@@ -4,6 +4,7 @@ import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProviderImpl
 import com.findmeahometeam.reskiume.ui.home.HomeViewmodel
 import com.findmeahometeam.reskiume.ui.profile.ProfileViewmodel
+import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimals.CheckAllNonHumanAnimalsViewmodel
 import com.findmeahometeam.reskiume.ui.profile.createAccount.CreateAccountViewmodel
 import com.findmeahometeam.reskiume.ui.profile.deleteAccount.DeleteAccountViewmodel
 import com.findmeahometeam.reskiume.ui.profile.loginAccount.LoginAccountViewmodel
@@ -23,4 +24,5 @@ val uiModule = module {
     viewModelOf(::ModifyAccountViewmodel)
     viewModelOf(::DeleteAccountViewmodel)
     viewModelOf(::CheckReviewsViewmodel)
+    viewModelOf(::CheckAllNonHumanAnimalsViewmodel)
 }

@@ -15,14 +15,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.findmeahometeam.reskiume.ui.core.backgroundColorForItems
 
 @Composable
 fun RmListItem(
     title: String,
     description: String,
     isEnabled: Boolean = true,
-    containerColor: Color = Color.White,
+    containerColor: Color = backgroundColorForItems,
     listAvatarType: RmListAvatarType,
+    descriptionMaxLines: Int = 3,
     onClick: () -> Unit
 ) {
     Card(
@@ -40,7 +42,11 @@ fun RmListItem(
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(5.dp))
-                RmSecondaryText(modifier = Modifier.fillMaxWidth(), text = description)
+                RmSecondaryText(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = description,
+                    maxLines = descriptionMaxLines
+                )
             }
         }
     }

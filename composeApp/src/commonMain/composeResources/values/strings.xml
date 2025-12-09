@@ -112,5 +112,10 @@
     <string name="check_reviews_screen_no_reviews">No reviews at the moment</string>
     <string name="check_reviews_screen_user_deleted">User deleted</string>
 
+    <!-- Check non-human animals -->
+    <string name="check_non_human_animals_screen_registered_non_human_animals_title">Registered non-human animals</string>
+    <string name="check_non_human_animals_screen_no_non_human_animals">There are no non-human animals registered</string>
+    <string name="check_non_human_animals_screen_register_non_human_animal">+  Register a non-human animal</string>
+
 
 </resources>

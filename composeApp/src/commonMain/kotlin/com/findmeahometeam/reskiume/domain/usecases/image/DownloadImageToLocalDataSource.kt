@@ -7,9 +7,10 @@ class DownloadImageToLocalDataSource(private val storageRepository: StorageRepos
 
     operator fun invoke(
         userUid: String,
-        imageType: Section,
+        extraId: String,
+        section: Section,
         onImageSaved: (String) -> Unit
     ) {
-        storageRepository.downloadImage(userUid, imageType, onImageSaved)
+        storageRepository.downloadImage(userUid, extraId, section, onImageSaved)
     }
 }

@@ -207,9 +207,10 @@ class DeleteAccountViewmodel(
             }
 
             deleteImageFromRemoteDataSource(
-                uid,
-                Section.USERS,
-                remoteImage
+                userUid = uid,
+                extraId = "",
+                section = Section.USERS,
+                currentUserImage = remoteImage
             ) { imageDeleted: Boolean ->
                 if (!imageDeleted) {
                     log.e(
@@ -234,10 +235,7 @@ class DeleteAccountViewmodel(
                 onSuccess()
                 return@launch
             }
-            deleteImageFromLocalDataSource(
-                userUid = uid,
-                currentImagePath = user.image
-            ) { isDeleted: Boolean ->
+            deleteImageFromLocalDataSource(currentImagePath = user.image) { isDeleted: Boolean ->
                 if (!isDeleted) {
                     log.e(
                         "DeleteAccountViewmodel",

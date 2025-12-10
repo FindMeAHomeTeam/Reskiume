@@ -15,7 +15,7 @@ import kotlin.test.Test
 class DeleteImageFromLocalDataSourceTest {
 
     val storageRepository: StorageRepository = mock {
-        everySuspend { deleteLocalImage(user.uid, user.image, any()) } returns Unit
+        everySuspend { deleteLocalImage(user.image, any()) } returns Unit
     }
 
     private val deleteImageFromLocalDataSource =
@@ -24,18 +24,18 @@ class DeleteImageFromLocalDataSourceTest {
     @Test
     fun `given a local user image_when the app deletes it_then it calls to deleteLocalImage`() =
         runTest {
-            deleteImageFromLocalDataSource(user.uid, user.image, {})
+            deleteImageFromLocalDataSource(user.image, {})
             verifySuspend {
-                storageRepository.deleteLocalImage(user.uid, user.image, any())
+                storageRepository.deleteLocalImage(user.image, any())
             }
         }
 
     @Test
     fun `given an empty local user image_when the app deletes it_then it doesn't call to deleteLocalImage`() =
         runTest {
-            deleteImageFromLocalDataSource(user.uid, "", {})
+            deleteImageFromLocalDataSource("", {})
             verifySuspend(exactly(0)) {
-                storageRepository.deleteLocalImage(user.uid, user.image, any())
+                storageRepository.deleteLocalImage(user.image, any())
             }
         }
 }

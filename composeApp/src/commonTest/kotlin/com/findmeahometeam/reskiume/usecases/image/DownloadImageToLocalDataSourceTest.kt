@@ -15,7 +15,7 @@ import kotlin.test.Test
 class DownloadImageToLocalDataSourceTest {
 
     val storageRepository: StorageRepository = mock {
-        everySuspend { downloadImage(user.uid, Section.USERS, any()) } returns Unit
+        everySuspend { downloadImage(user.uid, "", Section.USERS, any()) } returns Unit
     }
 
     private val downloadImageToLocalDataSource =
@@ -24,9 +24,9 @@ class DownloadImageToLocalDataSourceTest {
     @Test
     fun `given a local user image_when the app saves it_then it calls to saveImage`() =
         runTest {
-            downloadImageToLocalDataSource(user.uid, Section.USERS, {})
+            downloadImageToLocalDataSource(user.uid, "", Section.USERS, {})
             verifySuspend {
-                storageRepository.downloadImage(user.uid, Section.USERS, any())
+                storageRepository.downloadImage(user.uid, "", Section.USERS, any())
             }
         }
 }

@@ -131,7 +131,8 @@ class LoginAccountViewmodel(
 
                     downloadImageToLocalDataSource(
                         userUid = collectedUser.uid,
-                        imageType = Section.USERS
+                        extraId = "",
+                        section = Section.USERS
                     ) { localImagePath: String ->
 
                         onSavedAvatar(collectedUser.copy(image = localImagePath.ifBlank { collectedUser.image }))

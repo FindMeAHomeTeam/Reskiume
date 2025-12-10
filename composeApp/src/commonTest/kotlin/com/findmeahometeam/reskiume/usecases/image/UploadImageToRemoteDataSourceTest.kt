@@ -16,7 +16,7 @@ import kotlin.test.Test
 class UploadImageToRemoteDataSourceTest {
 
     val storageRepository: StorageRepository = mock {
-        everySuspend { uploadImage(user.uid, Section.USERS, user.image, any()) } returns Unit
+        everySuspend { uploadImage(user.uid, "", Section.USERS, user.image, any()) } returns Unit
     }
 
     private val uploadImageToRemoteDataSource =
@@ -25,18 +25,18 @@ class UploadImageToRemoteDataSourceTest {
     @Test
     fun `given a user image_when the app saves it in the remote data source_then it calls to uploadImage`() =
         runTest {
-            uploadImageToRemoteDataSource(user.uid, Section.USERS, user.image, {})
+            uploadImageToRemoteDataSource(user.uid, "", Section.USERS, user.image, {})
             verifySuspend {
-                storageRepository.uploadImage(user.uid, Section.USERS, user.image, any())
+                storageRepository.uploadImage(user.uid, "", Section.USERS, user.image, any())
             }
         }
 
     @Test
     fun `given an empty user image_when the app saves it in the remote data source_then it doesn't call to uploadImage`() =
         runTest {
-            uploadImageToRemoteDataSource(user.uid, Section.USERS, "", {})
+            uploadImageToRemoteDataSource(user.uid, "", Section.USERS, "", {})
             verifySuspend(exactly(0)) {
-                storageRepository.uploadImage(user.uid, Section.USERS, "", any())
+                storageRepository.uploadImage(user.uid, "", Section.USERS, "", any())
             }
         }
 }

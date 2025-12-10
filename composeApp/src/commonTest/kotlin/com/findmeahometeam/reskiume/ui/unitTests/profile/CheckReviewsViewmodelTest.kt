@@ -188,6 +188,7 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
             every {
                 downloadImage(
                     user.uid,
+                    "",
                     Section.USERS,
                     capture(onSaveImageToLocal)
                 )
@@ -196,6 +197,7 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
             every {
                 downloadImage(
                     author.uid,
+                    "",
                     Section.USERS,
                     capture(onSaveImageToLocal)
                 )

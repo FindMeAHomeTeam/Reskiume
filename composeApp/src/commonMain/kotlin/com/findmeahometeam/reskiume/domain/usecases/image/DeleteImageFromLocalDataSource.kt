@@ -5,14 +5,13 @@ import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepo
 class DeleteImageFromLocalDataSource(private val storageRepository: StorageRepository) {
 
     operator fun invoke(
-        userUid: String,
         currentImagePath: String,
         onImageDeleted: (Boolean) -> Unit
     ) {
         if (currentImagePath.isBlank()) {
             onImageDeleted(true)
         } else {
-            storageRepository.deleteLocalImage(userUid, currentImagePath, onImageDeleted)
+            storageRepository.deleteLocalImage(currentImagePath, onImageDeleted)
         }
     }
 }

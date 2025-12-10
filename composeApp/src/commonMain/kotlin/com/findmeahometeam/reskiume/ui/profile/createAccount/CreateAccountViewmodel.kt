@@ -66,7 +66,8 @@ class CreateAccountViewmodel(
     private fun saveUserToRemoteSource(user: User, password: String) {
         uploadImageToRemoteDataSource(
             userUid = user.uid,
-            imageType = Section.USERS,
+            extraId = "",
+            section = Section.USERS,
             imageUri = user.image
         ) { imageDownloadUri: String ->
             val userWithPossibleImageDownloadUri: User = if (imageDownloadUri.isBlank()) {
@@ -111,9 +112,10 @@ class CreateAccountViewmodel(
     ) {
         viewModelScope.launch {
             deleteImageFromRemoteDataSource(
-                userUid,
-                Section.USERS,
-                currentUserImage
+                userUid = userUid,
+                extraId = "",
+                section = Section.USERS,
+                currentUserImage = currentUserImage
             ) { imageDeleted: Boolean ->
                 if (!imageDeleted) {
                     log.e(

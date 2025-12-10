@@ -136,7 +136,6 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
         val storageRepository: StorageRepository = mock {
             every {
                 deleteLocalImage(
-                    user.uid,
                     user.image,
                     capture(onLocalImageDeleted)
                 )
@@ -145,6 +144,7 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
             everySuspend {
                 deleteRemoteImage(
                     user.uid,
+                    "",
                     Section.USERS,
                     capture(onRemoteImageDeleted)
                 )
@@ -153,6 +153,7 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
             every {
                 uploadImage(
                     user.uid,
+                    "",
                     Section.USERS,
                     user.image,
                     capture(onImageUploaded)

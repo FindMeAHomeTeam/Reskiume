@@ -119,6 +119,7 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
             every {
                 downloadImage(
                     user.uid,
+                    "",
                     Section.USERS,
                     capture(onSaveImageToLocal)
                 )

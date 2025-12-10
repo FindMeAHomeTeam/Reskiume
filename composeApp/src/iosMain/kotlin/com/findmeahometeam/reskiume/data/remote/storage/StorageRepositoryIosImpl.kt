@@ -6,13 +6,14 @@ import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepo
 
 class StorageRepositoryIosImpl(
     private val storageRepositoryForIosDelegateWrapper: StorageRepositoryForIosDelegateWrapper
-): StorageRepository {
+) : StorageRepository {
 
     private fun initialCheck(
         onSuccess: (StorageRepository) -> Unit,
         onFailure: () -> Unit
     ) {
-        val value: StorageRepository? = storageRepositoryForIosDelegateWrapper.storageRepositoryForIosDelegateState.value
+        val value: StorageRepository? =
+            storageRepositoryForIosDelegateWrapper.storageRepositoryForIosDelegateState.value
         if (value != null) {
             onSuccess(value)
         } else {
@@ -22,13 +23,14 @@ class StorageRepositoryIosImpl(
 
     override fun uploadImage(
         userUid: String,
+        extraId: String,
         section: Section,
         imageUri: String,
         onImageUploaded: (String) -> Unit
     ) {
         initialCheck(
             onSuccess = {
-                it.uploadImage(userUid, section, imageUri, onImageUploaded)
+                it.uploadImage(userUid, extraId, section, imageUri, onImageUploaded)
             },
             onFailure = {
                 onImageUploaded("")
@@ -38,12 +40,13 @@ class StorageRepositoryIosImpl(
 
     override fun downloadImage(
         userUid: String,
+        extraId: String,
         section: Section,
         onImageSaved: (String) -> Unit
     ) {
         initialCheck(
             onSuccess = {
-                it.downloadImage(userUid, section, onImageSaved)
+                it.downloadImage(userUid, extraId, section, onImageSaved)
             },
             onFailure = {
                 onImageSaved("")
@@ -52,13 +55,12 @@ class StorageRepositoryIosImpl(
     }
 
     override fun deleteLocalImage(
-        userUid: String,
         currentImagePath: String,
         onImageDeleted: (Boolean) -> Unit
     ) {
         initialCheck(
             onSuccess = {
-                it.deleteLocalImage(userUid, currentImagePath, onImageDeleted)
+                it.deleteLocalImage(currentImagePath, onImageDeleted)
             },
             onFailure = {
                 onImageDeleted(false)
@@ -68,12 +70,14 @@ class StorageRepositoryIosImpl(
 
     override suspend fun deleteRemoteImage(
         userUid: String,
+        extraId: String,
         section: Section,
         onImageDeleted: (Boolean) -> Unit
     ) {
-        val value: StorageRepository? = storageRepositoryForIosDelegateWrapper.storageRepositoryForIosDelegateState.value
+        val value: StorageRepository? =
+            storageRepositoryForIosDelegateWrapper.storageRepositoryForIosDelegateState.value
         if (value != null) {
-            value.deleteRemoteImage(userUid, section, onImageDeleted)
+            value.deleteRemoteImage(userUid, extraId, section, onImageDeleted)
         } else {
             onImageDeleted(false)
         }

@@ -161,7 +161,8 @@ class ModifyAccountViewmodel(
             }
             deleteImageFromRemoteDataSource(
                 userUid = user.uid,
-                imageType = Section.USERS,
+                extraId = "",
+                section = Section.USERS,
                 currentUserImage = previousUserData.image
             ) { isDeleted ->
 
@@ -186,10 +187,7 @@ class ModifyAccountViewmodel(
         viewModelScope.launch {
             val previousUserData: User = getUserFromLocalDataSource(user.uid)!!
 
-            deleteImageFromLocalDataSource(
-                userUid = user.uid,
-                currentImagePath = previousUserData.image
-            ) { isDeleted ->
+            deleteImageFromLocalDataSource(currentImagePath = previousUserData.image) { isDeleted ->
 
                 if (isDeleted) {
                     log.d(
@@ -214,7 +212,8 @@ class ModifyAccountViewmodel(
     ) {
         uploadImageToRemoteDataSource(
             userUid = user.uid,
-            imageType = Section.USERS,
+            extraId = "",
+            section = Section.USERS,
             imageUri = user.image
         ) { imageDownloadUri: String ->
             val userWithPossibleImageDownloadUri: User = if (imageDownloadUri.isBlank()) {

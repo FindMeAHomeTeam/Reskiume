@@ -152,15 +152,15 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
         val storageRepository: StorageRepository = mock {
             everySuspend {
                 deleteRemoteImage(
-                    user.uid,
-                    Section.USERS,
-                    capture(onRemoteImageDeleted)
+                    userUid = user.uid,
+                    extraId = "",
+                    section = Section.USERS,
+                    onImageDeleted = capture(onRemoteImageDeleted)
                 )
             } calls { onRemoteImageDeleted.get().invoke(remoteImageDeletedArg) }
 
             every {
                 deleteLocalImage(
-                    user.uid,
                     user.image,
                     capture(onLocalImageDeleted)
                 )

@@ -93,12 +93,14 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
                     any(),
                     any(),
                     any(),
+                    any(),
                     capture(onImageUploaded)
                 )
             } calls { onImageUploaded.get().invoke(onImageUploadedArg) }
 
             everySuspend {
                 deleteRemoteImage(
+                    any(),
                     any(),
                     any(),
                     capture(onImageDeletedFromRemote)

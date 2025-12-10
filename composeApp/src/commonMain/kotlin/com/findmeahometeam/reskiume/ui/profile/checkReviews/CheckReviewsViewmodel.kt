@@ -160,7 +160,8 @@ class CheckReviewsViewmodel(
 
                     downloadImageToLocalDataSource(
                         userUid = activist.uid,
-                        imageType = Section.USERS
+                        extraId = "",
+                        section = Section.USERS
                     ) { localImagePath: String ->
 
                         val activistWithLocalImage =
@@ -206,7 +207,8 @@ class CheckReviewsViewmodel(
 
                     downloadImageToLocalDataSource(
                         userUid = activist.uid,
-                        imageType = Section.USERS
+                        extraId = "",
+                        section = Section.USERS
                     ) { localImagePath: String ->
 
                         val activistWithLocalImage =

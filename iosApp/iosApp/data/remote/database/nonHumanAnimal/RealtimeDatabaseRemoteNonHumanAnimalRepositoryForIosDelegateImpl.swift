@@ -46,10 +46,10 @@ class RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateImpl: Realtime
                                     id: KotlinInt(integerLiteral: nonHumanAnimalNsDictionary["id"] as? Int ?? 0),
                                     caregiverId: nonHumanAnimalNsDictionary["caregiverId"] as? String ?? "",
                                     name: nonHumanAnimalNsDictionary["name"] as? String ?? "",
-                                    ageCategory: nonHumanAnimalNsDictionary["ageCategory"] as? AgeCategory ?? AgeCategory.baby,
+                                    ageCategory: AgeCategory.entries.first(where: { $0.name == (nonHumanAnimalNsDictionary["ageCategory"] as? String ?? AgeCategory.baby.name) }) ?? AgeCategory.baby,
                                     description: nonHumanAnimalNsDictionary["description"] as? String ?? "",
                                     imageUrl: nonHumanAnimalNsDictionary["imageUrl"] as? String ?? "",
-                                    nonHumanAnimalType: nonHumanAnimalNsDictionary["nonHumanAnimalType"] as? NonHumanAnimalType ?? NonHumanAnimalType.other
+                                    nonHumanAnimalType: NonHumanAnimalType.entries.first(where: { $0.name == (nonHumanAnimalNsDictionary["nonHumanAnimalType"] as? String ?? NonHumanAnimalType.other.name) }) ?? NonHumanAnimalType.other
                                 )
                                 remoteNonHumanAnimals.append(remoteNonHumanAnimal)
                             }

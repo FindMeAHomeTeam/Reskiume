@@ -8,32 +8,42 @@ class FakeStorageRepository(
     private val localDatasourceList: MutableList<Pair<String, String>> = mutableListOf()
 ) : StorageRepository {
 
+    private fun getPath(section: Section, userUid: String, extraId: String): String {
+        return if (extraId.isBlank()) {
+            "${section.path}/$userUid"
+        } else {
+            "${section.path}/$userUid/$extraId"
+        }
+    }
+
     override fun uploadImage(
         userUid: String,
+        extraId: String,
         section: Section,
         imageUri: String,
         onImageUploaded: (String) -> Unit
     ) {
-        remoteDatasourceList.add(Pair("$userUid/${section.path}", imageUri))
+        val path = getPath(section, userUid, extraId)
+        remoteDatasourceList.add(Pair(path, imageUri))
         onImageUploaded(imageUri)
     }
 
     override fun downloadImage(
         userUid: String,
+        extraId: String,
         section: Section,
         onImageSaved: (String) -> Unit
     ) {
-        val pathToLocalImage = "local_path/$userUid/${section.path}"
-        localDatasourceList.add(Pair("$userUid/${section.path}", pathToLocalImage))
+        val pathToLocalImage = getPath(section, userUid, extraId)
+        localDatasourceList.add(Pair(pathToLocalImage, if(extraId.isEmpty()) "$userUid.webp" else "$extraId.webp"))
         onImageSaved(pathToLocalImage)
     }
 
     override fun deleteLocalImage(
-        userUid: String,
         currentImagePath: String,
         onImageDeleted: (Boolean) -> Unit
     ) {
-        localDatasourceList.firstOrNull { it.first == "$userUid/$currentImagePath" }?.let {
+        localDatasourceList.firstOrNull { it.second == currentImagePath }?.let {
             localDatasourceList.remove(it)
             onImageDeleted(true)
         } ?: onImageDeleted(false)
@@ -41,10 +51,12 @@ class FakeStorageRepository(
 
     override suspend fun deleteRemoteImage(
         userUid: String,
+        extraId: String,
         section: Section,
         onImageDeleted: (Boolean) -> Unit
     ) {
-        remoteDatasourceList.firstOrNull { it.first == "$userUid/${section.path}" }?.let {
+        val pathToImage = getPath(section, userUid, extraId)
+        remoteDatasourceList.firstOrNull { it.first == pathToImage }?.let {
             remoteDatasourceList.remove(it)
             onImageDeleted(true)
         } ?: onImageDeleted(false)

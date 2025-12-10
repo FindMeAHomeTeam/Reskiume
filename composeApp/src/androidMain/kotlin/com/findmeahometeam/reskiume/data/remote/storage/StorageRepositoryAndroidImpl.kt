@@ -16,20 +16,37 @@ class StorageRepositoryAndroidImpl(
 
     private val storageRef: StorageReference = Firebase.storage.reference
 
-    private fun getStorageReference(section: Section, userUid: String): StorageReference {
+    private fun getStorageReference(
+        section: Section,
+        userUid: String,
+        extraId: String = ""
+    ): StorageReference {
         return when {
-            section == Section.USERS -> storageRef.child(Section.USERS.path).child(userUid).child("$userUid.webp")
-            else -> storageRef.child(Section.USERS.path).child(userUid).child("$userUid.webp")
+            section == Section.USERS -> storageRef
+                .child(Section.USERS.path)
+                .child(userUid)
+                .child("$userUid.webp")
+
+            section == Section.NON_HUMAN_ANIMALS -> storageRef
+                .child(Section.NON_HUMAN_ANIMALS.path)
+                .child(userUid)
+                .child("$extraId.webp")
+
+            else -> storageRef
+                .child(Section.USERS.path)
+                .child(userUid)
+                .child("$userUid.webp")
         }
     }
 
     override fun uploadImage(
         userUid: String,
+        extraId: String,
         section: Section,
         imageUri: String,
         onImageUploaded: (String) -> Unit
     ) {
-        val imageRef: StorageReference = getStorageReference(section, userUid)
+        val imageRef: StorageReference = getStorageReference(section, userUid, extraId)
         val uploadTask: UploadTask = imageRef.putFile(imageUri.toUri())
         uploadTask.continueWithTask { task ->
             if (!task.isSuccessful) {
@@ -47,10 +64,16 @@ class StorageRepositoryAndroidImpl(
         }
     }
 
-    override fun downloadImage(userUid: String, section: Section, onImageSaved: (String) -> Unit) {
-        val imageRef: StorageReference = getStorageReference(section, userUid)
+    override fun downloadImage(
+        userUid: String,
+        extraId: String,
+        section: Section,
+        onImageSaved: (String) -> Unit
+    ) {
+        val imageRef: StorageReference = getStorageReference(section, userUid, extraId)
         val localFile = when {
             section == Section.USERS -> File(context.filesDir, "$userUid.webp")
+            section == Section.NON_HUMAN_ANIMALS -> File(context.filesDir, "$userUid$extraId.webp")
             else -> File(context.filesDir, "$userUid.webp")
         }
 
@@ -65,7 +88,6 @@ class StorageRepositoryAndroidImpl(
     }
 
     override fun deleteLocalImage(
-        userUid: String,
         currentImagePath: String,
         onImageDeleted: (Boolean) -> Unit
     ) {
@@ -81,10 +103,11 @@ class StorageRepositoryAndroidImpl(
 
     override suspend fun deleteRemoteImage(
         userUid: String,
+        extraId: String,
         section: Section,
         onImageDeleted: (Boolean) -> Unit
     ) {
-        val imageRef: StorageReference = getStorageReference(section, userUid)
+        val imageRef: StorageReference = getStorageReference(section, userUid, extraId)
         imageRef.delete().addOnSuccessListener {
             onImageDeleted(true)
         }.addOnFailureListener {

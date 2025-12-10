@@ -1,11 +1,13 @@
 package com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimals
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromRemoteRepository
@@ -17,6 +19,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CheckAllNonHumanAnimalsViewmodel(
@@ -24,6 +27,7 @@ class CheckAllNonHumanAnimalsViewmodel(
     observeAuthStateInAuthDataSource: ObserveAuthStateInAuthDataSource,
     private val getDataByManagingObjectLocalCacheTimestamp: GetDataByManagingObjectLocalCacheTimestamp,
     private val getAllNonHumanAnimalsFromRemoteRepository: GetAllNonHumanAnimalsFromRemoteRepository,
+    private val downloadImageToLocalDataSource: DownloadImageToLocalDataSource,
     private val insertNonHumanAnimalInLocalRepository: InsertNonHumanAnimalInLocalRepository,
     private val modifyNonHumanAnimalInLocalRepository: ModifyNonHumanAnimalInLocalRepository,
     private val getAllNonHumanAnimalsFromLocalRepository: GetAllNonHumanAnimalsFromLocalRepository,
@@ -40,10 +44,10 @@ class CheckAllNonHumanAnimalsViewmodel(
                 savedBy = authUser?.uid ?: "",
                 section = Section.NON_HUMAN_ANIMALS,
                 onCompletionInsertCache = {
-                    getAllNonHumanAnimalsFromRemoteRepository(uid).insertRemoteNonHumanAnimalsInLocalRepository()
+                    getAllNonHumanAnimalsFromRemoteRepository(uid).downloadImageAndInsertNonHumanAnimalsInLocalRepository()
                 },
                 onCompletionUpdateCache = {
-                    getAllNonHumanAnimalsFromRemoteRepository(uid).modifyRemoteNonHumanAnimalsInLocalRepository()
+                    getAllNonHumanAnimalsFromRemoteRepository(uid).downloadImageAndModifyNonHumanAnimalsInLocalRepository()
                 },
                 onVerifyCacheIsRecent = {
                     getAllNonHumanAnimalsFromLocalRepository(uid)
@@ -51,43 +55,98 @@ class CheckAllNonHumanAnimalsViewmodel(
             )
         }
 
-    private fun Flow<List<NonHumanAnimal>>.insertRemoteNonHumanAnimalsInLocalRepository(): Flow<List<NonHumanAnimal>> =
-        this.map { list ->
-            list.map { nonHumanAnimal ->
-                insertNonHumanAnimalInLocalRepository(nonHumanAnimal) {
-                    if (it > 0) {
-                        log.d(
-                            "CheckNonHumanAnimalsViewmodel",
-                            "Non human animal ${nonHumanAnimal.id} added to local database"
-                        )
-                    } else {
-                        log.e(
-                            "CheckNonHumanAnimalsViewmodel",
-                            "Error adding the non human animal ${nonHumanAnimal.id} to local database"
-                        )
+    private fun Flow<List<NonHumanAnimal>>.downloadImageAndInsertNonHumanAnimalsInLocalRepository(): Flow<List<NonHumanAnimal>> =
+        this.map { nonHumanAnimalList ->
+            nonHumanAnimalList.map { nonHumanAnimal ->
+
+                if (nonHumanAnimal.imageUrl.isNotBlank()) {
+
+                    downloadImageToLocalDataSource(
+                        userUid = nonHumanAnimal.caregiverId,
+                        extraId = nonHumanAnimal.id.toString(),
+                        section = Section.NON_HUMAN_ANIMALS
+                    ) { localImagePath: String ->
+
+                        val nonHumanAnimalWithLocalImage =
+                            nonHumanAnimal.copy(imageUrl = localImagePath.ifBlank { nonHumanAnimal.imageUrl })
+                        insertNonHumanAnimalsInLocalRepository(nonHumanAnimalWithLocalImage)
                     }
+                } else {
+                    log.d(
+                        "CheckAllNonHumanAnimalsViewmodel",
+                        "Non human animal ${nonHumanAnimal.id} has no avatar image to save locally."
+                    )
+                    insertNonHumanAnimalsInLocalRepository(nonHumanAnimal)
                 }
                 nonHumanAnimal
             }
         }
 
-    private fun Flow<List<NonHumanAnimal>>.modifyRemoteNonHumanAnimalsInLocalRepository(): Flow<List<NonHumanAnimal>> =
-        this.map { list ->
-            list.map { nonHumanAnimal ->
-                modifyNonHumanAnimalInLocalRepository(nonHumanAnimal) {
-                    if (it > 0) {
-                        log.d(
-                            "CheckNonHumanAnimalsViewmodel",
-                            "Non human animal ${nonHumanAnimal.id} modified in local database"
-                        )
-                    } else {
-                        log.e(
-                            "CheckNonHumanAnimalsViewmodel",
-                            "Error modifying the non human animal ${nonHumanAnimal.id} in local database"
-                        )
+    private fun insertNonHumanAnimalsInLocalRepository(nonHumanAnimal: NonHumanAnimal) {
+
+        viewModelScope.launch {
+
+            insertNonHumanAnimalInLocalRepository(nonHumanAnimal) {
+                if (it > 0) {
+                    log.d(
+                        "CheckNonHumanAnimalsViewmodel",
+                        "Non human animal ${nonHumanAnimal.id} added to local database"
+                    )
+                } else {
+                    log.e(
+                        "CheckNonHumanAnimalsViewmodel",
+                        "Error adding the non human animal ${nonHumanAnimal.id} to local database"
+                    )
+                }
+            }
+        }
+    }
+
+
+    private fun Flow<List<NonHumanAnimal>>.downloadImageAndModifyNonHumanAnimalsInLocalRepository(): Flow<List<NonHumanAnimal>> =
+        this.map { nonHumanAnimalList ->
+            nonHumanAnimalList.map { nonHumanAnimal ->
+
+                if (nonHumanAnimal.imageUrl.isNotBlank()) {
+
+                    downloadImageToLocalDataSource(
+                        userUid = nonHumanAnimal.caregiverId,
+                        extraId = nonHumanAnimal.id.toString(),
+                        section = Section.NON_HUMAN_ANIMALS
+                    ) { localImagePath: String ->
+
+                        val nonHumanAnimalWithLocalImage =
+                            nonHumanAnimal.copy(imageUrl = localImagePath.ifBlank { nonHumanAnimal.imageUrl })
+                        modifyNonHumanAnimalsInLocalRepository(nonHumanAnimalWithLocalImage)
                     }
+                } else {
+                    log.d(
+                        "CheckAllNonHumanAnimalsViewmodel",
+                        "Non human animal ${nonHumanAnimal.id} has no avatar image to save locally."
+                    )
+                    modifyNonHumanAnimalsInLocalRepository(nonHumanAnimal)
                 }
                 nonHumanAnimal
             }
         }
+
+    private fun modifyNonHumanAnimalsInLocalRepository(nonHumanAnimal: NonHumanAnimal) {
+
+        viewModelScope.launch {
+
+            modifyNonHumanAnimalInLocalRepository(nonHumanAnimal) {
+                if (it > 0) {
+                    log.d(
+                        "CheckNonHumanAnimalsViewmodel",
+                        "Non human animal ${nonHumanAnimal.id} modified in local database"
+                    )
+                } else {
+                    log.e(
+                        "CheckNonHumanAnimalsViewmodel",
+                        "Error modifying the non human animal ${nonHumanAnimal.id} in local database"
+                    )
+                }
+            }
+        }
+    }
 }

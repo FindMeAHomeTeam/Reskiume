@@ -131,14 +131,14 @@ class CheckAllNonHumanAnimalsViewmodelTest : CoroutineTestDispatcher() {
         val localNonHumanAnimalRepository: LocalNonHumanAnimalRepository = mock {
             everySuspend {
                 insertNonHumanAnimal(
-                    nonHumanAnimal.copy(savedBy = "").toEntity(),
+                    nonHumanAnimal.toEntity(),
                     capture(onInsertNonHumanAnimalFromLocal)
                 )
             } calls { onInsertNonHumanAnimalFromLocal.get().invoke(nonHumanAnimalIdInsertedInLocalDatasourceArg) }
 
             everySuspend {
                 insertNonHumanAnimal(
-                    nonHumanAnimal.copy(savedBy = "", imageUrl = "").toEntity(),
+                    nonHumanAnimal.copy(imageUrl = "").toEntity(),
                     capture(onInsertNonHumanAnimalFromLocal)
                 )
             } calls { onInsertNonHumanAnimalFromLocal.get().invoke(nonHumanAnimalIdInsertedInLocalDatasourceArg) }
@@ -146,14 +146,14 @@ class CheckAllNonHumanAnimalsViewmodelTest : CoroutineTestDispatcher() {
 
             everySuspend {
                 modifyNonHumanAnimal(
-                    nonHumanAnimal.copy(savedBy = "").toEntity(),
+                    nonHumanAnimal.toEntity(),
                     capture(onModifyNonHumanAnimalFromLocal)
                 )
             } calls { onModifyNonHumanAnimalFromLocal.get().invoke(rowsUpdatedNonHumanAnimalArg) }
 
             everySuspend {
                 modifyNonHumanAnimal(
-                    nonHumanAnimal.copy(savedBy = "", imageUrl = "").toEntity(),
+                    nonHumanAnimal.copy(imageUrl = "").toEntity(),
                     capture(onModifyNonHumanAnimalFromLocal)
                 )
             } calls { onModifyNonHumanAnimalFromLocal.get().invoke(rowsUpdatedNonHumanAnimalArg) }
@@ -201,7 +201,6 @@ class CheckAllNonHumanAnimalsViewmodelTest : CoroutineTestDispatcher() {
     fun `given a user with empty cache_when the user clicks on a non human animal_then the non human animal is saved in local cache and displayed`() =
         runTest {
             getCheckAllNonHumanAnimalsViewmodel(
-                authStateReturn = null,
                 getLocalCacheEntityReturn = null
             ).nonHumanAnimalListFlow.test {
                 assertEquals(listOf(nonHumanAnimal.copy(savedBy = "")), awaitItem())
@@ -214,7 +213,6 @@ class CheckAllNonHumanAnimalsViewmodelTest : CoroutineTestDispatcher() {
     fun `given a registered NHA with no avatar with empty cache_when the user clicks on a NHA but have an error saving them_then the NHA is shown but not saved in local cache`() =
         runTest {
             getCheckAllNonHumanAnimalsViewmodel(
-                authStateReturn = null,
                 getLocalCacheEntityReturn = null,
                 getAllRemoteNonHumanAnimalsReturn = flowOf(listOf(nonHumanAnimal.copy(imageUrl = "").toData())),
                 nonHumanAnimalIdInsertedInLocalDatasourceArg = 0
@@ -237,7 +235,6 @@ class CheckAllNonHumanAnimalsViewmodelTest : CoroutineTestDispatcher() {
     fun `given a user with an outdated local cache_when the user clicks on a non human animal_then the non human animal is modified in local cache and displayed`() =
         runTest {
             getCheckAllNonHumanAnimalsViewmodel(
-                authStateReturn = null,
                 getLocalCacheEntityReturn =
                     localCache.copy(section = Section.NON_HUMAN_ANIMALS, timestamp = 123L).toEntity()
             ).nonHumanAnimalListFlow.test {
@@ -251,7 +248,6 @@ class CheckAllNonHumanAnimalsViewmodelTest : CoroutineTestDispatcher() {
     fun `given a registered NHA with no avatar and outdated cache_when the user clicks on a NHA but have an error modifying them_then the NHA is shown but not modified in local cache`() =
         runTest {
             getCheckAllNonHumanAnimalsViewmodel(
-                authStateReturn = null,
                 getLocalCacheEntityReturn =
                     localCache.copy(section = Section.NON_HUMAN_ANIMALS, timestamp = 123L).toEntity(),
                 getAllRemoteNonHumanAnimalsReturn = flowOf(listOf(nonHumanAnimal.copy(imageUrl = "").toData())),

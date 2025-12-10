@@ -128,12 +128,12 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 localUserRepository = FakeLocalUserRepository(mutableListOf(user)),
                 storageRepository = FakeStorageRepository(
                     remoteDatasourceList = mutableListOf(
-                        Pair("${user.uid}/${Section.USERS.path}", user.image)
+                        Pair("${Section.USERS.path}/${user.uid}", user.image)
                     ),
                     localDatasourceList = mutableListOf(
                         Pair(
-                            "${user.uid}/${user.image}",
-                            "local_path/${user.uid}/${Section.USERS.path}"
+                            "local_path",
+                            user.image
                         )
                     )
                 )
@@ -163,12 +163,12 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 localUserRepository = FakeLocalUserRepository(mutableListOf(user)),
                 storageRepository = FakeStorageRepository(
                     remoteDatasourceList = mutableListOf(
-                        Pair("${user.uid}/${Section.USERS.path}", user.image)
+                        Pair("${Section.USERS.path}/${user.uid}", user.image)
                     ),
                     localDatasourceList = mutableListOf(
                         Pair(
-                            "${user.uid}/${user.image}",
-                            "local_path/${user.uid}/${Section.USERS.path}"
+                            "local_path",
+                            user.image
                         )
                     )
                 )

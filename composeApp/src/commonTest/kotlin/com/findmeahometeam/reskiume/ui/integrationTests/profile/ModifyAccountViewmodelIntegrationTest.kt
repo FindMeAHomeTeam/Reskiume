@@ -117,12 +117,12 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(mutableListOf(user.toData())),
                 storageRepository = FakeStorageRepository(
                     remoteDatasourceList = mutableListOf(
-                        Pair("${user.uid}/${Section.USERS.path}", user.image)
+                        Pair("${Section.USERS.path}/${user.uid}", user.image)
                     ),
                     localDatasourceList = mutableListOf(
                         Pair(
-                            "${user.uid}/${user.image}",
-                            "local_path/${user.uid}/${Section.USERS.path}"
+                            "local_path",
+                            user.image
                         )
                     )
                 ),
@@ -219,7 +219,7 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(mutableListOf(user.toData())),
                 storageRepository = FakeStorageRepository(
                     remoteDatasourceList = mutableListOf(
-                        Pair("${user.uid}/${Section.USERS.path}", user.image)
+                        Pair("${Section.USERS.path}/${user.uid}", user.image)
                     )
                 ),
                 localUserRepository = FakeLocalUserRepository(mutableListOf(user))
@@ -250,22 +250,11 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     authPassword = userPwd
                 ),
                 realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(mutableListOf(user.toData())),
-                storageRepository = FakeStorageRepository(
-                    remoteDatasourceList = mutableListOf(
-                        Pair("${user.uid}/${Section.USERS.path}", user.image)
-                    ),
-                    localDatasourceList = mutableListOf(
-                        Pair(
-                            "${user.uid}/${user.image}",
-                            "local_path/${user.uid}/${Section.USERS.path}"
-                        )
-                    )
-                ),
                 localUserRepository = FakeLocalUserRepository(mutableListOf(user))
             )
             modifyAccountViewmodel.saveUserChanges(
                 isDifferentEmail = true,
-                isDifferentImage = true,
+                isDifferentImage = false,
                 user = user,
                 currentPassword = userPwd,
                 newPassword = "123456"

@@ -18,7 +18,7 @@ val user = User(
     username = "Juan Antonio",
     description = "Hello, this is Juan Antonio's profile.",
     email = "juan@email.com",
-    image = "image_uri_juan_antonio.jpg",
+    image = "userUid123.webp",
     isAvailable = true
 )
 
@@ -53,7 +53,7 @@ val author = User(
     username = "Patry",
     description = "Hello, this is Patry's profile.",
     email = "patry@email.com",
-    image = "image_uri_patry.jpg",
+    image = "PatryUid123.webp",
     isAvailable = true
 )
 
@@ -85,7 +85,7 @@ val nonHumanAnimal = NonHumanAnimal(
     name = "Lucky",
     ageCategory = AgeCategory.ADULT,
     description = "Lucky is wonderfully peaceful and calm",
-    imageUrl = "image_uri_lucky.jpg",
+    imageUrl = "1.webp",
     nonHumanAnimalType = NonHumanAnimalType.DOG,
 )
 

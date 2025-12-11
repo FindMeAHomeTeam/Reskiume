@@ -49,7 +49,8 @@ class RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateImpl: Realtime
                                     ageCategory: AgeCategory.entries.first(where: { $0.name == (nonHumanAnimalNsDictionary["ageCategory"] as? String ?? AgeCategory.baby.name) }) ?? AgeCategory.baby,
                                     description: nonHumanAnimalNsDictionary["description"] as? String ?? "",
                                     imageUrl: nonHumanAnimalNsDictionary["imageUrl"] as? String ?? "",
-                                    nonHumanAnimalType: NonHumanAnimalType.entries.first(where: { $0.name == (nonHumanAnimalNsDictionary["nonHumanAnimalType"] as? String ?? NonHumanAnimalType.other.name) }) ?? NonHumanAnimalType.other
+                                    nonHumanAnimalType: NonHumanAnimalType.entries.first(where: { $0.name == (nonHumanAnimalNsDictionary["nonHumanAnimalType"] as? String ?? NonHumanAnimalType.other.name) }) ?? NonHumanAnimalType.other,
+                                    sex: SexType.entries.first(where: { $0.name == (nonHumanAnimalNsDictionary["sex"] as? String ?? SexType.female.name) }) ?? SexType.female
                                 )
                                 remoteNonHumanAnimals.append(remoteNonHumanAnimal)
                             }
@@ -83,7 +84,8 @@ class RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateImpl: Realtime
             "ageCategory": remoteNonHumanAnimal.ageCategory!,
             "description": remoteNonHumanAnimal.description_!,
             "imageUrl": remoteNonHumanAnimal.imageUrl!,
-            "nonHumanAnimalType": remoteNonHumanAnimal.nonHumanAnimalType!
+            "nonHumanAnimalType": remoteNonHumanAnimal.nonHumanAnimalType!,
+            "sex": remoteNonHumanAnimal.sex!
         ]
     }
     

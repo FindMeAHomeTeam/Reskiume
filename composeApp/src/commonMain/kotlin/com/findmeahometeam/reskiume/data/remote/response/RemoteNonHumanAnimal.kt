@@ -3,6 +3,7 @@ package com.findmeahometeam.reskiume.data.remote.response
 import com.findmeahometeam.reskiume.domain.model.AgeCategory
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
+import com.findmeahometeam.reskiume.domain.model.SexType
 
 data class RemoteNonHumanAnimal(
     val id: Int? = 0,
@@ -11,7 +12,8 @@ data class RemoteNonHumanAnimal(
     val ageCategory: AgeCategory? = AgeCategory.BABY,
     val description: String? = "",
     val imageUrl: String? = "",
-    val nonHumanAnimalType: NonHumanAnimalType? = NonHumanAnimalType.OTHER
+    val nonHumanAnimalType: NonHumanAnimalType? = NonHumanAnimalType.OTHER,
+    val sex: SexType? = SexType.FEMALE
 ) {
     fun toMap(): Map<String, Any?> {
         return mapOf(
@@ -34,7 +36,8 @@ data class RemoteNonHumanAnimal(
             ageCategory = ageCategory ?: AgeCategory.BABY,
             description = description ?: "",
             imageUrl = imageUrl ?: "",
-            nonHumanAnimalType = nonHumanAnimalType ?: NonHumanAnimalType.OTHER
+            nonHumanAnimalType = nonHumanAnimalType ?: NonHumanAnimalType.OTHER,
+            sex = sex ?: SexType.FEMALE
         )
     }
 }

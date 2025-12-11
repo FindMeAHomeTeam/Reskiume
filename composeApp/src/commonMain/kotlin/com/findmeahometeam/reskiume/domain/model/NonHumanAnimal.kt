@@ -11,7 +11,8 @@ data class NonHumanAnimal(
     val ageCategory: AgeCategory,
     val description: String,
     val imageUrl: String,
-    val nonHumanAnimalType: NonHumanAnimalType
+    val nonHumanAnimalType: NonHumanAnimalType,
+    val sex: SexType
 ) {
 
     fun toEntity(): NonHumanAnimalEntity {
@@ -23,7 +24,8 @@ data class NonHumanAnimal(
             ageCategory = ageCategory,
             description = description,
             imageUrl = imageUrl,
-            nonHumanAnimalType = nonHumanAnimalType
+            nonHumanAnimalType = nonHumanAnimalType,
+            sex = sex
         )
     }
 
@@ -35,7 +37,8 @@ data class NonHumanAnimal(
             ageCategory = ageCategory,
             description = description,
             imageUrl = imageUrl,
-            nonHumanAnimalType = nonHumanAnimalType
+            nonHumanAnimalType = nonHumanAnimalType,
+            sex = sex
         )
     }
 }

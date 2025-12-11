@@ -5,6 +5,7 @@ import androidx.room.PrimaryKey
 import com.findmeahometeam.reskiume.domain.model.AgeCategory
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
+import com.findmeahometeam.reskiume.domain.model.SexType
 
 @Entity
 data class NonHumanAnimalEntity(
@@ -15,7 +16,8 @@ data class NonHumanAnimalEntity(
     val ageCategory: AgeCategory,
     val description: String,
     val imageUrl: String,
-    val nonHumanAnimalType: NonHumanAnimalType
+    val nonHumanAnimalType: NonHumanAnimalType,
+    val sex: SexType
 ) {
 
     fun toDomain(): NonHumanAnimal {
@@ -27,7 +29,8 @@ data class NonHumanAnimalEntity(
             ageCategory = ageCategory,
             description = description,
             imageUrl = imageUrl,
-            nonHumanAnimalType = nonHumanAnimalType
+            nonHumanAnimalType = nonHumanAnimalType,
+            sex = sex
         )
     }
 }

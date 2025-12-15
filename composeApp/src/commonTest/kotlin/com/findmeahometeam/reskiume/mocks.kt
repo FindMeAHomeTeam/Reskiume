@@ -7,6 +7,7 @@ import com.findmeahometeam.reskiume.domain.model.LocalCache
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
 import com.findmeahometeam.reskiume.domain.model.Review
+import com.findmeahometeam.reskiume.domain.model.SexType
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.UiReview
 
@@ -87,5 +88,6 @@ val nonHumanAnimal = NonHumanAnimal(
     description = "Lucky is wonderfully peaceful and calm",
     imageUrl = "1.webp",
     nonHumanAnimalType = NonHumanAnimalType.DOG,
+    sex = SexType.MALE
 )
 

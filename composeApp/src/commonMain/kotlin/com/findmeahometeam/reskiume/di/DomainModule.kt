@@ -41,10 +41,14 @@ import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromLocalRe
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.InsertReviewInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.InsertReviewInRemoteRepository
+import com.plusmobileapps.konnectivity.Konnectivity
 import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
 
 val domainModule = module {
+
+    // Network connectivity
+    single<Konnectivity> { Konnectivity() }
 
     // auth user
     factoryOf(::CreateUserWithEmailAndPasswordInAuthDataSource)

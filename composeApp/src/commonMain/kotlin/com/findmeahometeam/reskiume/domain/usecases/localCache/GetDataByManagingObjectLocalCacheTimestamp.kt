@@ -5,6 +5,7 @@ import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.LocalCache
 import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
+import com.plusmobileapps.konnectivity.Konnectivity
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -14,7 +15,8 @@ import kotlin.time.ExperimentalTime
 // and performs actions accordingly.
 class GetDataByManagingObjectLocalCacheTimestamp(
     private val repository: LocalCacheRepository,
-    private val log: Log
+    private val log: Log,
+    private val konnectivity: Konnectivity
 ) {
     @OptIn(ExperimentalTime::class)
     suspend operator fun <T> invoke(
@@ -25,66 +27,76 @@ class GetDataByManagingObjectLocalCacheTimestamp(
         onCompletionUpdateCache: suspend () -> T,
         onVerifyCacheIsRecent: suspend () -> T
     ): T {
-        val localCacheEntity: LocalCacheEntity? =
-            repository.getLocalCacheEntity(uid, section)
 
-        return when (localCacheEntity) {
-            null -> {
-                repository.insertLocalCacheEntity(
-                    LocalCache(
-                        uid = uid,
-                        savedBy = savedBy.ifBlank { uid },
-                        section = section,
-                        timestamp = Clock.System.now().epochSeconds
-                    ).toEntity()
-                ) { rowId ->
-                    if (rowId > 0) {
-                        log.d(
-                            "GetDataByManagingObjectLocalCacheTimestamp",
-                            "$uid added to local cache in section $section"
-                        )
-                    } else {
-                        log.e(
-                            "GetDataByManagingObjectLocalCacheTimestamp",
-                            "Error adding $uid to local cache in section $section"
-                        )
-                    }
-                }
-                onCompletionInsertCache()
-            }
+        return if (konnectivity.isConnected.not()) {
+            log.d(
+                "GetDataByManagingObjectLocalCacheTimestamp",
+                "No internet connection. Retrieving stored data for $uid in section $section"
+            )
+            onVerifyCacheIsRecent()
+        } else {
 
-            else -> {
+            val localCacheEntity: LocalCacheEntity? =
+                repository.getLocalCacheEntity(uid, section)
 
-                if (hasPassed24Hours(localCacheEntity.timestamp)) {
-
-                    repository.modifyLocalCacheEntity(
+            when (localCacheEntity) {
+                null -> {
+                    repository.insertLocalCacheEntity(
                         LocalCache(
-                            id = localCacheEntity.id,
                             uid = uid,
                             savedBy = savedBy.ifBlank { uid },
                             section = section,
                             timestamp = Clock.System.now().epochSeconds
                         ).toEntity()
-                    ) { rowsUpdated ->
-                        if (rowsUpdated > 0) {
+                    ) { rowId ->
+                        if (rowId > 0) {
                             log.d(
                                 "GetDataByManagingObjectLocalCacheTimestamp",
-                                "$uid updated in local cache in section $section"
+                                "$uid added to local cache in section $section"
                             )
                         } else {
                             log.e(
                                 "GetDataByManagingObjectLocalCacheTimestamp",
-                                "Error updating $uid in local cache in section $section"
+                                "Error adding $uid to local cache in section $section"
                             )
                         }
                     }
-                    onCompletionUpdateCache()
-                } else {
-                    log.d(
-                        "GetDataByManagingObjectLocalCacheTimestamp",
-                        "Cache for $uid in section $section is up-to-date."
-                    )
-                    onVerifyCacheIsRecent()
+                    onCompletionInsertCache()
+                }
+
+                else -> {
+
+                    if (hasPassed24Hours(localCacheEntity.timestamp)) {
+
+                        repository.modifyLocalCacheEntity(
+                            LocalCache(
+                                id = localCacheEntity.id,
+                                uid = uid,
+                                savedBy = savedBy.ifBlank { uid },
+                                section = section,
+                                timestamp = Clock.System.now().epochSeconds
+                            ).toEntity()
+                        ) { rowsUpdated ->
+                            if (rowsUpdated > 0) {
+                                log.d(
+                                    "GetDataByManagingObjectLocalCacheTimestamp",
+                                    "$uid updated in local cache in section $section"
+                                )
+                            } else {
+                                log.e(
+                                    "GetDataByManagingObjectLocalCacheTimestamp",
+                                    "Error updating $uid in local cache in section $section"
+                                )
+                            }
+                        }
+                        onCompletionUpdateCache()
+                    } else {
+                        log.d(
+                            "GetDataByManagingObjectLocalCacheTimestamp",
+                            "Cache for $uid in section $section is up-to-date."
+                        )
+                        onVerifyCacheIsRecent()
+                    }
                 }
             }
         }

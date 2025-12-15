@@ -85,6 +85,8 @@ kotlin {
             implementation(libs.coil.network.ktor)
 
             implementation(libs.image.picker.kmp)
+
+            implementation(libs.konnectivity)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

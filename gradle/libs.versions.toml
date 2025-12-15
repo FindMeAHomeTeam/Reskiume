@@ -15,6 +15,7 @@ googleServices = "4.4.4"
 imagepickerkmp = "1.0.28"
 junit = "4.13.2"
 koin-bom = "4.1.1"
+konnectivity = "0.1-alpha01"
 kotlin = "2.2.20"
 kotlinxDatetime = "0.7.1-0.6.x-compat"
 ksp = "2.2.20-2.0.2" #2.0.3 gives ksp.gradle.KspAATask issues
@@ -69,6 +70,9 @@ androidx-room-sqlite-wrapper = { module = "androidx.room:room-sqlite-wrapper", v
 
 #imagePicker
 image-picker-kmp = { module = "io.github.ismoy:imagepickerkmp", version.ref = "imagepickerkmp" }
+
+#konnectivity
+konnectivity = { module = "com.plusmobileapps:konnectivity", version.ref = "konnectivity" }
 
 #firebase
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }

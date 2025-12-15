@@ -8,6 +8,8 @@ import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.localCache
 import com.findmeahometeam.reskiume.user
+import com.plusmobileapps.konnectivity.Konnectivity
+import com.plusmobileapps.konnectivity.NetworkConnection
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -17,8 +19,12 @@ import dev.mokkery.matcher.capture.Capture
 import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
+import dev.mokkery.verify
 import dev.mokkery.verify.VerifyMode.Companion.exactly
 import dev.mokkery.verifySuspend
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
@@ -36,11 +42,20 @@ class GetDataByManagingObjectLocalCacheTimestampTest {
     private val onModifyLocalCache = Capture.slot<(rowsUpdated: Int) -> Unit>()
 
     private fun getUseCaseGetDataByManagingObjectLocalCacheTimestamp(
+        isConnectedReturn: Boolean = true,
         cacheArg: LocalCache = localCache,
         getLocalCacheEntityReturn: LocalCacheEntity? = localCache.toEntity(),
         rowIdInsertedArg: Long = 1L,
         rowsUpdatedArg: Int = 1
     ): GetDataByManagingObjectLocalCacheTimestamp {
+
+        val konnectivity: Konnectivity = mock {
+            every { isConnected } returns isConnectedReturn
+            every { currentNetworkConnection } returns NetworkConnection.WIFI
+            every { isConnectedState } returns MutableStateFlow(true)
+            every { currentNetworkConnectionState } returns MutableStateFlow(NetworkConnection.WIFI)
+        }
+
         localCacheRepository = mock {
 
             everySuspend {
@@ -64,8 +79,33 @@ class GetDataByManagingObjectLocalCacheTimestampTest {
                 )
             } calls { onModifyLocalCache.get().invoke(rowsUpdatedArg) }
         }
-        return GetDataByManagingObjectLocalCacheTimestamp(localCacheRepository, log)
+        return GetDataByManagingObjectLocalCacheTimestamp(localCacheRepository, log, konnectivity)
     }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `given no internet_when the app checks the cache_then onVerifyCacheIsRecent and logD are called`() =
+        runTest {
+            val getDataByManagingObjectLocalCacheTimestamp =
+                getUseCaseGetDataByManagingObjectLocalCacheTimestamp(isConnectedReturn = false)
+
+            getDataByManagingObjectLocalCacheTimestamp(
+                uid = user.uid,
+                section = Section.REVIEWS,
+                onCompletionInsertCache = { },
+                onCompletionUpdateCache = { },
+                onVerifyCacheIsRecent = { }
+            )
+
+            runCurrent()
+
+            verify {
+                log.d(
+                    "GetDataByManagingObjectLocalCacheTimestamp",
+                    "No internet connection. Retrieving stored data for ${user.uid} in section ${Section.REVIEWS}"
+                )
+            }
+        }
 
     @Test
     fun `given an empty local cache_when the app checks data and inserts the local cache_then getLocalCacheEntity insertLocalCacheEntity and logD are called`() =

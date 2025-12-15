@@ -19,6 +19,7 @@ import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManaging
 import com.findmeahometeam.reskiume.localCache
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeAuthRepository
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeKonnectivity
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalCacheRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalUserRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLog
@@ -27,6 +28,7 @@ import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeStorageReposit
 import com.findmeahometeam.reskiume.ui.profile.loginAccount.LoginAccountViewmodel
 import com.findmeahometeam.reskiume.user
 import com.findmeahometeam.reskiume.userPwd
+import com.plusmobileapps.konnectivity.Konnectivity
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertTrue
@@ -39,14 +41,15 @@ class LoginAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
         log: Log = FakeLog(),
         localUserRepository: LocalUserRepository = FakeLocalUserRepository(),
         realtimeDatabaseRemoteUserRepository: RealtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(),
-        storageRepository: StorageRepository = FakeStorageRepository()
+        storageRepository: StorageRepository = FakeStorageRepository(),
+        konnectivity: Konnectivity = FakeKonnectivity()
     ): LoginAccountViewmodel {
 
         val signInWithEmailAndPasswordFromAuthDataSource =
             SignInWithEmailAndPasswordFromAuthDataSource(authRepository)
 
         val getDataByManagingObjectLocalCacheTimestamp =
-            GetDataByManagingObjectLocalCacheTimestamp(localCacheRepository, log)
+            GetDataByManagingObjectLocalCacheTimestamp(localCacheRepository, log, konnectivity)
 
         val getUserFromRemoteDataSource =
             GetUserFromRemoteDataSource(realtimeDatabaseRemoteUserRepository)

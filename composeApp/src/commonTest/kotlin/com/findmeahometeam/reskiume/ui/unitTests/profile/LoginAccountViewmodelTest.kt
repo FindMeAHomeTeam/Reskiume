@@ -25,6 +25,8 @@ import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.profile.loginAccount.LoginAccountViewmodel
 import com.findmeahometeam.reskiume.user
 import com.findmeahometeam.reskiume.userPwd
+import com.plusmobileapps.konnectivity.Konnectivity
+import com.plusmobileapps.konnectivity.NetworkConnection
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -34,6 +36,7 @@ import dev.mokkery.matcher.capture.Capture
 import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -131,11 +134,18 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
             every { e(any(), any()) } returns Unit
         }
 
+        val konnectivity: Konnectivity = mock {
+            every { isConnected } returns true
+            every { currentNetworkConnection } returns NetworkConnection.WIFI
+            every { isConnectedState } returns MutableStateFlow(true)
+            every { currentNetworkConnectionState } returns MutableStateFlow(NetworkConnection.WIFI)
+        }
+
         val signInWithEmailAndPasswordFromAuthDataSource =
             SignInWithEmailAndPasswordFromAuthDataSource(authRepository)
 
         val getDataByManagingObjectLocalCacheTimestamp =
-            GetDataByManagingObjectLocalCacheTimestamp(localCacheRepository, log)
+            GetDataByManagingObjectLocalCacheTimestamp(localCacheRepository, log, konnectivity)
 
         val getUserFromRemoteDataSource =
             GetUserFromRemoteDataSource(realtimeDatabaseRemoteUserRepository)

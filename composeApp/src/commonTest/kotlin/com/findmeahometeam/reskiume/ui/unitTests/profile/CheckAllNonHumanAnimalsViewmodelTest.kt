@@ -27,6 +27,8 @@ import com.findmeahometeam.reskiume.ui.core.navigation.CheckAllNonHumanAnimals
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimals.CheckAllNonHumanAnimalsViewmodel
 import com.findmeahometeam.reskiume.user
+import com.plusmobileapps.konnectivity.Konnectivity
+import com.plusmobileapps.konnectivity.NetworkConnection
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -39,6 +41,7 @@ import dev.mokkery.mock
 import dev.mokkery.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -60,6 +63,13 @@ class CheckAllNonHumanAnimalsViewmodelTest : CoroutineTestDispatcher() {
     private val log: Log = mock {
         every { d(any(), any()) } calls { println(it) }
         every { e(any(), any()) } calls { println(it) }
+    }
+
+    private val konnectivity: Konnectivity = mock {
+        every { isConnected } returns true
+        every { currentNetworkConnection } returns NetworkConnection.WIFI
+        every { isConnectedState } returns MutableStateFlow(true)
+        every { currentNetworkConnectionState } returns MutableStateFlow(NetworkConnection.WIFI)
     }
 
     private fun getCheckAllNonHumanAnimalsViewmodel(
@@ -167,7 +177,7 @@ class CheckAllNonHumanAnimalsViewmodelTest : CoroutineTestDispatcher() {
             ObserveAuthStateInAuthDataSource(authRepository)
 
         val getDataByManagingObjectLocalCacheTimestamp =
-            GetDataByManagingObjectLocalCacheTimestamp(localCacheRepository, log)
+            GetDataByManagingObjectLocalCacheTimestamp(localCacheRepository, log, konnectivity)
 
         val getAllNonHumanAnimalsFromRemoteRepository =
             GetAllNonHumanAnimalsFromRemoteRepository(realtimeDatabaseRemoteNonHumanAnimalRepository)

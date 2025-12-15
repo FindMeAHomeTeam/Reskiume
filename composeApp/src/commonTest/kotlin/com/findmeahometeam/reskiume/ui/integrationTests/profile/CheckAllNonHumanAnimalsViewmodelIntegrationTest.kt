@@ -22,6 +22,7 @@ import com.findmeahometeam.reskiume.nonHumanAnimal
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckAllNonHumanAnimals
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeAuthRepository
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeKonnectivity
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalCacheRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLog
@@ -31,6 +32,7 @@ import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeStorageReposit
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimals.CheckAllNonHumanAnimalsViewmodel
 import com.findmeahometeam.reskiume.user
 import com.findmeahometeam.reskiume.userPwd
+import com.plusmobileapps.konnectivity.Konnectivity
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -50,13 +52,14 @@ class CheckAllNonHumanAnimalsViewmodelIntegrationTest : CoroutineTestDispatcher(
         realtimeDatabaseRemoteNonHumanAnimalRepository: RealtimeDatabaseRemoteNonHumanAnimalRepository = FakeRealtimeDatabaseRemoteNonHumanAnimalRepository(),
         storageRepository: StorageRepository = FakeStorageRepository(),
         localNonHumanAnimalRepository: LocalNonHumanAnimalRepository = FakeLocalNonHumanAnimalRepository(),
+        konnectivity: Konnectivity = FakeKonnectivity()
     ): CheckAllNonHumanAnimalsViewmodel {
 
         val observeAuthStateInAuthDataSource =
             ObserveAuthStateInAuthDataSource(authRepository)
 
         val getDataByManagingObjectLocalCacheTimestamp =
-            GetDataByManagingObjectLocalCacheTimestamp(localCacheRepository, log)
+            GetDataByManagingObjectLocalCacheTimestamp(localCacheRepository, log, konnectivity)
 
         val getAllNonHumanAnimalsFromRemoteRepository =
             GetAllNonHumanAnimalsFromRemoteRepository(realtimeDatabaseRemoteNonHumanAnimalRepository)

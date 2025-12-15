@@ -28,6 +28,7 @@ import com.findmeahometeam.reskiume.review
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckReviews
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeAuthRepository
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeKonnectivity
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalCacheRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalReviewRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalUserRepository
@@ -39,6 +40,7 @@ import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeStorageReposit
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsViewmodel
 import com.findmeahometeam.reskiume.uiReview
 import com.findmeahometeam.reskiume.userPwd
+import com.plusmobileapps.konnectivity.Konnectivity
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -55,14 +57,15 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
         localReviewRepository: LocalReviewRepository = FakeLocalReviewRepository(),
         localUserRepository: LocalUserRepository = FakeLocalUserRepository(),
         realtimeDatabaseRemoteUserRepository: RealtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(),
-        storageRepository: StorageRepository = FakeStorageRepository()
+        storageRepository: StorageRepository = FakeStorageRepository(),
+        konnectivity: Konnectivity = FakeKonnectivity()
     ): CheckReviewsViewmodel {
 
         val observeAuthStateInAuthDataSource =
             ObserveAuthStateInAuthDataSource(authRepository)
 
         val getDataByManagingObjectLocalCacheTimestamp =
-            GetDataByManagingObjectLocalCacheTimestamp(localCacheRepository, log)
+            GetDataByManagingObjectLocalCacheTimestamp(localCacheRepository, log, konnectivity)
 
         val getReviewsFromRemoteRepository =
             GetReviewsFromRemoteRepository(realtimeDatabaseRemoteReviewRepository)

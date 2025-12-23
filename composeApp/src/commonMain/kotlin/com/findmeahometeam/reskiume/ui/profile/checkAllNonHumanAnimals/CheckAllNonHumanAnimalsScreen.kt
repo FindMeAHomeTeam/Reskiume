@@ -28,14 +28,14 @@ import com.findmeahometeam.reskiume.ui.core.components.RmText
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import reskiume.composeapp.generated.resources.Res
-import reskiume.composeapp.generated.resources.check_non_human_animals_screen_no_non_human_animals
-import reskiume.composeapp.generated.resources.check_non_human_animals_screen_register_non_human_animal
-import reskiume.composeapp.generated.resources.check_non_human_animals_screen_registered_non_human_animals_title
+import reskiume.composeapp.generated.resources.check_all_non_human_animals_screen_no_non_human_animals
+import reskiume.composeapp.generated.resources.check_all_non_human_animals_screen_register_non_human_animal
+import reskiume.composeapp.generated.resources.check_all_non_human_animals_screen_registered_non_human_animals_title
 
 @Composable
 fun CheckAllNonHumanAnimalsScreen(
     onBackPressed: () -> Unit,
-    onNonHumanAnimalClick: (nonHumanAnimalId: Int) -> Unit
+    onNonHumanAnimalClick: (nonHumanAnimalId: String, caregiverId: String) -> Unit
 ) {
 
     val checkAllNonHumanAnimalsViewmodel: CheckAllNonHumanAnimalsViewmodel =
@@ -45,7 +45,7 @@ fun CheckAllNonHumanAnimalsScreen(
     )
 
     RmScaffold(
-        title = stringResource(Res.string.check_non_human_animals_screen_registered_non_human_animals_title),
+        title = stringResource(Res.string.check_all_non_human_animals_screen_registered_non_human_animals_title),
         onBackPressed = onBackPressed,
     ) { padding ->
         Column(
@@ -66,7 +66,7 @@ fun CheckAllNonHumanAnimalsScreen(
                 )
                 RmText(
                     modifier = Modifier.fillMaxWidth().padding(10.dp),
-                    text = stringResource(Res.string.check_non_human_animals_screen_no_non_human_animals),
+                    text = stringResource(Res.string.check_all_non_human_animals_screen_no_non_human_animals),
                     textAlign = TextAlign.Center,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Black
@@ -79,14 +79,19 @@ fun CheckAllNonHumanAnimalsScreen(
                             title = nonHumanAnimal.name,
                             description = nonHumanAnimal.description,
                             listAvatarType = RmListAvatarType.Image(nonHumanAnimal.imageUrl),
-                            onClick = { onNonHumanAnimalClick(nonHumanAnimal.id) }
+                            onClick = {
+                                onNonHumanAnimalClick(
+                                    nonHumanAnimal.id,
+                                    nonHumanAnimal.caregiverId
+                                )
+                            }
                         )
                     }
                 }
                 Spacer(modifier = Modifier.weight(1f))
             }
             RmButton(
-                text = stringResource(Res.string.check_non_human_animals_screen_register_non_human_animal),
+                text = stringResource(Res.string.check_all_non_human_animals_screen_register_non_human_animal),
                 onClick = {
 
                 }

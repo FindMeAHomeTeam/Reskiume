@@ -56,7 +56,7 @@ class RealtimeDatabaseRemoteNonHumanAnimalRepositoryAndroidImpl(
     ) {
         val remoteNonHumanAnimalValues: Map<String, Any?> = remoteNonHumanAnimal.toMap()
         val childUpdates: HashMap<String, Any> =
-            hashMapOf("/${Section.NON_HUMAN_ANIMALS.path}/${remoteNonHumanAnimal.caregiverId}" to remoteNonHumanAnimalValues)
+            hashMapOf("/${Section.NON_HUMAN_ANIMALS.path}/${remoteNonHumanAnimal.caregiverId}/${remoteNonHumanAnimal.id}" to remoteNonHumanAnimalValues)
 
         databaseRef.updateChildren(childUpdates).addOnSuccessListener {
             onModifyRemoteNonHumanAnimal(DatabaseResult.Success)

@@ -26,7 +26,13 @@ fun <T> RmResultState(
     onSuccess: @Composable (T) -> Unit
 ) {
     when (uiState) {
-        is UiState.Idle -> {} // Do nothing
+        is UiState.Idle -> { // Do nothing
+            Box(
+                modifier = Modifier.fillMaxWidth().height(64.dp),
+                contentAlignment = Alignment.Center,
+                content = {}
+            )
+        }
 
         is UiState.Loading -> {
             Box(

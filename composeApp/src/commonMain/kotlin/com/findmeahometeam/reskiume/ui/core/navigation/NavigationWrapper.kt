@@ -6,12 +6,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.findmeahometeam.reskiume.ui.home.HomeScreen
-import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimals.CheckAllNonHumanAnimalsScreen
+import com.findmeahometeam.reskiume.ui.profile.checkAllNonHumanAnimals.CheckAllNonHumanAnimalsScreen
 import com.findmeahometeam.reskiume.ui.profile.createAccount.CreateAccountScreen
 import com.findmeahometeam.reskiume.ui.profile.deleteAccount.DeleteAccountScreen
 import com.findmeahometeam.reskiume.ui.profile.loginAccount.LoginAccountScreen
 import com.findmeahometeam.reskiume.ui.profile.modifyAccount.ModifyAccountScreen
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsScreen
+import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.ModifyNonHumanAnimalScreen
 
 @Composable
 fun NavigationWrapper() {
@@ -62,8 +63,16 @@ fun NavigationWrapper() {
                 onBackPressed = {
                     mainNavController.navigateUp()
                 },
-                onNonHumanAnimalClick = { nonHumanAnimalId ->
-                    //mainNavController.navigate(CheckNonHumanAnimal(nonHumanAnimalId))
+                onNonHumanAnimalClick = { nonHumanAnimalId: String, caregiverId: String ->
+                    mainNavController.navigate(ModifyNonHumanAnimal(nonHumanAnimalId, caregiverId))
+                }
+            )
+        }
+
+        composable<ModifyNonHumanAnimal> {
+            ModifyNonHumanAnimalScreen(
+                onBackPressed = {
+                    mainNavController.navigateUp()
                 }
             )
         }

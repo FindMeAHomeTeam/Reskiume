@@ -27,7 +27,7 @@ fun <T : Enum<T>> RmDropDownMenu(
     modifier: Modifier = Modifier,
     dropDownLabel: String,
     defaultElementText: String,
-    elements: List<T>,
+    items: List<Pair<T, String>>,
     onClick: (T) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -70,13 +70,13 @@ fun <T : Enum<T>> RmDropDownMenu(
                     textFieldWidth.toDp()
                 })
         ) {
-            elements.forEach { element ->
+            items.forEach { element ->
                 DropdownMenuItem(
-                    text = { RmText(element.name) },
+                    text = { RmText(element.second) },
                     onClick = {
                         expanded = false
-                        value = element.name
-                        onClick(element)
+                        value = element.second
+                        onClick(element.first)
                     }
                 )
             }

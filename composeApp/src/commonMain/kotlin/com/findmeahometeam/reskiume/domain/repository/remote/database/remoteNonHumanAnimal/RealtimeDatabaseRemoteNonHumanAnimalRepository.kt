@@ -16,7 +16,7 @@ interface RealtimeDatabaseRemoteNonHumanAnimalRepository {
     )
 
     fun deleteRemoteNonHumanAnimal(
-        id: Int,
+        id: String,
         caregiverId: String,
         onDeleteRemoteNonHumanAnimal: (result: DatabaseResult) -> Unit
     )
@@ -26,6 +26,6 @@ interface RealtimeDatabaseRemoteNonHumanAnimalRepository {
         onDeleteAllRemoteNonHumanAnimals: (result: DatabaseResult) -> Unit
     )
 
-    fun getRemoteNonHumanAnimal(id: Int, caregiverId: String): Flow<RemoteNonHumanAnimal?>
+    fun getRemoteNonHumanAnimal(id: String, caregiverId: String): Flow<RemoteNonHumanAnimal?>
     fun getAllRemoteNonHumanAnimals(caregiverId: String): Flow<List<RemoteNonHumanAnimal>>
 }

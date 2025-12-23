@@ -1,6 +1,7 @@
 package com.findmeahometeam.reskiume.domain.model
 
 enum class NonHumanAnimalType {
+    UNSELECTED,
     DOG,
     CAT,
     BIRD,

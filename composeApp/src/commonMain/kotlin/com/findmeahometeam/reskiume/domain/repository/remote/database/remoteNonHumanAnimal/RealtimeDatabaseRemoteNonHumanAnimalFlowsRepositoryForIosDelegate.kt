@@ -5,9 +5,9 @@ import com.rickclephas.kmp.nativecoroutines.NativeCoroutines
 import kotlinx.coroutines.flow.Flow
 
 interface RealtimeDatabaseRemoteNonHumanAnimalFlowsRepositoryForIosDelegate {
-    fun updateNonHumanAnimalIdAndCaregiverId(id: Int = 0, caregiverId: String)
+    fun updateNonHumanAnimalIdAndCaregiverId(id: String = "", caregiverId: String)
     @NativeCoroutines
-    val nonHumanAnimalIdAndCaregiverIdPairFlow: Flow<Pair<Int, String>>
+    val nonHumanAnimalIdAndCaregiverIdPairFlow: Flow<Pair<String, String>>
     fun updateRemoteNonHumanAnimalListFlow(delegate: List<RemoteNonHumanAnimal>)
     val remoteNonHumanAnimalListFlow: Flow<List<RemoteNonHumanAnimal>>
 }

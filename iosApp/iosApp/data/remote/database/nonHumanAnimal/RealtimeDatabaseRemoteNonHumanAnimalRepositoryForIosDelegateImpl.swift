@@ -25,11 +25,11 @@ class RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateImpl: Realtime
                 let emittedValues = asyncSequence(for: realtimeDatabaseRemoteNonHumanAnimalFlowsRepositoryForIosDelegate.nonHumanAnimalIdAndCaregiverIdPairFlow)
                 for try await nonHumanAnimalIdAndCaregiverIdPair in emittedValues {
                     
-                    let nonHumanAnimalId: Int = nonHumanAnimalIdAndCaregiverIdPair.first?.intValue ?? 0
+                    let nonHumanAnimalId: String = nonHumanAnimalIdAndCaregiverIdPair.first as? String ?? ""
                     let caregiverId: String = nonHumanAnimalIdAndCaregiverIdPair.second as? String ?? ""
                     
                     if caregiverId != "" {
-                        let childPath = (nonHumanAnimalId == 0) ? "\(caregiverId)" : "\(caregiverId)\\\(nonHumanAnimalId)"
+                        let childPath = (nonHumanAnimalId == "") ? "\(caregiverId)" : "\(caregiverId)\\\(nonHumanAnimalId)"
                         
                         database.reference()
                             .child(Section.nonHumanAnimals.path)
@@ -43,14 +43,14 @@ class RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateImpl: Realtime
                                     continue
                                 }
                                 let remoteNonHumanAnimal = RemoteNonHumanAnimal(
-                                    id: KotlinInt(integerLiteral: nonHumanAnimalNsDictionary["id"] as? Int ?? 0),
+                                    id: nonHumanAnimalNsDictionary["id"] as? String ?? "",
                                     caregiverId: nonHumanAnimalNsDictionary["caregiverId"] as? String ?? "",
                                     name: nonHumanAnimalNsDictionary["name"] as? String ?? "",
-                                    ageCategory: AgeCategory.entries.first(where: { $0.name == (nonHumanAnimalNsDictionary["ageCategory"] as? String ?? AgeCategory.baby.name) }) ?? AgeCategory.baby,
+                                    ageCategory: AgeCategory.entries.first(where: { $0.name == (nonHumanAnimalNsDictionary["ageCategory"] as? String ?? AgeCategory.unselected.name) }) ?? AgeCategory.unselected,
                                     description: nonHumanAnimalNsDictionary["description"] as? String ?? "",
                                     imageUrl: nonHumanAnimalNsDictionary["imageUrl"] as? String ?? "",
-                                    nonHumanAnimalType: NonHumanAnimalType.entries.first(where: { $0.name == (nonHumanAnimalNsDictionary["nonHumanAnimalType"] as? String ?? NonHumanAnimalType.other.name) }) ?? NonHumanAnimalType.other,
-                                    sex: SexType.entries.first(where: { $0.name == (nonHumanAnimalNsDictionary["sex"] as? String ?? SexType.female.name) }) ?? SexType.female
+                                    nonHumanAnimalType: NonHumanAnimalType.entries.first(where: { $0.name == (nonHumanAnimalNsDictionary["nonHumanAnimalType"] as? String ?? NonHumanAnimalType.unselected.name) }) ?? NonHumanAnimalType.unselected,
+                                    gender: Gender.entries.first(where: { $0.name == (nonHumanAnimalNsDictionary["gender"] as? String ?? Gender.unselected.name) }) ?? Gender.unselected
                                 )
                                 remoteNonHumanAnimals.append(remoteNonHumanAnimal)
                             }
@@ -85,7 +85,7 @@ class RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateImpl: Realtime
             "description": remoteNonHumanAnimal.description_!,
             "imageUrl": remoteNonHumanAnimal.imageUrl!,
             "nonHumanAnimalType": remoteNonHumanAnimal.nonHumanAnimalType!,
-            "sex": remoteNonHumanAnimal.sex!
+            "gender": remoteNonHumanAnimal.gender!
         ]
     }
     
@@ -94,7 +94,7 @@ class RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateImpl: Realtime
             try await databaseReference!
                 .child(Section.nonHumanAnimals.path)
                 .child(remoteNonHumanAnimal.caregiverId!)
-                .child(remoteNonHumanAnimal.id?.stringValue ?? "")
+                .child(remoteNonHumanAnimal.id!)
                 .setValue(getNSDictionaryFromRemoteNonHumanAnimal(remoteNonHumanAnimal: remoteNonHumanAnimal))
             onInsertRemoteNonHumanAnimal(DatabaseResult.Success())
         } catch {
@@ -121,11 +121,11 @@ class RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateImpl: Realtime
         }
     }
     
-    func deleteRemoteNonHumanAnimal(id: Int32, caregiverId: String, onDeleteRemoteNonHumanAnimal: @escaping (DatabaseResult) -> Void) {
+    func deleteRemoteNonHumanAnimal(id: String, caregiverId: String, onDeleteRemoteNonHumanAnimal: @escaping (DatabaseResult) -> Void) {
         databaseReference!
             .child(Section.nonHumanAnimals.path)
             .child(caregiverId)
-            .child(String(id))
+            .child(id)
             .removeValue { error, _ in
             if (error == nil) {
                 onDeleteRemoteNonHumanAnimal(DatabaseResult.Success())

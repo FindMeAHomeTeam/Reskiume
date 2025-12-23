@@ -9,7 +9,7 @@ class GetNonHumanAnimalFromRemoteRepository(
     private val realtimeDatabaseRemoteNonHumanAnimalRepository: RealtimeDatabaseRemoteNonHumanAnimalRepository
 ) {
     operator fun invoke(
-        id: Int,
+        id: String,
         caregiverId: String
     ): Flow<NonHumanAnimal?> =
         realtimeDatabaseRemoteNonHumanAnimalRepository.getRemoteNonHumanAnimal(

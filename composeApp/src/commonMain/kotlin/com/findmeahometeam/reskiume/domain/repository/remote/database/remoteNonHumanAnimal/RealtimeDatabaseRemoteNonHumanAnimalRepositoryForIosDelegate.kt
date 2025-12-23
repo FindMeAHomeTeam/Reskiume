@@ -15,7 +15,7 @@ interface RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegate {
     )
 
     fun deleteRemoteNonHumanAnimal(
-        id: Int,
+        id: String,
         caregiverId: String,
         onDeleteRemoteNonHumanAnimal: (result: DatabaseResult) -> Unit
     )

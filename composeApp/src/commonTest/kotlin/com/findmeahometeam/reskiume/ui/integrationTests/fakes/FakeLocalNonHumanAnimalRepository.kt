@@ -39,7 +39,7 @@ class FakeLocalNonHumanAnimalRepository(
     }
 
     override suspend fun deleteNonHumanAnimal(
-        id: Int,
+        id: String,
         caregiverId: String,
         onDeleteNonHumanAnimal: (rowsDeleted: Int) -> Unit
     ) {
@@ -67,7 +67,7 @@ class FakeLocalNonHumanAnimalRepository(
     }
 
     override fun getNonHumanAnimal(
-        id: Int,
+        id: String,
         caregiverId: String
     ): Flow<NonHumanAnimalEntity?> =
         flowOf(localNonHumanAnimalList.firstOrNull { it.id == id && it.caregiverId == caregiverId })

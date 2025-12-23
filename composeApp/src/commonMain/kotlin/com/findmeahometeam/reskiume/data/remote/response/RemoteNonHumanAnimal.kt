@@ -3,17 +3,17 @@ package com.findmeahometeam.reskiume.data.remote.response
 import com.findmeahometeam.reskiume.domain.model.AgeCategory
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
-import com.findmeahometeam.reskiume.domain.model.SexType
+import com.findmeahometeam.reskiume.domain.model.Gender
 
 data class RemoteNonHumanAnimal(
-    val id: Int? = 0,
+    val id: String? = "",
     val caregiverId: String? = "",
     val name: String? = "",
-    val ageCategory: AgeCategory? = AgeCategory.BABY,
+    val ageCategory: AgeCategory? = AgeCategory.UNSELECTED,
     val description: String? = "",
     val imageUrl: String? = "",
-    val nonHumanAnimalType: NonHumanAnimalType? = NonHumanAnimalType.OTHER,
-    val sex: SexType? = SexType.FEMALE
+    val nonHumanAnimalType: NonHumanAnimalType? = NonHumanAnimalType.UNSELECTED,
+    val gender: Gender? = Gender.UNSELECTED
 ) {
     fun toMap(): Map<String, Any?> {
         return mapOf(
@@ -23,21 +23,22 @@ data class RemoteNonHumanAnimal(
             "ageCategory" to ageCategory,
             "description" to description,
             "imageUrl" to imageUrl,
-            "nonHumanAnimalType" to nonHumanAnimalType
+            "nonHumanAnimalType" to nonHumanAnimalType,
+            "gender" to gender
         )
     }
 
     fun toDomain(): NonHumanAnimal {
         return NonHumanAnimal(
-            id = id ?: 0,
+            id = id ?: "",
             caregiverId = caregiverId ?: "",
             savedBy = "",
             name = name ?: "",
-            ageCategory = ageCategory ?: AgeCategory.BABY,
+            ageCategory = ageCategory ?: AgeCategory.UNSELECTED,
             description = description ?: "",
             imageUrl = imageUrl ?: "",
-            nonHumanAnimalType = nonHumanAnimalType ?: NonHumanAnimalType.OTHER,
-            sex = sex ?: SexType.FEMALE
+            nonHumanAnimalType = nonHumanAnimalType ?: NonHumanAnimalType.UNSELECTED,
+            gender = gender ?: Gender.UNSELECTED
         )
     }
 }

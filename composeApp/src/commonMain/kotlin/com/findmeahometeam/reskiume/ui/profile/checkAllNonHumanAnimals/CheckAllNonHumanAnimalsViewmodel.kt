@@ -1,4 +1,4 @@
-package com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimals
+package com.findmeahometeam.reskiume.ui.profile.checkAllNonHumanAnimals
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -63,7 +63,7 @@ class CheckAllNonHumanAnimalsViewmodel(
 
                     downloadImageToLocalDataSource(
                         userUid = nonHumanAnimal.caregiverId,
-                        extraId = nonHumanAnimal.id.toString(),
+                        extraId = nonHumanAnimal.id,
                         section = Section.NON_HUMAN_ANIMALS
                     ) { localImagePath: String ->
 
@@ -111,7 +111,7 @@ class CheckAllNonHumanAnimalsViewmodel(
 
                     downloadImageToLocalDataSource(
                         userUid = nonHumanAnimal.caregiverId,
-                        extraId = nonHumanAnimal.id.toString(),
+                        extraId = nonHumanAnimal.id,
                         section = Section.NON_HUMAN_ANIMALS
                     ) { localImagePath: String ->
 

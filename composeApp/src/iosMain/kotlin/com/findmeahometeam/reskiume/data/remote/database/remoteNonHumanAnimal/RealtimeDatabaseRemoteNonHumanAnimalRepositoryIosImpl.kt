@@ -60,11 +60,11 @@ class RealtimeDatabaseRemoteNonHumanAnimalRepositoryIosImpl(
     }
 
     override fun deleteRemoteNonHumanAnimal(
-        id: Int,
+        id: String,
         caregiverId: String,
         onDeleteRemoteNonHumanAnimal: (DatabaseResult) -> Unit
     ) {
-        if (id == 0 || caregiverId.isBlank()) return onDeleteRemoteNonHumanAnimal(DatabaseResult.Error())
+        if (id.isBlank() || caregiverId.isBlank()) return onDeleteRemoteNonHumanAnimal(DatabaseResult.Error())
 
         val value =
             realtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateWrapper.realtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateState.value
@@ -91,7 +91,7 @@ class RealtimeDatabaseRemoteNonHumanAnimalRepositoryIosImpl(
     }
 
     override fun getRemoteNonHumanAnimal(
-        id: Int,
+        id: String,
         caregiverId: String
     ): Flow<RemoteNonHumanAnimal?> {
         realtimeDatabaseRemoteNonHumanAnimalFlowsRepositoryForIosDelegate

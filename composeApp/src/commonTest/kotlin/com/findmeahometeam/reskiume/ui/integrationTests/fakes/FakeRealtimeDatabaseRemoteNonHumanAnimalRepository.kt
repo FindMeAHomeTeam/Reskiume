@@ -40,7 +40,7 @@ class FakeRealtimeDatabaseRemoteNonHumanAnimalRepository(
     }
 
     override fun deleteRemoteNonHumanAnimal(
-        id: Int,
+        id: String,
         caregiverId: String,
         onDeleteRemoteNonHumanAnimal: (result: DatabaseResult) -> Unit
     ) {
@@ -68,7 +68,7 @@ class FakeRealtimeDatabaseRemoteNonHumanAnimalRepository(
     }
 
     override fun getRemoteNonHumanAnimal(
-        id: Int,
+        id: String,
         caregiverId: String
     ): Flow<RemoteNonHumanAnimal?> =
         flowOf(remoteNonHumanAnimalList.firstOrNull { it.id == id && it.caregiverId == caregiverId })

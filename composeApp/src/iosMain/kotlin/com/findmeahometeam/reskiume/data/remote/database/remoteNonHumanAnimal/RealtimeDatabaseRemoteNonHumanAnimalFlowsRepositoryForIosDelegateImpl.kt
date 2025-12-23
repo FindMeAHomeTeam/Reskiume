@@ -9,14 +9,14 @@ import kotlinx.coroutines.flow.asSharedFlow
 class RealtimeDatabaseRemoteNonHumanAnimalFlowsRepositoryForIosDelegateImpl :
     RealtimeDatabaseRemoteNonHumanAnimalFlowsRepositoryForIosDelegate {
 
-    private val _nonHumanAnimalIdAndCaregiverIdPairState: MutableSharedFlow<Pair<Int, String>> =
+    private val _nonHumanAnimalIdAndCaregiverIdPairState: MutableSharedFlow<Pair<String, String>> =
         MutableSharedFlow(extraBufferCapacity = 1)
 
-    override fun updateNonHumanAnimalIdAndCaregiverId(id: Int, caregiverId: String) {
+    override fun updateNonHumanAnimalIdAndCaregiverId(id: String, caregiverId: String) {
         _nonHumanAnimalIdAndCaregiverIdPairState.tryEmit(Pair(id, caregiverId))
     }
 
-    override val nonHumanAnimalIdAndCaregiverIdPairFlow: Flow<Pair<Int, String>> =
+    override val nonHumanAnimalIdAndCaregiverIdPairFlow: Flow<Pair<String, String>> =
         _nonHumanAnimalIdAndCaregiverIdPairState.asSharedFlow()
 
     private val _remoteNonHumanAnimalListState: MutableSharedFlow<List<RemoteNonHumanAnimal>> =

@@ -2,9 +2,11 @@ package com.findmeahometeam.reskiume.domain.model
 
 import com.findmeahometeam.reskiume.data.database.entity.NonHumanAnimalEntity
 import com.findmeahometeam.reskiume.data.remote.response.RemoteNonHumanAnimal
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 data class NonHumanAnimal(
-    val id: Int,
+    val id: String = "",
     val caregiverId: String,
     val savedBy: String,
     val name: String,
@@ -12,12 +14,16 @@ data class NonHumanAnimal(
     val description: String,
     val imageUrl: String,
     val nonHumanAnimalType: NonHumanAnimalType,
-    val sex: SexType
+    val gender: Gender
 ) {
+
+    @OptIn(ExperimentalTime::class)
+    private fun setId(): String =
+        id.ifBlank { Clock.System.now().epochSeconds.toString() + caregiverId }
 
     fun toEntity(): NonHumanAnimalEntity {
         return NonHumanAnimalEntity(
-            id = id,
+            id = id.ifBlank { setId() },
             caregiverId = caregiverId,
             savedBy = savedBy,
             name = name,
@@ -25,20 +31,20 @@ data class NonHumanAnimal(
             description = description,
             imageUrl = imageUrl,
             nonHumanAnimalType = nonHumanAnimalType,
-            sex = sex
+            gender = gender
         )
     }
 
     fun toData(): RemoteNonHumanAnimal {
         return RemoteNonHumanAnimal(
-            id = id,
+            id = id.ifBlank { setId() },
             caregiverId = caregiverId,
             name = name,
             ageCategory = ageCategory,
             description = description,
             imageUrl = imageUrl,
             nonHumanAnimalType = nonHumanAnimalType,
-            sex = sex
+            gender = gender
         )
     }
 }

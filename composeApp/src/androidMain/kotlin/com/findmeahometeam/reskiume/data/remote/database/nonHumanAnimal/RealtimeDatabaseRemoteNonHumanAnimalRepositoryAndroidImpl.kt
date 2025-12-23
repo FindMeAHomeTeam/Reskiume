@@ -23,14 +23,13 @@ class RealtimeDatabaseRemoteNonHumanAnimalRepositoryAndroidImpl(
         remoteNonHumanAnimal: RemoteNonHumanAnimal,
         onInsertRemoteNonHumanAnimal: (DatabaseResult) -> Unit
     ) {
-        if (remoteNonHumanAnimal.id != null
-            && remoteNonHumanAnimal.id != 0
+        if (remoteNonHumanAnimal.id?.isNotBlank() == true
             && remoteNonHumanAnimal.caregiverId?.isNotBlank() == true
         ) {
             databaseRef
                 .child(Section.NON_HUMAN_ANIMALS.path)
                 .child(remoteNonHumanAnimal.caregiverId)
-                .child(remoteNonHumanAnimal.id.toString())
+                .child(remoteNonHumanAnimal.id)
                 .setValue(remoteNonHumanAnimal.toMap())
                 .addOnSuccessListener {
                     onInsertRemoteNonHumanAnimal(DatabaseResult.Success)
@@ -71,14 +70,14 @@ class RealtimeDatabaseRemoteNonHumanAnimalRepositoryAndroidImpl(
     }
 
     override fun deleteRemoteNonHumanAnimal(
-        id: Int,
+        id: String,
         caregiverId: String,
         onDeleteRemoteNonHumanAnimal: (DatabaseResult) -> Unit
     ) {
         databaseRef
             .child(Section.NON_HUMAN_ANIMALS.path)
             .child(caregiverId)
-            .child(id.toString())
+            .child(id)
             .removeValue { error, _ ->
 
                 if (error == null) {
@@ -115,7 +114,7 @@ class RealtimeDatabaseRemoteNonHumanAnimalRepositoryAndroidImpl(
     }
 
     override fun getRemoteNonHumanAnimal(
-        id: Int,
+        id: String,
         caregiverId: String
     ): Flow<RemoteNonHumanAnimal?> =
         callbackFlow {
@@ -139,14 +138,14 @@ class RealtimeDatabaseRemoteNonHumanAnimalRepositoryAndroidImpl(
             databaseRef
                 .child(Section.NON_HUMAN_ANIMALS.path)
                 .child(caregiverId)
-                .child(id.toString())
+                .child(id)
                 .addListenerForSingleValueEvent(nonHumanAnimalListener)
 
             awaitClose {
                 databaseRef
                     .child(Section.NON_HUMAN_ANIMALS.path)
                     .child(caregiverId)
-                    .child(id.toString())
+                    .child(id)
                     .removeEventListener(nonHumanAnimalListener)
             }
         }

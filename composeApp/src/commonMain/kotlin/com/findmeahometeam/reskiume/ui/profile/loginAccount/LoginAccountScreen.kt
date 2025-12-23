@@ -2,6 +2,7 @@ package com.findmeahometeam.reskiume.ui.profile.loginAccount
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -75,7 +76,14 @@ fun LoginAccountScreen(onBackPressed: () -> Unit, onLoginSuccessful: () -> Unit)
                 onValueChange = { pwd = it }
             )
             Spacer(modifier = Modifier.height(10.dp))
-            RmResultState(uiState, onSuccess = { onLoginSuccessful() })
+            RmResultState(uiState) {
+                Box(
+                    modifier = Modifier.fillMaxWidth().height(64.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    onLoginSuccessful()
+                }
+            }
 
             Spacer(modifier = Modifier.weight(1f))
             RmButton(
@@ -83,7 +91,8 @@ fun LoginAccountScreen(onBackPressed: () -> Unit, onLoginSuccessful: () -> Unit)
                 enabled = isLogInButtonEnabled,
                 onClick = {
                     loginAccountViewmodel.signInUsingEmail(email, pwd)
-                })
+                }
+            )
         }
     }
 }

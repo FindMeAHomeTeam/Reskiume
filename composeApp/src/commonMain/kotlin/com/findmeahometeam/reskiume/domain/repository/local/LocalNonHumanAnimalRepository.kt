@@ -9,7 +9,7 @@ interface LocalNonHumanAnimalRepository {
 
     suspend fun modifyNonHumanAnimal(nonHumanAnimalEntity: NonHumanAnimalEntity, onModifyNonHumanAnimal: (rowsUpdated: Int) -> Unit)
 
-    suspend fun deleteNonHumanAnimal(id: String, caregiverId: String, onDeleteNonHumanAnimal: (rowsDeleted: Int) -> Unit)
+    suspend fun deleteNonHumanAnimal(id: String, onDeleteNonHumanAnimal: (rowsDeleted: Int) -> Unit)
 
     suspend fun deleteAllNonHumanAnimals(caregiverId: String, onDeleteAllNonHumanAnimals: (rowsDeleted: Int) -> Unit)
 

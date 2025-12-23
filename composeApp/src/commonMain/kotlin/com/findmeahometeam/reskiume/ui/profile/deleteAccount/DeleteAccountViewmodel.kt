@@ -210,7 +210,7 @@ class DeleteAccountViewmodel(
                 userUid = uid,
                 extraId = "",
                 section = Section.USERS,
-                currentUserImage = remoteImage
+                currentImage = remoteImage
             ) { imageDeleted: Boolean ->
                 if (!imageDeleted) {
                     log.e(

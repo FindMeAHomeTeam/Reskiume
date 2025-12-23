@@ -163,7 +163,7 @@ class ModifyAccountViewmodel(
                 userUid = user.uid,
                 extraId = "",
                 section = Section.USERS,
-                currentUserImage = previousUserData.image
+                currentImage = previousUserData.image
             ) { isDeleted ->
 
                 if (isDeleted) {

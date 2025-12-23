@@ -9,10 +9,10 @@ class DeleteImageFromRemoteDataSource(private val storageRepository: StorageRepo
         userUid: String,
         extraId: String,
         section: Section,
-        currentUserImage: String,
+        currentImage: String,
         onImageDeleted: (Boolean) -> Unit
     ) {
-        if (currentUserImage.isBlank()) {
+        if (currentImage.isBlank()) {
             onImageDeleted(true)
         } else {
             storageRepository.deleteRemoteImage(userUid, extraId, section, onImageDeleted)

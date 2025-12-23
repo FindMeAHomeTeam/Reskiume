@@ -115,7 +115,7 @@ class CreateAccountViewmodel(
                 userUid = userUid,
                 extraId = "",
                 section = Section.USERS,
-                currentUserImage = currentUserImage
+                currentImage = currentUserImage
             ) { imageDeleted: Boolean ->
                 if (!imageDeleted) {
                     log.e(

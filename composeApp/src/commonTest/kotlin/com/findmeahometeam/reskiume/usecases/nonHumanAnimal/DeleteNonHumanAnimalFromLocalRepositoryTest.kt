@@ -16,7 +16,7 @@ class DeleteNonHumanAnimalFromLocalRepositoryTest {
 
     val localNonHumanAnimalRepository: LocalNonHumanAnimalRepository = mock {
         everySuspend {
-            deleteNonHumanAnimal(nonHumanAnimal.id, user.uid, any())
+            deleteNonHumanAnimal(nonHumanAnimal.id, any())
         } returns Unit
     }
 
@@ -26,11 +26,10 @@ class DeleteNonHumanAnimalFromLocalRepositoryTest {
     @Test
     fun `given local non human animal_when the app deletes the local non human animal_then deleteNonHumanAnimal is called`() =
         runTest {
-            deleteNonHumanAnimalFromLocalRepository(nonHumanAnimal.id, user.uid, {})
+            deleteNonHumanAnimalFromLocalRepository(nonHumanAnimal.id, {})
             verifySuspend {
                 localNonHumanAnimalRepository.deleteNonHumanAnimal(
                     nonHumanAnimal.id,
-                    user.uid,
                     any()
                 )
             }

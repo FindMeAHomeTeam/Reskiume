@@ -40,11 +40,10 @@ class FakeLocalNonHumanAnimalRepository(
 
     override suspend fun deleteNonHumanAnimal(
         id: String,
-        caregiverId: String,
         onDeleteNonHumanAnimal: (rowsDeleted: Int) -> Unit
     ) {
         val nonHumanAnimal =
-            localNonHumanAnimalList.firstOrNull { it.id == id && it.caregiverId == caregiverId }
+            localNonHumanAnimalList.firstOrNull { it.id == id }
         if (nonHumanAnimal == null) {
             onDeleteNonHumanAnimal(0)
         } else {
@@ -66,11 +65,9 @@ class FakeLocalNonHumanAnimalRepository(
         }
     }
 
-    override fun getNonHumanAnimal(
+    override suspend fun getNonHumanAnimal(
         id: String,
-        caregiverId: String
-    ): Flow<NonHumanAnimalEntity?> =
-        flowOf(localNonHumanAnimalList.firstOrNull { it.id == id && it.caregiverId == caregiverId })
+    ): NonHumanAnimalEntity? = localNonHumanAnimalList.firstOrNull { it.id == id }
 
     override fun getAllNonHumanAnimals(caregiverId: String): Flow<List<NonHumanAnimalEntity>> =
         flowOf(localNonHumanAnimalList.filter { it.caregiverId == caregiverId })

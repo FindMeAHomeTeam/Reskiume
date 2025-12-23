@@ -22,4 +22,13 @@ class CheckReviews(val uid: String)
 class CheckAllNonHumanAnimals(val uid: String)
 
 @Serializable
-class CheckNonHumanAnimal(val nonHumanAnimalId: Int)
+class CheckNonHumanAnimal(
+    val nonHumanAnimalId: String,
+    val caregiverId: String
+)
+
+@Serializable
+class ModifyNonHumanAnimal(
+    val nonHumanAnimalId: String,
+    val caregiverId: String
+)

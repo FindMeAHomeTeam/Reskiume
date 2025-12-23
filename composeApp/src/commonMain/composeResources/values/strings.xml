@@ -112,10 +112,28 @@
     <string name="check_reviews_screen_no_reviews">No reviews at the moment</string>
     <string name="check_reviews_screen_user_deleted">User deleted</string>
 
-    <!-- Check non-human animals -->
-    <string name="check_non_human_animals_screen_registered_non_human_animals_title">Registered non-human animals</string>
-    <string name="check_non_human_animals_screen_no_non_human_animals">There are no non-human animals registered</string>
-    <string name="check_non_human_animals_screen_register_non_human_animal">+  Register a non-human animal</string>
+    <!-- Check all non-human animals -->
+    <string name="check_all_non_human_animals_screen_registered_non_human_animals_title">Registered non-human animals</string>
+    <string name="check_all_non_human_animals_screen_no_non_human_animals">There are no non-human animals registered</string>
+    <string name="check_all_non_human_animals_screen_register_non_human_animal">+  Register a non-human animal</string>
+
+    <!-- Check non-human animal -->
+    <string name="check_non_human_animal_screen_non_human_animal_profile_title">%1$s's profile</string>
+    <string name="check_non_human_animal_screen_non_human_animal_name">Name</string>
+    <string name="check_non_human_animal_screen_non_human_animal_type">Type</string>
+    <string name="check_non_human_animal_screen_non_human_animal_gender">Gender</string>
+    <string name="check_non_human_animal_screen_non_human_animal_age_category">Age category</string>
+    <string name="check_non_human_animal_screen_non_human_animal_description">description</string>
+
+    <!-- Modify non-human animal -->
+    <string name="modify_non_human_animal_screen_non_human_animal_profile_title">%1$s's profile</string>
+    <string name="modify_non_human_animal_screen_non_human_animal_name">Name</string>
+    <string name="modify_non_human_animal_screen_non_human_animal_type">Type</string>
+    <string name="modify_non_human_animal_screen_non_human_animal_gender">Gender</string>
+    <string name="modify_non_human_animal_screen_non_human_animal_age_category">Age category</string>
+    <string name="modify_non_human_animal_screen_non_human_animal_description">description</string>
+    <string name="modify_non_human_animal_screen_save_non_human_animal_changes_button">Save %1$s's changes</string>
+
 
 
 </resources>

@@ -1,6 +1,7 @@
 package com.findmeahometeam.reskiume.usecases.nonHumanAnimal
 
 import app.cash.turbine.test
+import com.findmeahometeam.reskiume.CoroutineTestDispatcher
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromRemoteRepository
 import com.findmeahometeam.reskiume.nonHumanAnimal
@@ -13,7 +14,7 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class GetAllNonHumanAnimalsFromRemoteRepositoryTest {
+class GetAllNonHumanAnimalsFromRemoteRepositoryTest: CoroutineTestDispatcher() {
 
     val realtimeDatabaseRemoteNonHumanAnimalRepository: RealtimeDatabaseRemoteNonHumanAnimalRepository = mock {
         every {

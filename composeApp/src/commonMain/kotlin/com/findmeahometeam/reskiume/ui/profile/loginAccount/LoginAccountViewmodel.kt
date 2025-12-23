@@ -28,12 +28,12 @@ class LoginAccountViewmodel(
     private val modifyUserInLocalDataSource: ModifyUserInLocalDataSource,
     private val log: Log
 ) : ViewModel() {
-    private var _state: MutableStateFlow<UiState> = MutableStateFlow(UiState.Idle)
-    val state: StateFlow<UiState> = _state.asStateFlow()
+    private var _state: MutableStateFlow<UiState<Unit>> = MutableStateFlow(UiState.Idle())
+    val state: StateFlow<UiState<Unit>> = _state.asStateFlow()
 
     fun signInUsingEmail(email: String, password: String) {
         viewModelScope.launch {
-            _state.value = UiState.Loading
+            _state.value = UiState.Loading()
             val authResult = signInWithEmailAndPasswordFromAuthDataSource(email, password)
             when (authResult) {
                 is AuthResult.Error -> {
@@ -66,7 +66,7 @@ class LoginAccountViewmodel(
                                         "LoginViewmodel",
                                         "Inserted user with uid ${collectedUser.uid} into local data source."
                                     )
-                                    _state.value = UiState.Success
+                                    _state.value = UiState.Success(Unit)
                                 } else {
                                     log.e(
                                         "LoginViewmodel",
@@ -91,7 +91,7 @@ class LoginAccountViewmodel(
                                         "LoginViewmodel",
                                         "Modified user with uid ${collectedUser.uid} into local data source."
                                     )
-                                    _state.value = UiState.Success
+                                    _state.value = UiState.Success(Unit)
                                 } else {
                                     log.e(
                                         "LoginViewmodel",
@@ -108,7 +108,7 @@ class LoginAccountViewmodel(
                         "LoginViewmodel",
                         "User with uid ${authUser.uid} is up-to-date in local data source."
                     )
-                    _state.value = UiState.Success
+                    _state.value = UiState.Success(Unit)
                 }
             )
         }

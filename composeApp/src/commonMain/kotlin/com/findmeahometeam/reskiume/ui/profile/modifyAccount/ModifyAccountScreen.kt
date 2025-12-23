@@ -69,7 +69,7 @@ fun ModifyAccountScreen(onBackPressed: () -> Unit) {
 
     val modifyAccountViewmodel: ModifyAccountViewmodel =
         koinViewModel<ModifyAccountViewmodel>()
-    val uiState: UiState by modifyAccountViewmodel.uiState.collectAsState()
+    val uiState: UiState<Unit> by modifyAccountViewmodel.uiState.collectAsState()
 
     val profileViewmodel: ProfileViewmodel = koinViewModel<ProfileViewmodel>()
     val profileUiState: ProfileViewmodel.ProfileUiState by profileViewmodel.state.collectAsState(
@@ -268,7 +268,7 @@ fun ModifyAccountScreen(onBackPressed: () -> Unit) {
             }
 
             Spacer(modifier = Modifier.height(10.dp))
-            RmResultState(uiState, onSuccess = onBackPressed)
+            RmResultState(uiState, onSuccess = { onBackPressed() })
             Spacer(modifier = Modifier.height(10.dp))
 
             Spacer(modifier = Modifier.weight(1f))

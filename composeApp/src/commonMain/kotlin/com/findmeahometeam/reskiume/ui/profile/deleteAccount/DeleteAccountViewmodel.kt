@@ -41,8 +41,8 @@ class DeleteAccountViewmodel(
     private val deleteUsersFromLocalDataSource: DeleteUsersFromLocalDataSource,
     private val log: Log
 ) : ViewModel() {
-    private var _state: MutableStateFlow<UiState> = MutableStateFlow(UiState.Idle)
-    val state: StateFlow<UiState> = _state.asStateFlow()
+    private var _state: MutableStateFlow<UiState<Unit>> = MutableStateFlow(UiState.Idle())
+    val state: StateFlow<UiState<Unit>> = _state.asStateFlow()
 
     private val authUserState: Flow<AuthUser?> = observeAuthStateInAuthDataSource()
 
@@ -117,7 +117,7 @@ class DeleteAccountViewmodel(
                     )
                     return@collect
                 }
-                _state.value = UiState.Loading
+                _state.value = UiState.Loading()
                 getUserFromRemoteDataSource(authUser.uid).collect { remoteUser: User? ->
 
                     if (remoteUser == null) {
@@ -289,7 +289,7 @@ class DeleteAccountViewmodel(
                         "deleteMyUserFromLocalDataSource: Error deleting user from local data source"
                     )
                 } else {
-                    _state.value = UiState.Success
+                    _state.value = UiState.Success(Unit)
                     log.d(
                         "DeleteAccountViewmodel",
                         "User deleted successfully"

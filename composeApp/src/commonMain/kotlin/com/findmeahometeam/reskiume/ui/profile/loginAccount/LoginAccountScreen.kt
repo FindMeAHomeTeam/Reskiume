@@ -39,7 +39,7 @@ import reskiume.composeapp.generated.resources.login_account_screen_log_in_title
 fun LoginAccountScreen(onBackPressed: () -> Unit, onLoginSuccessful: () -> Unit) {
 
     val loginAccountViewmodel: LoginAccountViewmodel = koinViewModel<LoginAccountViewmodel>()
-    val uiState: UiState by loginAccountViewmodel.state.collectAsState()
+    val uiState: UiState<Unit> by loginAccountViewmodel.state.collectAsState()
 
     var email: String by rememberSaveable { mutableStateOf("") }
     val emailRegexPattern =
@@ -75,7 +75,7 @@ fun LoginAccountScreen(onBackPressed: () -> Unit, onLoginSuccessful: () -> Unit)
                 onValueChange = { pwd = it }
             )
             Spacer(modifier = Modifier.height(10.dp))
-            RmResultState(uiState, onSuccess = onLoginSuccessful)
+            RmResultState(uiState, onSuccess = { onLoginSuccessful() })
 
             Spacer(modifier = Modifier.weight(1f))
             RmButton(

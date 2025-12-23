@@ -19,22 +19,22 @@ class HomeViewmodel(
     private val getUserFromLocalDataSource: GetUserFromLocalDataSource
 ) : ViewModel() {
 
-    val state: StateFlow<UiState> = observeAuthStateInAuthDataSource().map { authUser: AuthUser? ->
+    val state: StateFlow<UiState<Unit>> = observeAuthStateInAuthDataSource().map { authUser: AuthUser? ->
         if (authUser?.uid == null) {
             log.d("HomeViewmodel", "User not logged in")
-            UiState.Idle
+            UiState.Idle()
         } else {
             val user: User? = getUserFromLocalDataSource(authUser.uid)
             if (user == null) {
                 log.e("HomeViewmodel", "User data not found")
-                UiState.Idle
+                UiState.Idle()
             } else {
-                UiState.Success
+                UiState.Success(Unit)
             }
         }
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = UiState.Idle
+        initialValue = UiState.Idle()
     )
 }

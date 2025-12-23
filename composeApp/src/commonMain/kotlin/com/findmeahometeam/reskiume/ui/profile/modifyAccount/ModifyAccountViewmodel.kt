@@ -47,8 +47,8 @@ class ModifyAccountViewmodel(
 
     private val authUserState: Flow<AuthUser?> = observeAuthStateInAuthDataSource()
 
-    private val _uiState: MutableStateFlow<UiState> = MutableStateFlow(UiState.Idle)
-    val uiState: StateFlow<UiState> = _uiState.asStateFlow()
+    private val _uiState: MutableStateFlow<UiState<Unit>> = MutableStateFlow(UiState.Idle())
+    val uiState: StateFlow<UiState<Unit>> = _uiState.asStateFlow()
 
     fun saveUserChanges(
         isDifferentEmail: Boolean,
@@ -58,7 +58,7 @@ class ModifyAccountViewmodel(
         newPassword: String = ""
     ) {
         viewModelScope.launch {
-            _uiState.value = UiState.Loading
+            _uiState.value = UiState.Loading()
 
             updateUserEmailInAuthDataSource(isDifferentEmail, currentPassword, user.email) {
 
@@ -262,7 +262,7 @@ class ModifyAccountViewmodel(
                     "ModifyAccountViewmodel",
                     "saveUserChangesInLocalDataSource: User updated successfully in local data source"
                 )
-                _uiState.value = UiState.Success
+                _uiState.value = UiState.Success(Unit)
             } else {
                 log.e(
                     "ModifyAccountViewmodel",

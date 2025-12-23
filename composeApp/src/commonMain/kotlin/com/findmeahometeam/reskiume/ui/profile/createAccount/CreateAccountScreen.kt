@@ -47,7 +47,7 @@ import reskiume.composeapp.generated.resources.create_account_screen_name_field_
 fun CreateAccountScreen(onBackPressed: () -> Unit, navigateToLoginScreen: () -> Unit) {
 
     val createAccountViewmodel: CreateAccountViewmodel = koinViewModel<CreateAccountViewmodel>()
-    val uiState: UiState by createAccountViewmodel.state.collectAsState()
+    val uiState: UiState<Unit> by createAccountViewmodel.state.collectAsState()
 
     var name: String by rememberSaveable { mutableStateOf("") }
     var description: String by rememberSaveable { mutableStateOf("") }
@@ -107,7 +107,7 @@ fun CreateAccountScreen(onBackPressed: () -> Unit, navigateToLoginScreen: () -> 
                 onValueChange = { pwd = it }
             )
             Spacer(modifier = Modifier.height(10.dp))
-            RmResultState(uiState, onSuccess = onBackPressed)
+            RmResultState(uiState, onSuccess = { onBackPressed() })
 
             Spacer(modifier = Modifier.weight(1f))
             RmButton(

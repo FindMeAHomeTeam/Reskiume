@@ -35,8 +35,8 @@ class CreateAccountViewmodel(
     private val deleteImageFromRemoteDataSource: DeleteImageFromRemoteDataSource,
     private val log: Log
 ) : ViewModel() {
-    private var _state: MutableStateFlow<UiState> = MutableStateFlow(UiState.Idle)
-    val state: StateFlow<UiState> = _state.asStateFlow()
+    private var _state: MutableStateFlow<UiState<Unit>> = MutableStateFlow(UiState.Idle())
+    val state: StateFlow<UiState<Unit>> = _state.asStateFlow()
 
     fun createUserUsingEmailAndPwd(
         user: User,
@@ -45,7 +45,7 @@ class CreateAccountViewmodel(
         if (user.email == null) return
 
         viewModelScope.launch {
-            _state.value = UiState.Loading
+            _state.value = UiState.Loading()
             val authResult = createUserWithEmailAndPasswordInAuthDataSource(user.email, password)
             when (authResult) {
                 is AuthResult.Error -> {
@@ -215,7 +215,7 @@ class CreateAccountViewmodel(
                 )
             ) { rowId ->
                 if (rowId > 0) {
-                    _state.value = UiState.Success
+                    _state.value = UiState.Success(Unit)
                     log.d(
                         "CreateAccountViewmodel",
                         "User $uid cache added to local repository"

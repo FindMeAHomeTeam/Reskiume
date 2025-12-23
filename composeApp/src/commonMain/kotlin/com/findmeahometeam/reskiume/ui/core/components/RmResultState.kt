@@ -12,23 +12,36 @@ import org.jetbrains.compose.resources.stringResource
 import reskiume.composeapp.generated.resources.Res
 import reskiume.composeapp.generated.resources.general_error_unknown_message
 
-sealed class UiState {
-    object Idle : UiState()
-    object Loading : UiState()
-    object Success : UiState()
-    data class Error(val message: String = "") : UiState()
+sealed class UiState<T> {
+    class Idle<T> : UiState<T>()
+    class Loading<T> : UiState<T>()
+    data class Success<T>(val data: T) : UiState<T>()
+    data class Error<T>(val message: String = "") : UiState<T>()
 }
 
 @Composable
-fun RmResultState(uiState: UiState, customErrorMessage: String = "", onSuccess: () -> Unit) {
-    Box(modifier = Modifier.fillMaxWidth().height(64.dp), contentAlignment = Alignment.Center) {
-        when (uiState) {
-            UiState.Idle -> {} // Do nothing
-            UiState.Loading -> {
+fun <T> RmResultState(
+    uiState: UiState<T>,
+    customErrorMessage: String = "",
+    onSuccess: @Composable (T) -> Unit
+) {
+    when (uiState) {
+        is UiState.Idle -> {} // Do nothing
+
+        is UiState.Loading -> {
+            Box(
+                modifier = Modifier.fillMaxWidth().height(64.dp),
+                contentAlignment = Alignment.Center
+            ) {
                 RmCircularProgressIndicator()
             }
+        }
 
-            is UiState.Error -> {
+        is UiState.Error -> {
+            Box(
+                modifier = Modifier.fillMaxWidth().height(64.dp),
+                contentAlignment = Alignment.Center
+            ) {
                 RmText(
                     text = uiState.message.ifBlank {
                         customErrorMessage.ifBlank {
@@ -38,10 +51,10 @@ fun RmResultState(uiState: UiState, customErrorMessage: String = "", onSuccess: 
                     color = primaryRed
                 )
             }
+        }
 
-            UiState.Success -> {
-                onSuccess()
-            }
+        is UiState.Success -> {
+            onSuccess(uiState.data)
         }
     }
 }

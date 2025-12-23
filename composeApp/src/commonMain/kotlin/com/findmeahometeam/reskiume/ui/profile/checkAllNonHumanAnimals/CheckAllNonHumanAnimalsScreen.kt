@@ -1,4 +1,4 @@
-package com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimals
+package com.findmeahometeam.reskiume.ui.profile.checkAllNonHumanAnimals
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column

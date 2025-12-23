@@ -25,7 +25,7 @@ import com.findmeahometeam.reskiume.nonHumanAnimal
 import com.findmeahometeam.reskiume.review
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckAllNonHumanAnimals
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
-import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimals.CheckAllNonHumanAnimalsViewmodel
+import com.findmeahometeam.reskiume.ui.profile.checkAllNonHumanAnimals.CheckAllNonHumanAnimalsViewmodel
 import com.findmeahometeam.reskiume.user
 import com.plusmobileapps.konnectivity.Konnectivity
 import com.plusmobileapps.konnectivity.NetworkConnection

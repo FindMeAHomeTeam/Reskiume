@@ -134,6 +134,34 @@
     <string name="modify_non_human_animal_screen_non_human_animal_description">description</string>
     <string name="modify_non_human_animal_screen_save_non_human_animal_changes_button">Save %1$s's changes</string>
 
+    <!-- No human animal types -->
+    <string name="non_human_animal_type_unselected">Unselected</string>
+    <string name="non_human_animal_type_dog">Dog</string>
+    <string name="non_human_animal_type_cat">Cat</string>
+    <string name="non_human_animal_type_bird">Bird</string>
+    <string name="non_human_animal_type_rabbit">Rabbit</string>
+    <string name="non_human_animal_type_rodent">Rodent</string>
+    <string name="non_human_animal_type_ferret">Ferret</string>
+    <string name="non_human_animal_type_reptile">Reptile</string>
+    <string name="non_human_animal_type_fish">Fish</string>
+    <string name="non_human_animal_type_equid">Equid</string>
+    <string name="non_human_animal_type_hog">Hog</string>
+    <string name="non_human_animal_type_ovine">Ovine</string>
+    <string name="non_human_animal_type_bobine">Bobine</string>
+    <string name="non_human_animal_type_other">Other</string>
+
+    <!-- No human animal genders -->
+    <string name="non_human_animal_gender_unselected">Unselected</string>
+    <string name="non_human_animal_gender_female">Female</string>
+    <string name="non_human_animal_gender_male">Male</string>
+
+    <!-- No human animal age category -->
+    <string name="non_human_animal_age_category_unselected">Unselected</string>
+    <string name="non_human_animal_age_category_baby">Baby</string>
+    <string name="non_human_animal_age_category_young">Young</string>
+    <string name="non_human_animal_age_category_adult">Adult</string>
+    <string name="non_human_animal_age_category_senior">Senior</string>
+
 
 
 </resources>

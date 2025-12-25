@@ -22,6 +22,7 @@ import reskiume.composeapp.generated.resources.non_human_animal_type_cat
 import reskiume.composeapp.generated.resources.non_human_animal_type_dog
 import reskiume.composeapp.generated.resources.non_human_animal_type_equid
 import reskiume.composeapp.generated.resources.non_human_animal_type_ferret
+import reskiume.composeapp.generated.resources.non_human_animal_type_fish
 import reskiume.composeapp.generated.resources.non_human_animal_type_hog
 import reskiume.composeapp.generated.resources.non_human_animal_type_other
 import reskiume.composeapp.generated.resources.non_human_animal_type_ovine
@@ -57,7 +58,7 @@ fun NonHumanAnimalType.toStringResource(): StringResource {
         RODENT -> Res.string.non_human_animal_type_rodent
         FERRET -> Res.string.non_human_animal_type_ferret
         REPTILE -> Res.string.non_human_animal_type_reptile
-        FISH -> Res.string.non_human_animal_type_reptile
+        FISH -> Res.string.non_human_animal_type_fish
         EQUID -> Res.string.non_human_animal_type_equid
         HOG -> Res.string.non_human_animal_type_hog
         OVINE -> Res.string.non_human_animal_type_ovine

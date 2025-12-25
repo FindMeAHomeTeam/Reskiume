@@ -28,42 +28,72 @@ class RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateImpl: Realtime
                     let nonHumanAnimalId: String = nonHumanAnimalIdAndCaregiverIdPair.first as? String ?? ""
                     let caregiverId: String = nonHumanAnimalIdAndCaregiverIdPair.second as? String ?? ""
                     
-                    if caregiverId != "" {
-                        let childPath = (nonHumanAnimalId == "") ? "\(caregiverId)" : "\(caregiverId)\\\(nonHumanAnimalId)"
+                    if caregiverId != "" && nonHumanAnimalId == "" {
                         
                         database.reference()
                             .child(Section.nonHumanAnimals.path)
-                            .child(childPath)
+                            .child(caregiverId)
                             .observeSingleEvent (of: .value, with: { snapshot in
-                            var remoteNonHumanAnimals: [RemoteNonHumanAnimal] = []
-
-                            for nonHumanAnimal in snapshot.children {
-                                guard let nonHumanAnimalSnapshot = nonHumanAnimal as? DataSnapshot,
-                                      let nonHumanAnimalNsDictionary = nonHumanAnimalSnapshot.value as? [String: Any] else {
-                                    continue
+                                
+                                var remoteNonHumanAnimals: [RemoteNonHumanAnimal] = []
+                                
+                                for nonHumanAnimal in snapshot.children {
+                                    guard let nonHumanAnimalSnapshot = nonHumanAnimal as? DataSnapshot,
+                                          let nonHumanAnimalNsDictionary = nonHumanAnimalSnapshot.value as? [String: Any] else {
+                                        continue
+                                    }
+                                    let remoteNonHumanAnimal = RemoteNonHumanAnimal(
+                                        id: nonHumanAnimalNsDictionary["id"] as? String ?? "",
+                                        caregiverId: nonHumanAnimalNsDictionary["caregiverId"] as? String ?? "",
+                                        name: nonHumanAnimalNsDictionary["name"] as? String ?? "",
+                                        ageCategory: AgeCategory.entries.first(where: { $0.name == (nonHumanAnimalNsDictionary["ageCategory"] as? String ?? AgeCategory.unselected.name) }) ?? AgeCategory.unselected,
+                                        description: nonHumanAnimalNsDictionary["description"] as? String ?? "",
+                                        imageUrl: nonHumanAnimalNsDictionary["imageUrl"] as? String ?? "",
+                                        nonHumanAnimalType: NonHumanAnimalType.entries.first(where: { $0.name == (nonHumanAnimalNsDictionary["nonHumanAnimalType"] as? String ?? NonHumanAnimalType.unselected.name) }) ?? NonHumanAnimalType.unselected,
+                                        gender: Gender.entries.first(where: { $0.name == (nonHumanAnimalNsDictionary["gender"] as? String ?? Gender.unselected.name) }) ?? Gender.unselected
+                                    )
+                                    remoteNonHumanAnimals.append(remoteNonHumanAnimal)
                                 }
-                                let remoteNonHumanAnimal = RemoteNonHumanAnimal(
-                                    id: nonHumanAnimalNsDictionary["id"] as? String ?? "",
-                                    caregiverId: nonHumanAnimalNsDictionary["caregiverId"] as? String ?? "",
-                                    name: nonHumanAnimalNsDictionary["name"] as? String ?? "",
-                                    ageCategory: AgeCategory.entries.first(where: { $0.name == (nonHumanAnimalNsDictionary["ageCategory"] as? String ?? AgeCategory.unselected.name) }) ?? AgeCategory.unselected,
-                                    description: nonHumanAnimalNsDictionary["description"] as? String ?? "",
-                                    imageUrl: nonHumanAnimalNsDictionary["imageUrl"] as? String ?? "",
-                                    nonHumanAnimalType: NonHumanAnimalType.entries.first(where: { $0.name == (nonHumanAnimalNsDictionary["nonHumanAnimalType"] as? String ?? NonHumanAnimalType.unselected.name) }) ?? NonHumanAnimalType.unselected,
-                                    gender: Gender.entries.first(where: { $0.name == (nonHumanAnimalNsDictionary["gender"] as? String ?? Gender.unselected.name) }) ?? Gender.unselected
+                                realtimeDatabaseRemoteNonHumanAnimalFlowsRepositoryForIosDelegate.updateRemoteNonHumanAnimalListFlow(delegate: remoteNonHumanAnimals)
+                                
+                            }) { error in
+                                log.e(
+                                    tag: "RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateImpl",
+                                    message: "Error retrieving the remote non human animals for the caregiver id \(caregiverId): \(error.localizedDescription)",
+                                    throwable: nil
                                 )
-                                remoteNonHumanAnimals.append(remoteNonHumanAnimal)
+                                realtimeDatabaseRemoteNonHumanAnimalFlowsRepositoryForIosDelegate.updateRemoteNonHumanAnimalListFlow(delegate: [])
                             }
-                            realtimeDatabaseRemoteNonHumanAnimalFlowsRepositoryForIosDelegate.updateRemoteNonHumanAnimalListFlow(delegate: remoteNonHumanAnimals)
-                            
-                        }) { error in
-                            log.e(
-                                tag: "RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateImpl",
-                                message: "Error retrieving the remote non human animal \(nonHumanAnimalId) for the caregiver id \(caregiverId): \(error.localizedDescription)",
-                                throwable: nil
-                            )
-                            realtimeDatabaseRemoteNonHumanAnimalFlowsRepositoryForIosDelegate.updateRemoteNonHumanAnimalListFlow(delegate: [])
-                        }
+                    } else if caregiverId != "" && nonHumanAnimalId != "" {
+                        
+                        database.reference()
+                            .child(Section.nonHumanAnimals.path)
+                            .child(caregiverId)
+                            .child(nonHumanAnimalId)
+                            .observeSingleEvent (of: .value, with: { snapshot in
+                                                                
+                                let nonHumanAnimalNsDictionary: NSDictionary? = snapshot.value as? NSDictionary
+                                
+                                let remoteNonHumanAnimal = RemoteNonHumanAnimal(
+                                    id: nonHumanAnimalNsDictionary?["id"] as? String ?? "",
+                                    caregiverId: nonHumanAnimalNsDictionary?["caregiverId"] as? String ?? "",
+                                    name: nonHumanAnimalNsDictionary?["name"] as? String ?? "",
+                                    ageCategory: AgeCategory.entries.first(where: { $0.name == (nonHumanAnimalNsDictionary?["ageCategory"] as? String ?? AgeCategory.unselected.name) }) ?? AgeCategory.unselected,
+                                    description: nonHumanAnimalNsDictionary?["description"] as? String ?? "",
+                                    imageUrl: nonHumanAnimalNsDictionary?["imageUrl"] as? String ?? "",
+                                    nonHumanAnimalType: NonHumanAnimalType.entries.first(where: { $0.name == (nonHumanAnimalNsDictionary?["nonHumanAnimalType"] as? String ?? NonHumanAnimalType.unselected.name) }) ?? NonHumanAnimalType.unselected,
+                                    gender: Gender.entries.first(where: { $0.name == (nonHumanAnimalNsDictionary?["gender"] as? String ?? Gender.unselected.name) }) ?? Gender.unselected
+                                )
+                                realtimeDatabaseRemoteNonHumanAnimalFlowsRepositoryForIosDelegate.updateRemoteNonHumanAnimalListFlow(delegate: [remoteNonHumanAnimal])
+                                
+                            }) { error in
+                                log.e(
+                                    tag: "RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateImpl",
+                                    message: "Error retrieving the remote non human animal \(nonHumanAnimalId) for the caregiver id \(caregiverId): \(error.localizedDescription)",
+                                    throwable: nil
+                                )
+                                realtimeDatabaseRemoteNonHumanAnimalFlowsRepositoryForIosDelegate.updateRemoteNonHumanAnimalListFlow(delegate: [])
+                            }
                     }
                 }
             } catch {
@@ -81,11 +111,11 @@ class RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateImpl: Realtime
             "id": remoteNonHumanAnimal.id!,
             "caregiverId": remoteNonHumanAnimal.caregiverId!,
             "name": remoteNonHumanAnimal.name!,
-            "ageCategory": remoteNonHumanAnimal.ageCategory!,
+            "ageCategory": remoteNonHumanAnimal.ageCategory!.name,
             "description": remoteNonHumanAnimal.description_!,
             "imageUrl": remoteNonHumanAnimal.imageUrl!,
-            "nonHumanAnimalType": remoteNonHumanAnimal.nonHumanAnimalType!,
-            "gender": remoteNonHumanAnimal.gender!
+            "nonHumanAnimalType": remoteNonHumanAnimal.nonHumanAnimalType!.name,
+            "gender": remoteNonHumanAnimal.gender!.name
         ]
     }
     

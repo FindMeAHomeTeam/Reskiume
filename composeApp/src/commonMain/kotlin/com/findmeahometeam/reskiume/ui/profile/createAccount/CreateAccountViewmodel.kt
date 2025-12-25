@@ -214,16 +214,17 @@ class CreateAccountViewmodel(
                     timestamp = Clock.System.now().epochSeconds
                 )
             ) { rowId ->
+
                 if (rowId > 0) {
                     _state.value = UiState.Success(Unit)
                     log.d(
                         "CreateAccountViewmodel",
-                        "User $uid cache added to local repository"
+                        "$uid added to local cache in section ${Section.USERS}"
                     )
                 } else {
                     log.e(
                         "CreateAccountViewmodel",
-                        "Error adding user $uid cache to local repository"
+                        "Error adding $uid to local cache in section ${Section.USERS}"
                     )
                 }
             }

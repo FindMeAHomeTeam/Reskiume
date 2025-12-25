@@ -287,15 +287,16 @@ class ModifyAccountViewmodel(
                         timestamp = Clock.System.now().epochSeconds
                     )
                 ) { rowsUpdated: Int ->
+
                     if (rowsUpdated > 0) {
                         log.d(
                             "ModifyAccountViewmodel",
-                            "logOut: lastLogout updated successfully in local cache"
+                            "${authUser.uid} updated in local cache in section ${Section.USERS}"
                         )
                     } else {
                         log.e(
                             "ModifyAccountViewmodel",
-                            "logOut: failed to update lastLogout in local cache"
+                            "Error updating ${authUser.uid} in local cache in section ${Section.USERS}"
                         )
                     }
                     signOutFromAuthDataSource()

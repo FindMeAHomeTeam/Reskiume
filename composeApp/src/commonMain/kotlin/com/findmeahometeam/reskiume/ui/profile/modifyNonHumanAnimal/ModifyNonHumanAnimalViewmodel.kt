@@ -271,12 +271,12 @@ class ModifyNonHumanAnimalViewmodel(
                 if (rowsUpdated > 0) {
                     log.d(
                         "ModifyNonHumanAnimalViewModel",
-                        "modifyNonHumanAnimalCacheInLocalDataSource: the non human animal ${nonHumanAnimal.id} was updated successfully in local cache"
+                        "${nonHumanAnimal.id} updated in local cache in section ${Section.NON_HUMAN_ANIMALS}"
                     )
                 } else {
                     log.e(
                         "ModifyNonHumanAnimalViewModel",
-                        "modifyNonHumanAnimalCacheInLocalDataSource: failed to update the non human animal ${nonHumanAnimal.id} in local cache"
+                        "Error updating ${nonHumanAnimal.id} in local cache in section ${Section.NON_HUMAN_ANIMALS}"
                     )
                 }
                 _saveChangesUiState.value = UiState.Success(Unit)

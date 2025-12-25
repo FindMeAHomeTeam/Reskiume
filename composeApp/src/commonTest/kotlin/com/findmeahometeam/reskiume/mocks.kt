@@ -59,7 +59,7 @@ val author = User(
 )
 
 val review = Review(
-    id = "1625241600000 + ${author.uid}",
+    id = "1625241600000" + author.uid,
     savedBy = user.uid,
     timestamp = 1625241600000L,
     authorUid = author.uid,
@@ -80,7 +80,7 @@ val uiReview = UiReview(
 // Mocked nonHumanAnimal data for testing
 
 val nonHumanAnimal = NonHumanAnimal(
-    id = "123 + ${user.uid}",
+    id = "2625241600000" + user.uid,
     caregiverId = user.uid,
     savedBy = user.uid,
     name = "Lucky",

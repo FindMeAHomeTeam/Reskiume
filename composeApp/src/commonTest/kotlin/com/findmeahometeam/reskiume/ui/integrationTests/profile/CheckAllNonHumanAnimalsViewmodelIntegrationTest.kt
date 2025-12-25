@@ -13,6 +13,8 @@ import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepo
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
+import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.InsertNonHumanAnimalInLocalRepository
@@ -70,8 +72,12 @@ class CheckAllNonHumanAnimalsViewmodelIntegrationTest : CoroutineTestDispatcher(
         val insertNonHumanAnimalInLocalRepository =
             InsertNonHumanAnimalInLocalRepository(localNonHumanAnimalRepository, authRepository)
 
+        val insertCacheInLocalRepository = InsertCacheInLocalRepository(localCacheRepository)
+
         val modifyNonHumanAnimalInLocalRepository =
             ModifyNonHumanAnimalInLocalRepository(localNonHumanAnimalRepository, authRepository)
+
+        val modifyCacheInLocalRepository = ModifyCacheInLocalRepository(localCacheRepository)
 
         val getAllNonHumanAnimalsFromLocalRepository =
             GetAllNonHumanAnimalsFromLocalRepository(localNonHumanAnimalRepository)
@@ -83,7 +89,9 @@ class CheckAllNonHumanAnimalsViewmodelIntegrationTest : CoroutineTestDispatcher(
             getAllNonHumanAnimalsFromRemoteRepository,
             downloadImageToLocalDataSource,
             insertNonHumanAnimalInLocalRepository,
+            insertCacheInLocalRepository,
             modifyNonHumanAnimalInLocalRepository,
+            modifyCacheInLocalRepository,
             getAllNonHumanAnimalsFromLocalRepository,
             log
         )
@@ -121,7 +129,10 @@ class CheckAllNonHumanAnimalsViewmodelIntegrationTest : CoroutineTestDispatcher(
             runTest {
                 getCheckAllNonHumanAnimalsViewmodel(
                     localCacheRepository = FakeLocalCacheRepository(
-                        localCacheList = mutableListOf(localCache.copy(section = Section.NON_HUMAN_ANIMALS, timestamp = 123L).toEntity())
+                        localCacheList = mutableListOf(
+                            localCache.copy(section = Section.NON_HUMAN_ANIMALS, timestamp = 123L).toEntity(),
+                            localCache.copy(uid = nonHumanAnimal.id, section = Section.NON_HUMAN_ANIMALS, timestamp = 123L).toEntity()
+                        )
                     ),
                     realtimeDatabaseRemoteNonHumanAnimalRepository = FakeRealtimeDatabaseRemoteNonHumanAnimalRepository(
                         remoteNonHumanAnimalList = mutableListOf(nonHumanAnimal.toData())
@@ -138,7 +149,10 @@ class CheckAllNonHumanAnimalsViewmodelIntegrationTest : CoroutineTestDispatcher(
             runTest {
                 getCheckAllNonHumanAnimalsViewmodel(
                     localCacheRepository = FakeLocalCacheRepository(
-                        localCacheList = mutableListOf(localCache.copy(section = Section.NON_HUMAN_ANIMALS, timestamp = 123L).toEntity())
+                        localCacheList = mutableListOf(
+                            localCache.copy(section = Section.NON_HUMAN_ANIMALS, timestamp = 123L).toEntity(),
+                            localCache.copy(uid = nonHumanAnimal.id, section = Section.NON_HUMAN_ANIMALS, timestamp = 123L).toEntity()
+                        )
                     ),
                     realtimeDatabaseRemoteNonHumanAnimalRepository = FakeRealtimeDatabaseRemoteNonHumanAnimalRepository(
                         remoteNonHumanAnimalList = mutableListOf(nonHumanAnimal.copy(imageUrl = "").toData())
@@ -154,7 +168,10 @@ class CheckAllNonHumanAnimalsViewmodelIntegrationTest : CoroutineTestDispatcher(
             runTest {
                 getCheckAllNonHumanAnimalsViewmodel(
                     localCacheRepository = FakeLocalCacheRepository(
-                        localCacheList = mutableListOf(localCache.copy(section = Section.NON_HUMAN_ANIMALS).toEntity())
+                        localCacheList = mutableListOf(
+                            localCache.copy(section = Section.NON_HUMAN_ANIMALS).toEntity(),
+                            localCache.copy(uid = nonHumanAnimal.id, section = Section.NON_HUMAN_ANIMALS).toEntity()
+                        )
                     ),
                     localNonHumanAnimalRepository = FakeLocalNonHumanAnimalRepository(mutableListOf(nonHumanAnimal.toEntity()))
                 ).nonHumanAnimalListFlow.test {

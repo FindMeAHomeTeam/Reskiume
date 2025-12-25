@@ -16,6 +16,8 @@ import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepo
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
+import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.InsertNonHumanAnimalInLocalRepository
@@ -74,8 +76,10 @@ class CheckAllNonHumanAnimalsViewmodelTest : CoroutineTestDispatcher() {
 
     private fun getCheckAllNonHumanAnimalsViewmodel(
         authStateReturn: AuthUser? = authUser,
-        getLocalCacheEntityReturn: LocalCacheEntity? =
+        getLocalCacheEntityReturnForUser: LocalCacheEntity? =
             localCache.copy(section = Section.NON_HUMAN_ANIMALS).toEntity(),
+        getLocalCacheEntityReturnForNonHumanAnimal: LocalCacheEntity? =
+            localCache.copy(uid = nonHumanAnimal.id, section = Section.NON_HUMAN_ANIMALS).toEntity(),
         localCacheIdInsertedInLocalDatasourceArg: Long = 1L,
         localCacheUpdatedInLocalDatasourceArg: Int = 1,
         getAllRemoteNonHumanAnimalsReturn: Flow<List<RemoteNonHumanAnimal>> = flowOf(listOf(nonHumanAnimal.toData())),
@@ -101,7 +105,14 @@ class CheckAllNonHumanAnimalsViewmodelTest : CoroutineTestDispatcher() {
                     user.uid,
                     Section.NON_HUMAN_ANIMALS
                 )
-            } returns getLocalCacheEntityReturn
+            } returns getLocalCacheEntityReturnForUser
+
+            everySuspend {
+                getLocalCacheEntity(
+                    nonHumanAnimal.id,
+                    Section.NON_HUMAN_ANIMALS
+                )
+            } returns getLocalCacheEntityReturnForNonHumanAnimal
 
             everySuspend {
                 insertLocalCacheEntity(
@@ -153,7 +164,6 @@ class CheckAllNonHumanAnimalsViewmodelTest : CoroutineTestDispatcher() {
                 )
             } calls { onInsertNonHumanAnimalFromLocal.get().invoke(nonHumanAnimalIdInsertedInLocalDatasourceArg) }
 
-
             everySuspend {
                 modifyNonHumanAnimal(
                     nonHumanAnimal.toEntity(),
@@ -188,8 +198,12 @@ class CheckAllNonHumanAnimalsViewmodelTest : CoroutineTestDispatcher() {
         val insertNonHumanAnimalInLocalRepository =
             InsertNonHumanAnimalInLocalRepository(localNonHumanAnimalRepository, authRepository)
 
+        val insertCacheInLocalRepository = InsertCacheInLocalRepository(localCacheRepository)
+
         val modifyNonHumanAnimalInLocalRepository =
             ModifyNonHumanAnimalInLocalRepository(localNonHumanAnimalRepository, authRepository)
+
+        val modifyCacheInLocalRepository = ModifyCacheInLocalRepository(localCacheRepository)
 
         val getAllNonHumanAnimalsFromLocalRepository =
             GetAllNonHumanAnimalsFromLocalRepository(localNonHumanAnimalRepository)
@@ -201,7 +215,9 @@ class CheckAllNonHumanAnimalsViewmodelTest : CoroutineTestDispatcher() {
             getAllNonHumanAnimalsFromRemoteRepository,
             downloadImageToLocalDataSource,
             insertNonHumanAnimalInLocalRepository,
+            insertCacheInLocalRepository,
             modifyNonHumanAnimalInLocalRepository,
+            modifyCacheInLocalRepository,
             getAllNonHumanAnimalsFromLocalRepository,
             log
         )
@@ -211,7 +227,8 @@ class CheckAllNonHumanAnimalsViewmodelTest : CoroutineTestDispatcher() {
     fun `given a user with empty cache_when the user clicks on a non human animal_then the non human animal is saved in local cache and displayed`() =
         runTest {
             getCheckAllNonHumanAnimalsViewmodel(
-                getLocalCacheEntityReturn = null
+                getLocalCacheEntityReturnForUser = null,
+                getLocalCacheEntityReturnForNonHumanAnimal = null
             ).nonHumanAnimalListFlow.test {
                 assertEquals(listOf(nonHumanAnimal.copy(savedBy = "")), awaitItem())
                 awaitComplete()
@@ -223,7 +240,8 @@ class CheckAllNonHumanAnimalsViewmodelTest : CoroutineTestDispatcher() {
     fun `given a registered NHA with no avatar with empty cache_when the user clicks on a NHA but have an error saving them_then the NHA is shown but not saved in local cache`() =
         runTest {
             getCheckAllNonHumanAnimalsViewmodel(
-                getLocalCacheEntityReturn = null,
+                getLocalCacheEntityReturnForUser = null,
+                getLocalCacheEntityReturnForNonHumanAnimal = null,
                 getAllRemoteNonHumanAnimalsReturn = flowOf(listOf(nonHumanAnimal.copy(imageUrl = "").toData())),
                 nonHumanAnimalIdInsertedInLocalDatasourceArg = 0
             ).nonHumanAnimalListFlow.test {
@@ -245,8 +263,10 @@ class CheckAllNonHumanAnimalsViewmodelTest : CoroutineTestDispatcher() {
     fun `given a user with an outdated local cache_when the user clicks on a non human animal_then the non human animal is modified in local cache and displayed`() =
         runTest {
             getCheckAllNonHumanAnimalsViewmodel(
-                getLocalCacheEntityReturn =
-                    localCache.copy(section = Section.NON_HUMAN_ANIMALS, timestamp = 123L).toEntity()
+                getLocalCacheEntityReturnForUser =
+                    localCache.copy(section = Section.NON_HUMAN_ANIMALS, timestamp = 123L).toEntity(),
+                getLocalCacheEntityReturnForNonHumanAnimal =
+                    localCache.copy(uid = nonHumanAnimal.id, section = Section.NON_HUMAN_ANIMALS, timestamp = 123L).toEntity()
             ).nonHumanAnimalListFlow.test {
                 assertEquals(listOf(nonHumanAnimal.copy(savedBy = "")), awaitItem())
                 awaitComplete()
@@ -258,8 +278,10 @@ class CheckAllNonHumanAnimalsViewmodelTest : CoroutineTestDispatcher() {
     fun `given a registered NHA with no avatar and outdated cache_when the user clicks on a NHA but have an error modifying them_then the NHA is shown but not modified in local cache`() =
         runTest {
             getCheckAllNonHumanAnimalsViewmodel(
-                getLocalCacheEntityReturn =
+                getLocalCacheEntityReturnForUser =
                     localCache.copy(section = Section.NON_HUMAN_ANIMALS, timestamp = 123L).toEntity(),
+                getLocalCacheEntityReturnForNonHumanAnimal =
+                    localCache.copy(uid = nonHumanAnimal.id, section = Section.NON_HUMAN_ANIMALS, timestamp = 123L).toEntity(),
                 getAllRemoteNonHumanAnimalsReturn = flowOf(listOf(nonHumanAnimal.copy(imageUrl = "").toData())),
                 rowsUpdatedNonHumanAnimalArg = 0
             ).nonHumanAnimalListFlow.test {

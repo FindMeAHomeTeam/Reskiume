@@ -5,6 +5,7 @@ import com.findmeahometeam.reskiume.CoroutineTestDispatcher
 import com.findmeahometeam.reskiume.authUser
 import com.findmeahometeam.reskiume.data.remote.response.AuthResult
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
+import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
@@ -290,7 +291,7 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
             verify {
                 log.e(
                     "CreateAccountViewmodel",
-                    "Error adding user ${user.uid} cache to local repository"
+                    "Error adding ${user.uid} to local cache in section ${Section.USERS}"
                 )
             }
         }

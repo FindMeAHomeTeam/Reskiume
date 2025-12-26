@@ -13,7 +13,7 @@ class FakeLocalCacheRepository(
         onInsertLocalCache: (rowId: Long) -> Unit
     ) {
         val localCache =
-            localCacheList.firstOrNull { it.uid == localCacheEntity.uid && it.section == localCacheEntity.section }
+            localCacheList.firstOrNull { it.cachedObjectId == localCacheEntity.cachedObjectId && it.section == localCacheEntity.section }
         if (localCache == null) {
             localCacheList.add(localCacheEntity)
             onInsertLocalCache(1L)
@@ -23,10 +23,10 @@ class FakeLocalCacheRepository(
     }
 
     override suspend fun getLocalCacheEntity(
-        uid: String,
+        cachedObjectId: String,
         section: Section
     ): LocalCacheEntity? =
-        localCacheList.firstOrNull { it.uid == uid && it.section == section }
+        localCacheList.firstOrNull { it.cachedObjectId == cachedObjectId && it.section == section }
 
     override suspend fun modifyLocalCacheEntity(
         localCacheEntity: LocalCacheEntity,
@@ -43,11 +43,24 @@ class FakeLocalCacheRepository(
     }
 
     override suspend fun deleteLocalCacheEntity(
+        cachedObjectId: String,
+        onDeleteLocalCache: (rowsDeleted: Int) -> Unit
+    ) {
+        val localCache: LocalCacheEntity? = localCacheList.firstOrNull { it.cachedObjectId == cachedObjectId }
+        if (localCache == null) {
+            onDeleteLocalCache(0)
+        } else {
+            localCacheList.remove(localCache)
+            onDeleteLocalCache(1)
+        }
+    }
+
+    override suspend fun deleteAllLocalCacheEntity(
         uid: String,
         onDeleteLocalCache: (rowsDeleted: Int) -> Unit
     ) {
         val cacheList =
-            localCacheList.filter { it.uid == uid || it.savedBy == uid || it.savedBy == "" }
+            localCacheList.filter { it.cachedObjectId == uid || it.savedBy == uid || it.savedBy == "" }
         if (cacheList.isEmpty()) {
             onDeleteLocalCache(0)
         } else {

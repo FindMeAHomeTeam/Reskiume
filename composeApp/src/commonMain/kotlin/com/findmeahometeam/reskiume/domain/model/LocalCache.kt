@@ -5,7 +5,7 @@ import com.findmeahometeam.reskiume.data.util.Section
 
 data class LocalCache(
     val id: Int = 0,
-    val uid: String,
+    val cachedObjectId: String,
     val savedBy: String,
     val section: Section,
     val timestamp: Long,
@@ -13,7 +13,7 @@ data class LocalCache(
     fun toEntity(): LocalCacheEntity {
         return LocalCacheEntity(
             id = id,
-            uid = uid,
+            cachedObjectId = cachedObjectId,
             savedBy = savedBy,
             section = section,
             timestamp = timestamp

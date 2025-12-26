@@ -47,7 +47,7 @@ class CheckAllNonHumanAnimalsViewmodel(
         observeAuthStateInAuthDataSource().flatMapConcat { authUser: AuthUser? ->
 
             getDataByManagingObjectLocalCacheTimestamp(
-                uid = uid,
+                cachedObjectId = uid,
                 savedBy = authUser?.uid ?: "",
                 section = Section.NON_HUMAN_ANIMALS,
                 onCompletionInsertCache = {
@@ -104,7 +104,7 @@ class CheckAllNonHumanAnimalsViewmodel(
 
                         insertCacheInLocalRepository(
                             LocalCache(
-                                uid = nonHumanAnimal.id,
+                                cachedObjectId = nonHumanAnimal.id,
                                 savedBy = uid,
                                 section = Section.NON_HUMAN_ANIMALS,
                                 timestamp = Clock.System.now().epochSeconds
@@ -177,7 +177,7 @@ class CheckAllNonHumanAnimalsViewmodel(
 
                         modifyCacheInLocalRepository(
                             LocalCache(
-                                uid = nonHumanAnimal.id,
+                                cachedObjectId = nonHumanAnimal.id,
                                 savedBy = uid,
                                 section = Section.NON_HUMAN_ANIMALS,
                                 timestamp = Clock.System.now().epochSeconds

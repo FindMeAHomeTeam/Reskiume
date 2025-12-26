@@ -7,6 +7,7 @@ import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
 class LocalCacheRepositoryImpl(
     private val reskiumeDatabase: ReskiumeDatabase
 ) : LocalCacheRepository {
+
     override suspend fun insertLocalCacheEntity(
         localCacheEntity: LocalCacheEntity,
         onInsertLocalCache: (rowId: Long) -> Unit
@@ -16,8 +17,8 @@ class LocalCacheRepositoryImpl(
         )
     }
 
-    override suspend fun getLocalCacheEntity(uid: String, section: Section): LocalCacheEntity? =
-        reskiumeDatabase.getLocalCacheDao().getLocalCacheEntity(uid, section)
+    override suspend fun getLocalCacheEntity(cachedObjectId: String, section: Section): LocalCacheEntity? =
+        reskiumeDatabase.getLocalCacheDao().getLocalCacheEntity(cachedObjectId, section)
 
     override suspend fun modifyLocalCacheEntity(
         localCacheEntity: LocalCacheEntity,

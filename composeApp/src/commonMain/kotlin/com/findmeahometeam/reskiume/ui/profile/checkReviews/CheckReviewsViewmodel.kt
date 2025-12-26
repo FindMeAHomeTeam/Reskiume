@@ -68,7 +68,7 @@ class CheckReviewsViewmodel(
         observeAuthStateInAuthDataSource().flatMapConcat { authUser: AuthUser? ->
 
             getDataByManagingObjectLocalCacheTimestamp(
-                uid = uid,
+                cachedObjectId = uid,
                 savedBy = authUser?.uid ?: "",
                 section = Section.REVIEWS,
                 onCompletionInsertCache = {
@@ -133,7 +133,7 @@ class CheckReviewsViewmodel(
     private suspend fun getActivist(activistUid: String, myUserUid: String): User? {
 
         return getDataByManagingObjectLocalCacheTimestamp(
-            uid = activistUid,
+            cachedObjectId = activistUid,
             savedBy = myUserUid,
             section = Section.USERS,
             onCompletionInsertCache = {

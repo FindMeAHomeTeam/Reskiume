@@ -16,7 +16,7 @@ class ModifyCacheInLocalRepositoryTest {
     val localCacheRepository: LocalCacheRepository = mock {
         everySuspend {
             getLocalCacheEntity(
-                localCache.uid,
+                localCache.cachedObjectId,
                 localCache.section
             )
         } returns localCache.toEntity()
@@ -37,7 +37,7 @@ class ModifyCacheInLocalRepositoryTest {
         runTest {
             modifyCacheInLocalRepository(localCache, {})
             verifySuspend {
-                localCacheRepository.getLocalCacheEntity(localCache.uid, localCache.section)
+                localCacheRepository.getLocalCacheEntity(localCache.cachedObjectId, localCache.section)
                 localCacheRepository.modifyLocalCacheEntity(localCache.toEntity(), any())
             }
         }

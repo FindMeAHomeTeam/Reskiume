@@ -89,7 +89,7 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
             localCache.copy(section = Section.USERS).toEntity(),
         getUserReviewsLocalCacheEntityReturn: LocalCacheEntity? = localCache.toEntity(),
         getAuthorLocalCacheEntityReturn: LocalCacheEntity? =
-            localCache.copy(uid = author.uid, section = Section.USERS).toEntity(),
+            localCache.copy(cachedObjectId = author.uid, section = Section.USERS).toEntity(),
         localCacheIdInsertedInLocalDatasourceArg: Long = 1L,
         localCacheUpdatedInLocalDatasourceArg: Int = 1,
         getRemoteReviewsReturn: Flow<List<RemoteReview>> = flowOf(listOf(review.toData())),
@@ -315,7 +315,7 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
                 uidArg = author.uid,
                 authStateReturn = null,
                 getAuthorLocalCacheEntityReturn =
-                localCache.copy(uid = author.uid, section = Section.USERS, timestamp = 123L).toEntity()
+                localCache.copy(cachedObjectId = author.uid, section = Section.USERS, timestamp = 123L).toEntity()
             ).getUserDataIfNotMine().test {
                 assertEquals(author.copy(savedBy = "", email = null), awaitItem())
                 awaitComplete()
@@ -330,7 +330,7 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
                 uidArg = author.uid,
                 authStateReturn = null,
                 getAuthorLocalCacheEntityReturn =
-                    localCache.copy(uid = author.uid, section = Section.USERS, timestamp = 123L).toEntity(),
+                    localCache.copy(cachedObjectId = author.uid, section = Section.USERS, timestamp = 123L).toEntity(),
                 getRemoteAuthorReturn = flowOf(author.copy(image = "").toData()),
                 rowsUpdatedUserArg = 0,
                 absolutePathAuthorArg = ""

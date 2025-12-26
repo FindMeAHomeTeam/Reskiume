@@ -79,7 +79,7 @@ class CheckAllNonHumanAnimalsViewmodelTest : CoroutineTestDispatcher() {
         getLocalCacheEntityReturnForUser: LocalCacheEntity? =
             localCache.copy(section = Section.NON_HUMAN_ANIMALS).toEntity(),
         getLocalCacheEntityReturnForNonHumanAnimal: LocalCacheEntity? =
-            localCache.copy(uid = nonHumanAnimal.id, section = Section.NON_HUMAN_ANIMALS).toEntity(),
+            localCache.copy(cachedObjectId = nonHumanAnimal.id, section = Section.NON_HUMAN_ANIMALS).toEntity(),
         localCacheIdInsertedInLocalDatasourceArg: Long = 1L,
         localCacheUpdatedInLocalDatasourceArg: Int = 1,
         getAllRemoteNonHumanAnimalsReturn: Flow<List<RemoteNonHumanAnimal>> = flowOf(listOf(nonHumanAnimal.toData())),
@@ -266,7 +266,7 @@ class CheckAllNonHumanAnimalsViewmodelTest : CoroutineTestDispatcher() {
                 getLocalCacheEntityReturnForUser =
                     localCache.copy(section = Section.NON_HUMAN_ANIMALS, timestamp = 123L).toEntity(),
                 getLocalCacheEntityReturnForNonHumanAnimal =
-                    localCache.copy(uid = nonHumanAnimal.id, section = Section.NON_HUMAN_ANIMALS, timestamp = 123L).toEntity()
+                    localCache.copy(cachedObjectId = nonHumanAnimal.id, section = Section.NON_HUMAN_ANIMALS, timestamp = 123L).toEntity()
             ).nonHumanAnimalListFlow.test {
                 assertEquals(listOf(nonHumanAnimal.copy(savedBy = "")), awaitItem())
                 awaitComplete()
@@ -281,7 +281,7 @@ class CheckAllNonHumanAnimalsViewmodelTest : CoroutineTestDispatcher() {
                 getLocalCacheEntityReturnForUser =
                     localCache.copy(section = Section.NON_HUMAN_ANIMALS, timestamp = 123L).toEntity(),
                 getLocalCacheEntityReturnForNonHumanAnimal =
-                    localCache.copy(uid = nonHumanAnimal.id, section = Section.NON_HUMAN_ANIMALS, timestamp = 123L).toEntity(),
+                    localCache.copy(cachedObjectId = nonHumanAnimal.id, section = Section.NON_HUMAN_ANIMALS, timestamp = 123L).toEntity(),
                 getAllRemoteNonHumanAnimalsReturn = flowOf(listOf(nonHumanAnimal.copy(imageUrl = "").toData())),
                 rowsUpdatedNonHumanAnimalArg = 0
             ).nonHumanAnimalListFlow.test {

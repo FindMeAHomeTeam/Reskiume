@@ -51,7 +51,7 @@ class LoginAccountViewmodel(
         viewModelScope.launch {
 
             getDataByManagingObjectLocalCacheTimestamp(
-                uid = authUser.uid,
+                cachedObjectId = authUser.uid,
                 section = Section.USERS,
                 onCompletionInsertCache = {
 

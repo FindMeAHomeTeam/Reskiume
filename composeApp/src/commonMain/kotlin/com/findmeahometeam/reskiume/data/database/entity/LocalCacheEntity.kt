@@ -7,7 +7,7 @@ import com.findmeahometeam.reskiume.data.util.Section
 @Entity
 data class LocalCacheEntity(
     @PrimaryKey(autoGenerate = true) val id: Int,
-    val uid: String,
+    val cachedObjectId: String,
     val savedBy: String,
     val section: Section,
     val timestamp: Long,

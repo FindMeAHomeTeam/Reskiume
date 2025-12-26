@@ -60,7 +60,7 @@ class GetDataByManagingObjectLocalCacheTimestampTest {
 
             everySuspend {
                 getLocalCacheEntity(
-                    cacheArg.uid,
+                    cacheArg.cachedObjectId,
                     cacheArg.section
                 )
             } returns getLocalCacheEntityReturn
@@ -90,7 +90,7 @@ class GetDataByManagingObjectLocalCacheTimestampTest {
                 getUseCaseGetDataByManagingObjectLocalCacheTimestamp(isConnectedReturn = false)
 
             getDataByManagingObjectLocalCacheTimestamp(
-                uid = user.uid,
+                cachedObjectId = user.uid,
                 section = Section.REVIEWS,
                 onCompletionInsertCache = { },
                 onCompletionUpdateCache = { },
@@ -114,7 +114,7 @@ class GetDataByManagingObjectLocalCacheTimestampTest {
                 getUseCaseGetDataByManagingObjectLocalCacheTimestamp(getLocalCacheEntityReturn = null)
 
             getDataByManagingObjectLocalCacheTimestamp(
-                uid = user.uid,
+                cachedObjectId = user.uid,
                 section = Section.REVIEWS,
                 onCompletionInsertCache = { },
                 onCompletionUpdateCache = { },
@@ -137,7 +137,7 @@ class GetDataByManagingObjectLocalCacheTimestampTest {
                 )
 
             getDataByManagingObjectLocalCacheTimestamp(
-                uid = user.uid,
+                cachedObjectId = user.uid,
                 section = Section.REVIEWS,
                 onCompletionInsertCache = { },
                 onCompletionUpdateCache = { },
@@ -161,7 +161,7 @@ class GetDataByManagingObjectLocalCacheTimestampTest {
                 )
 
             getDataByManagingObjectLocalCacheTimestamp(
-                uid = user.uid,
+                cachedObjectId = user.uid,
                 section = Section.REVIEWS,
                 onCompletionInsertCache = { },
                 onCompletionUpdateCache = { },
@@ -186,7 +186,7 @@ class GetDataByManagingObjectLocalCacheTimestampTest {
                 )
 
             getDataByManagingObjectLocalCacheTimestamp(
-                uid = user.uid,
+                cachedObjectId = user.uid,
                 section = Section.REVIEWS,
                 onCompletionInsertCache = { },
                 onCompletionUpdateCache = { },
@@ -206,7 +206,7 @@ class GetDataByManagingObjectLocalCacheTimestampTest {
                 getUseCaseGetDataByManagingObjectLocalCacheTimestamp()
 
             getDataByManagingObjectLocalCacheTimestamp(
-                uid = user.uid,
+                cachedObjectId = user.uid,
                 section = Section.REVIEWS,
                 onCompletionInsertCache = { },
                 onCompletionUpdateCache = { },

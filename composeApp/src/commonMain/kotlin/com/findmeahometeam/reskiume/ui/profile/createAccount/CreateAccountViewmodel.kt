@@ -208,7 +208,7 @@ class CreateAccountViewmodel(
         viewModelScope.launch {
             insertCacheInLocalRepository(
                 LocalCache(
-                    uid = uid,
+                    cachedObjectId = uid,
                     savedBy = uid,
                     section = Section.USERS,
                     timestamp = Clock.System.now().epochSeconds

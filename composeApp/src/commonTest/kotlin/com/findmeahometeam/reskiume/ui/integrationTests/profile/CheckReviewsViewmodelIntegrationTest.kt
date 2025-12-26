@@ -174,7 +174,7 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 localCacheRepository = FakeLocalCacheRepository(
                     localCacheList = mutableListOf(
                         localCache.copy(
-                            uid = author.uid,
+                            cachedObjectId = author.uid,
                             section = Section.USERS,
                             timestamp = 123L
                         ).toEntity()
@@ -202,7 +202,7 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 localCacheRepository = FakeLocalCacheRepository(
                     localCacheList = mutableListOf(
                         localCache.copy(
-                            uid = author.uid,
+                            cachedObjectId = author.uid,
                             section = Section.USERS,
                             timestamp = 123L
                         ).toEntity()
@@ -230,7 +230,7 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 localCacheRepository = FakeLocalCacheRepository(
                     localCacheList = mutableListOf(
                         localCache.copy(
-                            uid = author.uid,
+                            cachedObjectId = author.uid,
                             section = Section.USERS
                         ).toEntity()
                     )
@@ -259,7 +259,7 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
                             section = Section.USERS
                         ).toEntity(),
                         localCache.copy(
-                            uid = author.uid,
+                            cachedObjectId = author.uid,
                             section = Section.USERS
                         ).toEntity()
                     )
@@ -303,7 +303,7 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
                             timestamp = 123L
                         ).toEntity(),
                         localCache.copy(
-                            uid = author.uid,
+                            cachedObjectId = author.uid,
                             section = Section.USERS
                         ).toEntity()
                     )
@@ -344,7 +344,7 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
                             section = Section.USERS
                         ).toEntity(),
                         localCache.copy(
-                            uid = author.uid,
+                            cachedObjectId = author.uid,
                             section = Section.USERS
                         ).toEntity()
                     )

@@ -131,7 +131,7 @@ class CheckAllNonHumanAnimalsViewmodelIntegrationTest : CoroutineTestDispatcher(
                     localCacheRepository = FakeLocalCacheRepository(
                         localCacheList = mutableListOf(
                             localCache.copy(section = Section.NON_HUMAN_ANIMALS, timestamp = 123L).toEntity(),
-                            localCache.copy(uid = nonHumanAnimal.id, section = Section.NON_HUMAN_ANIMALS, timestamp = 123L).toEntity()
+                            localCache.copy(cachedObjectId = nonHumanAnimal.id, section = Section.NON_HUMAN_ANIMALS, timestamp = 123L).toEntity()
                         )
                     ),
                     realtimeDatabaseRemoteNonHumanAnimalRepository = FakeRealtimeDatabaseRemoteNonHumanAnimalRepository(
@@ -151,7 +151,7 @@ class CheckAllNonHumanAnimalsViewmodelIntegrationTest : CoroutineTestDispatcher(
                     localCacheRepository = FakeLocalCacheRepository(
                         localCacheList = mutableListOf(
                             localCache.copy(section = Section.NON_HUMAN_ANIMALS, timestamp = 123L).toEntity(),
-                            localCache.copy(uid = nonHumanAnimal.id, section = Section.NON_HUMAN_ANIMALS, timestamp = 123L).toEntity()
+                            localCache.copy(cachedObjectId = nonHumanAnimal.id, section = Section.NON_HUMAN_ANIMALS, timestamp = 123L).toEntity()
                         )
                     ),
                     realtimeDatabaseRemoteNonHumanAnimalRepository = FakeRealtimeDatabaseRemoteNonHumanAnimalRepository(
@@ -170,7 +170,7 @@ class CheckAllNonHumanAnimalsViewmodelIntegrationTest : CoroutineTestDispatcher(
                     localCacheRepository = FakeLocalCacheRepository(
                         localCacheList = mutableListOf(
                             localCache.copy(section = Section.NON_HUMAN_ANIMALS).toEntity(),
-                            localCache.copy(uid = nonHumanAnimal.id, section = Section.NON_HUMAN_ANIMALS).toEntity()
+                            localCache.copy(cachedObjectId = nonHumanAnimal.id, section = Section.NON_HUMAN_ANIMALS).toEntity()
                         )
                     ),
                     localNonHumanAnimalRepository = FakeLocalNonHumanAnimalRepository(mutableListOf(nonHumanAnimal.toEntity()))

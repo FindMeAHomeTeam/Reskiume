@@ -39,7 +39,7 @@ val authUser = AuthUser(
 
 val localCache = LocalCache(
     id = 0,
-    uid = user.uid,
+    cachedObjectId = user.uid,
     savedBy = user.uid,
     section = Section.REVIEWS,
     timestamp = 1625328000000L

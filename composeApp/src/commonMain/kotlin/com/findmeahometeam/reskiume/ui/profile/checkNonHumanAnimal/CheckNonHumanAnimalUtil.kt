@@ -41,7 +41,7 @@ class CheckNonHumanAnimalUtil(
         observeAuthStateInAuthDataSource().flatMapConcat { authUser: AuthUser? ->
 
             getDataByManagingObjectLocalCacheTimestamp(
-                uid = nonHumanAnimalId,
+                cachedObjectId = nonHumanAnimalId,
                 savedBy = authUser?.uid ?: "",
                 section = Section.NON_HUMAN_ANIMALS,
                 onCompletionInsertCache = {

@@ -83,7 +83,7 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
 
             everySuspend {
                 getLocalCacheEntity(
-                    cacheArg.uid,
+                    cacheArg.cachedObjectId,
                     cacheArg.section
                 )
             } returns getLocalCacheEntityReturn

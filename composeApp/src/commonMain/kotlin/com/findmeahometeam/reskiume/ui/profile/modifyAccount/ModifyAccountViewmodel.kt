@@ -281,7 +281,7 @@ class ModifyAccountViewmodel(
 
                 modifyCacheInLocalRepository(
                     LocalCache(
-                        uid = authUser.uid,
+                        cachedObjectId = authUser.uid,
                         savedBy = authUser.uid,
                         section = Section.USERS,
                         timestamp = Clock.System.now().epochSeconds

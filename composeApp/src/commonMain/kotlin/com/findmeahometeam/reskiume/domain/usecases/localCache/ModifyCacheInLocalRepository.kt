@@ -6,7 +6,7 @@ import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
 
 class ModifyCacheInLocalRepository(private val repository: LocalCacheRepository) {
     suspend operator fun invoke(localCache: LocalCache, onModifyUser: (rowsUpdated: Int) -> Unit) {
-        val localCacheEntity: LocalCacheEntity? = repository.getLocalCacheEntity(localCache.uid, localCache.section)
+        val localCacheEntity: LocalCacheEntity? = repository.getLocalCacheEntity(localCache.cachedObjectId, localCache.section)
         repository.modifyLocalCacheEntity(localCacheEntity!!.copy(timestamp = localCache.timestamp), onModifyUser)
     }
 }

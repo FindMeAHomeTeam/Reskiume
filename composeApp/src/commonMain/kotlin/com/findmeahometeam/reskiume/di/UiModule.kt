@@ -6,11 +6,12 @@ import com.findmeahometeam.reskiume.ui.home.HomeViewmodel
 import com.findmeahometeam.reskiume.ui.profile.ProfileViewmodel
 import com.findmeahometeam.reskiume.ui.profile.checkAllNonHumanAnimals.CheckAllNonHumanAnimalsViewmodel
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
-import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsViewmodel
+import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalViewmodel
 import com.findmeahometeam.reskiume.ui.profile.createAccount.CreateAccountViewmodel
 import com.findmeahometeam.reskiume.ui.profile.deleteAccount.DeleteAccountViewmodel
 import com.findmeahometeam.reskiume.ui.profile.loginAccount.LoginAccountViewmodel
 import com.findmeahometeam.reskiume.ui.profile.modifyAccount.ModifyAccountViewmodel
+import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsViewmodel
 import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.ModifyNonHumanAnimalViewmodel
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
@@ -29,5 +30,6 @@ val uiModule = module {
     viewModelOf(::CheckReviewsViewmodel)
     viewModelOf(::CheckAllNonHumanAnimalsViewmodel)
     viewModelOf(::ModifyNonHumanAnimalViewmodel)
+    viewModelOf(::CheckNonHumanAnimalViewmodel)
     singleOf(::CheckNonHumanAnimalUtil)
 }

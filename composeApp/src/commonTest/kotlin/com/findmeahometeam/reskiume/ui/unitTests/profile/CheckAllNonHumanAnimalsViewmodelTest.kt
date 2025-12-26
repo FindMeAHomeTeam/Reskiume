@@ -142,7 +142,7 @@ class CheckAllNonHumanAnimalsViewmodelTest : CoroutineTestDispatcher() {
             every {
                 downloadImage(
                     user.uid,
-                    nonHumanAnimal.id.toString(),
+                    nonHumanAnimal.id,
                     Section.NON_HUMAN_ANIMALS,
                     capture(onSaveImageToLocal)
                 )

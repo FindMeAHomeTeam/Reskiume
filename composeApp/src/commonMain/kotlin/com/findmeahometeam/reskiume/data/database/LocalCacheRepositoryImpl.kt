@@ -28,6 +28,13 @@ class LocalCacheRepositoryImpl(
     }
 
     override suspend fun deleteLocalCacheEntity(
+        cachedObjectId: String,
+        onDeleteLocalCache: (rowsDeleted: Int) -> Unit
+    ) {
+        onDeleteLocalCache(reskiumeDatabase.getLocalCacheDao().deleteLocalCacheEntity(cachedObjectId))
+    }
+
+    override suspend fun deleteAllLocalCacheEntity(
         uid: String,
         onDeleteLocalCache: (rowsDeleted: Int) -> Unit
     ) {

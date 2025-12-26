@@ -15,7 +15,7 @@ import com.findmeahometeam.reskiume.domain.usecases.user.DeleteUserFromRemoteDat
 import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
-import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteCacheFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteAllCacheFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.DeleteReviewsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.DeleteReviewsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromRemoteRepository
@@ -31,7 +31,7 @@ class DeleteAccountViewmodel(
     private val getReviewsFromRemoteRepository: GetReviewsFromRemoteRepository,
     private val deleteReviewsFromRemoteRepository: DeleteReviewsFromRemoteRepository,
     private val deleteReviewsFromLocalRepository: DeleteReviewsFromLocalRepository,
-    private val deleteCacheFromLocalRepository: DeleteCacheFromLocalRepository,
+    private val deleteAllCacheFromLocalRepository: DeleteAllCacheFromLocalRepository,
     private val getUserFromLocalDataSource: GetUserFromLocalDataSource,
     private val getUserFromRemoteDataSource: GetUserFromRemoteDataSource,
     private val deleteUserFromAuthDataSource: DeleteUserFromAuthDataSource,
@@ -176,16 +176,16 @@ class DeleteAccountViewmodel(
 
         viewModelScope.launch {
 
-            deleteCacheFromLocalRepository(uid) { rowsDeleted ->
+            deleteAllCacheFromLocalRepository(uid) { rowsDeleted ->
                 if (rowsDeleted > 0) {
                     log.d(
                         "DeleteAccountViewmodel",
-                        "deleteUserCacheInLocalRepository: Deleted $rowsDeleted cache entries from local repository"
+                        "deleteUserCacheFromLocalRepository: Deleted $rowsDeleted cache entries for $uid from local repository"
                     )
                 } else {
                     log.e(
                         "DeleteAccountViewmodel",
-                        "deleteUserCacheInLocalRepository: No cache entries to delete from local repository"
+                        "deleteUserCacheFromLocalRepository: Error deleting entries for $uid from local repository"
                     )
                 }
                 onCompletion()

@@ -25,7 +25,7 @@ import com.findmeahometeam.reskiume.domain.usecases.user.DeleteUserFromRemoteDat
 import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
-import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteCacheFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteAllCacheFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.DeleteReviewsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.DeleteReviewsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromRemoteRepository
@@ -129,7 +129,7 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
 
         val localCacheRepository: LocalCacheRepository = mock {
             everySuspend {
-                deleteLocalCacheEntity(
+                deleteAllLocalCacheEntity(
                     user.uid,
                     capture(onDeleteLocalCacheEntity)
                 )
@@ -179,7 +179,7 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
         val deleteReviewsFromLocalRepository =
             DeleteReviewsFromLocalRepository(localReviewRepository)
 
-        val deleteCacheFromLocalRepository = DeleteCacheFromLocalRepository(localCacheRepository)
+        val deleteAllCacheFromLocalRepository = DeleteAllCacheFromLocalRepository(localCacheRepository)
 
         val getUserFromLocalDataSource =
             GetUserFromLocalDataSource(localUserRepository)
@@ -207,7 +207,7 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
             getReviewsFromRemoteRepository,
             deleteReviewsFromRemoteRepository,
             deleteReviewsFromLocalRepository,
-            deleteCacheFromLocalRepository,
+            deleteAllCacheFromLocalRepository,
             getUserFromLocalDataSource,
             getUserFromRemoteDataSource,
             deleteUserFromAuthDataSource,

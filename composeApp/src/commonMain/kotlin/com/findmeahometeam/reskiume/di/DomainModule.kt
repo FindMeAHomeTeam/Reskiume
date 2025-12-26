@@ -19,6 +19,7 @@ import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDa
 import com.findmeahometeam.reskiume.domain.usecases.authUser.SignInWithEmailAndPasswordFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.SignOutFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteAllCacheFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteCacheFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
@@ -70,6 +71,7 @@ val domainModule = module {
     factoryOf(::ModifyCacheInLocalRepository)
     factoryOf(::GetDataByManagingObjectLocalCacheTimestamp)
     factoryOf(::DeleteCacheFromLocalRepository)
+    factoryOf(::DeleteAllCacheFromLocalRepository)
 
     // nonHumanAnimal
     factoryOf(::DeleteAllNonHumanAnimalsFromLocalRepository)

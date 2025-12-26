@@ -10,7 +10,10 @@ import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteCacheFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.DeleteNonHumanAnimalFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.DeleteNonHumanAnimalFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetNonHumanAnimalFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetNonHumanAnimalFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.ModifyNonHumanAnimalInLocalRepository
@@ -38,6 +41,9 @@ class ModifyNonHumanAnimalViewmodel(
     private val modifyNonHumanAnimalInRemoteRepository: ModifyNonHumanAnimalInRemoteRepository,
     private val modifyNonHumanAnimalInLocalRepository: ModifyNonHumanAnimalInLocalRepository,
     private val modifyCacheInLocalRepository: ModifyCacheInLocalRepository,
+    private val deleteNonHumanAnimalFromRemoteRepository: DeleteNonHumanAnimalFromRemoteRepository,
+    private val deleteNonHumanAnimalFromLocalRepository: DeleteNonHumanAnimalFromLocalRepository,
+    private val deleteCacheFromLocalRepository: DeleteCacheFromLocalRepository,
     private val log: Log
 ) : ViewModel() {
 
@@ -50,16 +56,16 @@ class ModifyNonHumanAnimalViewmodel(
     val nonHumanAnimalFlow: Flow<UiState<NonHumanAnimal>> =
         checkNonHumanAnimalUtil.getNonHumanAnimalFlow(viewModelScope, nonHumanAnimalId, caregiverId)
 
-    private val _saveChangesUiState: MutableStateFlow<UiState<Unit>> =
+    private val _manageChangesUiState: MutableStateFlow<UiState<Unit>> =
         MutableStateFlow(UiState.Idle())
-    val saveChangesUiState: StateFlow<UiState<Unit>> = _saveChangesUiState.asStateFlow()
+    val manageChangesUiState: StateFlow<UiState<Unit>> = _manageChangesUiState.asStateFlow()
 
     fun saveNonHumanAnimalChanges(
         isDifferentImage: Boolean,
         modifiedNonHumanAnimal: NonHumanAnimal
     ) {
         viewModelScope.launch {
-            _saveChangesUiState.value = UiState.Loading()
+            _manageChangesUiState.value = UiState.Loading()
 
             if (isDifferentImage) {
                 deleteCurrentImageInRemoteDataSource(
@@ -139,7 +145,7 @@ class ModifyNonHumanAnimalViewmodel(
                             "ModifyNonHumanAnimalViewModel",
                             "deleteCurrentImageInRemoteDataSource: failed to delete the image from the non human animal $nonHumanAnimalId in remote data source"
                         )
-                        _saveChangesUiState.value = UiState.Error()
+                        _manageChangesUiState.value = UiState.Error()
                     }
                 }
             }
@@ -168,7 +174,7 @@ class ModifyNonHumanAnimalViewmodel(
                         "ModifyNonHumanAnimalViewModel",
                         "deleteCurrentImageInLocalDataSource: failed to delete the image from the non human animal $nonHumanAnimalId in local data source"
                     )
-                    _saveChangesUiState.value = UiState.Error()
+                    _manageChangesUiState.value = UiState.Error()
                 }
             }
         }
@@ -222,7 +228,7 @@ class ModifyNonHumanAnimalViewmodel(
                         "ModifyNonHumanAnimalViewModel",
                         "modifyNonHumanAnimalInRemoteDataSource: failed to update the non human animal ${nonHumanAnimal.id} in remote data source"
                     )
-                    _saveChangesUiState.value = UiState.Error()
+                    _manageChangesUiState.value = UiState.Error()
                 }
             }
         }
@@ -248,7 +254,7 @@ class ModifyNonHumanAnimalViewmodel(
                         "ModifyNonHumanAnimalViewModel",
                         "modifyNonHumanAnimalInLocalDataSource: failed to update the non human animal ${modifiedNonHumanAnimal.id} in the local data source"
                     )
-                    _saveChangesUiState.value = UiState.Error()
+                    _manageChangesUiState.value = UiState.Error()
                 }
             }
         }
@@ -261,7 +267,7 @@ class ModifyNonHumanAnimalViewmodel(
 
             modifyCacheInLocalRepository(
                 LocalCache(
-                    uid = nonHumanAnimal.id,
+                    cachedObjectId = nonHumanAnimal.id,
                     savedBy = nonHumanAnimal.caregiverId,
                     section = Section.NON_HUMAN_ANIMALS,
                     timestamp = Clock.System.now().epochSeconds
@@ -279,7 +285,93 @@ class ModifyNonHumanAnimalViewmodel(
                         "Error updating ${nonHumanAnimal.id} in local cache in section ${Section.NON_HUMAN_ANIMALS}"
                     )
                 }
-                _saveChangesUiState.value = UiState.Success(Unit)
+                _manageChangesUiState.value = UiState.Success(Unit)
+            }
+        }
+    }
+
+    fun deleteNonHumanAnimal(id: String, caregiverId: String) {
+
+        deleteNonHumanAnimalFromRemoteDataSource(id, caregiverId) {
+
+            deleteNonHumanAnimalFromLocalDataSource(id) {
+
+                deleteNonHumanAnimalCacheFromLocalDataSource(id)
+            }
+        }
+    }
+
+    private fun deleteNonHumanAnimalFromRemoteDataSource(
+        id: String,
+        caregiverId: String,
+        success: () -> Unit
+    ) {
+        _manageChangesUiState.value = UiState.Loading()
+
+        deleteNonHumanAnimalFromRemoteRepository(
+            id,
+            caregiverId
+        ) { databaseResult: DatabaseResult ->
+
+            if (databaseResult is DatabaseResult.Success) {
+                log.d(
+                    "ModifyNonHumanAnimalViewModel",
+                    "Non human animal $id deleted in the remote data source"
+                )
+                success()
+            } else {
+                log.e(
+                    "ModifyNonHumanAnimalViewModel",
+                    "Error deleting the non human animal $id in the remote data source"
+                )
+                _manageChangesUiState.value = UiState.Error()
+            }
+        }
+    }
+
+    private fun deleteNonHumanAnimalFromLocalDataSource(id: String, success: () -> Unit) {
+
+        viewModelScope.launch {
+            _manageChangesUiState.value = UiState.Loading()
+
+            deleteNonHumanAnimalFromLocalRepository(id) { rowsDeleted: Int ->
+
+                if (rowsDeleted > 0) {
+                    log.d(
+                        "ModifyNonHumanAnimalViewModel",
+                        "Non human animal $id deleted in the local data source"
+                    )
+                    success()
+                } else {
+                    log.e(
+                        "ModifyNonHumanAnimalViewModel",
+                        "Error deleting the non human animal $id in the local data source"
+                    )
+                    _manageChangesUiState.value = UiState.Error()
+                }
+            }
+        }
+    }
+
+    private fun deleteNonHumanAnimalCacheFromLocalDataSource(id: String) {
+
+        viewModelScope.launch {
+            _manageChangesUiState.value = UiState.Loading()
+
+            deleteCacheFromLocalRepository(id) { rowsDeleted: Int ->
+
+                if (rowsDeleted > 0) {
+                    log.d(
+                        "ModifyNonHumanAnimalViewModel",
+                        "Non human animal $id deleted in the local cache in section ${Section.NON_HUMAN_ANIMALS}"
+                    )
+                } else {
+                    log.e(
+                        "ModifyNonHumanAnimalViewModel",
+                        "Error deleting the non human animal $id in the local cache in section ${Section.NON_HUMAN_ANIMALS}"
+                    )
+                }
+                _manageChangesUiState.value = UiState.Success(Unit)
             }
         }
     }

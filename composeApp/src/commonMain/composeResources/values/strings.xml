@@ -132,6 +132,11 @@
     <string name="modify_non_human_animal_screen_non_human_animal_gender">Gender</string>
     <string name="modify_non_human_animal_screen_non_human_animal_age_category">Age category</string>
     <string name="modify_non_human_animal_screen_non_human_animal_description">description</string>
+    <string name="modify_non_human_animal_screen_delete_non_human_animal_text">Delete %1$s's profile</string>
+    <string name="modify_non_human_animal_screen_delete_non_human_animal_button">Delete</string>
+    <string name="modify_non_human_animal_screen_dismiss_delete_non_human_animal_button">Dismiss</string>
+    <string name="modify_non_human_animal_screen_delete_non_human_animal_title">Do you want to delete %1$s's profile?</string>
+    <string name="modify_non_human_animal_screen_delete_non_human_animal_message">This action can not be undone</string>
     <string name="modify_non_human_animal_screen_save_non_human_animal_changes_button">Save %1$s's changes</string>
 
     <!-- No human animal types -->

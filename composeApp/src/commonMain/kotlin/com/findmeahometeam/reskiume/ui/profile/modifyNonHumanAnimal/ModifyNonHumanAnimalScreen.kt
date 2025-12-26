@@ -28,14 +28,21 @@ import com.findmeahometeam.reskiume.domain.model.toStringResource
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.components.RmAddPhoto
 import com.findmeahometeam.reskiume.ui.core.components.RmButton
+import com.findmeahometeam.reskiume.ui.core.components.RmDialog
 import com.findmeahometeam.reskiume.ui.core.components.RmDropDownMenu
 import com.findmeahometeam.reskiume.ui.core.components.RmResultState
 import com.findmeahometeam.reskiume.ui.core.components.RmScaffold
 import com.findmeahometeam.reskiume.ui.core.components.RmTextField
+import com.findmeahometeam.reskiume.ui.core.components.RmTextLink
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import reskiume.composeapp.generated.resources.Res
+import reskiume.composeapp.generated.resources.modify_non_human_animal_screen_delete_non_human_animal_button
+import reskiume.composeapp.generated.resources.modify_non_human_animal_screen_delete_non_human_animal_message
+import reskiume.composeapp.generated.resources.modify_non_human_animal_screen_delete_non_human_animal_text
+import reskiume.composeapp.generated.resources.modify_non_human_animal_screen_delete_non_human_animal_title
+import reskiume.composeapp.generated.resources.modify_non_human_animal_screen_dismiss_delete_non_human_animal_button
 import reskiume.composeapp.generated.resources.modify_non_human_animal_screen_non_human_animal_age_category
 import reskiume.composeapp.generated.resources.modify_non_human_animal_screen_non_human_animal_description
 import reskiume.composeapp.generated.resources.modify_non_human_animal_screen_non_human_animal_gender
@@ -54,7 +61,7 @@ fun ModifyNonHumanAnimalScreen(
     val nonHumanAnimalState: UiState<NonHumanAnimal> by modifyNonHumanAnimalViewmodel.nonHumanAnimalFlow.collectAsState(
         initial = UiState.Loading()
     )
-    val saveChangesUiState: UiState<Unit> by modifyNonHumanAnimalViewmodel.saveChangesUiState.collectAsState()
+    val saveChangesUiState: UiState<Unit> by modifyNonHumanAnimalViewmodel.manageChangesUiState.collectAsState()
 
     val scrollState = rememberScrollState()
 
@@ -88,6 +95,7 @@ fun ModifyNonHumanAnimalScreen(
                 var gender: Gender by rememberSaveable { mutableStateOf(nonHumanAnimal.gender) }
                 var ageCategory: AgeCategory by rememberSaveable { mutableStateOf(nonHumanAnimal.ageCategory) }
                 var description: String by rememberSaveable { mutableStateOf(nonHumanAnimal.description) }
+                var displayDeleteDialog: Boolean by rememberSaveable { mutableStateOf(false) }
 
                 val isUpdateUserButtonEnabled by remember(
                     imageUrl,
@@ -175,6 +183,36 @@ fun ModifyNonHumanAnimalScreen(
                     label = stringResource(Res.string.modify_non_human_animal_screen_non_human_animal_description),
                     onValueChange = { description = it }
                 )
+
+                Spacer(modifier = Modifier.height(20.dp))
+                RmTextLink(
+                    text = stringResource(
+                        Res.string.modify_non_human_animal_screen_delete_non_human_animal_text,
+                        nonHumanAnimal.name
+                    ),
+                    textToLink = stringResource(Res.string.modify_non_human_animal_screen_delete_non_human_animal_button),
+                    onClick = { displayDeleteDialog = true }
+                )
+                if (displayDeleteDialog) {
+                    RmDialog(
+                        emoji = "🗑️",
+                        title = stringResource(
+                            Res.string.modify_non_human_animal_screen_delete_non_human_animal_title,
+                            nonHumanAnimal.name
+                        ),
+                        message = stringResource(Res.string.modify_non_human_animal_screen_delete_non_human_animal_message),
+                        allowMessage = stringResource(Res.string.modify_non_human_animal_screen_delete_non_human_animal_button),
+                        denyMessage = stringResource(Res.string.modify_non_human_animal_screen_dismiss_delete_non_human_animal_button),
+                        onClickAllow = {
+                            modifyNonHumanAnimalViewmodel.deleteNonHumanAnimal(
+                                nonHumanAnimal.id,
+                                nonHumanAnimal.caregiverId
+                            )
+                            displayDeleteDialog = false
+                        },
+                        onClickDeny = { displayDeleteDialog = false }
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(10.dp))
                 RmResultState(saveChangesUiState, onSuccess = { onBackPressed() })

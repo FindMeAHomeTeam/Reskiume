@@ -44,7 +44,7 @@ class StorageRepositoryAndroidImpl(
         extraId: String,
         section: Section,
         imageUri: String,
-        onImageUploaded: (String) -> Unit
+        onImageUploaded: (imagePath: String) -> Unit
     ) {
         val imageRef: StorageReference = getStorageReference(section, userUid, extraId)
         val uploadTask: UploadTask = imageRef.putFile(imageUri.toUri())
@@ -68,7 +68,7 @@ class StorageRepositoryAndroidImpl(
         userUid: String,
         extraId: String,
         section: Section,
-        onImageSaved: (String) -> Unit
+        onImageSaved: (imagePath: String) -> Unit
     ) {
         val imageRef: StorageReference = getStorageReference(section, userUid, extraId)
         val localFile = when {
@@ -89,7 +89,7 @@ class StorageRepositoryAndroidImpl(
 
     override fun deleteLocalImage(
         currentImagePath: String,
-        onImageDeleted: (Boolean) -> Unit
+        onImageDeleted: (isDeleted: Boolean) -> Unit
     ) {
         val localFile = if (currentImagePath.contains("file:///")) {
             val uri = currentImagePath.toUri()
@@ -105,7 +105,7 @@ class StorageRepositoryAndroidImpl(
         userUid: String,
         extraId: String,
         section: Section,
-        onImageDeleted: (Boolean) -> Unit
+        onImageDeleted: (isDeleted: Boolean) -> Unit
     ) {
         val imageRef: StorageReference = getStorageReference(section, userUid, extraId)
         imageRef.delete().addOnSuccessListener {

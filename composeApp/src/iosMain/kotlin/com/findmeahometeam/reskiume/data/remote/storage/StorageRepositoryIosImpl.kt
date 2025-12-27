@@ -26,7 +26,7 @@ class StorageRepositoryIosImpl(
         extraId: String,
         section: Section,
         imageUri: String,
-        onImageUploaded: (String) -> Unit
+        onImageUploaded: (imagePath: String) -> Unit
     ) {
         initialCheck(
             onSuccess = {
@@ -42,7 +42,7 @@ class StorageRepositoryIosImpl(
         userUid: String,
         extraId: String,
         section: Section,
-        onImageSaved: (String) -> Unit
+        onImageSaved: (imagePath: String) -> Unit
     ) {
         initialCheck(
             onSuccess = {
@@ -56,7 +56,7 @@ class StorageRepositoryIosImpl(
 
     override fun deleteLocalImage(
         currentImagePath: String,
-        onImageDeleted: (Boolean) -> Unit
+        onImageDeleted: (isDeleted: Boolean) -> Unit
     ) {
         initialCheck(
             onSuccess = {
@@ -72,7 +72,7 @@ class StorageRepositoryIosImpl(
         userUid: String,
         extraId: String,
         section: Section,
-        onImageDeleted: (Boolean) -> Unit
+        onImageDeleted: (isDeleted: Boolean) -> Unit
     ) {
         val value: StorageRepository? =
             storageRepositoryForIosDelegateWrapper.storageRepositoryForIosDelegateState.value

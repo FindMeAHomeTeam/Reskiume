@@ -21,7 +21,7 @@ class FakeStorageRepository(
         extraId: String,
         section: Section,
         imageUri: String,
-        onImageUploaded: (String) -> Unit
+        onImageUploaded: (imagePath: String) -> Unit
     ) {
         val path = getPath(section, userUid, extraId)
         remoteDatasourceList.add(Pair(path, imageUri))
@@ -32,7 +32,7 @@ class FakeStorageRepository(
         userUid: String,
         extraId: String,
         section: Section,
-        onImageSaved: (String) -> Unit
+        onImageSaved: (imagePath: String) -> Unit
     ) {
         val pathToLocalImage = getPath(section, userUid, extraId)
         localDatasourceList.add(Pair(pathToLocalImage, if(extraId.isEmpty()) "$userUid.webp" else "$extraId.webp"))
@@ -41,7 +41,7 @@ class FakeStorageRepository(
 
     override fun deleteLocalImage(
         currentImagePath: String,
-        onImageDeleted: (Boolean) -> Unit
+        onImageDeleted: (isDeleted: Boolean) -> Unit
     ) {
         localDatasourceList.firstOrNull { it.second == currentImagePath }?.let {
             localDatasourceList.remove(it)
@@ -53,7 +53,7 @@ class FakeStorageRepository(
         userUid: String,
         extraId: String,
         section: Section,
-        onImageDeleted: (Boolean) -> Unit
+        onImageDeleted: (isDeleted: Boolean) -> Unit
     ) {
         val pathToImage = getPath(section, userUid, extraId)
         remoteDatasourceList.firstOrNull { it.first == pathToImage }?.let {

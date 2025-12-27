@@ -24,7 +24,6 @@ import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.InsertNonHuma
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.ModifyNonHumanAnimalInLocalRepository
 import com.findmeahometeam.reskiume.localCache
 import com.findmeahometeam.reskiume.nonHumanAnimal
-import com.findmeahometeam.reskiume.review
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckAllNonHumanAnimals
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
 import com.findmeahometeam.reskiume.ui.profile.checkAllNonHumanAnimals.CheckAllNonHumanAnimalsViewmodel
@@ -133,7 +132,7 @@ class CheckAllNonHumanAnimalsViewmodelTest : CoroutineTestDispatcher() {
 
         val realtimeDatabaseRemoteNonHumanAnimalRepository: RealtimeDatabaseRemoteNonHumanAnimalRepository = mock {
             every {
-                getAllRemoteNonHumanAnimals(review.reviewedUid)
+                getAllRemoteNonHumanAnimals(nonHumanAnimal.caregiverId)
             } returns getAllRemoteNonHumanAnimalsReturn
         }
 

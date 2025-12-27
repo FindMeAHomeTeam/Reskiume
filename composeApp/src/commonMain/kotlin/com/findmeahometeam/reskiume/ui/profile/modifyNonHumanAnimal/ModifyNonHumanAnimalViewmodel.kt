@@ -166,13 +166,13 @@ class ModifyNonHumanAnimalViewmodel(
                 if (isDeleted) {
                     log.d(
                         "ModifyNonHumanAnimalViewModel",
-                        "deleteCurrentImageInLocalDataSource: Image deleted from the non human animal $nonHumanAnimalId was successfully in local data source"
+                        "deleteCurrentImageInLocalDataSource: Image from the non human animal $nonHumanAnimalId was successfully deleted in the local data source"
                     )
                     onSuccess()
                 } else {
                     log.e(
                         "ModifyNonHumanAnimalViewModel",
-                        "deleteCurrentImageInLocalDataSource: failed to delete the image from the non human animal $nonHumanAnimalId in local data source"
+                        "deleteCurrentImageInLocalDataSource: Failed to delete the image from the non human animal $nonHumanAnimalId in the local data source"
                     )
                     _manageChangesUiState.value = UiState.Error()
                 }
@@ -292,6 +292,8 @@ class ModifyNonHumanAnimalViewmodel(
 
     fun deleteNonHumanAnimal(id: String, caregiverId: String) {
 
+        _manageChangesUiState.value = UiState.Loading()
+
         deleteNonHumanAnimalFromRemoteDataSource(id, caregiverId) {
 
             deleteNonHumanAnimalFromLocalDataSource(id) {
@@ -306,8 +308,6 @@ class ModifyNonHumanAnimalViewmodel(
         caregiverId: String,
         success: () -> Unit
     ) {
-        _manageChangesUiState.value = UiState.Loading()
-
         deleteNonHumanAnimalFromRemoteRepository(
             id,
             caregiverId
@@ -332,7 +332,6 @@ class ModifyNonHumanAnimalViewmodel(
     private fun deleteNonHumanAnimalFromLocalDataSource(id: String, success: () -> Unit) {
 
         viewModelScope.launch {
-            _manageChangesUiState.value = UiState.Loading()
 
             deleteNonHumanAnimalFromLocalRepository(id) { rowsDeleted: Int ->
 
@@ -356,7 +355,6 @@ class ModifyNonHumanAnimalViewmodel(
     private fun deleteNonHumanAnimalCacheFromLocalDataSource(id: String) {
 
         viewModelScope.launch {
-            _manageChangesUiState.value = UiState.Loading()
 
             deleteCacheFromLocalRepository(id) { rowsDeleted: Int ->
 

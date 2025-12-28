@@ -68,6 +68,7 @@ class ModifyNonHumanAnimalViewmodel(
             _manageChangesUiState.value = UiState.Loading()
 
             if (isDifferentImage) {
+
                 deleteCurrentImageInRemoteDataSource(
                     modifiedNonHumanAnimal.caregiverId,
                     modifiedNonHumanAnimal.id

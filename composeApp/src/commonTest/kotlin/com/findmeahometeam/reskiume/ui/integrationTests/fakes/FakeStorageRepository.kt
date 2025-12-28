@@ -8,14 +8,6 @@ class FakeStorageRepository(
     private val localDatasourceList: MutableList<Pair<String, String>> = mutableListOf()
 ) : StorageRepository {
 
-    private fun getPath(section: Section, userUid: String, extraId: String): String {
-        return if (extraId.isBlank()) {
-            "${section.path}/$userUid"
-        } else {
-            "${section.path}/$userUid/$extraId"
-        }
-    }
-
     override fun uploadImage(
         userUid: String,
         extraId: String,
@@ -23,8 +15,7 @@ class FakeStorageRepository(
         imageUri: String,
         onImageUploaded: (imagePath: String) -> Unit
     ) {
-        val path = getPath(section, userUid, extraId)
-        remoteDatasourceList.add(Pair(path, imageUri))
+        remoteDatasourceList.add(Pair("${section.path}/$userUid", imageUri))
         onImageUploaded(imageUri)
     }
 
@@ -34,9 +25,8 @@ class FakeStorageRepository(
         section: Section,
         onImageSaved: (imagePath: String) -> Unit
     ) {
-        val pathToLocalImage = getPath(section, userUid, extraId)
-        localDatasourceList.add(Pair(pathToLocalImage, if(extraId.isEmpty()) "$userUid.webp" else "$extraId.webp"))
-        onImageSaved(pathToLocalImage)
+        localDatasourceList.add(Pair("${section.path}/$userUid", if(extraId.isEmpty()) "$userUid.webp" else "$userUid$extraId.webp"))
+        onImageSaved("${section.path}/$userUid")
     }
 
     override fun deleteLocalImage(
@@ -55,8 +45,7 @@ class FakeStorageRepository(
         section: Section,
         onImageDeleted: (isDeleted: Boolean) -> Unit
     ) {
-        val pathToImage = getPath(section, userUid, extraId)
-        remoteDatasourceList.firstOrNull { it.first == pathToImage }?.let {
+        remoteDatasourceList.firstOrNull { it.first == "${section.path}/$userUid" }?.let {
             remoteDatasourceList.remove(it)
             onImageDeleted(true)
         } ?: onImageDeleted(false)

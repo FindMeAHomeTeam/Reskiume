@@ -61,7 +61,7 @@ fun ModifyNonHumanAnimalScreen(
     val nonHumanAnimalState: UiState<NonHumanAnimal> by modifyNonHumanAnimalViewmodel.nonHumanAnimalFlow.collectAsState(
         initial = UiState.Loading()
     )
-    val saveChangesUiState: UiState<Unit> by modifyNonHumanAnimalViewmodel.manageChangesUiState.collectAsState()
+    val manageChangesUiState: UiState<Unit> by modifyNonHumanAnimalViewmodel.manageChangesUiState.collectAsState()
 
     val scrollState = rememberScrollState()
 
@@ -215,7 +215,7 @@ fun ModifyNonHumanAnimalScreen(
                 }
 
                 Spacer(modifier = Modifier.height(10.dp))
-                RmResultState(saveChangesUiState, onSuccess = { onBackPressed() })
+                RmResultState(manageChangesUiState, onSuccess = { onBackPressed() })
                 Spacer(modifier = Modifier.height(10.dp))
 
                 Spacer(modifier = Modifier.weight(1f))

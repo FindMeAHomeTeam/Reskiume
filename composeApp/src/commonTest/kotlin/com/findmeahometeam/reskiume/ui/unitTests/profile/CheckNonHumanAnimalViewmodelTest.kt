@@ -245,7 +245,7 @@ class CheckNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
     }
 
     @Test
-    fun `given a user with empty cache_when the app download the data to modify a non human animal_then the non human animal is saved in local cache and displayed`() =
+    fun `given a user with empty cache_when the app downloads the data to check a non human animal_then the non human animal is saved in local cache and displayed`() =
         runTest {
             getCheckNonHumanAnimalViewmodel(
                 getLocalCacheEntityForNonHumanAnimalReturn = null
@@ -257,7 +257,7 @@ class CheckNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `given a user with empty cache and a wrong NHA id_when the app download the data to modify a NHA_then the app display an error and deletes the stored cache entity`() =
+    fun `given a user with empty cache and a wrong NHA id_when the app downloads the data to check a NHA_then the app display an error and deletes the stored cache entity`() =
         runTest {
             getCheckNonHumanAnimalViewmodel(
                 nonHumanAnimalIdArg = "wrongId",
@@ -283,7 +283,7 @@ class CheckNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `given no cache and a wrong NHA id_when the app gets the data to modify a NHA but there is an error in the local db_then the app shows an error and do not delete the stored cache entity`() =
+    fun `given no cache and a wrong NHA id_when the app gets the data to check a NHA but there is an error in the local db_then the app shows an error and do not delete the stored cache entity`() =
         runTest {
             getCheckNonHumanAnimalViewmodel(
                 nonHumanAnimalIdArg = "wrongId",
@@ -309,7 +309,7 @@ class CheckNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
         }
 
     @Test
-    fun `given a user with an outdated cache_when the app download the data to modify a non human animal_then the non human animal is updated in local cache and displayed`() =
+    fun `given a user with an outdated cache_when the app downloads the data to check a non human animal_then the non human animal is updated in local cache and displayed`() =
         runTest {
             getCheckNonHumanAnimalViewmodel(
                 getLocalCacheEntityForNonHumanAnimalReturn = localCache.copy(
@@ -325,7 +325,7 @@ class CheckNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `given a user with an outdated cache and a wrong NHA id_when the app download the data to modify a NHA_then the app display an error and deletes the stored cache entity`() =
+    fun `given a user with an outdated cache and a wrong NHA id_when the app downloads the data to check a NHA_then the app display an error and deletes the stored cache entity`() =
         runTest {
             getCheckNonHumanAnimalViewmodel(
                 nonHumanAnimalIdArg = "wrongId",

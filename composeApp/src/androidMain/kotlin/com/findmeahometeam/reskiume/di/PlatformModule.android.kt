@@ -1,11 +1,11 @@
 package com.findmeahometeam.reskiume.di
 
-import com.findmeahometeam.reskiume.data.remote.auth.AuthRepositoryAndroidImpl
 import com.findmeahometeam.reskiume.data.database.ReskiumeDatabase
 import com.findmeahometeam.reskiume.data.database.getDatabase
+import com.findmeahometeam.reskiume.data.remote.auth.AuthRepositoryAndroidImpl
 import com.findmeahometeam.reskiume.data.remote.database.nonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepositoryAndroidImpl
-import com.findmeahometeam.reskiume.data.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepositoryAndroidImpl
 import com.findmeahometeam.reskiume.data.remote.database.remoteReview.RealtimeDatabaseRemoteReviewRepositoryAndroidImpl
+import com.findmeahometeam.reskiume.data.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepositoryAndroidImpl
 import com.findmeahometeam.reskiume.data.remote.storage.StorageRepositoryAndroidImpl
 import com.findmeahometeam.reskiume.data.util.analytics.Analytics
 import com.findmeahometeam.reskiume.data.util.analytics.AnalyticsAndroidImpl
@@ -18,7 +18,6 @@ import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.google.firebase.Firebase
 import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.database
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
@@ -30,8 +29,7 @@ actual val platformModule: Module = module {
     singleOf(::AnalyticsAndroidImpl) bind Analytics::class
     singleOf(::AuthRepositoryAndroidImpl) bind AuthRepository::class
     single<ReskiumeDatabase> { getDatabase(get()) }
-    single<FirebaseDatabase>{ Firebase.database.also { it.setPersistenceEnabled(true) } }
-    single<DatabaseReference>{ get<FirebaseDatabase>().reference }
+    single<DatabaseReference>{ Firebase.database.reference }
     singleOf(::RealtimeDatabaseRemoteUserRepositoryAndroidImpl) bind RealtimeDatabaseRemoteUserRepository::class
     singleOf(::RealtimeDatabaseRemoteReviewRepositoryAndroidImpl) bind RealtimeDatabaseRemoteReviewRepository::class
     singleOf(::StorageRepositoryAndroidImpl) bind StorageRepository::class

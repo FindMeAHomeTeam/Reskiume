@@ -164,6 +164,14 @@
     <string name="non_human_animal_age_category_adult">Adult</string>
     <string name="non_human_animal_age_category_senior">Senior</string>
 
+    <!-- Create a non human animal -->
+    <string name="create_non_human_animal_screen_title">Create a non-human animal</string>
+    <string name="create_non_human_animal_screen_non_human_animal_name">Name</string>
+    <string name="create_non_human_animal_screen_non_human_animal_type">Type</string>
+    <string name="create_non_human_animal_screen_non_human_animal_gender">Gender</string>
+    <string name="create_non_human_animal_screen_non_human_animal_age_category">Age category</string>
+    <string name="create_non_human_animal_screen_non_human_animal_description">description</string>
+    <string name="create_non_human_animal_screen_create_non_human_animal_profile_button">Create %1$s's profile</string>
 
 
 </resources>

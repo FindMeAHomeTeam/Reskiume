@@ -41,23 +41,23 @@ class CheckAllNonHumanAnimalsViewmodel(
     private val log: Log
 ) : ViewModel() {
 
-    private val uid = saveStateHandleProvider.provideObjectRoute(CheckAllNonHumanAnimals::class).uid
+    private val caregiverId = saveStateHandleProvider.provideObjectRoute(CheckAllNonHumanAnimals::class).caregiverId
 
     val nonHumanAnimalListFlow: Flow<List<NonHumanAnimal>> =
         observeAuthStateInAuthDataSource().flatMapConcat { authUser: AuthUser? ->
 
             getDataByManagingObjectLocalCacheTimestamp(
-                cachedObjectId = uid,
+                cachedObjectId = caregiverId,
                 savedBy = authUser?.uid ?: "",
                 section = Section.NON_HUMAN_ANIMALS,
                 onCompletionInsertCache = {
-                    getAllNonHumanAnimalsFromRemoteRepository(uid).downloadImageAndInsertNonHumanAnimalsInLocalRepository()
+                    getAllNonHumanAnimalsFromRemoteRepository(caregiverId).downloadImageAndInsertNonHumanAnimalsInLocalRepository()
                 },
                 onCompletionUpdateCache = {
-                    getAllNonHumanAnimalsFromRemoteRepository(uid).downloadImageAndModifyNonHumanAnimalsInLocalRepository()
+                    getAllNonHumanAnimalsFromRemoteRepository(caregiverId).downloadImageAndModifyNonHumanAnimalsInLocalRepository()
                 },
                 onVerifyCacheIsRecent = {
-                    getAllNonHumanAnimalsFromLocalRepository(uid)
+                    getAllNonHumanAnimalsFromLocalRepository(caregiverId)
                 }
             )
         }
@@ -105,7 +105,7 @@ class CheckAllNonHumanAnimalsViewmodel(
                         insertCacheInLocalRepository(
                             LocalCache(
                                 cachedObjectId = nonHumanAnimal.id,
-                                savedBy = uid,
+                                savedBy = caregiverId,
                                 section = Section.NON_HUMAN_ANIMALS,
                                 timestamp = Clock.System.now().epochSeconds
                             )
@@ -178,7 +178,7 @@ class CheckAllNonHumanAnimalsViewmodel(
                         modifyCacheInLocalRepository(
                             LocalCache(
                                 cachedObjectId = nonHumanAnimal.id,
-                                savedBy = uid,
+                                savedBy = caregiverId,
                                 section = Section.NON_HUMAN_ANIMALS,
                                 timestamp = Clock.System.now().epochSeconds
                             )

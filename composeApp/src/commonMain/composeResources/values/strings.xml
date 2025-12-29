@@ -171,7 +171,8 @@
     <string name="create_non_human_animal_screen_non_human_animal_gender">Gender</string>
     <string name="create_non_human_animal_screen_non_human_animal_age_category">Age category</string>
     <string name="create_non_human_animal_screen_non_human_animal_description">description</string>
-    <string name="create_non_human_animal_screen_create_non_human_animal_profile_button">Create %1$s's profile</string>
+    <string name="create_non_human_animal_screen_create_non_human_animal_profile_button">Create non-human animal profile</string>
+    <string name="create_non_human_animal_screen_create_non_human_animal_profile_named_button">Create %1$s's profile</string>
 
 
 </resources>

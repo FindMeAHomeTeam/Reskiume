@@ -37,6 +37,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import reskiume.composeapp.generated.resources.Res
 import reskiume.composeapp.generated.resources.create_non_human_animal_screen_create_non_human_animal_profile_button
+import reskiume.composeapp.generated.resources.create_non_human_animal_screen_create_non_human_animal_profile_named_button
 import reskiume.composeapp.generated.resources.create_non_human_animal_screen_non_human_animal_age_category
 import reskiume.composeapp.generated.resources.create_non_human_animal_screen_non_human_animal_description
 import reskiume.composeapp.generated.resources.create_non_human_animal_screen_non_human_animal_gender
@@ -166,10 +167,14 @@ fun CreateNonHumanAnimalScreen(
 
             Spacer(modifier = Modifier.weight(1f))
             RmButton(
-                text = stringResource(
-                    Res.string.create_non_human_animal_screen_create_non_human_animal_profile_button,
-                    name
-                ),
+                text = if (name.isEmpty()) {
+                    stringResource(Res.string.create_non_human_animal_screen_create_non_human_animal_profile_button)
+                } else {
+                    stringResource(
+                        Res.string.create_non_human_animal_screen_create_non_human_animal_profile_named_button,
+                        name
+                    )
+                },
                 enabled = isUpdateUserButtonEnabled,
                 onClick = {
                     createNonHumanAnimalViewmodel.saveNonHumanAnimalChanges(

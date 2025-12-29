@@ -35,7 +35,8 @@ import reskiume.composeapp.generated.resources.check_all_non_human_animals_scree
 @Composable
 fun CheckAllNonHumanAnimalsScreen(
     onBackPressed: () -> Unit,
-    onNonHumanAnimalClick: (nonHumanAnimalId: String, caregiverId: String) -> Unit
+    onNonHumanAnimalClick: (nonHumanAnimalId: String, caregiverId: String) -> Unit,
+    onCreateNonHumanAnimal: () -> Unit
 ) {
 
     val checkAllNonHumanAnimalsViewmodel: CheckAllNonHumanAnimalsViewmodel =
@@ -71,7 +72,6 @@ fun CheckAllNonHumanAnimalsScreen(
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Black
                 )
-                Spacer(modifier = Modifier.weight(1f))
             } else {
                 LazyColumn {
                     items(nonHumanAnimalList) { nonHumanAnimal ->
@@ -86,14 +86,15 @@ fun CheckAllNonHumanAnimalsScreen(
                                 )
                             }
                         )
+                        Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
-                Spacer(modifier = Modifier.weight(1f))
             }
+            Spacer(modifier = Modifier.weight(1f))
             RmButton(
                 text = stringResource(Res.string.check_all_non_human_animals_screen_register_non_human_animal),
                 onClick = {
-
+                    onCreateNonHumanAnimal()
                 }
             )
             Spacer(modifier = Modifier.height(8.dp))

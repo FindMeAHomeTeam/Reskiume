@@ -8,10 +8,11 @@ enum class Routes(val route: String) {
     RESCUE("rescue"),
     CHATS("chats"),
     PROFILE("profile"),
-    CREATE_ACCOUNT("create account"),
-    LOGIN_ACCOUNT("login account"),
-    MODIFY_ACCOUNT("modify account"),
-    DELETE_ACCOUNT("delete account"),
+    CREATE_ACCOUNT("createAccount"),
+    LOGIN_ACCOUNT("loginAccount"),
+    MODIFY_ACCOUNT("modifyAccount"),
+    DELETE_ACCOUNT("deleteAccount"),
+    CREATE_NON_HUMAN_ANIMAL("createNonHumanAnimal")
 
 }
 

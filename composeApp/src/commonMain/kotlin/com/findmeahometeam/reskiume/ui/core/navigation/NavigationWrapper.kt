@@ -12,6 +12,7 @@ import com.findmeahometeam.reskiume.ui.profile.deleteAccount.DeleteAccountScreen
 import com.findmeahometeam.reskiume.ui.profile.loginAccount.LoginAccountScreen
 import com.findmeahometeam.reskiume.ui.profile.modifyAccount.ModifyAccountScreen
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsScreen
+import com.findmeahometeam.reskiume.ui.profile.createNonHumanAnimal.CreateNonHumanAnimalScreen
 import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.ModifyNonHumanAnimalScreen
 
 @Composable
@@ -65,12 +66,23 @@ fun NavigationWrapper() {
                 },
                 onNonHumanAnimalClick = { nonHumanAnimalId: String, caregiverId: String ->
                     mainNavController.navigate(ModifyNonHumanAnimal(nonHumanAnimalId, caregiverId))
+                },
+                onCreateNonHumanAnimal = {
+                    mainNavController.navigate(Routes.CREATE_NON_HUMAN_ANIMAL.route)
                 }
             )
         }
 
         composable<ModifyNonHumanAnimal> {
             ModifyNonHumanAnimalScreen(
+                onBackPressed = {
+                    mainNavController.navigateUp()
+                }
+            )
+        }
+
+        composable(route = Routes.CREATE_NON_HUMAN_ANIMAL.route) {
+            CreateNonHumanAnimalScreen(
                 onBackPressed = {
                     mainNavController.navigateUp()
                 }

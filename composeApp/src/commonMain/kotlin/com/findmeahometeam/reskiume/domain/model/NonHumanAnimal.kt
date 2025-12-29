@@ -8,7 +8,7 @@ import kotlin.time.ExperimentalTime
 data class NonHumanAnimal(
     val id: String = "",
     val caregiverId: String,
-    val savedBy: String,
+    val savedBy: String = "",
     val name: String,
     val ageCategory: AgeCategory,
     val description: String,

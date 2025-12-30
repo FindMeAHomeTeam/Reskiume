@@ -69,11 +69,11 @@ class ModifyNonHumanAnimalViewmodel(
 
             if (isDifferentImage) {
 
-                deleteCurrentImageInRemoteDataSource(
+                deleteCurrentImageFromRemoteDataSource(
                     modifiedNonHumanAnimal.caregiverId,
                     modifiedNonHumanAnimal.id
                 ) {
-                    deleteCurrentImageInLocalDataSource(modifiedNonHumanAnimal.id) {
+                    deleteCurrentImageFromLocalDataSource(modifiedNonHumanAnimal.id) {
 
                         uploadNewImageToRemoteDataSource(modifiedNonHumanAnimal) { nonHumanAnimalWithPossibleImageDownloadUri: NonHumanAnimal ->
 
@@ -113,7 +113,7 @@ class ModifyNonHumanAnimalViewmodel(
     }
 
 
-    private fun deleteCurrentImageInRemoteDataSource(
+    private fun deleteCurrentImageFromRemoteDataSource(
         caregiverId: String,
         nonHumanAnimalId: String,
         onSuccess: () -> Unit
@@ -138,13 +138,13 @@ class ModifyNonHumanAnimalViewmodel(
                     if (isDeleted) {
                         log.d(
                             "ModifyNonHumanAnimalViewModel",
-                            "deleteCurrentImageInRemoteDataSource: Image from the non human animal $nonHumanAnimalId was deleted successfully in remote data source"
+                            "deleteCurrentImageFromRemoteDataSource: Image from the non human animal $nonHumanAnimalId was deleted successfully in remote data source"
                         )
                         onSuccess()
                     } else {
                         log.e(
                             "ModifyNonHumanAnimalViewModel",
-                            "deleteCurrentImageInRemoteDataSource: failed to delete the image from the non human animal $nonHumanAnimalId in remote data source"
+                            "deleteCurrentImageFromRemoteDataSource: failed to delete the image from the non human animal $nonHumanAnimalId in remote data source"
                         )
                         _manageChangesUiState.value = UiState.Error()
                     }
@@ -153,7 +153,7 @@ class ModifyNonHumanAnimalViewmodel(
         }
     }
 
-    private fun deleteCurrentImageInLocalDataSource(
+    private fun deleteCurrentImageFromLocalDataSource(
         nonHumanAnimalId: String,
         onSuccess: () -> Unit
     ) {
@@ -167,13 +167,13 @@ class ModifyNonHumanAnimalViewmodel(
                 if (isDeleted) {
                     log.d(
                         "ModifyNonHumanAnimalViewModel",
-                        "deleteCurrentImageInLocalDataSource: Image from the non human animal $nonHumanAnimalId was successfully deleted in the local data source"
+                        "deleteCurrentImageFromLocalDataSource: Image from the non human animal $nonHumanAnimalId was successfully deleted in the local data source"
                     )
                     onSuccess()
                 } else {
                     log.e(
                         "ModifyNonHumanAnimalViewModel",
-                        "deleteCurrentImageInLocalDataSource: Failed to delete the image from the non human animal $nonHumanAnimalId in the local data source"
+                        "deleteCurrentImageFromLocalDataSource: Failed to delete the image from the non human animal $nonHumanAnimalId in the local data source"
                     )
                     _manageChangesUiState.value = UiState.Error()
                 }

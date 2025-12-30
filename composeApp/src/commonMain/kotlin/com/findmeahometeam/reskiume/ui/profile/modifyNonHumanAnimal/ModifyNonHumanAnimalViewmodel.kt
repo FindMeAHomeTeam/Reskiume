@@ -167,7 +167,7 @@ class ModifyNonHumanAnimalViewmodel(
                 if (isDeleted) {
                     log.d(
                         "ModifyNonHumanAnimalViewModel",
-                        "deleteCurrentImageFromLocalDataSource: Image from the non human animal $nonHumanAnimalId was successfully deleted in the local data source"
+                        "deleteCurrentImageFromLocalDataSource: Image from the non human animal $nonHumanAnimalId was deleted successfully in the local data source"
                     )
                     onSuccess()
                 } else {
@@ -325,13 +325,13 @@ class ModifyNonHumanAnimalViewmodel(
             if (databaseResult is DatabaseResult.Success) {
                 log.d(
                     "ModifyNonHumanAnimalViewModel",
-                    "Non human animal $id deleted in the remote data source"
+                    "deleteNonHumanAnimalFromRemoteDataSource: Non human animal $id deleted in the remote data source"
                 )
                 success()
             } else {
                 log.e(
                     "ModifyNonHumanAnimalViewModel",
-                    "Error deleting the non human animal $id in the remote data source"
+                    "deleteNonHumanAnimalFromRemoteDataSource: Error deleting the non human animal $id in the remote data source"
                 )
                 _manageChangesUiState.value = UiState.Error()
             }
@@ -347,13 +347,13 @@ class ModifyNonHumanAnimalViewmodel(
                 if (rowsDeleted > 0) {
                     log.d(
                         "ModifyNonHumanAnimalViewModel",
-                        "Non human animal $id deleted in the local data source"
+                        "deleteNonHumanAnimalFromLocalDataSource: Non human animal $id deleted in the local data source"
                     )
                     success()
                 } else {
                     log.e(
                         "ModifyNonHumanAnimalViewModel",
-                        "Error deleting the non human animal $id in the local data source"
+                        "deleteNonHumanAnimalFromLocalDataSource: Error deleting the non human animal $id in the local data source"
                     )
                     _manageChangesUiState.value = UiState.Error()
                 }

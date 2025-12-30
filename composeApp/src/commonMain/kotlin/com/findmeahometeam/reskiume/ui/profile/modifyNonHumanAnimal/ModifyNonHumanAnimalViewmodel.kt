@@ -295,11 +295,19 @@ class ModifyNonHumanAnimalViewmodel(
 
         _manageChangesUiState.value = UiState.Loading()
 
-        deleteNonHumanAnimalFromRemoteDataSource(id, caregiverId) {
+        deleteCurrentImageFromRemoteDataSource(
+            caregiverId,
+            id
+        ) {
+            deleteCurrentImageFromLocalDataSource(id) {
 
-            deleteNonHumanAnimalFromLocalDataSource(id) {
+                deleteNonHumanAnimalFromRemoteDataSource(id, caregiverId) {
 
-                deleteNonHumanAnimalCacheFromLocalDataSource(id)
+                    deleteNonHumanAnimalFromLocalDataSource(id) {
+
+                        deleteNonHumanAnimalCacheFromLocalDataSource(id)
+                    }
+                }
             }
         }
     }

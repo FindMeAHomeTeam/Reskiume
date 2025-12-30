@@ -17,7 +17,6 @@ class ProfileViewmodel(
     val state: Flow<ProfileUiState> =
         observeAuthStateInAuthDataSource().map { authUser: AuthUser? ->
             if (authUser?.uid == null) {
-                log.d("ProfileViewmodel", "User not logged in")
                 ProfileUiState.Idle
             } else {
                 val user: User? = getUserFromLocalDataSource(authUser.uid)

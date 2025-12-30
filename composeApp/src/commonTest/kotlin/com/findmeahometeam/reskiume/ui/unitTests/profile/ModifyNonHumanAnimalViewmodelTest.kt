@@ -740,7 +740,7 @@ class ModifyNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
 
             verify {
                 log.e(
-                    "CheckNonHumanAnimalUtil",
+                    "DeleteNonHumanAnimalUtil",
                     "Error deleting the non human animal ${nonHumanAnimal.id} in the local cache in section ${Section.NON_HUMAN_ANIMALS}"
                 )
             }

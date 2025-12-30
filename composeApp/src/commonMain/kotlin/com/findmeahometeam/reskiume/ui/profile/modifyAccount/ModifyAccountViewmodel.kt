@@ -65,9 +65,9 @@ class ModifyAccountViewmodel(
                 updateUserPasswordInAuthDataSource(currentPassword, newPassword) {
 
                     if (isDifferentImage) {
-                        deleteCurrentImageInRemoteDataSource(user) {
+                        deleteCurrentImageFromRemoteDataSource(user) {
 
-                            deleteCurrentImageInLocalDataSource(user) {
+                            deleteCurrentImageFromLocalDataSource(user) {
 
                                 uploadNewImageToRemoteDataSource(user) { userWithPossibleImageDownloadUri: User ->
 
@@ -153,7 +153,7 @@ class ModifyAccountViewmodel(
         }
     }
 
-    private suspend fun deleteCurrentImageInRemoteDataSource(user: User, onSuccess: () -> Unit) {
+    private suspend fun deleteCurrentImageFromRemoteDataSource(user: User, onSuccess: () -> Unit) {
         getUserFromRemoteDataSource(user.uid).collect { previousUserData: User? ->
 
             if (previousUserData == null) {
@@ -169,13 +169,13 @@ class ModifyAccountViewmodel(
                 if (isDeleted) {
                     log.d(
                         "ModifyAccountViewmodel",
-                        "deleteCurrentImageInRemoteDataSource: Image deleted successfully in remote data source"
+                        "deleteCurrentImageFromRemoteDataSource: Image deleted successfully in remote data source"
                     )
                     onSuccess()
                 } else {
                     log.e(
                         "ModifyAccountViewmodel",
-                        "deleteCurrentImageInRemoteDataSource: failed to delete image in remote data source"
+                        "deleteCurrentImageFromRemoteDataSource: failed to delete image in remote data source"
                     )
                     _uiState.value = UiState.Error()
                 }
@@ -183,7 +183,7 @@ class ModifyAccountViewmodel(
         }
     }
 
-    private fun deleteCurrentImageInLocalDataSource(user: User, onSuccess: () -> Unit) {
+    private fun deleteCurrentImageFromLocalDataSource(user: User, onSuccess: () -> Unit) {
         viewModelScope.launch {
             val previousUserData: User = getUserFromLocalDataSource(user.uid)!!
 
@@ -192,13 +192,13 @@ class ModifyAccountViewmodel(
                 if (isDeleted) {
                     log.d(
                         "ModifyAccountViewmodel",
-                        "deleteCurrentImageInLocalDataSource: Image deleted successfully in local data source"
+                        "deleteCurrentImageFromLocalDataSource: Image deleted successfully in local data source"
                     )
                     onSuccess()
                 } else {
                     log.e(
                         "ModifyAccountViewmodel",
-                        "deleteCurrentImageInLocalDataSource: failed to delete image in local data source"
+                        "deleteCurrentImageFromLocalDataSource: failed to delete image in local data source"
                     )
                     _uiState.value = UiState.Error()
                 }

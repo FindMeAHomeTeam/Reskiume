@@ -35,6 +35,7 @@ import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.navigation.ModifyNonHumanAnimal
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
+import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.DeleteNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.ModifyNonHumanAnimalViewmodel
 import com.plusmobileapps.konnectivity.Konnectivity
 import com.plusmobileapps.konnectivity.NetworkConnection
@@ -343,9 +344,21 @@ class ModifyNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
             log
         )
 
+        val deleteNonHumanAnimalUtil = DeleteNonHumanAnimalUtil(
+            getNonHumanAnimalFromRemoteRepository,
+            getNonHumanAnimalFromLocalRepository,
+            deleteImageFromRemoteDataSource,
+            deleteImageFromLocalDataSource,
+            deleteNonHumanAnimalFromRemoteRepository,
+            deleteNonHumanAnimalFromLocalRepository,
+            deleteCacheFromLocalRepository,
+            log
+        )
+
         return ModifyNonHumanAnimalViewmodel(
             saveStateHandleProvider,
             checkNonHumanAnimalUtil,
+            deleteNonHumanAnimalUtil,
             getNonHumanAnimalFromRemoteRepository,
             deleteImageFromRemoteDataSource,
             getNonHumanAnimalFromLocalRepository,
@@ -354,9 +367,6 @@ class ModifyNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
             modifyNonHumanAnimalInRemoteRepository,
             modifyNonHumanAnimalInLocalRepository,
             modifyCacheInLocalRepository,
-            deleteNonHumanAnimalFromRemoteRepository,
-            deleteNonHumanAnimalFromLocalRepository,
-            deleteCacheFromLocalRepository,
             log
         )
     }
@@ -730,7 +740,7 @@ class ModifyNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
 
             verify {
                 log.e(
-                    "ModifyNonHumanAnimalViewModel",
+                    "CheckNonHumanAnimalUtil",
                     "Error deleting the non human animal ${nonHumanAnimal.id} in the local cache in section ${Section.NON_HUMAN_ANIMALS}"
                 )
             }

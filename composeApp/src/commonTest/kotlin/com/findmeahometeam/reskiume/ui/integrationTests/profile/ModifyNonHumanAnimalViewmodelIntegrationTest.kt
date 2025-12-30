@@ -38,6 +38,7 @@ import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeRealtimeDataba
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeSaveStateHandleProvider
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeStorageRepository
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
+import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.DeleteNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.ModifyNonHumanAnimalViewmodel
 import com.findmeahometeam.reskiume.user
 import com.plusmobileapps.konnectivity.Konnectivity
@@ -118,9 +119,21 @@ class ModifyNonHumanAnimalViewmodelIntegrationTest : CoroutineTestDispatcher() {
             log
         )
 
+        val deleteNonHumanAnimalUtil = DeleteNonHumanAnimalUtil(
+            getNonHumanAnimalFromRemoteRepository,
+            getNonHumanAnimalFromLocalRepository,
+            deleteImageFromRemoteDataSource,
+            deleteImageFromLocalDataSource,
+            deleteNonHumanAnimalFromRemoteRepository,
+            deleteNonHumanAnimalFromLocalRepository,
+            deleteCacheFromLocalRepository,
+            log
+        )
+
         return ModifyNonHumanAnimalViewmodel(
             saveStateHandleProvider,
             checkNonHumanAnimalUtil,
+            deleteNonHumanAnimalUtil,
             getNonHumanAnimalFromRemoteRepository,
             deleteImageFromRemoteDataSource,
             getNonHumanAnimalFromLocalRepository,
@@ -129,9 +142,6 @@ class ModifyNonHumanAnimalViewmodelIntegrationTest : CoroutineTestDispatcher() {
             modifyNonHumanAnimalInRemoteRepository,
             modifyNonHumanAnimalInLocalRepository,
             modifyCacheInLocalRepository,
-            deleteNonHumanAnimalFromRemoteRepository,
-            deleteNonHumanAnimalFromLocalRepository,
-            deleteCacheFromLocalRepository,
             log
         )
     }

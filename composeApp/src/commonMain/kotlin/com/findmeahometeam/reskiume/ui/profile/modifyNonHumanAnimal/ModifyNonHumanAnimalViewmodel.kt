@@ -10,10 +10,7 @@ import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
-import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteCacheFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
-import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.DeleteNonHumanAnimalFromLocalRepository
-import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.DeleteNonHumanAnimalFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetNonHumanAnimalFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetNonHumanAnimalFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.ModifyNonHumanAnimalInLocalRepository
@@ -33,6 +30,7 @@ import kotlin.time.ExperimentalTime
 class ModifyNonHumanAnimalViewmodel(
     saveStateHandleProvider: SaveStateHandleProvider,
     checkNonHumanAnimalUtil: CheckNonHumanAnimalUtil,
+    private val deleteNonHumanAnimalUtil: DeleteNonHumanAnimalUtil,
     private val getNonHumanAnimalFromRemoteRepository: GetNonHumanAnimalFromRemoteRepository,
     private val deleteImageFromRemoteDataSource: DeleteImageFromRemoteDataSource,
     private val getNonHumanAnimalFromLocalRepository: GetNonHumanAnimalFromLocalRepository,
@@ -41,9 +39,6 @@ class ModifyNonHumanAnimalViewmodel(
     private val modifyNonHumanAnimalInRemoteRepository: ModifyNonHumanAnimalInRemoteRepository,
     private val modifyNonHumanAnimalInLocalRepository: ModifyNonHumanAnimalInLocalRepository,
     private val modifyCacheInLocalRepository: ModifyCacheInLocalRepository,
-    private val deleteNonHumanAnimalFromRemoteRepository: DeleteNonHumanAnimalFromRemoteRepository,
-    private val deleteNonHumanAnimalFromLocalRepository: DeleteNonHumanAnimalFromLocalRepository,
-    private val deleteCacheFromLocalRepository: DeleteCacheFromLocalRepository,
     private val log: Log
 ) : ViewModel() {
 
@@ -54,7 +49,11 @@ class ModifyNonHumanAnimalViewmodel(
         saveStateHandleProvider.provideObjectRoute(ModifyNonHumanAnimal::class).caregiverId
 
     val nonHumanAnimalFlow: Flow<UiState<NonHumanAnimal>> =
-        checkNonHumanAnimalUtil.getNonHumanAnimalFlow(viewModelScope, nonHumanAnimalId, caregiverId)
+        checkNonHumanAnimalUtil.getNonHumanAnimalFlow(
+            viewModelScope,
+            nonHumanAnimalId,
+            caregiverId
+        )
 
     private val _manageChangesUiState: MutableStateFlow<UiState<Unit>> =
         MutableStateFlow(UiState.Idle())
@@ -295,91 +294,16 @@ class ModifyNonHumanAnimalViewmodel(
 
         _manageChangesUiState.value = UiState.Loading()
 
-        deleteCurrentImageFromRemoteDataSource(
-            caregiverId,
-            id
-        ) {
-            deleteCurrentImageFromLocalDataSource(id) {
-
-                deleteNonHumanAnimalFromRemoteDataSource(id, caregiverId) {
-
-                    deleteNonHumanAnimalFromLocalDataSource(id) {
-
-                        deleteNonHumanAnimalCacheFromLocalDataSource(id)
-                    }
-                }
-            }
-        }
-    }
-
-    private fun deleteNonHumanAnimalFromRemoteDataSource(
-        id: String,
-        caregiverId: String,
-        success: () -> Unit
-    ) {
-        deleteNonHumanAnimalFromRemoteRepository(
-            id,
-            caregiverId
-        ) { databaseResult: DatabaseResult ->
-
-            if (databaseResult is DatabaseResult.Success) {
-                log.d(
-                    "ModifyNonHumanAnimalViewModel",
-                    "deleteNonHumanAnimalFromRemoteDataSource: Non human animal $id deleted in the remote data source"
-                )
-                success()
-            } else {
-                log.e(
-                    "ModifyNonHumanAnimalViewModel",
-                    "deleteNonHumanAnimalFromRemoteDataSource: Error deleting the non human animal $id in the remote data source"
-                )
+        deleteNonHumanAnimalUtil.deleteNonHumanAnimal(
+            id = id,
+            caregiverId = caregiverId,
+            coroutineScope = viewModelScope,
+            onError = {
                 _manageChangesUiState.value = UiState.Error()
-            }
-        }
-    }
-
-    private fun deleteNonHumanAnimalFromLocalDataSource(id: String, success: () -> Unit) {
-
-        viewModelScope.launch {
-
-            deleteNonHumanAnimalFromLocalRepository(id) { rowsDeleted: Int ->
-
-                if (rowsDeleted > 0) {
-                    log.d(
-                        "ModifyNonHumanAnimalViewModel",
-                        "deleteNonHumanAnimalFromLocalDataSource: Non human animal $id deleted in the local data source"
-                    )
-                    success()
-                } else {
-                    log.e(
-                        "ModifyNonHumanAnimalViewModel",
-                        "deleteNonHumanAnimalFromLocalDataSource: Error deleting the non human animal $id in the local data source"
-                    )
-                    _manageChangesUiState.value = UiState.Error()
-                }
-            }
-        }
-    }
-
-    private fun deleteNonHumanAnimalCacheFromLocalDataSource(id: String) {
-
-        viewModelScope.launch {
-
-            deleteCacheFromLocalRepository(id) { rowsDeleted: Int ->
-
-                if (rowsDeleted > 0) {
-                    log.d(
-                        "ModifyNonHumanAnimalViewModel",
-                        "Non human animal $id deleted in the local cache in section ${Section.NON_HUMAN_ANIMALS}"
-                    )
-                } else {
-                    log.e(
-                        "ModifyNonHumanAnimalViewModel",
-                        "Error deleting the non human animal $id in the local cache in section ${Section.NON_HUMAN_ANIMALS}"
-                    )
-                }
+            },
+            onComplete = {
                 _manageChangesUiState.value = UiState.Success(Unit)
             }
-        }
+        )
     }
 }

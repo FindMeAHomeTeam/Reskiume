@@ -48,9 +48,9 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
 
     private val onModifyLocalCache = Capture.slot<(rowsUpdated: Int) -> Unit>()
 
-    private val onInsertUserFromLocal = Capture.slot<(Long) -> Unit>()
+    private val onInsertUserInLocal = Capture.slot<(Long) -> Unit>()
 
-    private val onModifyUserFromLocal = Capture.slot<(Int) -> Unit>()
+    private val onModifyUserInLocal = Capture.slot<(Int) -> Unit>()
 
     private val onSaveImageToLocal = Capture.slot<(String) -> Unit>()
 
@@ -105,11 +105,11 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
 
         val localUserRepository: LocalUserRepository = mock {
 
-            everySuspend { insertUser(any(), capture(onInsertUserFromLocal)) } calls {
-                onInsertUserFromLocal.get().invoke(rowIdInsertedUserArg)
+            everySuspend { insertUser(any(), capture(onInsertUserInLocal)) } calls {
+                onInsertUserInLocal.get().invoke(rowIdInsertedUserArg)
             }
-            everySuspend { modifyUser(any(), capture(onModifyUserFromLocal)) } calls {
-                onModifyUserFromLocal.get().invoke(rowsUpdatedUserArg)
+            everySuspend { modifyUser(any(), capture(onModifyUserInLocal)) } calls {
+                onModifyUserInLocal.get().invoke(rowsUpdatedUserArg)
             }
         }
 

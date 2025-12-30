@@ -53,7 +53,7 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
 
     private val onSuccessRemoteUser = Capture.slot<(DatabaseResult) -> Unit>()
 
-    private val onInsertUserFromLocal = Capture.slot<(Long) -> Unit>()
+    private val onInsertUserInLocal = Capture.slot<(Long) -> Unit>()
 
     private val log: Log = mock {
         every { d(any(), any()) } returns Unit
@@ -135,8 +135,8 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
         }
 
         val localUserRepository: LocalUserRepository = mock {
-            everySuspend { insertUser(any(), capture(onInsertUserFromLocal)) } calls {
-                onInsertUserFromLocal.get().invoke(onInsertUserArg)
+            everySuspend { insertUser(any(), capture(onInsertUserInLocal)) } calls {
+                onInsertUserInLocal.get().invoke(onInsertUserArg)
             }
         }
 

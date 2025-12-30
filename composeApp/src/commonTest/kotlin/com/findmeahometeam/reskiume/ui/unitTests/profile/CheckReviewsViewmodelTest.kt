@@ -64,9 +64,9 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
 
     private val onInsertReview = Capture.slot<(rowId: Long) -> Unit>()
 
-    private val onInsertUserFromLocal = Capture.slot<(Long) -> Unit>()
+    private val onInsertUserInLocal = Capture.slot<(Long) -> Unit>()
 
-    private val onModifyUserFromLocal = Capture.slot<(Int) -> Unit>()
+    private val onModifyUserInLocal = Capture.slot<(Int) -> Unit>()
 
     private val onSaveImageToLocal = Capture.slot<(String) -> Unit>()
 
@@ -176,11 +176,11 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
                 getUser(author.uid)
             } returns author
 
-            everySuspend { insertUser(any(), capture(onInsertUserFromLocal)) } calls {
-                onInsertUserFromLocal.get().invoke(rowIdInsertedUserArg)
+            everySuspend { insertUser(any(), capture(onInsertUserInLocal)) } calls {
+                onInsertUserInLocal.get().invoke(rowIdInsertedUserArg)
             }
-            everySuspend { modifyUser(any(), capture(onModifyUserFromLocal)) } calls {
-                onModifyUserFromLocal.get().invoke(rowsUpdatedUserArg)
+            everySuspend { modifyUser(any(), capture(onModifyUserInLocal)) } calls {
+                onModifyUserInLocal.get().invoke(rowsUpdatedUserArg)
             }
         }
 

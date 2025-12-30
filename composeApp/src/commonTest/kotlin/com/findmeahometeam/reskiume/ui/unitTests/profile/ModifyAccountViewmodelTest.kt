@@ -56,7 +56,7 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
 
     private val onUpdateUserPwdFromAuth = Capture.slot<(String) -> Unit>()
 
-    private val onModifyUserFromLocal = Capture.slot<(Int) -> Unit>()
+    private val onModifyUserInLocal = Capture.slot<(Int) -> Unit>()
 
     private val onUpdateRemoteUser = Capture.slot<(DatabaseResult) -> Unit>()
 
@@ -116,9 +116,9 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
             everySuspend {
                 modifyUser(
                     modifyUserArg,
-                    capture(onModifyUserFromLocal)
+                    capture(onModifyUserInLocal)
                 )
-            } calls { onModifyUserFromLocal.get().invoke(onModifyUserArg) }
+            } calls { onModifyUserInLocal.get().invoke(onModifyUserArg) }
         }
 
         val realtimeDatabaseRemoteUserRepository: RealtimeDatabaseRemoteUserRepository = mock {

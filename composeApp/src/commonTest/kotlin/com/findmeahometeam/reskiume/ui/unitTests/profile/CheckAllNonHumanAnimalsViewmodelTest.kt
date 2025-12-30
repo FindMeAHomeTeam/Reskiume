@@ -57,9 +57,9 @@ class CheckAllNonHumanAnimalsViewmodelTest : CoroutineTestDispatcher() {
 
     private val onSaveImageToLocal = Capture.slot<(String) -> Unit>()
 
-    private val onInsertNonHumanAnimalFromLocal = Capture.slot<(rowId: Long) -> Unit>()
+    private val onInsertNonHumanAnimalInLocal = Capture.slot<(rowId: Long) -> Unit>()
 
-    private val onModifyNonHumanAnimalFromLocal = Capture.slot<(Int) -> Unit>()
+    private val onModifyNonHumanAnimalInLocal = Capture.slot<(Int) -> Unit>()
 
     private val log: Log = mock {
         every { d(any(), any()) } calls { println(it) }
@@ -152,30 +152,30 @@ class CheckAllNonHumanAnimalsViewmodelTest : CoroutineTestDispatcher() {
             everySuspend {
                 insertNonHumanAnimal(
                     nonHumanAnimal.toEntity(),
-                    capture(onInsertNonHumanAnimalFromLocal)
+                    capture(onInsertNonHumanAnimalInLocal)
                 )
-            } calls { onInsertNonHumanAnimalFromLocal.get().invoke(nonHumanAnimalIdInsertedInLocalDatasourceArg) }
+            } calls { onInsertNonHumanAnimalInLocal.get().invoke(nonHumanAnimalIdInsertedInLocalDatasourceArg) }
 
             everySuspend {
                 insertNonHumanAnimal(
                     nonHumanAnimal.copy(imageUrl = "").toEntity(),
-                    capture(onInsertNonHumanAnimalFromLocal)
+                    capture(onInsertNonHumanAnimalInLocal)
                 )
-            } calls { onInsertNonHumanAnimalFromLocal.get().invoke(nonHumanAnimalIdInsertedInLocalDatasourceArg) }
+            } calls { onInsertNonHumanAnimalInLocal.get().invoke(nonHumanAnimalIdInsertedInLocalDatasourceArg) }
 
             everySuspend {
                 modifyNonHumanAnimal(
                     nonHumanAnimal.toEntity(),
-                    capture(onModifyNonHumanAnimalFromLocal)
+                    capture(onModifyNonHumanAnimalInLocal)
                 )
-            } calls { onModifyNonHumanAnimalFromLocal.get().invoke(rowsUpdatedNonHumanAnimalArg) }
+            } calls { onModifyNonHumanAnimalInLocal.get().invoke(rowsUpdatedNonHumanAnimalArg) }
 
             everySuspend {
                 modifyNonHumanAnimal(
                     nonHumanAnimal.copy(imageUrl = "").toEntity(),
-                    capture(onModifyNonHumanAnimalFromLocal)
+                    capture(onModifyNonHumanAnimalInLocal)
                 )
-            } calls { onModifyNonHumanAnimalFromLocal.get().invoke(rowsUpdatedNonHumanAnimalArg) }
+            } calls { onModifyNonHumanAnimalInLocal.get().invoke(rowsUpdatedNonHumanAnimalArg) }
 
             every {
                 getAllNonHumanAnimals(user.uid)

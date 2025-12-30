@@ -44,9 +44,9 @@ class CreateNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
 
     private val onUploadImageToLocal = Capture.slot<(imagePath: String) -> Unit>()
 
-    private val onInsertNonHumanAnimalFromLocal = Capture.slot<(rowId: Long) -> Unit>()
+    private val onInsertNonHumanAnimalInLocal = Capture.slot<(rowId: Long) -> Unit>()
 
-    private val onInsertNonHumanAnimalFromRemote = Capture.slot<(result: DatabaseResult) -> Unit>()
+    private val onInsertNonHumanAnimalInRemote = Capture.slot<(result: DatabaseResult) -> Unit>()
 
     private val log: Log = mock {
         every { d(any(), any()) } calls { println(it) }
@@ -86,20 +86,20 @@ class CreateNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
                 everySuspend {
                     insertRemoteNonHumanAnimal(
                         nonHumanAnimal.copy(id = nonHumanAnimalId).toData(),
-                        capture(onInsertNonHumanAnimalFromRemote)
+                        capture(onInsertNonHumanAnimalInRemote)
                     )
                 } calls {
-                    onInsertNonHumanAnimalFromRemote.get()
+                    onInsertNonHumanAnimalInRemote.get()
                         .invoke(databaseResultAfterCreatingRemoteNonHumanAnimalArg)
                 }
 
                 everySuspend {
                     insertRemoteNonHumanAnimal(
                         nonHumanAnimal.copy(id = nonHumanAnimalId, imageUrl = "").toData(),
-                        capture(onInsertNonHumanAnimalFromRemote)
+                        capture(onInsertNonHumanAnimalInRemote)
                     )
                 } calls {
-                    onInsertNonHumanAnimalFromRemote.get()
+                    onInsertNonHumanAnimalInRemote.get()
                         .invoke(databaseResultAfterCreatingRemoteNonHumanAnimalArg)
                 }
             }
@@ -121,20 +121,20 @@ class CreateNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
             everySuspend {
                 insertNonHumanAnimal(
                     nonHumanAnimal.copy(id = nonHumanAnimalId).toEntity(),
-                    capture(onInsertNonHumanAnimalFromLocal)
+                    capture(onInsertNonHumanAnimalInLocal)
                 )
             } calls {
-                onInsertNonHumanAnimalFromLocal.get()
+                onInsertNonHumanAnimalInLocal.get()
                     .invoke(rowIdAfterCreatingLocalNonHumanAnimalArg)
             }
 
             everySuspend {
                 insertNonHumanAnimal(
                     nonHumanAnimal.copy(id = nonHumanAnimalId, imageUrl = "").toEntity(),
-                    capture(onInsertNonHumanAnimalFromLocal)
+                    capture(onInsertNonHumanAnimalInLocal)
                 )
             } calls {
-                onInsertNonHumanAnimalFromLocal.get()
+                onInsertNonHumanAnimalInLocal.get()
                     .invoke(rowIdAfterCreatingLocalNonHumanAnimalArg)
             }
         }

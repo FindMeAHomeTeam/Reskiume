@@ -59,9 +59,9 @@ class CheckNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
 
     private val onDownloadImageToLocal = Capture.slot<(imagePath: String) -> Unit>()
 
-    private val onInsertNonHumanAnimalFromLocal = Capture.slot<(rowId: Long) -> Unit>()
+    private val onInsertNonHumanAnimalInLocal = Capture.slot<(rowId: Long) -> Unit>()
 
-    private val onModifyNonHumanAnimalFromLocal = Capture.slot<(rowsUpdated: Int) -> Unit>()
+    private val onModifyNonHumanAnimalInLocal = Capture.slot<(rowsUpdated: Int) -> Unit>()
 
     private val log: Log = mock {
         every { d(any(), any()) } calls { println(it) }
@@ -82,8 +82,8 @@ class CheckNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
                 .toEntity(),
         getLocalCacheEntityForWrongNonHumanAnimalReturn: LocalCacheEntity? = null,
         localCacheUpdatedInLocalDatasourceArg: Int = 1,
-        numberOfNonHumanAnimalsDeletedInLocalCacheArg: Int = 1,
-        numberOfNonHumanAnimalsDeletedInLocalCacheWithWrongIdArg: Int = 1,
+        numberOfNonHumanAnimalsDeletedFromLocalCacheArg: Int = 1,
+        numberOfNonHumanAnimalsDeletedFromLocalCacheWithWrongIdArg: Int = 1,
         nonHumanAnimalEntityReturn: NonHumanAnimalEntity? = nonHumanAnimal.toEntity(),
         nonHumanAnimalEntityArg: NonHumanAnimalEntity = nonHumanAnimal.toEntity(),
         rowsUpdatedNonHumanAnimalArg: Int = 1
@@ -137,7 +137,7 @@ class CheckNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
                     capture(onDeleteLocalCacheEntity)
                 )
             } calls {
-                onDeleteLocalCacheEntity.get().invoke(numberOfNonHumanAnimalsDeletedInLocalCacheArg)
+                onDeleteLocalCacheEntity.get().invoke(numberOfNonHumanAnimalsDeletedFromLocalCacheArg)
             }
 
             everySuspend {
@@ -147,7 +147,7 @@ class CheckNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
                 )
             } calls {
                 onDeleteLocalCacheEntityWithWrongId.get()
-                    .invoke(numberOfNonHumanAnimalsDeletedInLocalCacheWithWrongIdArg)
+                    .invoke(numberOfNonHumanAnimalsDeletedFromLocalCacheWithWrongIdArg)
             }
         }
 
@@ -184,10 +184,10 @@ class CheckNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
             everySuspend {
                 insertNonHumanAnimal(
                     nonHumanAnimal.toEntity(),
-                    capture(onInsertNonHumanAnimalFromLocal)
+                    capture(onInsertNonHumanAnimalInLocal)
                 )
             } calls {
-                onInsertNonHumanAnimalFromLocal.get().invoke(1L)
+                onInsertNonHumanAnimalInLocal.get().invoke(1L)
             }
 
             everySuspend {
@@ -197,9 +197,9 @@ class CheckNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
             everySuspend {
                 modifyNonHumanAnimal(
                     nonHumanAnimalEntityArg,
-                    capture(onModifyNonHumanAnimalFromLocal)
+                    capture(onModifyNonHumanAnimalInLocal)
                 )
-            } calls { onModifyNonHumanAnimalFromLocal.get().invoke(rowsUpdatedNonHumanAnimalArg) }
+            } calls { onModifyNonHumanAnimalInLocal.get().invoke(rowsUpdatedNonHumanAnimalArg) }
         }
 
         val observeAuthStateInAuthDataSource =
@@ -288,7 +288,7 @@ class CheckNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
             getCheckNonHumanAnimalViewmodel(
                 nonHumanAnimalIdArg = "wrongId",
                 getLocalCacheEntityForNonHumanAnimalReturn = null,
-                numberOfNonHumanAnimalsDeletedInLocalCacheWithWrongIdArg = 0
+                numberOfNonHumanAnimalsDeletedFromLocalCacheWithWrongIdArg = 0
             ).nonHumanAnimalFlow.test {
                 assertEquals(UiState.Error(), awaitItem())
                 awaitComplete()

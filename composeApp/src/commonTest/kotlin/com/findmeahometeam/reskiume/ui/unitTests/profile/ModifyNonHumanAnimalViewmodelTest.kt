@@ -560,7 +560,7 @@ class ModifyNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
         }
 
     @Test
-    fun `given a modified non human animal_when the app updates the data and fails deleting the local image_then the data is not modified`() =
+    fun `given a modified non human animal_when the app updates the data and fails deleting the local image_then the data is not modified in the local repository`() =
         runTest {
             val modifyNonHumanAnimalViewmodel = getModifyNonHumanAnimalViewmodel(
                 localImageDeletedArg = false
@@ -615,7 +615,7 @@ class ModifyNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
         }
 
     @Test
-    fun `given a modified non human animal_when the app updates the data but fails in the local repository_then the data is not modified`() =
+    fun `given a modified non human animal_when the app updates the data but fails in the local repository_then the data is not modified in the local repository`() =
         runTest {
             val modifyNonHumanAnimalViewmodel = getModifyNonHumanAnimalViewmodel(
                 rowsUpdatedNonHumanAnimalArg = 0
@@ -692,7 +692,7 @@ class ModifyNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
         }
 
     @Test
-    fun `given a non human animal_when the app deletes the non human animal but fails deleting them in the local repository_then the data is not deleted`() =
+    fun `given a non human animal_when the app deletes the non human animal but fails deleting them in the local repository_then the data is not deleted in the local repository`() =
         runTest {
             val modifyNonHumanAnimalViewmodel = getModifyNonHumanAnimalViewmodel(
                 rowsDeletedOfNonHumanAnimalsArg = 0

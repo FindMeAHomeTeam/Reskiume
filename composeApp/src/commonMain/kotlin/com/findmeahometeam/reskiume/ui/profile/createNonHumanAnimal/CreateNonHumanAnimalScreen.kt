@@ -178,7 +178,7 @@ fun CreateNonHumanAnimalScreen(
                 enabled = isUpdateUserButtonEnabled,
                 onClick = {
                     createNonHumanAnimalViewmodel.saveNonHumanAnimalChanges(
-                        nonHumanAnimal = NonHumanAnimal(
+                        NonHumanAnimal(
                             caregiverId = "",
                             imageUrl = imageUrl,
                             name = name,

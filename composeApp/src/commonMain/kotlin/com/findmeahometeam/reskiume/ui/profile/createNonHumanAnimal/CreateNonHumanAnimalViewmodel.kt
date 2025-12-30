@@ -34,26 +34,26 @@ class CreateNonHumanAnimalViewmodel(
     val saveChangesUiState: StateFlow<UiState<Unit>> = _saveChangesUiState.asStateFlow()
 
     @OptIn(ExperimentalTime::class)
-    fun saveNonHumanAnimalChanges(nonHumanAnimal: NonHumanAnimal) {
+    fun saveNonHumanAnimalChanges(createdNonHumanAnimal: NonHumanAnimal) {
 
         viewModelScope.launch {
             _saveChangesUiState.value = UiState.Loading()
 
             val caregiverId: String = observeAuthStateInAuthDataSource().firstOrNull()?.uid!!
 
-            val createdNonHumanAnimal: NonHumanAnimal = nonHumanAnimal.copy(
+            val nonHumanAnimal: NonHumanAnimal = createdNonHumanAnimal.copy(
                 id = Clock.System.now().epochSeconds.toString() + caregiverId,
                 caregiverId = caregiverId
             )
-            uploadNewImageToRemoteDataSource(createdNonHumanAnimal) { nonHumanAnimalWithPossibleImageDownloadUri: NonHumanAnimal ->
+            uploadNewImageToRemoteDataSource(nonHumanAnimal) { nonHumanAnimalWithPossibleImageDownloadUri: NonHumanAnimal ->
 
                 createNonHumanAnimalInRemoteDataSource(
                     nonHumanAnimalWithPossibleImageDownloadUri
                 ) {
-                    createNonHumanAnimalInLocalDataSource(createdNonHumanAnimal) {
+                    createNonHumanAnimalInLocalDataSource(nonHumanAnimal) {
 
                         createCacheForNonHumanAnimalInLocalDataSource(
-                            createdNonHumanAnimal
+                            nonHumanAnimal
                         )
                     }
                 }
@@ -62,52 +62,52 @@ class CreateNonHumanAnimalViewmodel(
     }
 
     private fun uploadNewImageToRemoteDataSource(
-        createdNonHumanAnimal: NonHumanAnimal,
+        nonHumanAnimal: NonHumanAnimal,
         onSuccess: (NonHumanAnimal) -> Unit
     ) {
         uploadImageToRemoteDataSource(
-            userUid = createdNonHumanAnimal.caregiverId,
-            extraId = createdNonHumanAnimal.id,
+            userUid = nonHumanAnimal.caregiverId,
+            extraId = nonHumanAnimal.id,
             section = Section.NON_HUMAN_ANIMALS,
-            imageUri = createdNonHumanAnimal.imageUrl
+            imageUri = nonHumanAnimal.imageUrl
         ) { imageDownloadUri: String ->
 
             val nonHumanAnimalWithPossibleImageDownloadUri: NonHumanAnimal =
                 if (imageDownloadUri.isBlank()) {
                     log.d(
                         "CreateNonHumanAnimalViewModel",
-                        "uploadNewImageToRemoteDataSource: the download URI from the non human animal ${createdNonHumanAnimal.id} is blank"
+                        "uploadNewImageToRemoteDataSource: the download URI from the non human animal ${nonHumanAnimal.id} is blank"
                     )
-                    createdNonHumanAnimal
+                    nonHumanAnimal
                 } else {
                     log.d(
                         "CreateNonHumanAnimalViewModel",
-                        "uploadNewImageToRemoteDataSource: the download URI from the non human animal ${createdNonHumanAnimal.id} was saved successfully"
+                        "uploadNewImageToRemoteDataSource: the download URI from the non human animal ${nonHumanAnimal.id} was saved successfully"
                     )
-                    createdNonHumanAnimal.copy(imageUrl = imageDownloadUri)
+                    nonHumanAnimal.copy(imageUrl = imageDownloadUri)
                 }
             onSuccess(nonHumanAnimalWithPossibleImageDownloadUri)
         }
     }
 
     private fun createNonHumanAnimalInRemoteDataSource(
-        createdNonHumanAnimal: NonHumanAnimal,
+        nonHumanAnimal: NonHumanAnimal,
         onSuccess: () -> Unit
     ) {
         viewModelScope.launch {
 
-            insertNonHumanAnimalInRemoteRepository(createdNonHumanAnimal) { result ->
+            insertNonHumanAnimalInRemoteRepository(nonHumanAnimal) { result ->
 
                 if (result is DatabaseResult.Success) {
                     log.d(
                         "CreateNonHumanAnimalViewModel",
-                        "createNonHumanAnimalInRemoteDataSource: non human animal ${createdNonHumanAnimal.id} created successfully in remote data source"
+                        "createNonHumanAnimalInRemoteDataSource: non human animal ${nonHumanAnimal.id} created successfully in remote data source"
                     )
                     onSuccess()
                 } else {
                     log.e(
                         "CreateNonHumanAnimalViewModel",
-                        "createNonHumanAnimalInRemoteDataSource: failed to create the non human animal ${createdNonHumanAnimal.id} in remote data source"
+                        "createNonHumanAnimalInRemoteDataSource: failed to create the non human animal ${nonHumanAnimal.id} in remote data source"
                     )
                     _saveChangesUiState.value = UiState.Error()
                 }
@@ -116,24 +116,24 @@ class CreateNonHumanAnimalViewmodel(
     }
 
     private fun createNonHumanAnimalInLocalDataSource(
-        createdNonHumanAnimal: NonHumanAnimal,
+        nonHumanAnimal: NonHumanAnimal,
         onSuccess: () -> Unit
     ) {
 
         viewModelScope.launch {
 
-            insertNonHumanAnimalInLocalRepository(createdNonHumanAnimal) { rowId: Long ->
+            insertNonHumanAnimalInLocalRepository(nonHumanAnimal) { rowId: Long ->
 
                 if (rowId > 0) {
                     log.d(
                         "CreateNonHumanAnimalViewModel",
-                        "createNonHumanAnimalInLocalDataSource: non human animal ${createdNonHumanAnimal.id} created successfully in the local data source"
+                        "createNonHumanAnimalInLocalDataSource: non human animal ${nonHumanAnimal.id} created successfully in the local data source"
                     )
                     onSuccess()
                 } else {
                     log.e(
                         "CreateNonHumanAnimalViewModel",
-                        "createNonHumanAnimalInLocalDataSource: failed to create the non human animal ${createdNonHumanAnimal.id} in the local data source"
+                        "createNonHumanAnimalInLocalDataSource: failed to create the non human animal ${nonHumanAnimal.id} in the local data source"
                     )
                     _saveChangesUiState.value = UiState.Error()
                 }

@@ -442,6 +442,20 @@ class ModifyNonHumanAnimalViewmodelIntegrationTest : CoroutineTestDispatcher() {
     fun `given a non human animal_when the app deletes the non human animal_then the data is deleted from the local and remote repositories`() =
         runTest {
             val modifyNonHumanAnimalViewmodel = getModifyNonHumanAnimalViewmodel(
+                storageRepository = FakeStorageRepository(
+                    remoteDatasourceList = mutableListOf(
+                        Pair(
+                            "${Section.NON_HUMAN_ANIMALS.path}/${user.uid}",
+                            "${nonHumanAnimal.id}.webp"
+                        )
+                    ),
+                    localDatasourceList = mutableListOf(
+                        Pair(
+                            "local_path",
+                            nonHumanAnimal.imageUrl
+                        )
+                    )
+                ),
                 realtimeDatabaseRemoteNonHumanAnimalRepository = FakeRealtimeDatabaseRemoteNonHumanAnimalRepository(
                     remoteNonHumanAnimalList = mutableListOf(nonHumanAnimal.toData())
                 ),
@@ -469,42 +483,23 @@ class ModifyNonHumanAnimalViewmodelIntegrationTest : CoroutineTestDispatcher() {
         }
 
     @Test
-    fun `given a non human animal_when the app deletes the non human animal but fails deleting them in the remote repository_then the data is not deleted`() =
-        runTest {
-            val modifyNonHumanAnimalViewmodel = getModifyNonHumanAnimalViewmodel()
-            modifyNonHumanAnimalViewmodel.deleteNonHumanAnimal(
-                nonHumanAnimal.id,
-                nonHumanAnimal.caregiverId
-            )
-            modifyNonHumanAnimalViewmodel.manageChangesUiState.test {
-                assertTrue { awaitItem() is UiState.Error }
-                ensureAllEventsConsumed()
-            }
-        }
-
-    @Test
-    fun `given a non human animal_when the app deletes the non human animal but fails deleting them in the local repository_then the data is not deleted`() =
-        runTest {
-            val modifyNonHumanAnimalViewmodel = getModifyNonHumanAnimalViewmodel(
-                realtimeDatabaseRemoteNonHumanAnimalRepository = FakeRealtimeDatabaseRemoteNonHumanAnimalRepository(
-                    remoteNonHumanAnimalList = mutableListOf(nonHumanAnimal.toData())
-                )
-            )
-            modifyNonHumanAnimalViewmodel.deleteNonHumanAnimal(
-                nonHumanAnimal.id,
-                nonHumanAnimal.caregiverId
-            )
-            modifyNonHumanAnimalViewmodel.manageChangesUiState.test {
-                assertTrue { awaitItem() is UiState.Loading }
-                assertTrue { awaitItem() is UiState.Error }
-                ensureAllEventsConsumed()
-            }
-        }
-
-    @Test
     fun `given a non human animal_when the app deletes the non human animal but fails deleting its cache_then the data is deleted from the local and remote repositories and LogE is called`() =
         runTest {
             val modifyNonHumanAnimalViewmodel = getModifyNonHumanAnimalViewmodel(
+                storageRepository = FakeStorageRepository(
+                    remoteDatasourceList = mutableListOf(
+                        Pair(
+                            "${Section.NON_HUMAN_ANIMALS.path}/${user.uid}",
+                            "${nonHumanAnimal.id}.webp"
+                        )
+                    ),
+                    localDatasourceList = mutableListOf(
+                        Pair(
+                            "local_path",
+                            nonHumanAnimal.imageUrl
+                        )
+                    )
+                ),
                 realtimeDatabaseRemoteNonHumanAnimalRepository = FakeRealtimeDatabaseRemoteNonHumanAnimalRepository(
                     remoteNonHumanAnimalList = mutableListOf(nonHumanAnimal.toData())
                 ),

@@ -686,6 +686,7 @@ class ModifyNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
                 nonHumanAnimal.caregiverId
             )
             modifyNonHumanAnimalViewmodel.manageChangesUiState.test {
+                assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Error }
                 ensureAllEventsConsumed()
             }

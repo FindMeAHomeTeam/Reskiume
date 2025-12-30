@@ -91,13 +91,13 @@ class DeleteNonHumanAnimalUtil(
                     if (isDeleted) {
                         log.d(
                             "DeleteNonHumanAnimalUtil",
-                            "deleteCurrentImageFromRemoteDataSource: Image from the non human animal $nonHumanAnimalId was deleted successfully in remote data source"
+                            "deleteCurrentImageFromRemoteDataSource: Image from the non human animal $nonHumanAnimalId was deleted successfully in the remote data source"
                         )
                         onSuccess()
                     } else {
                         log.e(
                             "DeleteNonHumanAnimalUtil",
-                            "deleteCurrentImageFromRemoteDataSource: failed to delete the image from the non human animal $nonHumanAnimalId in remote data source"
+                            "deleteCurrentImageFromRemoteDataSource: failed to delete the image from the non human animal $nonHumanAnimalId in the remote data source"
                         )
                         onError()
                     }

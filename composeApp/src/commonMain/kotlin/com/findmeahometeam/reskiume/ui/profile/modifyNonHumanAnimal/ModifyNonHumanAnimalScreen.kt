@@ -222,7 +222,7 @@ fun ModifyNonHumanAnimalScreen(
                 RmButton(
                     text = stringResource(
                         Res.string.modify_non_human_animal_screen_save_non_human_animal_changes_button,
-                        nonHumanAnimal.name
+                        name
                     ),
                     enabled = isUpdateUserButtonEnabled,
                     onClick = {

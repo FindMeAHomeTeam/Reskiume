@@ -1,6 +1,7 @@
 package com.findmeahometeam.reskiume.ui.core.components
 
 import RmRatingBar
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,10 +19,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.findmeahometeam.reskiume.ui.core.backgroundColorForItems
+import com.findmeahometeam.reskiume.ui.core.primaryGreen
+import com.findmeahometeam.reskiume.ui.core.textColor
 
 @Composable
 fun RmListReviewItem(
-    title: String,
+    author: String,
     description: String,
     isEnabled: Boolean = true,
     containerColor: Color = backgroundColorForItems,
@@ -41,11 +44,21 @@ fun RmListReviewItem(
             Column(modifier = Modifier.fillMaxWidth()) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     RmText(
-                        text = title,
+                        text = author,
+                        color = textColor,
                         fontWeight = FontWeight.ExtraBold,
-                        fontSize = 17.sp
+                        fontSize = 17.sp,
+                        modifier = Modifier.weight(1f)
                     )
-                    Spacer(modifier = Modifier.weight(1f))
+                    Spacer(modifier = Modifier.width(10.dp))
+                    RmText(
+                        text = rating.toString(),
+                        fontWeight = FontWeight.ExtraBold,
+                        modifier = Modifier
+                            .background(primaryGreen)
+                            .padding(3.dp)
+                    )
+                    Spacer(modifier = Modifier.width(5.dp))
                     RmRatingBar(
                         rating = rating,
                         starSize = 15.dp,

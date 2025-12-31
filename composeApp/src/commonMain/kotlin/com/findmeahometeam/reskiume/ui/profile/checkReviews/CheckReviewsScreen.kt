@@ -111,7 +111,7 @@ fun CheckReviewsScreen(
                     }
                     items(uiReviewList) { uiReview ->
                         RmListReviewItem(
-                            title = uiReview.authorName.ifBlank { stringResource(Res.string.check_reviews_screen_user_deleted) },
+                            author = uiReview.authorName.ifBlank { stringResource(Res.string.check_reviews_screen_user_deleted) },
                             description = uiReview.description,
                             listAvatarType = RmListAvatarType.Image(resource = uiReview.authorUri),
                             rating = uiReview.rating,

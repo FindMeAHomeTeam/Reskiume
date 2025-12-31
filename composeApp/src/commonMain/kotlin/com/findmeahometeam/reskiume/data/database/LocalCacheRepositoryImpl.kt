@@ -38,6 +38,6 @@ class LocalCacheRepositoryImpl(
         uid: String,
         onDeleteLocalCache: (rowsDeleted: Int) -> Unit
     ) {
-        onDeleteLocalCache(reskiumeDatabase.getLocalCacheDao().deleteLocalCacheEntity(uid))
+        onDeleteLocalCache(reskiumeDatabase.getLocalCacheDao().deleteAllLocalCacheEntity(uid))
     }
 }

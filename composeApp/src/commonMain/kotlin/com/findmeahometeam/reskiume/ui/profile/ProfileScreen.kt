@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
+import com.findmeahometeam.reskiume.ui.core.components.RmDialog
 import com.findmeahometeam.reskiume.ui.core.components.RmHeader
 import com.findmeahometeam.reskiume.ui.core.components.RmListAvatarType
 import com.findmeahometeam.reskiume.ui.core.components.RmListButtonItem
@@ -34,9 +35,15 @@ import com.findmeahometeam.reskiume.ui.core.primaryRed
 import com.findmeahometeam.reskiume.ui.core.secondaryBlue
 import com.findmeahometeam.reskiume.ui.core.secondaryRed
 import com.findmeahometeam.reskiume.ui.core.tertiaryGreen
+import com.findmeahometeam.reskiume.ui.profile.giveFeedback.GiveFeedback
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import reskiume.composeapp.generated.resources.Res
+import reskiume.composeapp.generated.resources.give_feedback_dialog_message
+import reskiume.composeapp.generated.resources.give_feedback_dialog_ok_button
+import reskiume.composeapp.generated.resources.give_feedback_dialog_title
+import reskiume.composeapp.generated.resources.give_feedback_subject
 import reskiume.composeapp.generated.resources.ic_advice
 import reskiume.composeapp.generated.resources.ic_delete
 import reskiume.composeapp.generated.resources.ic_feedback
@@ -79,7 +86,10 @@ fun ProfileScreen(
     val profileUiState: ProfileViewmodel.ProfileUiState by profileViewmodel.state.collectAsState(
         initial = ProfileViewmodel.ProfileUiState.Idle
     )
+    val giveFeedback: GiveFeedback = koinInject<GiveFeedback>()
     var user: User? by remember { mutableStateOf(null) }
+    var displayNoEmailAppError: Boolean by remember { mutableStateOf(false) }
+
     val scrollState: ScrollState = rememberScrollState()
 
     user = when (profileUiState) {
@@ -253,6 +263,7 @@ fun ProfileScreen(
         Spacer(modifier = Modifier.height(10.dp))
 
         // Feedback screen
+        val feedbackSubject = stringResource(Res.string.give_feedback_subject)
         RmListButtonItem(
             title = stringResource(Res.string.profile_screen_feedback_title),
             description = stringResource(Res.string.profile_screen_feedback_description),
@@ -263,9 +274,25 @@ fun ProfileScreen(
                 iconColor = primaryBlue
             ),
             onClick = {
-                // TODO
+                giveFeedback.sendEmail(
+                    subject = feedbackSubject,
+                    onError = {
+                        displayNoEmailAppError = true
+                    }
+                )
             }
         )
+        if (displayNoEmailAppError) {
+
+            RmDialog(
+                emoji = "✉️",
+                title = stringResource(Res.string.give_feedback_dialog_title),
+                message = stringResource(Res.string.give_feedback_dialog_message),
+                allowMessage = stringResource(Res.string.give_feedback_dialog_ok_button),
+                onClickAllow = { displayNoEmailAppError = false },
+                onClickDeny = { displayNoEmailAppError = false }
+            )
+        }
 
         // Delete account screen
         if (user != null) {

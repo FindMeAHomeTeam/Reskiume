@@ -34,7 +34,7 @@
     <string name="profile_screen_my_rescue_events_description">Manage your rescue events</string>
     <string name="profile_screen_get_advice_title">Get advice</string>
     <string name="profile_screen_get_advice_description">Learn how to help non-human animals</string>
-    <string name="profile_screen_feedback_title">Give feedback</string>
+    <string name="profile_screen_feedback_title">Send feedback by email</string>
     <string name="profile_screen_feedback_description">Help to improve the app</string>
     <string name="profile_screen_delete_account_title">Delete account</string>
     <string name="profile_screen_delete_account_description">This action can not be undone</string>
@@ -173,6 +173,13 @@
     <string name="create_non_human_animal_screen_non_human_animal_description">description</string>
     <string name="create_non_human_animal_screen_create_non_human_animal_profile_button">Create non-human animal profile</string>
     <string name="create_non_human_animal_screen_create_non_human_animal_profile_named_button">Create %1$s's profile</string>
+
+    <!-- Give feedback -->
+    <string name="give_feedback_subject">Feedback for Reskiume</string>
+    <string name="give_feedback_dialog_title">You have no email app installed</string>
+    <string name="give_feedback_dialog_message">Please, go to the store and install one</string>
+    <string name="give_feedback_dialog_ok_button">Ok</string>
+
 
 
 </resources>

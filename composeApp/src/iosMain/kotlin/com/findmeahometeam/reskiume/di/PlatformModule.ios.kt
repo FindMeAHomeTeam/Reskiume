@@ -38,6 +38,8 @@ import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepo
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepositoryForIosDelegateWrapper
 import com.findmeahometeam.reskiume.domain.repository.util.analytics.AnalyticsForIosWrapper
 import com.findmeahometeam.reskiume.domain.repository.util.log.CrashlyticsForIosWrapper
+import com.findmeahometeam.reskiume.ui.profile.giveFeedback.GiveFeedback
+import com.findmeahometeam.reskiume.ui.profile.giveFeedback.GiveFeedbackImpl
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
@@ -63,4 +65,5 @@ actual val platformModule: Module = module {
     singleOf(::RealtimeDatabaseRemoteNonHumanAnimalRepositoryIosImpl) bind RealtimeDatabaseRemoteNonHumanAnimalRepository::class
     singleOf(::RealtimeDatabaseRemoteNonHumanAnimalFlowsRepositoryForIosDelegateImpl) bind RealtimeDatabaseRemoteNonHumanAnimalFlowsRepositoryForIosDelegate::class
     singleOf(::RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateWrapperImpl) bind RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateWrapper::class
+    singleOf(::GiveFeedbackImpl) bind GiveFeedback::class
 }

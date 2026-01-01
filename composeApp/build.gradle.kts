@@ -52,6 +52,7 @@ kotlin {
             implementation(libs.firebase.crashlytics.ndk)
             implementation(libs.firebase.analytics)
             implementation(libs.firebase.storage)
+            implementation(libs.ktor.client.android)
         }
         androidUnitTest.dependencies {
             implementation(libs.kotlin.testJunit)
@@ -96,6 +97,9 @@ kotlin {
             implementation(libs.paging.testing)
             implementation(libs.turbine)
 
+        }
+        iosMain.dependencies {
+            implementation(libs.ktor.client.darwin)
         }
     }
 }

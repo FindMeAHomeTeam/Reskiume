@@ -19,6 +19,7 @@ konnectivity = "0.1-alpha01"
 kotlin = "2.2.20"
 kotlinxDatetime = "0.7.1-0.6.x-compat"
 ksp = "2.2.20-2.0.2" #2.0.3 gives ksp.gradle.KspAATask issues
+ktorClient = "3.3.3"
 mokkery-plugin = "3.0.0" #Needs a new kotlin version
 nativecoroutines = "1.0.0-ALPHA-47"
 navigation = "2.9.1"
@@ -61,6 +62,8 @@ koin-testJunit = { module = "io.insert-koin:koin-test-junit4" }
 #coil
 coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
 coil-network-ktor = { group = "io.coil-kt.coil3", name = "coil-network-ktor3", version.ref = "coil" }
+ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktorClient" }
+ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktorClient" }
 
 #room
 androidx-sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }

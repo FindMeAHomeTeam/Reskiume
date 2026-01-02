@@ -27,11 +27,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil3.compose.AsyncImage
 import com.findmeahometeam.reskiume.ui.core.gray
 import com.findmeahometeam.reskiume.ui.core.primaryGreen
 import com.findmeahometeam.reskiume.ui.core.primaryRed
@@ -49,6 +47,7 @@ import io.github.ismoy.imagepickerkmp.presentation.ui.components.ImagePickerLaun
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import reskiume.composeapp.generated.resources.Res
+import reskiume.composeapp.generated.resources.add_photo_screen_selected_photo_content_description
 import reskiume.composeapp.generated.resources.camera_picker_go_to_settings_title
 import reskiume.composeapp.generated.resources.camera_picker_grant_in_settings_message
 import reskiume.composeapp.generated.resources.camera_picker_open_settings_button
@@ -155,11 +154,10 @@ fun RmAddPhoto(
                     .height(200.dp)
             ) {
                 Box(contentAlignment = Alignment.TopEnd) {
-                    AsyncImage(
-                        model = uri,
-                        contentDescription = "Selected photo",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
+                    RmImage(
+                        imagePath = uri,
+                        contentDescription = stringResource(Res.string.add_photo_screen_selected_photo_content_description),
+                        modifier = Modifier.fillMaxSize()
                     )
                     Row(
                         modifier = Modifier.wrapContentSize()
@@ -209,7 +207,7 @@ fun InvokeGalleryPicker(
         mimeTypes = listOf(MimeType.IMAGE_JPEG, MimeType.IMAGE_PNG),
         cameraCaptureConfig = CameraCaptureConfig(
             permissionAndConfirmationConfig = PermissionAndConfirmationConfig(
-                customConfirmationView = { photoResult: PhotoResult, onConfirm: (PhotoResult) -> Unit, onRetry: () -> Unit ->
+                customConfirmationView = { photoResult: PhotoResult, onConfirm: (PhotoResult) -> Unit, _: () -> Unit ->
                     onConfirm(photoResult)
                 }
             ),
@@ -234,7 +232,7 @@ fun InvokeCameraPicker(onCameraPickerResult: (Boolean, String) -> Unit) {
             cameraCaptureConfig = CameraCaptureConfig(
                 compressionLevel = CompressionLevel.HIGH,
                 permissionAndConfirmationConfig = PermissionAndConfirmationConfig(
-                    customConfirmationView = { photoResult, onConfirm: (PhotoResult) -> Unit, onRetry: () -> Unit ->
+                    customConfirmationView = { photoResult, onConfirm: (PhotoResult) -> Unit, _: () -> Unit ->
                         onConfirm(photoResult)
                     },
                     customDeniedDialog = { onRetry: () -> Unit ->

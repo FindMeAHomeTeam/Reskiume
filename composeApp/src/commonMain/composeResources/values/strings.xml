@@ -65,6 +65,9 @@
     <string name="camera_picker_grant_in_settings_message">Camera permission is required to capture photos. Please grant it in settings</string>
     <string name="camera_picker_open_settings_button">Open settings</string>
 
+    <!-- Add photo -->
+    <string name="add_photo_screen_selected_photo_content_description">Selected photo</string>
+
     <!-- Login account screen -->
     <string name="login_account_screen_log_in_title">Log in to your account</string>
     <string name="login_account_screen_email_field_label">Email</string>

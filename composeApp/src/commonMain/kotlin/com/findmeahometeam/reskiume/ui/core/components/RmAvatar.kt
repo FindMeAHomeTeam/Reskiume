@@ -10,9 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
 import com.findmeahometeam.reskiume.ui.core.primaryGreen
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
@@ -56,11 +54,9 @@ fun RmAvatar(listAvatarType: RmListAvatarType) {
                     tint = primaryGreen
                 )
             } else {
-                AsyncImage(
+                RmImage(
                     modifier = Modifier.size(55.dp).clip(RoundedCornerShape(15.dp)),
-                    model = listAvatarType.resource,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop
+                    imagePath = listAvatarType.resource
                 )
             }
         }

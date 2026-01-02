@@ -23,16 +23,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil3.compose.AsyncImage
 import com.findmeahometeam.reskiume.domain.model.Gender
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.toStringResource
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
+import com.findmeahometeam.reskiume.ui.core.components.RmImage
 import com.findmeahometeam.reskiume.ui.core.components.RmResultState
 import com.findmeahometeam.reskiume.ui.core.components.RmScaffold
 import com.findmeahometeam.reskiume.ui.core.components.RmText
@@ -82,15 +81,14 @@ fun CheckNonHumanAnimalScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Spacer(modifier = Modifier.height(8.dp))
-                AsyncImage(
-                    model = nonHumanAnimal.imageUrl,
+                RmImage(
+                    imagePath = nonHumanAnimal.imageUrl,
                     contentDescription =
                         stringResource(
                             Res.string.check_non_human_animal_screen_non_human_animal_avatar_content_description,
                             nonHumanAnimal.name
                         ),
-                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(15.dp)),
-                    contentScale = ContentScale.Crop
+                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(15.dp))
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))

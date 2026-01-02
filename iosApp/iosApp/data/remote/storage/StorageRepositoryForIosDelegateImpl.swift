@@ -78,7 +78,7 @@ class StorageRepositoryForIosDelegateImpl: StorageRepository {
                     onImageSaved("")
                     self.log.e(tag: "StorageRepositoryForIosDelegateImpl", message: "Error downloading the image: \(String(describing: error!.localizedDescription))", throwable: nil)
                 } else {
-                    onImageSaved(url?.absoluteString ?? "")
+                    onImageSaved(fileName)
                 }
             }
         }

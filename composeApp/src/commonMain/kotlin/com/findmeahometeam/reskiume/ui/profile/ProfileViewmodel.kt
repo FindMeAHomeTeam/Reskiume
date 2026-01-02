@@ -4,14 +4,16 @@ import androidx.lifecycle.ViewModel
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.User
-import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.GetCompleteImagePathFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class ProfileViewmodel(
     observeAuthStateInAuthDataSource: ObserveAuthStateInAuthDataSource,
     private val getUserFromLocalDataSource: GetUserFromLocalDataSource,
+    private val getCompleteImagePathFromLocalDataSource: GetCompleteImagePathFromLocalDataSource,
     private val log: Log
 ) : ViewModel() {
     val state: Flow<ProfileUiState> =
@@ -27,7 +29,11 @@ class ProfileViewmodel(
                     ProfileUiState.Success(
                         user = user.copy(
                             email = authUser.email,
-                            image = if (user.image.isBlank() || user.image == "null") "" else user.image,
+                            image = if (user.image.isBlank() || user.image == "null") {
+                                ""
+                            } else {
+                                getCompleteImagePathFromLocalDataSource(user.image)
+                            },
                         )
                     )
                 }

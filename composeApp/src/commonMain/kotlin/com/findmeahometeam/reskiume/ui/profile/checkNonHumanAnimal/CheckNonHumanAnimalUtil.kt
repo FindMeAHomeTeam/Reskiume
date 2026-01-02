@@ -6,6 +6,7 @@ import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.GetCompleteImagePathFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteCacheFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetNonHumanAnimalFromLocalRepository
@@ -30,6 +31,7 @@ class CheckNonHumanAnimalUtil(
     private val insertNonHumanAnimalInLocalRepository: InsertNonHumanAnimalInLocalRepository,
     private val modifyNonHumanAnimalInLocalRepository: ModifyNonHumanAnimalInLocalRepository,
     private val getNonHumanAnimalFromLocalRepository: GetNonHumanAnimalFromLocalRepository,
+    private val getCompleteImagePathFromLocalDataSource: GetCompleteImagePathFromLocalDataSource,
     private val log: Log
 ) {
 
@@ -41,7 +43,7 @@ class CheckNonHumanAnimalUtil(
     ): Flow<UiState<NonHumanAnimal>> =
         observeAuthStateInAuthDataSource().flatMapConcat { authUser: AuthUser? ->
 
-            getDataByManagingObjectLocalCacheTimestamp(
+            getDataByManagingObjectLocalCacheTimestamp<Flow<UiState<NonHumanAnimal>>>(
                 cachedObjectId = nonHumanAnimalId,
                 savedBy = authUser?.uid ?: "",
                 section = Section.NON_HUMAN_ANIMALS,
@@ -93,7 +95,17 @@ class CheckNonHumanAnimalUtil(
                         flowOf(UiState.Success(nonHumanAnimal))
                     }
                 }
-            )
+            ).map {
+                if (it is UiState.Success) {
+                    UiState.Success(
+                        it.data.copy(
+                            imageUrl = getCompleteImagePathFromLocalDataSource(it.data.imageUrl)
+                        )
+                    )
+                } else {
+                    it
+                }
+            }
         }
 
     private fun Flow<NonHumanAnimal?>.downloadImageAndInsertNonHumanAnimalInLocalRepository(

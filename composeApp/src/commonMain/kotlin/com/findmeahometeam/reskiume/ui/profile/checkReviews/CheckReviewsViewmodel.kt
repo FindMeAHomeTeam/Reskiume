@@ -9,6 +9,7 @@ import com.findmeahometeam.reskiume.domain.model.Review
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.GetCompleteImagePathFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromRemoteRepository
@@ -43,6 +44,7 @@ class CheckReviewsViewmodel(
     private val getUserFromLocalDataSource: GetUserFromLocalDataSource,
     private val getUserFromRemoteDataSource: GetUserFromRemoteDataSource,
     private val downloadImageToLocalDataSource: DownloadImageToLocalDataSource,
+    private val getCompleteImagePathFromLocalDataSource: GetCompleteImagePathFromLocalDataSource,
     private val insertUserInLocalDataSource: InsertUserInLocalDataSource,
     private val modifyUserInLocalDataSource: ModifyUserInLocalDataSource,
     private val log: Log
@@ -132,7 +134,7 @@ class CheckReviewsViewmodel(
 
     private suspend fun getActivist(activistUid: String, myUserUid: String): User? {
 
-        return getDataByManagingObjectLocalCacheTimestamp(
+        val user: User? = getDataByManagingObjectLocalCacheTimestamp(
             cachedObjectId = activistUid,
             savedBy = myUserUid,
             section = Section.USERS,
@@ -148,6 +150,13 @@ class CheckReviewsViewmodel(
             },
             onVerifyCacheIsRecent = {
                 getUserFromLocalDataSource(activistUid)
+            }
+        )
+        return user?.copy(
+            image = if (user.image.isBlank()) {
+                user.image
+            } else {
+                getCompleteImagePathFromLocalDataSource(user.image)
             }
         )
     }

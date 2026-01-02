@@ -9,6 +9,7 @@ import com.findmeahometeam.reskiume.domain.model.LocalCache
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.GetCompleteImagePathFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
@@ -38,10 +39,12 @@ class CheckAllNonHumanAnimalsViewmodel(
     private val modifyNonHumanAnimalInLocalRepository: ModifyNonHumanAnimalInLocalRepository,
     private val modifyCacheInLocalRepository: ModifyCacheInLocalRepository,
     private val getAllNonHumanAnimalsFromLocalRepository: GetAllNonHumanAnimalsFromLocalRepository,
+    private val getCompleteImagePathFromLocalDataSource: GetCompleteImagePathFromLocalDataSource,
     private val log: Log
 ) : ViewModel() {
 
-    private val caregiverId = saveStateHandleProvider.provideObjectRoute(CheckAllNonHumanAnimals::class).caregiverId
+    private val caregiverId =
+        saveStateHandleProvider.provideObjectRoute(CheckAllNonHumanAnimals::class).caregiverId
 
     val nonHumanAnimalListFlow: Flow<List<NonHumanAnimal>> =
         observeAuthStateInAuthDataSource().flatMapConcat { authUser: AuthUser? ->
@@ -59,7 +62,13 @@ class CheckAllNonHumanAnimalsViewmodel(
                 onVerifyCacheIsRecent = {
                     getAllNonHumanAnimalsFromLocalRepository(caregiverId)
                 }
-            )
+            ).map {
+                it.map { nonHumanAnimal ->
+                    nonHumanAnimal.copy(
+                        imageUrl = getCompleteImagePathFromLocalDataSource(nonHumanAnimal.imageUrl)
+                    )
+                }
+            }
         }
 
     private fun Flow<List<NonHumanAnimal>>.downloadImageAndInsertNonHumanAnimalsInLocalRepository(): Flow<List<NonHumanAnimal>> =

@@ -7,12 +7,12 @@ import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.User
+import com.findmeahometeam.reskiume.domain.usecases.authUser.SignInWithEmailAndPasswordFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.authUser.SignInWithEmailAndPasswordFromAuthDataSource
-import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -34,8 +34,7 @@ class LoginAccountViewmodel(
     fun signInUsingEmail(email: String, password: String) {
         viewModelScope.launch {
             _state.value = UiState.Loading()
-            val authResult = signInWithEmailAndPasswordFromAuthDataSource(email, password)
-            when (authResult) {
+            when (val authResult = signInWithEmailAndPasswordFromAuthDataSource(email, password)) {
                 is AuthResult.Error -> {
                     _state.value = UiState.Error(authResult.message)
                 }
@@ -129,14 +128,12 @@ class LoginAccountViewmodel(
                     )
                 } else if (collectedUser.image.isNotBlank()) {
 
-                    downloadImageToLocalDataSource(
+                    val localImagePath: String = downloadImageToLocalDataSource(
                         userUid = collectedUser.uid,
                         extraId = "",
                         section = Section.USERS
-                    ) { localImagePath: String ->
-
-                        onSavedAvatar(collectedUser.copy(image = localImagePath.ifBlank { collectedUser.image }))
-                    }
+                    )
+                    onSavedAvatar(collectedUser.copy(image = localImagePath.ifBlank { collectedUser.image }))
                 } else {
                     log.d(
                         "LoginViewmodel",

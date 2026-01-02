@@ -164,25 +164,28 @@ class CheckReviewsViewmodel(
     private fun Flow<User?>.saveImageAndInsertUserInLocalRepository(): Flow<User?> =
         this.map { user ->
 
-            user?.also { activist ->
+            user?.let { activist ->
                 if (activist.image.isNotBlank()) {
 
-                    downloadImageToLocalDataSource(
+                    val localImagePath: String = downloadImageToLocalDataSource(
                         userUid = activist.uid,
                         extraId = "",
                         section = Section.USERS
-                    ) { localImagePath: String ->
+                    )
+                    val activistWithLocalImage =
+                        activist.copy(image = localImagePath.ifBlank { activist.image })
 
-                        val activistWithLocalImage =
-                            activist.copy(image = localImagePath.ifBlank { activist.image })
-                        insertUserInLocalRepository(activistWithLocalImage)
-                    }
+                    insertUserInLocalRepository(activistWithLocalImage)
+
+                    activistWithLocalImage
                 } else {
                     log.d(
                         "CheckReviewsViewmodel",
                         "User ${activist.uid} has no avatar image to save locally."
                     )
                     insertUserInLocalRepository(activist)
+
+                    activist
                 }
             }
         }
@@ -211,25 +214,27 @@ class CheckReviewsViewmodel(
     private fun Flow<User?>.saveImageAndModifyUserInLocalRepository(): Flow<User?> =
         this.map { user ->
 
-            user?.also { activist ->
+            user?.let { activist ->
                 if (activist.image.isNotBlank()) {
 
-                    downloadImageToLocalDataSource(
+                    val localImagePath: String = downloadImageToLocalDataSource(
                         userUid = activist.uid,
                         extraId = "",
                         section = Section.USERS
-                    ) { localImagePath: String ->
+                    )
+                    val activistWithLocalImage =
+                        activist.copy(image = localImagePath.ifBlank { activist.image })
 
-                        val activistWithLocalImage =
-                            activist.copy(image = localImagePath.ifBlank { activist.image })
-                        modifyUserInLocalRepository(activistWithLocalImage)
-                    }
+                    modifyUserInLocalRepository(activistWithLocalImage)
+
+                    activistWithLocalImage
                 } else {
                     log.d(
                         "CheckReviewsViewmodel",
                         "User ${activist.uid} has no avatar image to save locally."
                     )
                     modifyUserInLocalRepository(activist)
+                    activist
                 }
             }
         }

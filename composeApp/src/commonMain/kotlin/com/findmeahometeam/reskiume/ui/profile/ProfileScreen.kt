@@ -252,50 +252,51 @@ fun ProfileScreen(
                 // TODO
             }
         )
-        Spacer(Modifier.height(32.dp))
-        RmText(
-            modifier = Modifier.fillMaxWidth().padding(10.dp),
-            text = stringResource(Res.string.profile_screen_settings_section),
-            textAlign = TextAlign.Start,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.ExtraBold
-        )
-        Spacer(modifier = Modifier.height(10.dp))
 
-        // Feedback screen
-        val feedbackSubject = stringResource(Res.string.give_feedback_subject)
-        RmListButtonItem(
-            title = stringResource(Res.string.profile_screen_feedback_title),
-            description = stringResource(Res.string.profile_screen_feedback_description),
-            containerColor = backgroundColor,
-            listAvatarType = RmListAvatarType.Icon(
-                backgroundColor = secondaryBlue,
-                icon = Res.drawable.ic_feedback,
-                iconColor = primaryBlue
-            ),
-            onClick = {
-                giveFeedback.sendEmail(
-                    subject = feedbackSubject,
-                    onError = {
-                        displayNoEmailAppError = true
-                    }
+        if (user != null) {
+            Spacer(Modifier.height(32.dp))
+            RmText(
+                modifier = Modifier.fillMaxWidth().padding(10.dp),
+                text = stringResource(Res.string.profile_screen_settings_section),
+                textAlign = TextAlign.Start,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.ExtraBold
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // Feedback screen
+            val feedbackSubject = stringResource(Res.string.give_feedback_subject)
+            RmListButtonItem(
+                title = stringResource(Res.string.profile_screen_feedback_title),
+                description = stringResource(Res.string.profile_screen_feedback_description),
+                containerColor = backgroundColor,
+                listAvatarType = RmListAvatarType.Icon(
+                    backgroundColor = secondaryBlue,
+                    icon = Res.drawable.ic_feedback,
+                    iconColor = primaryBlue
+                ),
+                onClick = {
+                    giveFeedback.sendEmail(
+                        subject = feedbackSubject,
+                        onError = {
+                            displayNoEmailAppError = true
+                        }
+                    )
+                }
+            )
+            if (displayNoEmailAppError) {
+
+                RmDialog(
+                    emoji = "✉️",
+                    title = stringResource(Res.string.give_feedback_dialog_title),
+                    message = stringResource(Res.string.give_feedback_dialog_message),
+                    allowMessage = stringResource(Res.string.give_feedback_dialog_ok_button),
+                    onClickAllow = { displayNoEmailAppError = false },
+                    onClickDeny = { displayNoEmailAppError = false }
                 )
             }
-        )
-        if (displayNoEmailAppError) {
 
-            RmDialog(
-                emoji = "✉️",
-                title = stringResource(Res.string.give_feedback_dialog_title),
-                message = stringResource(Res.string.give_feedback_dialog_message),
-                allowMessage = stringResource(Res.string.give_feedback_dialog_ok_button),
-                onClickAllow = { displayNoEmailAppError = false },
-                onClickDeny = { displayNoEmailAppError = false }
-            )
-        }
-
-        // Delete account screen
-        if (user != null) {
+            // Delete account screen
             RmListButtonItem(
                 title = stringResource(Res.string.profile_screen_delete_account_title),
                 description = stringResource(Res.string.profile_screen_delete_account_description),

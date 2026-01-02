@@ -114,8 +114,7 @@ class CheckNonHumanAnimalUtil(
         this.map { nonHumanAnimal: NonHumanAnimal? ->
 
             when {
-                nonHumanAnimal == null -> { /* do nothing */
-                }
+                nonHumanAnimal == null -> nonHumanAnimal
 
                 nonHumanAnimal.imageUrl.isBlank() -> {
                     log.d(
@@ -123,26 +122,26 @@ class CheckNonHumanAnimalUtil(
                         "Non human animal ${nonHumanAnimal.id} has no avatar image to save locally."
                     )
                     insertNonHumanAnimalsInLocalRepository(nonHumanAnimal)
+
+                    nonHumanAnimal
                 }
 
                 else -> {
-                    downloadImageToLocalDataSource(
+                    val localImagePath: String = downloadImageToLocalDataSource(
                         userUid = nonHumanAnimal.caregiverId,
                         extraId = nonHumanAnimal.id,
                         section = Section.NON_HUMAN_ANIMALS
-                    ) { localImagePath: String ->
+                    )
+                    val nonHumanAnimalWithLocalImage = nonHumanAnimal.copy(
+                        imageUrl = localImagePath.ifBlank { nonHumanAnimal.imageUrl }
+                    )
+                    coroutineScope.launch {
 
-                        val nonHumanAnimalWithLocalImage =
-                            nonHumanAnimal.copy(imageUrl = localImagePath.ifBlank { nonHumanAnimal.imageUrl })
-
-                        coroutineScope.launch {
-
-                            insertNonHumanAnimalsInLocalRepository(nonHumanAnimalWithLocalImage)
-                        }
+                        insertNonHumanAnimalsInLocalRepository(nonHumanAnimalWithLocalImage)
                     }
+                    nonHumanAnimalWithLocalImage
                 }
             }
-            nonHumanAnimal
         }
 
     private fun deleteNonHumanAnimalCacheFromLocalDataSource(
@@ -192,6 +191,7 @@ class CheckNonHumanAnimalUtil(
 
             when {
                 nonHumanAnimal == null -> { /* do nothing */
+                    nonHumanAnimal
                 }
 
                 nonHumanAnimal.imageUrl.isBlank() -> {
@@ -200,26 +200,28 @@ class CheckNonHumanAnimalUtil(
                         "Non human animal ${nonHumanAnimal.id} has no avatar image to save locally."
                     )
                     modifyNonHumanAnimalsInLocalRepository(nonHumanAnimal)
+
+                    nonHumanAnimal
                 }
 
                 else -> {
-                    downloadImageToLocalDataSource(
+                    val localImagePath: String = downloadImageToLocalDataSource(
                         userUid = nonHumanAnimal.caregiverId,
                         extraId = nonHumanAnimal.id,
                         section = Section.NON_HUMAN_ANIMALS
-                    ) { localImagePath: String ->
+                    )
 
-                        val nonHumanAnimalWithLocalImage =
-                            nonHumanAnimal.copy(imageUrl = localImagePath.ifBlank { nonHumanAnimal.imageUrl })
+                    val nonHumanAnimalWithLocalImage = nonHumanAnimal.copy(
+                        imageUrl = localImagePath.ifBlank { nonHumanAnimal.imageUrl }
+                    )
 
-                        coroutineScope.launch {
+                    coroutineScope.launch {
 
-                            modifyNonHumanAnimalsInLocalRepository(nonHumanAnimalWithLocalImage)
-                        }
+                        modifyNonHumanAnimalsInLocalRepository(nonHumanAnimalWithLocalImage)
                     }
+                    nonHumanAnimalWithLocalImage
                 }
             }
-            nonHumanAnimal
         }
 
     private suspend fun modifyNonHumanAnimalsInLocalRepository(nonHumanAnimal: NonHumanAnimal) {

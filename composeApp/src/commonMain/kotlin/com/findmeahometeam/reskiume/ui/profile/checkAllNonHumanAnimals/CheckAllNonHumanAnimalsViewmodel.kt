@@ -77,24 +77,26 @@ class CheckAllNonHumanAnimalsViewmodel(
 
                 if (nonHumanAnimal.imageUrl.isNotBlank()) {
 
-                    downloadImageToLocalDataSource(
+                    val localImagePath: String = downloadImageToLocalDataSource(
                         userUid = nonHumanAnimal.caregiverId,
                         extraId = nonHumanAnimal.id,
                         section = Section.NON_HUMAN_ANIMALS
-                    ) { localImagePath: String ->
+                    )
+                    val nonHumanAnimalWithLocalImage =
+                        nonHumanAnimal.copy(imageUrl = localImagePath.ifBlank { nonHumanAnimal.imageUrl })
 
-                        val nonHumanAnimalWithLocalImage =
-                            nonHumanAnimal.copy(imageUrl = localImagePath.ifBlank { nonHumanAnimal.imageUrl })
-                        insertNonHumanAnimalsInLocalRepository(nonHumanAnimalWithLocalImage)
-                    }
+                    insertNonHumanAnimalsInLocalRepository(nonHumanAnimalWithLocalImage)
+
+                    nonHumanAnimalWithLocalImage
                 } else {
                     log.d(
                         "CheckAllNonHumanAnimalsViewmodel",
                         "Non human animal ${nonHumanAnimal.id} has no avatar image to save locally."
                     )
                     insertNonHumanAnimalsInLocalRepository(nonHumanAnimal)
+
+                    nonHumanAnimal
                 }
-                nonHumanAnimal
             }
         }
 
@@ -150,24 +152,26 @@ class CheckAllNonHumanAnimalsViewmodel(
 
                 if (nonHumanAnimal.imageUrl.isNotBlank()) {
 
-                    downloadImageToLocalDataSource(
+                    val localImagePath: String = downloadImageToLocalDataSource(
                         userUid = nonHumanAnimal.caregiverId,
                         extraId = nonHumanAnimal.id,
                         section = Section.NON_HUMAN_ANIMALS
-                    ) { localImagePath: String ->
+                    )
+                    val nonHumanAnimalWithLocalImage =
+                        nonHumanAnimal.copy(imageUrl = localImagePath.ifBlank { nonHumanAnimal.imageUrl })
 
-                        val nonHumanAnimalWithLocalImage =
-                            nonHumanAnimal.copy(imageUrl = localImagePath.ifBlank { nonHumanAnimal.imageUrl })
-                        modifyNonHumanAnimalsInLocalRepository(nonHumanAnimalWithLocalImage)
-                    }
+                    modifyNonHumanAnimalsInLocalRepository(nonHumanAnimalWithLocalImage)
+
+                    nonHumanAnimalWithLocalImage
                 } else {
                     log.d(
                         "CheckAllNonHumanAnimalsViewmodel",
                         "Non human animal ${nonHumanAnimal.id} has no avatar image to save locally."
                     )
                     modifyNonHumanAnimalsInLocalRepository(nonHumanAnimal)
+
+                    nonHumanAnimal
                 }
-                nonHumanAnimal
             }
         }
 

@@ -1,20 +1,19 @@
 package com.findmeahometeam.reskiume.di
 
-import com.findmeahometeam.reskiume.data.remote.auth.AuthRepositoryIosImpl
 import com.findmeahometeam.reskiume.data.database.ReskiumeDatabase
 import com.findmeahometeam.reskiume.data.database.getDatabase
-import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepositoryForIosDelegateWrapper
 import com.findmeahometeam.reskiume.data.remote.auth.AuthRepositoryForIosDelegateWrapperImpl
+import com.findmeahometeam.reskiume.data.remote.auth.AuthRepositoryIosImpl
 import com.findmeahometeam.reskiume.data.remote.auth.AuthUserRepositoryForIosDelegateImpl
 import com.findmeahometeam.reskiume.data.remote.database.remoteNonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalFlowsRepositoryForIosDelegateImpl
 import com.findmeahometeam.reskiume.data.remote.database.remoteNonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateWrapperImpl
 import com.findmeahometeam.reskiume.data.remote.database.remoteNonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepositoryIosImpl
 import com.findmeahometeam.reskiume.data.remote.database.remoteReview.RealtimeDatabaseRemoteReviewFlowsRepositoryForIosDelegateImpl
 import com.findmeahometeam.reskiume.data.remote.database.remoteReview.RealtimeDatabaseRemoteReviewRepositoryForIosDelegateWrapperImpl
+import com.findmeahometeam.reskiume.data.remote.database.remoteReview.RealtimeDatabaseRemoteReviewRepositoryIosImpl
 import com.findmeahometeam.reskiume.data.remote.database.remoteUser.RealtimeDatabaseRemoteUserFlowsRepositoryForIosDelegateImpl
 import com.findmeahometeam.reskiume.data.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepositoryForIosDelegateWrapperImpl
 import com.findmeahometeam.reskiume.data.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepositoryIosImpl
-import com.findmeahometeam.reskiume.data.remote.database.remoteReview.RealtimeDatabaseRemoteReviewRepositoryIosImpl
 import com.findmeahometeam.reskiume.data.remote.storage.StorageRepositoryForIosDelegateWrapperImpl
 import com.findmeahometeam.reskiume.data.remote.storage.StorageRepositoryIosImpl
 import com.findmeahometeam.reskiume.data.util.analytics.Analytics
@@ -24,6 +23,7 @@ import com.findmeahometeam.reskiume.data.util.log.CrashlyticsForIosDelegateWrapp
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.data.util.log.LogIosImpl
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepositoryForIosDelegateWrapper
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthUserRepositoryForIosDelegate
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalFlowsRepositoryForIosDelegate
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepository
@@ -40,6 +40,8 @@ import com.findmeahometeam.reskiume.domain.repository.util.analytics.AnalyticsFo
 import com.findmeahometeam.reskiume.domain.repository.util.log.CrashlyticsForIosWrapper
 import com.findmeahometeam.reskiume.ui.profile.giveFeedback.GiveFeedback
 import com.findmeahometeam.reskiume.ui.profile.giveFeedback.GiveFeedbackImpl
+import com.findmeahometeam.reskiume.ui.util.ManageImagePath
+import com.findmeahometeam.reskiume.ui.util.ManageImagePathImpl
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
@@ -66,4 +68,5 @@ actual val platformModule: Module = module {
     singleOf(::RealtimeDatabaseRemoteNonHumanAnimalFlowsRepositoryForIosDelegateImpl) bind RealtimeDatabaseRemoteNonHumanAnimalFlowsRepositoryForIosDelegate::class
     singleOf(::RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateWrapperImpl) bind RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateWrapper::class
     singleOf(::GiveFeedbackImpl) bind GiveFeedback::class
+    singleOf(::ManageImagePathImpl) bind ManageImagePath::class
 }

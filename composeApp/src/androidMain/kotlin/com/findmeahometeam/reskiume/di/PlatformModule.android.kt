@@ -18,6 +18,8 @@ import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.ui.profile.giveFeedback.GiveFeedback
 import com.findmeahometeam.reskiume.ui.profile.giveFeedback.GiveFeedbackImpl
+import com.findmeahometeam.reskiume.ui.util.ManageImagePath
+import com.findmeahometeam.reskiume.ui.util.ManageImagePathImpl
 import com.google.firebase.Firebase
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.database
@@ -37,4 +39,5 @@ actual val platformModule: Module = module {
     singleOf(::StorageRepositoryAndroidImpl) bind StorageRepository::class
     singleOf(::RealtimeDatabaseRemoteNonHumanAnimalRepositoryAndroidImpl) bind RealtimeDatabaseRemoteNonHumanAnimalRepository::class
     singleOf(::GiveFeedbackImpl) bind GiveFeedback::class
+    singleOf(::ManageImagePathImpl) bind ManageImagePath::class
 }

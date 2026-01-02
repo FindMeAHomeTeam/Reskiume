@@ -18,6 +18,7 @@ import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInA
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.SignInWithEmailAndPasswordFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.SignOutFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.GetCompleteImagePathFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteAllCacheFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteCacheFromLocalRepository
@@ -65,6 +66,7 @@ val domainModule = module {
     factoryOf(::DeleteImageFromRemoteDataSource)
     factoryOf(::DownloadImageToLocalDataSource)
     factoryOf(::UploadImageToRemoteDataSource)
+    factoryOf(::GetCompleteImagePathFromLocalDataSource)
 
     // localCache
     factoryOf(::InsertCacheInLocalRepository)

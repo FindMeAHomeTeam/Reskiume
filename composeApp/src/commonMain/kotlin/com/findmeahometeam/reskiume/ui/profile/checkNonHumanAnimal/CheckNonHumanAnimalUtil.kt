@@ -99,7 +99,11 @@ class CheckNonHumanAnimalUtil(
                 if (it is UiState.Success) {
                     UiState.Success(
                         it.data.copy(
-                            imageUrl = getCompleteImagePathFromLocalDataSource(it.data.imageUrl)
+                            imageUrl = if (it.data.imageUrl.isEmpty()) {
+                                it.data.imageUrl
+                            } else {
+                                getCompleteImagePathFromLocalDataSource(it.data.imageUrl)
+                            }
                         )
                     )
                 } else {

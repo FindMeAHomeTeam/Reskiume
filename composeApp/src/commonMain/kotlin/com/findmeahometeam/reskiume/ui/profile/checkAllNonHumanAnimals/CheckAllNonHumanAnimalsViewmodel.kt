@@ -65,7 +65,11 @@ class CheckAllNonHumanAnimalsViewmodel(
             ).map {
                 it.map { nonHumanAnimal ->
                     nonHumanAnimal.copy(
-                        imageUrl = getCompleteImagePathFromLocalDataSource(nonHumanAnimal.imageUrl)
+                        imageUrl = if(nonHumanAnimal.imageUrl.isEmpty()) {
+                            nonHumanAnimal.imageUrl
+                        } else {
+                            getCompleteImagePathFromLocalDataSource(nonHumanAnimal.imageUrl)
+                        }
                     )
                 }
             }

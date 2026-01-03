@@ -1,0 +1,30 @@
+package com.findmeahometeam.reskiume.usecases.image
+
+import com.findmeahometeam.reskiume.domain.usecases.image.GetCompleteImagePathFromLocalDataSource
+import com.findmeahometeam.reskiume.nonHumanAnimal
+import com.findmeahometeam.reskiume.ui.util.ManageImagePath
+import dev.mokkery.answering.returns
+import dev.mokkery.every
+import dev.mokkery.mock
+import dev.mokkery.verify
+import kotlinx.coroutines.test.runTest
+import kotlin.test.Test
+
+class GetCompleteImagePathFromLocalDataSourceTest {
+
+    val manageImagePath: ManageImagePath = mock {
+        every { getCompleteImagePath(nonHumanAnimal.imageUrl) } returns nonHumanAnimal.imageUrl
+    }
+
+    private val getCompleteImagePathFromLocalDataSource =
+        GetCompleteImagePathFromLocalDataSource(manageImagePath)
+
+    @Test
+    fun `given a non human animal image_when the app gets its complete path_then it calls to getCompleteImagePath`() =
+        runTest {
+            getCompleteImagePathFromLocalDataSource(nonHumanAnimal.imageUrl)
+            verify {
+                manageImagePath.getCompleteImagePath(nonHumanAnimal.imageUrl)
+            }
+        }
+}

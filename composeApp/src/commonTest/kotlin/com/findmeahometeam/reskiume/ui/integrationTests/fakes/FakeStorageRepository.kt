@@ -25,8 +25,9 @@ class FakeStorageRepository(
         section: Section,
         onImageSaved: (imagePath: String) -> Unit
     ) {
-        localDatasourceList.add(Pair("${section.path}/$userUid", if(extraId.isEmpty()) "$userUid.webp" else "$userUid$extraId.webp"))
-        onImageSaved("${section.path}/$userUid")
+        val imagePathPair: Pair<String, String> = Pair("${section.path}/$userUid", if(extraId.isEmpty()) "$userUid.webp" else "$userUid$extraId.webp")
+        localDatasourceList.add(imagePathPair)
+        onImageSaved(imagePathPair.second)
     }
 
     override fun deleteLocalImage(

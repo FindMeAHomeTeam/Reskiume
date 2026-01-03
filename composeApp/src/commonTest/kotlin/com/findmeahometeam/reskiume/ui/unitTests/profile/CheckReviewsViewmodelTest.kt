@@ -24,6 +24,7 @@ import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInLocalDataSo
 import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.GetCompleteImagePathFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromRemoteRepository
@@ -33,6 +34,7 @@ import com.findmeahometeam.reskiume.review
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckReviews
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsViewmodel
+import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.findmeahometeam.reskiume.uiReview
 import com.findmeahometeam.reskiume.user
 import com.plusmobileapps.konnectivity.Konnectivity
@@ -214,6 +216,11 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
             } calls { onSaveImageToLocal.get().invoke(absolutePathAuthorArg) }
         }
 
+        val manageImagePath: ManageImagePath = mock {
+            every { getCompleteImagePath(author.image) } returns author.image
+            every { getCompleteImagePath(user.image) } returns user.image
+        }
+
         val observeAuthStateInAuthDataSource =
             ObserveAuthStateInAuthDataSource(authRepository)
 
@@ -244,6 +251,9 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
         val modifyUserInLocalDataSource =
             ModifyUserInLocalDataSource(localUserRepository, authRepository)
 
+        val getCompleteImagePathFromLocalDataSource =
+            GetCompleteImagePathFromLocalDataSource(manageImagePath)
+
         return CheckReviewsViewmodel(
             saveStateHandleProvider,
             observeAuthStateInAuthDataSource,
@@ -254,6 +264,7 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
             getUserFromLocalDataSource,
             getUserFromRemoteDataSource,
             downloadImageToLocalDataSource,
+            getCompleteImagePathFromLocalDataSource,
             insertUserInLocalDataSource,
             modifyUserInLocalDataSource,
             log
@@ -270,14 +281,14 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
         }
 
     @Test
-    fun `given a user with empty cache_when the user clicks on a review_then the reviewed user profile is saved in local cache and displayed`() =
+    fun `given a user with empty cache_when the user clicks on a review_then the reviewed user profile is saved in local cache and displayed with their local image`() =
         runTest {
             getCheckReviewsViewmodel(
                 uidArg = author.uid,
                 authStateReturn = null,
                 getAuthorLocalCacheEntityReturn = null
             ).getUserDataIfNotMine().test {
-                assertEquals(author.copy(savedBy = "", email = null), awaitItem())
+                assertEquals(author.copy(savedBy = "", email = null, image = user.image), awaitItem())
                 awaitComplete()
             }
         }
@@ -309,7 +320,7 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
         }
 
     @Test
-    fun `given a user with an old local cache_when the user clicks on a review_then the reviewed user profile is modified in local cache and displayed`() =
+    fun `given a user with an old local cache_when the user clicks on a review_then the reviewed user profile is modified in local cache and displayed with the local image`() =
         runTest {
             getCheckReviewsViewmodel(
                 uidArg = author.uid,
@@ -317,7 +328,7 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
                 getAuthorLocalCacheEntityReturn =
                 localCache.copy(cachedObjectId = author.uid, section = Section.USERS, timestamp = 123L).toEntity()
             ).getUserDataIfNotMine().test {
-                assertEquals(author.copy(savedBy = "", email = null), awaitItem())
+                assertEquals(author.copy(savedBy = "", email = null, image = user.image), awaitItem())
                 awaitComplete()
             }
         }
@@ -362,7 +373,7 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
         }
 
     @Test
-    fun `given a registered user with an empty cache_when the user opens the reviews section_then that user will see the review section populated`() =
+    fun `given a registered user with an empty cache_when the user opens the reviews section_then that user will see the review section populated using a local image`() =
         runTest {
             getCheckReviewsViewmodel(
                 getUserLocalCacheEntityReturn = null,
@@ -374,7 +385,7 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
                 assertEquals(uiReview.date, actualUiReviewList[0].date)
                 assertEquals(uiReview.authorUid, actualUiReviewList[0].authorUid)
                 assertEquals(uiReview.authorName, actualUiReviewList[0].authorName)
-                assertEquals(uiReview.authorUri, actualUiReviewList[0].authorUri)
+                assertEquals(user.image, actualUiReviewList[0].authorUri)
                 assertEquals(uiReview.description, actualUiReviewList[0].description)
                 assertEquals(uiReview.rating, actualUiReviewList[0].rating)
 

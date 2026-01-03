@@ -18,6 +18,7 @@ import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInA
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.GetCompleteImagePathFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteCacheFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
@@ -37,6 +38,7 @@ import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.DeleteNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.ModifyNonHumanAnimalViewmodel
+import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.plusmobileapps.konnectivity.Konnectivity
 import com.plusmobileapps.konnectivity.NetworkConnection
 import dev.mokkery.answering.calls
@@ -287,6 +289,10 @@ class ModifyNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
             }
         }
 
+        val manageImagePath: ManageImagePath = mock {
+            every { getCompleteImagePath(nonHumanAnimal.imageUrl) } returns nonHumanAnimal.imageUrl
+        }
+
         val observeAuthStateInAuthDataSource =
             ObserveAuthStateInAuthDataSource(authRepository)
 
@@ -332,6 +338,9 @@ class ModifyNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
         val deleteNonHumanAnimalFromLocalRepository =
             DeleteNonHumanAnimalFromLocalRepository(localNonHumanAnimalRepository)
 
+        val getCompleteImagePathFromLocalDataSource =
+            GetCompleteImagePathFromLocalDataSource(manageImagePath)
+
         val checkNonHumanAnimalUtil = CheckNonHumanAnimalUtil(
             observeAuthStateInAuthDataSource,
             getDataByManagingObjectLocalCacheTimestamp,
@@ -341,6 +350,7 @@ class ModifyNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
             insertNonHumanAnimalInLocalRepository,
             modifyNonHumanAnimalInLocalRepository,
             getNonHumanAnimalFromLocalRepository,
+            getCompleteImagePathFromLocalDataSource,
             log
         )
 

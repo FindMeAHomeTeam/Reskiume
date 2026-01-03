@@ -8,8 +8,10 @@ import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.GetCompleteImagePathFromLocalDataSource
 import com.findmeahometeam.reskiume.ui.profile.ProfileViewmodel
 import com.findmeahometeam.reskiume.ui.profile.ProfileViewmodel.ProfileUiState
+import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.findmeahometeam.reskiume.user
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -30,7 +32,14 @@ class ProfileViewmodelTest : CoroutineTestDispatcher() {
         everySuspend { getUser("wrongUid") } returns null
     }
 
+    val manageImagePath: ManageImagePath = mock {
+        every { getCompleteImagePath(user.image) } returns user.image
+    }
+
     private val getUserFromLocalDataSource = GetUserFromLocalDataSource(localUserRepository)
+
+    private val getCompleteImagePathFromLocalDataSource =
+        GetCompleteImagePathFromLocalDataSource(manageImagePath)
 
     private val log: Log = mock {
         every { d(any(), any()) } returns Unit
@@ -42,6 +51,7 @@ class ProfileViewmodelTest : CoroutineTestDispatcher() {
         return ProfileViewmodel(
             observeAuthStateInAuthDataSource,
             getUserFromLocalDataSource,
+            getCompleteImagePathFromLocalDataSource,
             log
         )
     }

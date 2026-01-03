@@ -15,6 +15,7 @@ import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonH
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.GetCompleteImagePathFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
@@ -27,6 +28,7 @@ import com.findmeahometeam.reskiume.nonHumanAnimal
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckAllNonHumanAnimals
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
 import com.findmeahometeam.reskiume.ui.profile.checkAllNonHumanAnimals.CheckAllNonHumanAnimalsViewmodel
+import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.findmeahometeam.reskiume.user
 import com.plusmobileapps.konnectivity.Konnectivity
 import com.plusmobileapps.konnectivity.NetworkConnection
@@ -182,6 +184,10 @@ class CheckAllNonHumanAnimalsViewmodelTest : CoroutineTestDispatcher() {
             } returns flowOf(listOf(nonHumanAnimal.toEntity()))
         }
 
+        val manageImagePath: ManageImagePath = mock {
+            every { getCompleteImagePath(nonHumanAnimal.imageUrl) } returns nonHumanAnimal.imageUrl
+        }
+
         val observeAuthStateInAuthDataSource =
             ObserveAuthStateInAuthDataSource(authRepository)
 
@@ -207,6 +213,9 @@ class CheckAllNonHumanAnimalsViewmodelTest : CoroutineTestDispatcher() {
         val getAllNonHumanAnimalsFromLocalRepository =
             GetAllNonHumanAnimalsFromLocalRepository(localNonHumanAnimalRepository)
 
+        val getCompleteImagePathFromLocalDataSource =
+            GetCompleteImagePathFromLocalDataSource(manageImagePath)
+
         return CheckAllNonHumanAnimalsViewmodel(
             saveStateHandleProvider,
             observeAuthStateInAuthDataSource,
@@ -218,6 +227,7 @@ class CheckAllNonHumanAnimalsViewmodelTest : CoroutineTestDispatcher() {
             modifyNonHumanAnimalInLocalRepository,
             modifyCacheInLocalRepository,
             getAllNonHumanAnimalsFromLocalRepository,
+            getCompleteImagePathFromLocalDataSource,
             log
         )
     }

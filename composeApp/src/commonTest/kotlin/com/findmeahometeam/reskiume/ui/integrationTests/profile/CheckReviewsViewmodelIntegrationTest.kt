@@ -19,6 +19,7 @@ import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInLocalDataSo
 import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.GetCompleteImagePathFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromRemoteRepository
@@ -33,11 +34,13 @@ import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalCacheRepo
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalReviewRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalUserRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLog
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeManageImagePath
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeRealtimeDatabaseRemoteReviewRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeRealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeSaveStateHandleProvider
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeStorageRepository
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsViewmodel
+import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.findmeahometeam.reskiume.uiReview
 import com.findmeahometeam.reskiume.userPwd
 import com.plusmobileapps.konnectivity.Konnectivity
@@ -58,7 +61,8 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
         localUserRepository: LocalUserRepository = FakeLocalUserRepository(),
         realtimeDatabaseRemoteUserRepository: RealtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(),
         storageRepository: StorageRepository = FakeStorageRepository(),
-        konnectivity: Konnectivity = FakeKonnectivity()
+        konnectivity: Konnectivity = FakeKonnectivity(),
+        manageImagePath: ManageImagePath = FakeManageImagePath()
     ): CheckReviewsViewmodel {
 
         val observeAuthStateInAuthDataSource =
@@ -91,6 +95,9 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
         val modifyUserInLocalDataSource =
             ModifyUserInLocalDataSource(localUserRepository, authRepository)
 
+        val getCompleteImagePathFromLocalDataSource =
+            GetCompleteImagePathFromLocalDataSource(manageImagePath)
+
         return CheckReviewsViewmodel(
             saveStateHandleProvider,
             observeAuthStateInAuthDataSource,
@@ -101,6 +108,7 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
             getUserFromLocalDataSource,
             getUserFromRemoteDataSource,
             downloadImageToLocalDataSource,
+            getCompleteImagePathFromLocalDataSource,
             insertUserInLocalDataSource,
             modifyUserInLocalDataSource,
             log

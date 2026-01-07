@@ -4,9 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.findmeahometeam.reskiume.domain.model.Advice
 import com.findmeahometeam.reskiume.domain.model.AdviceImage
+import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.components.UiState.Success
+import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckActivistUtil
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -36,9 +38,12 @@ import reskiume.composeapp.generated.resources.check_all_advice_screen_option_re
 
 class CheckAllAdviceViewmodel(
     private val observeAuthStateInAuthDataSource: ObserveAuthStateInAuthDataSource,
+    private val checkActivistUtil: CheckActivistUtil
 ) : ViewModel() {
 
     private var selectedAdviceType: AdviceType = AdviceType.ALL
+
+    private var myUid: String? = null
 
     private val rescueAdviceList = listOf(
         Advice(
@@ -137,8 +142,25 @@ class CheckAllAdviceViewmodel(
     fun checkAuthState(onLoggedIn: (Boolean) -> Unit) {
         viewModelScope.launch {
 
-            val isLoggedIn = observeAuthStateInAuthDataSource().firstOrNull() != null
-            onLoggedIn(isLoggedIn)
+            myUid = observeAuthStateInAuthDataSource().firstOrNull()?.uid
+            onLoggedIn(myUid != null)
+        }
+    }
+
+    fun retrieveAdviceAuthor(userId: String?, onAuthorFetched: (User?) -> Unit) {
+
+        if (userId == null) {
+            onAuthorFetched(null)
+            return
+        }
+        viewModelScope.launch {
+            val author =
+                checkActivistUtil.getUser(
+                    activistUid = userId,
+                    myUserUid = myUid ?: "",
+                    coroutineScope = viewModelScope
+                )
+            onAuthorFetched(author)
         }
     }
 }

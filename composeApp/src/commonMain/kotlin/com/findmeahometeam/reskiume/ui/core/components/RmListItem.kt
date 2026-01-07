@@ -19,6 +19,7 @@ import com.findmeahometeam.reskiume.ui.core.backgroundColorForItems
 
 @Composable
 fun RmListItem(
+    modifier: Modifier = Modifier,
     title: String,
     description: String,
     isEnabled: Boolean = true,
@@ -28,6 +29,7 @@ fun RmListItem(
     onClick: () -> Unit
 ) {
     Card(
+        modifier = modifier,
         enabled = isEnabled,
         colors = CardDefaults.cardColors().copy(containerColor = containerColor),
         onClick = { onClick() }

@@ -290,9 +290,9 @@ fun ProfileScreen(
 
                 RmDialog(
                     emoji = "✉️",
-                    title = stringResource(Res.string.give_feedback_dialog_title),
-                    message = stringResource(Res.string.give_feedback_dialog_message),
-                    allowMessage = stringResource(Res.string.give_feedback_dialog_ok_button),
+                    title = stringResource(Res.string.give_feedback_no_email_app_dialog_title),
+                    message = stringResource(Res.string.give_feedback_no_email_app_dialog_message),
+                    allowMessage = stringResource(Res.string.give_feedback_no_email_app_dialog_ok_button),
                     onClickAllow = { displayNoEmailAppError = false },
                     onClickDeny = { displayNoEmailAppError = false }
                 )

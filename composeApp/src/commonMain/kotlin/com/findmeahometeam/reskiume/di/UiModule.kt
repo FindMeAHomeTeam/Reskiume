@@ -17,6 +17,8 @@ import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckActivistUtil
 import com.findmeahometeam.reskiume.ui.profile.createNonHumanAnimal.CreateNonHumanAnimalViewmodel
 import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.DeleteNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.ModifyNonHumanAnimalViewmodel
+import com.findmeahometeam.reskiume.ui.util.StringProvider
+import com.findmeahometeam.reskiume.ui.util.StringProviderImpl
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
@@ -25,6 +27,7 @@ import org.koin.dsl.module
 
 val uiModule = module {
     factoryOf(::SaveStateHandleProviderImpl) bind SaveStateHandleProvider::class
+    factoryOf(::StringProviderImpl) bind StringProvider::class
     viewModelOf(::HomeViewmodel)
     viewModelOf(::ProfileViewmodel)
     viewModelOf(::CreateAccountViewmodel)

@@ -47,6 +47,9 @@ fun BottomNavigationWrapper(
                 navigateToCheckNonHumanAnimalsScreen = { uid ->
                     mainNavHostController.navigate(CheckAllNonHumanAnimals(uid))
                 },
+                navigateToCheckAllAdviceScreen = {
+                    mainNavHostController.navigate(Routes.CHECK_ALL_ADVICE.route)
+                },
                 navigateToDeleteAccountScreen = {
                     mainNavHostController.navigate(Routes.DELETE_ACCOUNT.route)
                 }

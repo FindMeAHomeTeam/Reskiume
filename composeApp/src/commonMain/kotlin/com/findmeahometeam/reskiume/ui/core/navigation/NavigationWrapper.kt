@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.findmeahometeam.reskiume.ui.home.HomeScreen
+import com.findmeahometeam.reskiume.ui.profile.checkAllAdvice.CheckAllAdviceScreen
 import com.findmeahometeam.reskiume.ui.profile.checkAllNonHumanAnimals.CheckAllNonHumanAnimalsScreen
 import com.findmeahometeam.reskiume.ui.profile.createAccount.CreateAccountScreen
 import com.findmeahometeam.reskiume.ui.profile.deleteAccount.DeleteAccountScreen
@@ -87,6 +88,12 @@ fun NavigationWrapper() {
                     mainNavController.navigateUp()
                 }
             )
+        }
+
+        composable(route = Routes.CHECK_ALL_ADVICE.route) {
+            CheckAllAdviceScreen {
+                mainNavController.navigateUp()
+            }
         }
 
         composable(route = Routes.DELETE_ACCOUNT.route) {

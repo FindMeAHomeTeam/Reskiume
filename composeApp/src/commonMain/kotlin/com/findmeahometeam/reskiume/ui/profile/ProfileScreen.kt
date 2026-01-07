@@ -40,9 +40,10 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import reskiume.composeapp.generated.resources.Res
-import reskiume.composeapp.generated.resources.give_feedback_dialog_message
-import reskiume.composeapp.generated.resources.give_feedback_dialog_ok_button
-import reskiume.composeapp.generated.resources.give_feedback_dialog_title
+import reskiume.composeapp.generated.resources.give_feedback_body
+import reskiume.composeapp.generated.resources.give_feedback_no_email_app_dialog_message
+import reskiume.composeapp.generated.resources.give_feedback_no_email_app_dialog_ok_button
+import reskiume.composeapp.generated.resources.give_feedback_no_email_app_dialog_title
 import reskiume.composeapp.generated.resources.give_feedback_subject
 import reskiume.composeapp.generated.resources.ic_advice
 import reskiume.composeapp.generated.resources.ic_delete
@@ -80,6 +81,7 @@ fun ProfileScreen(
     navigateToModifyAccountScreen: () -> Unit,
     navigateToCheckReviewsScreen: (uid: String) -> Unit,
     navigateToCheckNonHumanAnimalsScreen: (uid: String) -> Unit,
+    navigateToCheckAllAdviceScreen: () -> Unit,
     navigateToDeleteAccountScreen: () -> Unit
 ) {
     val profileViewmodel: ProfileViewmodel = koinViewModel<ProfileViewmodel>()
@@ -249,7 +251,7 @@ fun ProfileScreen(
                 iconColor = primaryGreen
             ),
             onClick = {
-                // TODO
+                navigateToCheckAllAdviceScreen()
             }
         )
 

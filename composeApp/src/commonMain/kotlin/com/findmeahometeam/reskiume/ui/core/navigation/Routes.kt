@@ -12,7 +12,8 @@ enum class Routes(val route: String) {
     LOGIN_ACCOUNT("loginAccount"),
     MODIFY_ACCOUNT("modifyAccount"),
     DELETE_ACCOUNT("deleteAccount"),
-    CREATE_NON_HUMAN_ANIMAL("createNonHumanAnimal")
+    CREATE_NON_HUMAN_ANIMAL("createNonHumanAnimal"),
+    CHECK_ALL_ADVICE("checkAllAdvice")
 
 }
 

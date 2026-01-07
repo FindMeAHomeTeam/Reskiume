@@ -39,6 +39,7 @@ import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeRealtimeDataba
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeRealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeSaveStateHandleProvider
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeStorageRepository
+import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckActivistUtil
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsViewmodel
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.findmeahometeam.reskiume.uiReview
@@ -80,11 +81,11 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
         val insertReviewInLocalRepository =
             InsertReviewInLocalRepository(localReviewRepository, authRepository)
 
-        val getUserFromLocalDataSource =
-            GetUserFromLocalDataSource(localUserRepository)
-
         val getUserFromRemoteDataSource =
             GetUserFromRemoteDataSource(realtimeDatabaseRemoteUserRepository)
+
+        val getUserFromLocalDataSource =
+            GetUserFromLocalDataSource(localUserRepository)
 
         val downloadImageToLocalDataSource =
             DownloadImageToLocalDataSource(storageRepository)
@@ -98,6 +99,17 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
         val getCompleteImagePathFromLocalDataSource =
             GetCompleteImagePathFromLocalDataSource(manageImagePath)
 
+        val checkActivistUtil = CheckActivistUtil(
+            getDataByManagingObjectLocalCacheTimestamp,
+            getUserFromRemoteDataSource,
+            getUserFromLocalDataSource,
+            downloadImageToLocalDataSource,
+            insertUserInLocalDataSource,
+            modifyUserInLocalDataSource,
+            getCompleteImagePathFromLocalDataSource,
+            log
+        )
+
         return CheckReviewsViewmodel(
             saveStateHandleProvider,
             observeAuthStateInAuthDataSource,
@@ -105,12 +117,7 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
             getReviewsFromRemoteRepository,
             getReviewsFromLocalRepository,
             insertReviewInLocalRepository,
-            getUserFromLocalDataSource,
-            getUserFromRemoteDataSource,
-            downloadImageToLocalDataSource,
-            getCompleteImagePathFromLocalDataSource,
-            insertUserInLocalDataSource,
-            modifyUserInLocalDataSource,
+            checkActivistUtil,
             log
         )
     }

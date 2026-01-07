@@ -33,6 +33,7 @@ import com.findmeahometeam.reskiume.localCache
 import com.findmeahometeam.reskiume.review
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckReviews
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
+import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckActivistUtil
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsViewmodel
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.findmeahometeam.reskiume.uiReview
@@ -236,11 +237,11 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
         val insertReviewInLocalRepository =
             InsertReviewInLocalRepository(localReviewRepository, authRepository)
 
-        val getUserFromLocalDataSource =
-            GetUserFromLocalDataSource(localUserRepository)
-
         val getUserFromRemoteDataSource =
             GetUserFromRemoteDataSource(realtimeDatabaseRemoteUserRepository)
+
+        val getUserFromLocalDataSource =
+            GetUserFromLocalDataSource(localUserRepository)
 
         val downloadImageToLocalDataSource =
             DownloadImageToLocalDataSource(storageRepository)
@@ -254,6 +255,17 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
         val getCompleteImagePathFromLocalDataSource =
             GetCompleteImagePathFromLocalDataSource(manageImagePath)
 
+        val checkActivistUtil = CheckActivistUtil(
+            getDataByManagingObjectLocalCacheTimestamp,
+            getUserFromRemoteDataSource,
+            getUserFromLocalDataSource,
+            downloadImageToLocalDataSource,
+            insertUserInLocalDataSource,
+            modifyUserInLocalDataSource,
+            getCompleteImagePathFromLocalDataSource,
+            log
+        )
+
         return CheckReviewsViewmodel(
             saveStateHandleProvider,
             observeAuthStateInAuthDataSource,
@@ -261,12 +273,7 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
             getReviewsFromRemoteRepository,
             getReviewsFromLocalRepository,
             insertReviewInLocalRepository,
-            getUserFromLocalDataSource,
-            getUserFromRemoteDataSource,
-            downloadImageToLocalDataSource,
-            getCompleteImagePathFromLocalDataSource,
-            insertUserInLocalDataSource,
-            modifyUserInLocalDataSource,
+            checkActivistUtil,
             log
         )
     }
@@ -313,7 +320,7 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
 
             verify {
                 log.e(
-                    "CheckReviewsViewmodel",
+                    "CheckUserUtil",
                     "Error adding user ${author.uid} to local database"
                 )
             }
@@ -354,7 +361,7 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
 
             verify {
                 log.e(
-                    "CheckReviewsViewmodel",
+                    "CheckUserUtil",
                     "Failed to modify user with uid ${author.uid} in local data source."
                 )
             }

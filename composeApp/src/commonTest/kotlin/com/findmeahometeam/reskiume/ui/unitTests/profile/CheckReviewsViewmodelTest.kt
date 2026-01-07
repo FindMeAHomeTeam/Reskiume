@@ -67,11 +67,11 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
 
     private val onInsertReview = Capture.slot<(rowId: Long) -> Unit>()
 
-    private val onInsertUserInLocal = Capture.slot<(Long) -> Unit>()
+    private val onInsertUserInLocal = Capture.slot<(rowId: Long) -> Unit>()
 
-    private val onModifyUserInLocal = Capture.slot<(Int) -> Unit>()
+    private val onModifyUserInLocal = Capture.slot<(rowsUpdated: Int) -> Unit>()
 
-    private val onSaveImageToLocal = Capture.slot<(String) -> Unit>()
+    private val onSaveImageToLocal = Capture.slot<(imagePath: String) -> Unit>()
 
     private val log: Log = mock {
         every { d(any(), any()) } calls { println(it) }

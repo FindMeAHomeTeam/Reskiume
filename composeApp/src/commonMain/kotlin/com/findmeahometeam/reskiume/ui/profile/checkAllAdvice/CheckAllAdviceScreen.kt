@@ -138,7 +138,7 @@ fun CheckAllAdviceScreen(
                                             CheckAdvice(
                                                 title = title,
                                                 description = description,
-                                                image = advice.image,
+                                                image = advice.image.name,
                                                 authorUid = author?.uid,
                                                 authorName = author?.username,
                                                 authorImage = author?.image

@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.findmeahometeam.reskiume.domain.model.toAdviceImage
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.components.RmImage
 import com.findmeahometeam.reskiume.ui.core.components.RmScaffold
@@ -59,19 +60,20 @@ fun CheckAdviceScreen(
                 .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            val adviceImage = checkAdvice.image.toAdviceImage()
             Box(
                 modifier = Modifier
                     .background(
-                        color = checkAdvice.image.backgroundColor,
+                        color = adviceImage.backgroundColor,
                         shape = CircleShape
                     ).size(64.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     modifier = Modifier.size(48.dp),
-                    painter = painterResource(checkAdvice.image.icon),
+                    painter = painterResource(adviceImage.icon),
                     contentDescription = null,
-                    tint = checkAdvice.image.iconColor
+                    tint = adviceImage.iconColor
                 )
             }
             Spacer(modifier = Modifier.height(15.dp))

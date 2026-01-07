@@ -38,3 +38,12 @@ enum class AdviceImage(val backgroundColor: Color, val icon: DrawableResource, v
         iconColor = primaryBlue
     )
 }
+
+fun String.toAdviceImage(): AdviceImage {
+    return when (this) {
+        "RESCUE" -> AdviceImage.RESCUE
+        "REHOME" -> AdviceImage.REHOME
+        "CARE" -> AdviceImage.CARE
+        else -> AdviceImage.RESCUE
+    }
+}

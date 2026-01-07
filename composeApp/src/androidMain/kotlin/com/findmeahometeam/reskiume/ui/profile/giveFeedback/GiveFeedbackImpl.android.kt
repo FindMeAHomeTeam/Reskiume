@@ -8,12 +8,13 @@ class GiveFeedbackImpl(
     private val context: Context
 ): GiveFeedback {
 
-    override fun sendEmail(subject: String, onError: () -> Unit) {
+    override fun sendEmail(subject: String, body: String, onError: () -> Unit) {
 
         val intent = Intent(Intent.ACTION_SENDTO).apply {
             data = "mailto:".toUri()
             putExtra(Intent.EXTRA_EMAIL, arrayOf("findmeahomeappsteam@gmail.com"))
             putExtra(Intent.EXTRA_SUBJECT, subject)
+            putExtra(Intent.EXTRA_TEXT, body)
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         if (intent.resolveActivity(context.packageManager) != null) {

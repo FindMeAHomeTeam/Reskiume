@@ -7,14 +7,17 @@ import platform.UIKit.UIApplication
 
 class GiveFeedbackImpl: GiveFeedback {
 
-    override fun sendEmail(subject: String, onError: () -> Unit) {
+    override fun sendEmail(subject: String, body: String, onError: () -> Unit) {
 
         // Use NSURLComponents to build the email URL safely
         val components: NSURLComponents = NSURLComponents().apply {
             setScheme("mailto")
             setPath("findmeahomeappsteam@gmail.com")
             setQueryItems(
-                listOf(NSURLQueryItem(name = "subject", value = subject))
+                listOf(
+                    NSURLQueryItem(name = "subject", value = subject),
+                    NSURLQueryItem(name = "body", value = body)
+                )
             )
         }
         val url: NSURL? = components.URL

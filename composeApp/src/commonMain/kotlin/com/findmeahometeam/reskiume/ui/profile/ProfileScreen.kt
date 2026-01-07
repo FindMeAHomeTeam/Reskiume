@@ -266,6 +266,7 @@ fun ProfileScreen(
 
             // Feedback screen
             val feedbackSubject = stringResource(Res.string.give_feedback_subject)
+            val feedbackBody = stringResource(Res.string.give_feedback_body)
             RmListButtonItem(
                 title = stringResource(Res.string.profile_screen_feedback_title),
                 description = stringResource(Res.string.profile_screen_feedback_description),
@@ -278,6 +279,7 @@ fun ProfileScreen(
                 onClick = {
                     giveFeedback.sendEmail(
                         subject = feedbackSubject,
+                        body = feedbackBody,
                         onError = {
                             displayNoEmailAppError = true
                         }

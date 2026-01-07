@@ -13,6 +13,7 @@ import com.findmeahometeam.reskiume.ui.profile.deleteAccount.DeleteAccountViewmo
 import com.findmeahometeam.reskiume.ui.profile.loginAccount.LoginAccountViewmodel
 import com.findmeahometeam.reskiume.ui.profile.modifyAccount.ModifyAccountViewmodel
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsViewmodel
+import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckActivistUtil
 import com.findmeahometeam.reskiume.ui.profile.createNonHumanAnimal.CreateNonHumanAnimalViewmodel
 import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.DeleteNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.ModifyNonHumanAnimalViewmodel
@@ -31,6 +32,7 @@ val uiModule = module {
     viewModelOf(::ModifyAccountViewmodel)
     viewModelOf(::DeleteAccountViewmodel)
     viewModelOf(::CheckReviewsViewmodel)
+    singleOf(::CheckActivistUtil)
     viewModelOf(::CheckAllNonHumanAnimalsViewmodel)
     viewModelOf(::ModifyNonHumanAnimalViewmodel)
     viewModelOf(::CheckNonHumanAnimalViewmodel)

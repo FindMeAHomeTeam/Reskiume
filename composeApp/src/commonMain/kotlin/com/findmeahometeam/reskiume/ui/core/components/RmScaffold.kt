@@ -30,6 +30,7 @@ import reskiume.composeapp.generated.resources.ic_back
 fun RmScaffold(
     title: String = "",
     onBackPressed: () -> Unit,
+    floatingActionButton: @Composable () -> Unit = {},
     content: @Composable (PaddingValues) -> Unit
 ) {
     Scaffold(
@@ -61,6 +62,7 @@ fun RmScaffold(
                 colors = TopAppBarDefaults.topAppBarColors().copy(containerColor = backgroundColor)
             )
         },
+        floatingActionButton = floatingActionButton,
         content = content
     )
 }

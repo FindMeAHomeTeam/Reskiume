@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SegmentedButton
@@ -34,6 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.findmeahometeam.reskiume.domain.model.Advice
+import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.components.RmDialog
 import com.findmeahometeam.reskiume.ui.core.components.RmListAvatarType
@@ -43,6 +43,7 @@ import com.findmeahometeam.reskiume.ui.core.components.RmScaffold
 import com.findmeahometeam.reskiume.ui.core.components.RmSearchBar
 import com.findmeahometeam.reskiume.ui.core.components.RmText
 import com.findmeahometeam.reskiume.ui.core.components.UiState
+import com.findmeahometeam.reskiume.ui.core.navigation.CheckAdvice
 import com.findmeahometeam.reskiume.ui.core.primaryGreen
 import com.findmeahometeam.reskiume.ui.core.secondaryGreen
 import com.findmeahometeam.reskiume.ui.core.tertiaryGreen
@@ -62,10 +63,10 @@ import reskiume.composeapp.generated.resources.give_feedback_no_email_app_dialog
 import reskiume.composeapp.generated.resources.give_feedback_no_email_app_dialog_title
 import reskiume.composeapp.generated.resources.ic_mail
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CheckAllAdviceScreen(
-    onBackPressed: () -> Unit
+    onBackPressed: () -> Unit,
+    onSeeAdvice: (CheckAdvice) -> Unit
 ) {
     val checkAllAdviceViewmodel: CheckAllAdviceViewmodel = koinViewModel<CheckAllAdviceViewmodel>()
 
@@ -119,17 +120,31 @@ fun CheckAllAdviceScreen(
                     LazyColumn {
                         items(adviceList, key = { advice -> advice.hashCode() }) { advice ->
 
+                            val title = stringResource(advice.title)
+                            val description = stringResource(advice.description)
                             RmListItem(
                                 modifier = Modifier.animateItem(),
-                                title = stringResource(advice.title),
-                                description = stringResource(advice.description),
+                                title = title,
+                                description = description,
                                 listAvatarType = RmListAvatarType.Icon(
                                     backgroundColor = advice.image.backgroundColor,
                                     icon = advice.image.icon,
                                     iconColor = advice.image.iconColor
                                 ),
                                 onClick = {
-                                    //
+                                    checkAllAdviceViewmodel.retrieveAdviceAuthor(advice.authorId) { author: User? ->
+
+                                        onSeeAdvice(
+                                            CheckAdvice(
+                                                title = title,
+                                                description = description,
+                                                image = advice.image,
+                                                authorUid = author?.uid,
+                                                authorName = author?.username,
+                                                authorImage = author?.image
+                                            )
+                                        )
+                                    }
                                 }
                             )
                             Spacer(modifier = Modifier.height(8.dp))

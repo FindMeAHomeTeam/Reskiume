@@ -1,5 +1,6 @@
 package com.findmeahometeam.reskiume.ui.core.navigation
 
+import com.findmeahometeam.reskiume.domain.model.AdviceImage
 import kotlinx.serialization.Serializable
 
 enum class Routes(val route: String) {
@@ -33,4 +34,14 @@ class CheckNonHumanAnimal(
 class ModifyNonHumanAnimal(
     val nonHumanAnimalId: String,
     val caregiverId: String
+)
+
+@Serializable
+class CheckAdvice(
+    val title: String,
+    val description: String,
+    val image: AdviceImage = AdviceImage.RESCUE,
+    val authorUid: String? = null,
+    val authorName: String? = null,
+    val authorImage: String? = null
 )

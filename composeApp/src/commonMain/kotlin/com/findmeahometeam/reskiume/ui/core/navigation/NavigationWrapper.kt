@@ -5,7 +5,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.findmeahometeam.reskiume.ui.home.HomeScreen
+import com.findmeahometeam.reskiume.ui.profile.checkAdvice.CheckAdviceScreen
 import com.findmeahometeam.reskiume.ui.profile.checkAllAdvice.CheckAllAdviceScreen
 import com.findmeahometeam.reskiume.ui.profile.checkAllNonHumanAnimals.CheckAllNonHumanAnimalsScreen
 import com.findmeahometeam.reskiume.ui.profile.createAccount.CreateAccountScreen
@@ -44,16 +46,12 @@ fun NavigationWrapper() {
         }
 
         composable(route = Routes.MODIFY_ACCOUNT.route) {
-            ModifyAccountScreen(onBackPressed = {
-                mainNavController.navigateUp()
-            })
+            ModifyAccountScreen(onBackPressed = { mainNavController.navigateUp() })
         }
 
         composable<CheckReviews> {
             CheckReviewsScreen(
-                onBackPressed = {
-                    mainNavController.navigateUp()
-                },
+                onBackPressed = { mainNavController.navigateUp() },
                 onReviewClick = { uid ->
                     mainNavController.navigate(CheckReviews(uid))
                 }
@@ -75,31 +73,32 @@ fun NavigationWrapper() {
         }
 
         composable<ModifyNonHumanAnimal> {
-            ModifyNonHumanAnimalScreen(
-                onBackPressed = {
-                    mainNavController.navigateUp()
-                }
-            )
+            ModifyNonHumanAnimalScreen(onBackPressed = { mainNavController.navigateUp() })
         }
 
         composable(route = Routes.CREATE_NON_HUMAN_ANIMAL.route) {
-            CreateNonHumanAnimalScreen(
-                onBackPressed = {
-                    mainNavController.navigateUp()
-                }
-            )
+            CreateNonHumanAnimalScreen(onBackPressed = { mainNavController.navigateUp() })
         }
 
         composable(route = Routes.CHECK_ALL_ADVICE.route) {
-            CheckAllAdviceScreen {
-                mainNavController.navigateUp()
+            CheckAllAdviceScreen(
+                onBackPressed = { mainNavController.navigateUp() }
+            ) { checkAdvice ->
+                mainNavController.navigate(checkAdvice)
             }
+        }
+        composable<CheckAdvice> {
+            CheckAdviceScreen(
+                checkAdvice = it.toRoute(),
+                onAuthorClick = { uid ->
+                    mainNavController.navigate(CheckReviews(uid))
+                },
+                onBackPressed = { mainNavController.navigateUp() }
+            )
         }
 
         composable(route = Routes.DELETE_ACCOUNT.route) {
-            DeleteAccountScreen(onBackPressed = {
-                mainNavController.navigateUp()
-            })
+            DeleteAccountScreen(onBackPressed = { mainNavController.navigateUp() })
         }
     }
 }

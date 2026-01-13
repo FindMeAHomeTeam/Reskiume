@@ -30,6 +30,7 @@ import reskiume.composeapp.generated.resources.ic_back
 fun RmScaffold(
     title: String = "",
     onBackPressed: () -> Unit,
+    displayNavigationIcon: Boolean = true,
     floatingActionButton: @Composable () -> Unit = {},
     content: @Composable (PaddingValues) -> Unit
 ) {
@@ -47,16 +48,18 @@ fun RmScaffold(
                     )
                 },
                 navigationIcon = {
-                    IconButton(
-                        modifier = Modifier.padding(start = 16.dp).size(32.dp),
-                        onClick = onBackPressed
-                    ) {
-                        Icon(
-                            painter = painterResource(Res.drawable.ic_back),
-                            contentDescription = stringResource(Res.string.back_arrow_content_description),
-                            tint = textColor,
-                            modifier = Modifier.size(24.dp),
-                        )
+                    if (displayNavigationIcon) {
+                        IconButton(
+                            modifier = Modifier.padding(start = 16.dp).size(32.dp),
+                            onClick = onBackPressed
+                        ) {
+                            Icon(
+                                painter = painterResource(Res.drawable.ic_back),
+                                contentDescription = stringResource(Res.string.back_arrow_content_description),
+                                tint = textColor,
+                                modifier = Modifier.size(24.dp),
+                            )
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors().copy(containerColor = backgroundColor)

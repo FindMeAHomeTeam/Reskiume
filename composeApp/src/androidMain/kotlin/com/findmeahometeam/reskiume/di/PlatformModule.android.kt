@@ -23,6 +23,8 @@ import com.findmeahometeam.reskiume.ui.util.ManageImagePathImpl
 import com.google.firebase.Firebase
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.database
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.android.Android
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
@@ -40,4 +42,5 @@ actual val platformModule: Module = module {
     singleOf(::RealtimeDatabaseRemoteNonHumanAnimalRepositoryAndroidImpl) bind RealtimeDatabaseRemoteNonHumanAnimalRepository::class
     singleOf(::GiveFeedbackImpl) bind GiveFeedback::class
     singleOf(::ManageImagePathImpl) bind ManageImagePath::class
+    single<HttpClient> { HttpClient(Android) }
 }

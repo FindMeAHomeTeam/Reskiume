@@ -42,6 +42,8 @@ import com.findmeahometeam.reskiume.ui.profile.giveFeedback.GiveFeedback
 import com.findmeahometeam.reskiume.ui.profile.giveFeedback.GiveFeedbackImpl
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.findmeahometeam.reskiume.ui.util.ManageImagePathImpl
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.darwin.Darwin
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
@@ -69,4 +71,5 @@ actual val platformModule: Module = module {
     singleOf(::RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateWrapperImpl) bind RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateWrapper::class
     singleOf(::GiveFeedbackImpl) bind GiveFeedback::class
     singleOf(::ManageImagePathImpl) bind ManageImagePath::class
+    single<HttpClient> { HttpClient(Darwin) }
 }

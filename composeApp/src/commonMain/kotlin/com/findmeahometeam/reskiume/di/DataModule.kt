@@ -5,7 +5,7 @@ import com.findmeahometeam.reskiume.data.database.LocalFosterHomeRepositoryImpl
 import com.findmeahometeam.reskiume.data.database.LocalNonHumanAnimalRepositoryImpl
 import com.findmeahometeam.reskiume.data.database.LocalReviewRepositoryImpl
 import com.findmeahometeam.reskiume.data.database.LocalUserRepositoryImpl
-import com.findmeahometeam.reskiume.data.database.LocalNonHumanAnimalRepositoryImpl
+import com.findmeahometeam.reskiume.data.util.translator.Translator
 import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
@@ -21,4 +21,5 @@ val dataModule = module {
     singleOf(::LocalReviewRepositoryImpl) bind LocalReviewRepository::class
     singleOf(::LocalNonHumanAnimalRepositoryImpl) bind LocalNonHumanAnimalRepository::class
     singleOf(::LocalFosterHomeRepositoryImpl) bind LocalFosterHomeRepository::class
+    singleOf(::Translator)
 }

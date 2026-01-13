@@ -7,25 +7,25 @@ androidx-activity = "1.12.2"
 androidx-lifecycle = "2.9.6"
 coil = "3.3.0"
 composeHotReload = "1.0.0"
-composeMultiplatform = "1.9.3"
+composeMultiplatform = "1.9.3" #Deprecates compose libraries
 coroutines = "1.10.2"
 crashlyticsPlugin = "3.0.6"
 firebase-bom = "34.7.0"
 googleServices = "4.4.4"
-imagepickerkmp = "1.0.28"
+imagepickerkmp = "1.0.29"
 junit = "4.13.2"
 koin-bom = "4.1.1"
 konnectivity = "0.1-alpha01"
 kotlin = "2.2.20"
 kotlinxDatetime = "0.7.1-0.6.x-compat"
 ksp = "2.2.20-2.0.2" #2.0.3 gives ksp.gradle.KspAATask issues
-ktorClient = "3.3.3"
+ktor = "3.3.3"
 mokkery-plugin = "3.0.0" #Needs a new kotlin version
-nativecoroutines = "1.0.0-ALPHA-47"
+nativecoroutines = "1.0.0-ALPHA-47" #Needs a new kotlin version
 navigation = "2.9.1"
 paging = "3.4.0-beta01"
-room = "2.8.2"
-sqlite = "2.6.1"
+room = "2.8.2" #Needs a new kotlin version
+sqlite = "2.6.1" #Needs a new kotlin version
 turbine = "1.2.1"
 
 [libraries]
@@ -62,8 +62,13 @@ koin-testJunit = { module = "io.insert-koin:koin-test-junit4" }
 #coil
 coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
 coil-network-ktor = { group = "io.coil-kt.coil3", name = "coil-network-ktor3", version.ref = "coil" }
-ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktorClient" }
-ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktorClient" }
+
+#ktor
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-serialization = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
+ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
 
 #room
 androidx-sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }

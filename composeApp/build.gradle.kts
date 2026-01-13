@@ -84,6 +84,9 @@ kotlin {
 
             implementation(libs.coil.compose)
             implementation(libs.coil.network.ktor)
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.negotiation)
+            implementation(libs.ktor.serialization)
 
             implementation(libs.image.picker.kmp)
 

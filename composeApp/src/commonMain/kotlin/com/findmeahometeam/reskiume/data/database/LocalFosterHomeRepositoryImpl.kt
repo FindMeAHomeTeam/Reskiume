@@ -1,0 +1,109 @@
+package com.findmeahometeam.reskiume.data.database
+
+import com.findmeahometeam.reskiume.data.database.entity.fosterHome.AcceptedNonHumanAnimalGenderEntityForFosterHome
+import com.findmeahometeam.reskiume.data.database.entity.fosterHome.AcceptedNonHumanAnimalTypeEntityForFosterHome
+import com.findmeahometeam.reskiume.data.database.entity.fosterHome.FosterHomeEntity
+import com.findmeahometeam.reskiume.data.database.entity.fosterHome.FosterHomeWithAllNonHumanAnimalData
+import com.findmeahometeam.reskiume.data.database.entity.fosterHome.ResidentNonHumanAnimalIdEntityForFosterHome
+import com.findmeahometeam.reskiume.domain.repository.local.LocalFosterHomeRepository
+import kotlinx.coroutines.flow.Flow
+
+class LocalFosterHomeRepositoryImpl(
+    private val reskiumeDatabase: ReskiumeDatabase
+) : LocalFosterHomeRepository {
+
+    override suspend fun insertFosterHome(
+        fosterHomeEntity: FosterHomeEntity,
+        onInsertFosterHome: (rowId: Long) -> Unit
+    ) {
+        onInsertFosterHome(reskiumeDatabase.getFosterHomeDao().insertFosterHome(fosterHomeEntity))
+    }
+
+    override suspend fun insertAcceptedNonHumanAnimalTypeForFosterHome(
+        acceptedNonHumanAnimalType: AcceptedNonHumanAnimalTypeEntityForFosterHome,
+        onInsertAcceptedNonHumanAnimalType: (rowId: Long) -> Unit
+    ) {
+        onInsertAcceptedNonHumanAnimalType(
+            reskiumeDatabase.getFosterHomeDao()
+                .insertAcceptedNonHumanAnimalTypeForFosterHome(acceptedNonHumanAnimalType)
+        )
+    }
+
+    override suspend fun insertAcceptedNonHumanAnimalGenderForFosterHome(
+        acceptedNonHumanAnimalGender: AcceptedNonHumanAnimalGenderEntityForFosterHome,
+        onInsertAcceptedNonHumanAnimalGender: (rowId: Long) -> Unit
+    ) {
+        onInsertAcceptedNonHumanAnimalGender(
+            reskiumeDatabase.getFosterHomeDao()
+                .insertAcceptedNonHumanAnimalGenderForFosterHome(acceptedNonHumanAnimalGender)
+        )
+    }
+
+    override suspend fun insertResidentNonHumanAnimalIdForFosterHome(
+        residentNonHumanAnimalId: ResidentNonHumanAnimalIdEntityForFosterHome,
+        onInsertResidentNonHumanAnimalId: (rowId: Long) -> Unit
+    ) {
+        onInsertResidentNonHumanAnimalId(
+            reskiumeDatabase.getFosterHomeDao()
+                .insertResidentNonHumanAnimalIdForFosterHome(residentNonHumanAnimalId)
+        )
+    }
+
+    override suspend fun modifyFosterHome(
+        fosterHomeEntity: FosterHomeEntity,
+        onModifyFosterHome: (rowsUpdated: Int) -> Unit
+    ) {
+        onModifyFosterHome(reskiumeDatabase.getFosterHomeDao().modifyFosterHome(fosterHomeEntity))
+    }
+
+    override suspend fun modifyAcceptedNonHumanAnimalTypeForFosterHome(
+        acceptedNonHumanAnimalType: AcceptedNonHumanAnimalTypeEntityForFosterHome,
+        onModifyAcceptedNonHumanAnimalType: (rowsUpdated: Int) -> Unit
+    ) {
+        onModifyAcceptedNonHumanAnimalType(
+            reskiumeDatabase.getFosterHomeDao()
+                .modifyAcceptedNonHumanAnimalTypeForFosterHome(acceptedNonHumanAnimalType)
+        )
+    }
+
+    override suspend fun modifyAcceptedNonHumanAnimalGenderForFosterHome(
+        acceptedNonHumanAnimalGender: AcceptedNonHumanAnimalGenderEntityForFosterHome,
+        onModifyAcceptedNonHumanAnimalGender: (rowsUpdated: Int) -> Unit
+    ) {
+        onModifyAcceptedNonHumanAnimalGender(
+            reskiumeDatabase.getFosterHomeDao()
+                .modifyAcceptedNonHumanAnimalGenderForFosterHome(acceptedNonHumanAnimalGender)
+        )
+    }
+
+    override suspend fun modifyResidentNonHumanAnimalIdForFosterHome(
+        residentNonHumanAnimalId: ResidentNonHumanAnimalIdEntityForFosterHome,
+        onModifyResidentNonHumanAnimalId: (rowsUpdated: Int) -> Unit
+    ) {
+        onModifyResidentNonHumanAnimalId(
+            reskiumeDatabase.getFosterHomeDao()
+                .modifyResidentNonHumanAnimalIdForFosterHome(residentNonHumanAnimalId)
+        )
+    }
+
+    override suspend fun deleteFosterHome(
+        id: String,
+        onDeleteFosterHome: (rowsDeleted: Int) -> Unit
+    ) {
+        onDeleteFosterHome(reskiumeDatabase.getFosterHomeDao().deleteFosterHome(id))
+    }
+
+    override suspend fun deleteAllFosterHomes(
+        ownerId: String,
+        onDeleteAllFosterHomes: (rowsDeleted: Int) -> Unit
+    ) {
+        onDeleteAllFosterHomes(reskiumeDatabase.getFosterHomeDao().deleteAllFosterHomes(ownerId))
+    }
+
+    override suspend fun getFosterHome(id: String): FosterHomeWithAllNonHumanAnimalData? =
+        reskiumeDatabase.getFosterHomeDao().getFosterHome(id)
+
+
+    override fun getAllFosterHomes(ownerId: String): Flow<List<FosterHomeWithAllNonHumanAnimalData>> =
+        reskiumeDatabase.getFosterHomeDao().getAllFosterHomes(ownerId)
+}

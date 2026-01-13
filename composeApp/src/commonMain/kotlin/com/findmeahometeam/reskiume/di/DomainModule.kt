@@ -18,6 +18,18 @@ import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInA
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.SignInWithEmailAndPasswordFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.SignOutFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.fosterHome.DeleteAllFosterHomesFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.fosterHome.DeleteFosterHomeFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllFosterHomesFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetFosterHomeFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.fosterHome.InsertAcceptedNonHumanAnimalGenderForFosterHomeInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.fosterHome.InsertAcceptedNonHumanAnimalTypeForFosterHomeInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.fosterHome.InsertFosterHomeInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.fosterHome.InsertResidentNonHumanAnimalForFosterHomeInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.fosterHome.ModifyAcceptedNonHumanAnimalGenderForFosterHomeInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.fosterHome.ModifyAcceptedNonHumanAnimalTypeForFosterHomeInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.fosterHome.ModifyFosterHomeInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.fosterHome.ModifyResidentNonHumanAnimalForFosterHomeInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.image.GetCompleteImagePathFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteAllCacheFromLocalRepository
@@ -60,6 +72,20 @@ val domainModule = module {
     factoryOf(::ObserveAuthStateInAuthDataSource)
     factoryOf(::SignInWithEmailAndPasswordFromAuthDataSource)
     factoryOf(::SignOutFromAuthDataSource)
+
+    // fosterHome
+    factoryOf(::DeleteAllFosterHomesFromLocalRepository)
+    factoryOf(::DeleteFosterHomeFromLocalRepository)
+    factoryOf(::GetAllFosterHomesFromLocalRepository)
+    factoryOf(::GetFosterHomeFromLocalRepository)
+    factoryOf(::InsertFosterHomeInLocalRepository)
+    factoryOf(::InsertResidentNonHumanAnimalForFosterHomeInLocalRepository)
+    factoryOf(::InsertAcceptedNonHumanAnimalTypeForFosterHomeInLocalRepository)
+    factoryOf(::InsertAcceptedNonHumanAnimalGenderForFosterHomeInLocalRepository)
+    factoryOf(::ModifyFosterHomeInLocalRepository)
+    factoryOf(::ModifyResidentNonHumanAnimalForFosterHomeInLocalRepository)
+    factoryOf(::ModifyAcceptedNonHumanAnimalTypeForFosterHomeInLocalRepository)
+    factoryOf(::ModifyAcceptedNonHumanAnimalGenderForFosterHomeInLocalRepository)
 
     // image
     factoryOf(::DeleteImageFromLocalDataSource)

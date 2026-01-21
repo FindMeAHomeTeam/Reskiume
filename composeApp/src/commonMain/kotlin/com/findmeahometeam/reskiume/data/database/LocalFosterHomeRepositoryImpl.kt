@@ -104,6 +104,25 @@ class LocalFosterHomeRepositoryImpl(
         reskiumeDatabase.getFosterHomeDao().getFosterHome(id)
 
 
-    override fun getAllFosterHomes(ownerId: String): Flow<List<FosterHomeWithAllNonHumanAnimalData>> =
-        reskiumeDatabase.getFosterHomeDao().getAllFosterHomes(ownerId)
+    override fun getAllMyFosterHomes(ownerId: String): Flow<List<FosterHomeWithAllNonHumanAnimalData>> =
+        reskiumeDatabase.getFosterHomeDao().getAllMyFosterHomes(ownerId)
+
+    override fun getAllFosterHomesByCountryAndCity(
+        country: String,
+        city: String
+    ): Flow<List<FosterHomeWithAllNonHumanAnimalData>> =
+        reskiumeDatabase.getFosterHomeDao().getAllFosterHomesByCountryAndCity(country, city)
+
+    override fun getAllFosterHomesByLocation(
+        activistLongitude: Double,
+        activistLatitude: Double,
+        rangeLongitude: Double,
+        rangeLatitude: Double
+    ): Flow<List<FosterHomeWithAllNonHumanAnimalData>> =
+        reskiumeDatabase.getFosterHomeDao().getAllFosterHomesByLocation(
+            activistLongitude,
+            activistLatitude,
+            rangeLongitude,
+            rangeLatitude
+        )
 }

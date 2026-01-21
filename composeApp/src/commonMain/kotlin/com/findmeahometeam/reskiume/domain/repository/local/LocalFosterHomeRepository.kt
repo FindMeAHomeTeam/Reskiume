@@ -58,5 +58,14 @@ interface LocalFosterHomeRepository {
 
     suspend fun getFosterHome(id: String): FosterHomeWithAllNonHumanAnimalData?
 
-    fun getAllFosterHomes(ownerId: String): Flow<List<FosterHomeWithAllNonHumanAnimalData>>
+    fun getAllMyFosterHomes(ownerId: String): Flow<List<FosterHomeWithAllNonHumanAnimalData>>
+
+    fun getAllFosterHomesByCountryAndCity(country: String, city: String): Flow<List<FosterHomeWithAllNonHumanAnimalData>>
+
+    fun getAllFosterHomesByLocation(
+        activistLongitude: Double,
+        activistLatitude: Double,
+        rangeLongitude: Double,
+        rangeLatitude: Double
+    ): Flow<List<FosterHomeWithAllNonHumanAnimalData>>
 }

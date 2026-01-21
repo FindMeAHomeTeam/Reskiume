@@ -44,7 +44,7 @@ interface FosterHomeDao {
     suspend fun deleteFosterHome(id: String): Int
 
     @Query("DELETE FROM FosterHomeEntity WHERE ownerId = :ownerId OR savedBy = :ownerId OR savedBy = '' ")
-    suspend fun deleteAllFosterHomes(ownerId: String): Int
+    suspend fun deleteAllMyFosterHomes(ownerId: String): Int
 
     @Transaction
     @Query("SELECT * FROM FosterHomeEntity WHERE id = :id")
@@ -52,5 +52,20 @@ interface FosterHomeDao {
 
     @Transaction
     @Query("SELECT * FROM FosterHomeEntity WHERE ownerId = :ownerId")
-    fun getAllFosterHomes(ownerId: String): Flow<List<FosterHomeWithAllNonHumanAnimalData>>
+    fun getAllMyFosterHomes(ownerId: String): Flow<List<FosterHomeWithAllNonHumanAnimalData>>
+
+    @Transaction
+    @Query("SELECT * FROM FosterHomeEntity WHERE country = :country AND city = :city")
+    fun getAllFosterHomesByCountryAndCity(country: String, city: String): Flow<List<FosterHomeWithAllNonHumanAnimalData>>
+
+    @Transaction
+    @Query("SELECT * FROM FosterHomeEntity WHERE " +
+            "longitude >= :activistLongitude - :rangeLongitude AND longitude <= :activistLongitude + :rangeLongitude " +
+            "AND latitude >= :activistLatitude - :rangeLatitude AND latitude <= :activistLatitude + :rangeLatitude")
+    fun getAllFosterHomesByLocation(
+        activistLongitude: Double,
+        activistLatitude: Double,
+        rangeLongitude: Double,
+        rangeLatitude: Double
+    ): Flow<List<FosterHomeWithAllNonHumanAnimalData>>
 }

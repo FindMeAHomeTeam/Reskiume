@@ -39,6 +39,9 @@ class KMPViewControllerWrapper: UIViewController {
             FirebaseRemoteReviewDatabaseManager.shared.startIfNeeded()
             FirebaseRemoteNonHumanAnimalDatabaseManager.shared.startIfNeeded()
             
+            // FireStore
+            FirebaseRemoteFosterHomeFireStoreManager.shared.startIfNeeded()
+            
             didInitialize = true
         }
     }

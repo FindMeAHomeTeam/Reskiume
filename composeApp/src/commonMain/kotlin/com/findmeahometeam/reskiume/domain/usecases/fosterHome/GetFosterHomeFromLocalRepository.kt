@@ -5,18 +5,20 @@ import com.findmeahometeam.reskiume.domain.repository.local.LocalFosterHomeRepos
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.mapNotNull
 
 class GetFosterHomeFromLocalRepository(
     private val localFosterHomeRepository: LocalFosterHomeRepository,
     private val checkNonHumanAnimalUtil: CheckNonHumanAnimalUtil
 ) {
-    suspend operator fun invoke(
+    operator fun invoke(
         id: String,
         coroutineScope: CoroutineScope
-    ): FosterHome? =
-        localFosterHomeRepository.getFosterHome(id)?.let { fosterHomeWithAllNonHumanAnimalData ->
+    ): Flow<FosterHome?> = flow {
+        val result: FosterHome? = localFosterHomeRepository.getFosterHome(id)?.let { fosterHomeWithAllNonHumanAnimalData ->
             fosterHomeWithAllNonHumanAnimalData.fosterHomeEntity.toDomain(
                 allAcceptedNonHumanAnimalTypes = fosterHomeWithAllNonHumanAnimalData.allAcceptedNonHumanAnimalTypes.map { it.toDomain() },
                 allAcceptedNonHumanAnimalGenders = fosterHomeWithAllNonHumanAnimalData.allAcceptedNonHumanAnimalGenders.map { it.toDomain() },
@@ -28,7 +30,7 @@ class GetFosterHomeFromLocalRepository(
                                     coroutineScope = coroutineScope,
                                     nonHumanAnimalId = nonHumanAnimalId,
                                     caregiverId = caregiverId
-                                ).map { uiState ->
+                                ).mapNotNull { uiState ->
                                     if (uiState is UiState.Success) {
                                         uiState.data
                                     } else {
@@ -40,4 +42,6 @@ class GetFosterHomeFromLocalRepository(
                 }
             )
         }
+        emit(result)
+    }
 }

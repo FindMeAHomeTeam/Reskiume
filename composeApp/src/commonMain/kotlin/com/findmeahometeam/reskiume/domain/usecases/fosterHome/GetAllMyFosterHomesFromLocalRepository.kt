@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 
-class GetAllFosterHomesFromLocalRepository(
+class GetAllMyFosterHomesFromLocalRepository(
     private val localFosterHomeRepository: LocalFosterHomeRepository,
     private val checkNonHumanAnimalUtil: CheckNonHumanAnimalUtil
 ) {
@@ -18,7 +18,7 @@ class GetAllFosterHomesFromLocalRepository(
         ownerId: String,
         coroutineScope: CoroutineScope
     ): Flow<List<FosterHome>> =
-        localFosterHomeRepository.getAllFosterHomes(ownerId)
+        localFosterHomeRepository.getAllMyFosterHomes(ownerId)
             .map { list ->
                 list.map { fosterHomeWithAllNonHumanAnimalData: FosterHomeWithAllNonHumanAnimalData ->
                     fosterHomeWithAllNonHumanAnimalData.fosterHomeEntity.toDomain(

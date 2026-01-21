@@ -4,6 +4,7 @@ import FirebaseAnalytics
 import FirebaseCore
 import FirebaseAuth
 import FirebaseStorage
+import FirebaseFirestore
 import SwiftUI
 import ComposeApp
 

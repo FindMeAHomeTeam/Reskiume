@@ -85,7 +85,7 @@ class RealtimeDatabaseRemoteNonHumanAnimalRepositoryAndroidImpl(
                 } else {
                     log.e(
                         "RealtimeDatabaseRemoteNonHumanAnimalRepositoryAndroidImpl",
-                        "deleteRemoteNonHumanAnimal: Error deleting the non human animal from the caregiver $caregiverId"
+                        "deleteRemoteNonHumanAnimal: Error deleting the remote non human animal from the caregiver $caregiverId"
                     )
                     onDeleteRemoteNonHumanAnimal(DatabaseResult.Error())
                 }
@@ -106,7 +106,7 @@ class RealtimeDatabaseRemoteNonHumanAnimalRepositoryAndroidImpl(
                 } else {
                     log.e(
                         "RealtimeDatabaseRemoteNonHumanAnimalRepositoryAndroidImpl",
-                        "deleteAllRemoteNonHumanAnimals: Error deleting all non human animals from the caregiver $caregiverId"
+                        "deleteAllRemoteNonHumanAnimals: Error deleting all remote non human animals from the caregiver $caregiverId"
                     )
                     onDeleteAllRemoteNonHumanAnimals(DatabaseResult.Error())
                 }

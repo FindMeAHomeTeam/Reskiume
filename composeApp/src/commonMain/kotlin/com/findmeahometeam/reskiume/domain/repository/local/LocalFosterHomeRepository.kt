@@ -51,9 +51,9 @@ interface LocalFosterHomeRepository {
 
     suspend fun deleteFosterHome(id: String, onDeleteFosterHome: (rowsDeleted: Int) -> Unit)
 
-    suspend fun deleteAllFosterHomes(
+    suspend fun deleteAllMyFosterHomes(
         ownerId: String,
-        onDeleteAllFosterHomes: (rowsDeleted: Int) -> Unit
+        onDeleteAllMyFosterHomes: (rowsDeleted: Int) -> Unit
     )
 
     suspend fun getFosterHome(id: String): FosterHomeWithAllNonHumanAnimalData?

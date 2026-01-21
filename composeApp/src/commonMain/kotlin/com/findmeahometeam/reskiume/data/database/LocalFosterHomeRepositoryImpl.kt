@@ -93,11 +93,13 @@ class LocalFosterHomeRepositoryImpl(
         onDeleteFosterHome(reskiumeDatabase.getFosterHomeDao().deleteFosterHome(id))
     }
 
-    override suspend fun deleteAllFosterHomes(
+    override suspend fun deleteAllMyFosterHomes(
         ownerId: String,
-        onDeleteAllFosterHomes: (rowsDeleted: Int) -> Unit
+        onDeleteAllMyFosterHomes: (rowsDeleted: Int) -> Unit
     ) {
-        onDeleteAllFosterHomes(reskiumeDatabase.getFosterHomeDao().deleteAllFosterHomes(ownerId))
+        onDeleteAllMyFosterHomes(
+            reskiumeDatabase.getFosterHomeDao().deleteAllMyFosterHomes(ownerId)
+        )
     }
 
     override suspend fun getFosterHome(id: String): FosterHomeWithAllNonHumanAnimalData? =

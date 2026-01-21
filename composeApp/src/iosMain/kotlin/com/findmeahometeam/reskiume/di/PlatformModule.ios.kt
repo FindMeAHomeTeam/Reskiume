@@ -5,6 +5,9 @@ import com.findmeahometeam.reskiume.data.database.getDatabase
 import com.findmeahometeam.reskiume.data.remote.auth.AuthRepositoryForIosDelegateWrapperImpl
 import com.findmeahometeam.reskiume.data.remote.auth.AuthRepositoryIosImpl
 import com.findmeahometeam.reskiume.data.remote.auth.AuthUserRepositoryForIosDelegateImpl
+import com.findmeahometeam.reskiume.data.remote.fireStore.remoteFosterHome.FireStoreRemoteFosterHomeFlowsRepositoryForIosDelegateImpl
+import com.findmeahometeam.reskiume.data.remote.fireStore.remoteFosterHome.FireStoreRemoteFosterHomeRepositoryForIosDelegateWrapperImpl
+import com.findmeahometeam.reskiume.data.remote.fireStore.remoteFosterHome.FireStoreRemoteFosterHomeRepositoryIosImpl
 import com.findmeahometeam.reskiume.data.remote.database.remoteNonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalFlowsRepositoryForIosDelegateImpl
 import com.findmeahometeam.reskiume.data.remote.database.remoteNonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateWrapperImpl
 import com.findmeahometeam.reskiume.data.remote.database.remoteNonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepositoryIosImpl
@@ -34,6 +37,9 @@ import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteRevi
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserFlowsRepositoryForIosDelegate
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepositoryForIosDelegateWrapper
+import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteFosterHome.FireStoreRemoteFosterHomeFlowsRepositoryForIosDelegate
+import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteFosterHome.FireStoreRemoteFosterHomeRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteFosterHome.FireStoreRemoteFosterHomeRepositoryForIosDelegateWrapper
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepositoryForIosDelegateWrapper
 import com.findmeahometeam.reskiume.domain.repository.util.analytics.AnalyticsForIosWrapper
@@ -72,4 +78,7 @@ actual val platformModule: Module = module {
     singleOf(::GiveFeedbackImpl) bind GiveFeedback::class
     singleOf(::ManageImagePathImpl) bind ManageImagePath::class
     single<HttpClient> { HttpClient(Darwin) }
+    singleOf(::FireStoreRemoteFosterHomeRepositoryIosImpl) bind FireStoreRemoteFosterHomeRepository::class
+    singleOf(::FireStoreRemoteFosterHomeFlowsRepositoryForIosDelegateImpl) bind FireStoreRemoteFosterHomeFlowsRepositoryForIosDelegate::class
+    singleOf(::FireStoreRemoteFosterHomeRepositoryForIosDelegateWrapperImpl) bind FireStoreRemoteFosterHomeRepositoryForIosDelegateWrapper::class
 }

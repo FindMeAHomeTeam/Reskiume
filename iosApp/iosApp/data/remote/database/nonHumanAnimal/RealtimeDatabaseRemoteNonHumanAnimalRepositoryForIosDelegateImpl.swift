@@ -59,7 +59,7 @@ class RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateImpl: Realtime
                             }) { error in
                                 log.e(
                                     tag: "RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateImpl",
-                                    message: "Error retrieving the remote non human animals for the caregiver id \(caregiverId): \(error.localizedDescription)",
+                                    message: "Error retrieving the remote non human animals for the caregiver id \(caregiverId): \(String(describing: error))",
                                     throwable: nil
                                 )
                                 realtimeDatabaseRemoteNonHumanAnimalFlowsRepositoryForIosDelegate.updateRemoteNonHumanAnimalListFlow(delegate: [])
@@ -89,7 +89,7 @@ class RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateImpl: Realtime
                             }) { error in
                                 log.e(
                                     tag: "RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateImpl",
-                                    message: "Error retrieving the remote non human animal \(nonHumanAnimalId) for the caregiver id \(caregiverId): \(error.localizedDescription)",
+                                    message: "Error retrieving the remote non human animal \(nonHumanAnimalId) for the caregiver id \(caregiverId): \(String(describing: error))",
                                     throwable: nil
                                 )
                                 realtimeDatabaseRemoteNonHumanAnimalFlowsRepositoryForIosDelegate.updateRemoteNonHumanAnimalListFlow(delegate: [])

@@ -47,7 +47,11 @@ class RealtimeDatabaseRemoteReviewRepositoryForIosDelegateImpl: RealtimeDatabase
                             realtimeDatabaseRemoteReviewFlowsRepositoryForIosDelegate.updateRealtimeDatabaseRemoteReviewsRepositoryForIosDelegate(delegate: remoteReviews)
                             
                         }) { error in
-                            log.e(tag: "RealtimeDatabaseRemoteReviewRepositoryForIosDelegateImpl", message: "Error retrieving the remote review for user id \(reviewedUid): \(error.localizedDescription)", throwable: nil)
+                            log.e(
+                                tag: "RealtimeDatabaseRemoteReviewRepositoryForIosDelegateImpl",
+                                message: "Error retrieving the remote review for user id \(reviewedUid): \(String(describing: error))",
+                                throwable: nil
+                            )
                             realtimeDatabaseRemoteReviewFlowsRepositoryForIosDelegate.updateRealtimeDatabaseRemoteReviewsRepositoryForIosDelegate(delegate: [])
                         }
                     }

@@ -47,7 +47,11 @@ class RealtimeDatabaseRemoteUserRepositoryForIosDelegateImpl: RealtimeDatabaseRe
                             realtimeDatabaseRemoteUserFlowsRepositoryForIosDelegate.updateRealtimeDatabaseRemoteUserRepositoryForIosDelegate(delegate: remoteUser)
                             
                         }) { error in
-                            log.e(tag: "RealtimeDatabaseRemoteUserRepositoryForIosDelegateImpl", message: "Error retrieving the remote user id \(userUid): \(error.localizedDescription)", throwable: nil)
+                            log.e(
+                                tag: "RealtimeDatabaseRemoteUserRepositoryForIosDelegateImpl",
+                                message: "Error retrieving the remote user id \(userUid): \(String(describing: error))",
+                                throwable: nil
+                            )
                             realtimeDatabaseRemoteUserFlowsRepositoryForIosDelegate.updateRealtimeDatabaseRemoteUserRepositoryForIosDelegate(delegate: nil)
                         }
                     }

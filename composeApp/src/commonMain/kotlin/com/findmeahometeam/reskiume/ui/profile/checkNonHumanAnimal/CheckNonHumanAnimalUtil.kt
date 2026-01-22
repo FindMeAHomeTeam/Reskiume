@@ -122,7 +122,7 @@ class CheckNonHumanAnimalUtil(
 
                 nonHumanAnimal.imageUrl.isBlank() -> {
                     log.d(
-                        "CheckNonHumanAnimalViewmodel",
+                        "CheckNonHumanAnimalUtil",
                         "Non human animal ${nonHumanAnimal.id} has no avatar image to save locally."
                     )
                     insertNonHumanAnimalsInLocalRepository(nonHumanAnimal)
@@ -176,12 +176,12 @@ class CheckNonHumanAnimalUtil(
         insertNonHumanAnimalInLocalRepository(nonHumanAnimal) {
             if (it > 0) {
                 log.d(
-                    "CheckNonHumanAnimalsViewmodel",
+                    "CheckNonHumanAnimalUtil",
                     "Non human animal ${nonHumanAnimal.id} added to local database"
                 )
             } else {
                 log.e(
-                    "CheckNonHumanAnimalsViewmodel",
+                    "CheckNonHumanAnimalUtil",
                     "Error adding the non human animal ${nonHumanAnimal.id} to local database"
                 )
             }
@@ -200,7 +200,7 @@ class CheckNonHumanAnimalUtil(
 
                 nonHumanAnimal.imageUrl.isBlank() -> {
                     log.d(
-                        "CheckNonHumanAnimalViewmodel",
+                        "CheckNonHumanAnimalUtil",
                         "Non human animal ${nonHumanAnimal.id} has no avatar image to save locally."
                     )
                     modifyNonHumanAnimalsInLocalRepository(nonHumanAnimal)
@@ -233,12 +233,12 @@ class CheckNonHumanAnimalUtil(
         modifyNonHumanAnimalInLocalRepository(nonHumanAnimal) {
             if (it > 0) {
                 log.d(
-                    "CheckNonHumanAnimalsViewmodel",
+                    "CheckNonHumanAnimalUtil",
                     "Non human animal ${nonHumanAnimal.id} modified in local database"
                 )
             } else {
                 log.e(
-                    "CheckNonHumanAnimalsViewmodel",
+                    "CheckNonHumanAnimalUtil",
                     "Error modifying the non human animal ${nonHumanAnimal.id} in local database"
                 )
             }

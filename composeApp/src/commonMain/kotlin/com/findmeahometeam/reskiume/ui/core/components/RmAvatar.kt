@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.findmeahometeam.reskiume.ui.core.primaryGreen
 import org.jetbrains.compose.resources.DrawableResource
@@ -21,7 +22,7 @@ sealed class RmListAvatarType {
     data class Icon(val backgroundColor: Color, val icon: DrawableResource, val iconColor: Color) :
         RmListAvatarType()
 
-    data class Image(val resource: String) : RmListAvatarType()
+    data class Image(val resource: String, val size: Dp = 55.dp) : RmListAvatarType()
 }
 
 @Composable
@@ -48,14 +49,14 @@ fun RmAvatar(listAvatarType: RmListAvatarType) {
         is RmListAvatarType.Image -> {
             if (listAvatarType.resource.isBlank()) {
                 Icon(
-                    modifier = Modifier.size(55.dp).clip(RoundedCornerShape(15.dp)),
+                    modifier = Modifier.size(listAvatarType.size).clip(RoundedCornerShape(15.dp)),
                     painter = painterResource(Res.drawable.reskiume),
                     contentDescription = null,
                     tint = primaryGreen
                 )
             } else {
                 RmImage(
-                    modifier = Modifier.size(55.dp).clip(RoundedCornerShape(15.dp)),
+                    modifier = Modifier.size(listAvatarType.size).clip(RoundedCornerShape(15.dp)),
                     imagePath = listAvatarType.resource
                 )
             }

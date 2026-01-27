@@ -29,8 +29,7 @@ import reskiume.composeapp.generated.resources.ic_back
 @Composable
 fun RmScaffold(
     title: String = "",
-    onBackPressed: () -> Unit,
-    displayNavigationIcon: Boolean = true,
+    onBackPressed: (() -> Unit)? = null,
     floatingActionButton: @Composable () -> Unit = {},
     content: @Composable (PaddingValues) -> Unit
 ) {
@@ -48,7 +47,7 @@ fun RmScaffold(
                     )
                 },
                 navigationIcon = {
-                    if (displayNavigationIcon) {
+                    if (onBackPressed != null) {
                         IconButton(
                             modifier = Modifier.padding(start = 16.dp).size(32.dp),
                             onClick = onBackPressed

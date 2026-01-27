@@ -30,7 +30,7 @@ sealed class BottomBarItem {
 
 
     data class FosterHomes(
-        override val route: String = Routes.FOSTER_HOMES.route,
+        override val route: String = Routes.CHECK_ALL_FOSTER_HOMES.route,
         override val title: @Composable () -> String = { stringResource(Res.string.bottom_bar_item_foster_homes) },
         override val icon: @Composable (() -> Unit) = {
             Icon(

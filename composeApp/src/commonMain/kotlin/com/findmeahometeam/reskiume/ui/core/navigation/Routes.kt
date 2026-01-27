@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 enum class Routes(val route: String) {
     HOME_SCREEN("homeScreen"),
-    FOSTER_HOMES("fosterHomes"),
+    CHECK_ALL_FOSTER_HOMES("checkAllFosterHomes"),
     RESCUE("rescue"),
     CHATS("chats"),
     PROFILE("profile"),

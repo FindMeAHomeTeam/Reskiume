@@ -1,0 +1,45 @@
+<resources>
+    <!-- Advice: Rescue -->
+    <string name="advice_rescue_found_non_human_animal_title">I found a non-human animal in the street. What can I do?</string>
+    <string name="advice_rescue_found_non_human_animal_description">The first thing you need to establish is if the non-human animal displays signs of being abandoned. A dirty coat and a lack of an identification chip indicate that the non-human animal is abandoned or lives where you found him/her.
+\nIf he/she shows signs of distress or vulnerability, pick him/her up and take him/her to the nearest veterinary clinic to ask for an identification test. Vets are forced by law to provide this service for free! They will also inform you about your options to ensure that the non-human animal gets taken care of in the future.
+\nIf the non-human animal can be identified, the clinic will contact his/her caretakers to arrange a pick up. The most common case is for them to do it, but they may refuse to because they cannot take care of him/her anymore.
+\nIf the non-human animal cannot be identified, you will need to find a home for him/her. Reskiume, the social networks and putting up posters in the street are your best allies!</string>
+    <string name="advice_rescue_pick_non_human_animal_title">How do I pick up a non-human animal?</string>
+    <string name="advice_rescue_pick_non_human_animal_description">Every non-human animal will behave differently, so there are no general rules. Feeling lost or abandoned or having been victim to an accident may influence the non-human animal’s behaviour greatly.
+\nBear in mind that:
+\nYou may need help to rescue a non-human animal, especially a large-sized one.
+\nThe non-human animal may be frightened and will try to flee or defend itself if he/she feels threatened to be trapped.
+\nIf the non-human animal flees, it may risk his/her own life and that of the people around.
+\nDo not try to play tricks or trap him/her by force, but rather take your time to win his/her trust with food and softly spoken words. Avoid brisk movements or looking directly into his/her eyes.
+\nFor example, cats are particularly tricky to rescue, so non-human animal shelters often provide special trap cages for this scenario.
+\nIf you bring the non-human animal into your car, make sure that he/she does not have access to the driver’s area. Even if he/she is quiet and behaves well, he/she may provoke an accident.
+</string>
+    <string name="advice_rescue_rejected_non_human_animal_title">What if an identified non-human animal is rejected by his/her caretakers?</string>
+    <string name="advice_rescue_rejected_non_human_animal_description">Unfortunately, this happens sometimes. In this case, you will need to look for a home for the non-human animal.
+        \nWe've got your back here: search with Reskiume for a foster home that will take care of the non-human animal immediately or take care of him/her while you find a permanent adoption home.</string>
+
+    <!-- Advice: Rehome -->
+    <string name="advice_rehome_find_a_home_non_human_animal_title">What are the steps to find a home for my non-human animal using Reskiume?</string>
+    <string name="advice_rehome_find_a_home_non_human_animal_description">On the front page, you can browse homes in your area that can provide care for your non-human animal.
+\nTry to find a foster home for the non-human animal first. In a foster home, an experienced volunteer will take care of him/her. Use the filters and the homes in the list to see a detailed view with more photos and a description. Tap “Contact” to send a message to the owner and arrange the pick up.
+\nOnce your non-human animal is safely placed in a foster home, you can collaborate with the foster home volunteer to find a permanent adoption family within the app. Additionally, share your non-human animal’s profile on social networks to reach even more people who may be willing to adopt him/her. </string>
+    <string name="advice_rehome_visit_non_human_animal_title">Will I be able to visit the non-human animal after he/she is adopted? </string>
+    <string name="advice_rehome_visit_non_human_animal_description">Of course! Visits should be arranged between you and the adoption or foster home directly.
+        \nWhen you contact them, try to arrange a couple of visits to monitor whether the non-human animal is being correctly taken care of. </string>
+
+    <!-- Advice: Care -->
+    <string name="advice_care_feed_non_human_animal_title">What do I feed him/her?</string>
+    <string name="advice_care_feed_non_human_animal_description">Most abandoned or lost non-human animals are found dehydrated from the stress and deficient nutrition.
+        \nHowever, some will reject eating or drinking out of stress, so it is important to provide them access to food and water, especially at night when the environment is calmer. In the case of baby non-human animals, refer to your vet.</string>
+    <string name="advice_care_bloat_torsion_non_human_animal_title">What causes bloat and torsion?</string>
+    <string name="advice_care_bloat_torsion_non_human_animal_description">The exact cause is unknown. It is more common in deep-chested large and giant dogs. Bloat and torsion are thought to be associated with eating large meals, exercising just before or after eating, and gorging on large amounts of food or water.
+        \nThere is no foolproof way to prevent bloat, but these things may help:
+        \n- Feed your dog more than once daily (two meals of equal size).
+        \n- Do not allow your dog to exercise immediately before/after eating.
+        \n- Do not give your dog access to large food sources.
+        \n- Do not allow your dog to drink large volumes of water at the same time.
+        \nEmergency surgery is needed for any dog with a rotated stomach, once your dog is stable.</string>
+
+
+</resources>

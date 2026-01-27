@@ -8,6 +8,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.findmeahometeam.reskiume.ui.core.primaryRed
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import org.jetbrains.compose.resources.stringResource
 import reskiume.composeapp.generated.resources.Res
 import reskiume.composeapp.generated.resources.general_error_unknown_message
@@ -17,6 +19,14 @@ sealed class UiState<T> {
     class Loading<T> : UiState<T>()
     data class Success<T>(val data: T) : UiState<T>()
     data class Error<T>(val message: String = "") : UiState<T>()
+}
+
+fun <T> Flow<T?>.toUiState(): Flow<UiState<T>> = this.map {
+    if (it == null) {
+        UiState.Error()
+    } else {
+        UiState.Success(it)
+    }
 }
 
 @Composable

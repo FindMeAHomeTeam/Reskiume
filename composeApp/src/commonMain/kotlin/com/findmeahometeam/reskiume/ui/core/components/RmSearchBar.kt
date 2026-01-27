@@ -23,9 +23,8 @@ import com.findmeahometeam.reskiume.ui.core.textColor
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import reskiume.composeapp.generated.resources.Res
-import reskiume.composeapp.generated.resources.check_all_advice_screen_erase_input_content_description
-import reskiume.composeapp.generated.resources.check_all_advice_screen_search_icon_content_description
-import reskiume.composeapp.generated.resources.check_all_advice_screen_seek_advice
+import reskiume.composeapp.generated.resources.search_bar_erase_input_content_description
+import reskiume.composeapp.generated.resources.search_bar_search_icon_content_description
 import reskiume.composeapp.generated.resources.ic_erase_input
 import reskiume.composeapp.generated.resources.ic_search
 
@@ -33,6 +32,7 @@ import reskiume.composeapp.generated.resources.ic_search
 @Composable
 fun RmSearchBar(
     modifier: Modifier = Modifier,
+    placeholder: String,
     onSearch: (String) -> Unit
 ) {
     var query: String by rememberSaveable { mutableStateOf("") }
@@ -55,11 +55,11 @@ fun RmSearchBar(
             },
             expanded = false,
             onExpandedChange = { },
-            placeholder = { RmText(stringResource(Res.string.check_all_advice_screen_seek_advice)) },
+            placeholder = { RmText(placeholder) },
             leadingIcon = {
                 Icon(
                     painter = painterResource(Res.drawable.ic_search),
-                    contentDescription = stringResource(Res.string.check_all_advice_screen_search_icon_content_description),
+                    contentDescription = stringResource(Res.string.search_bar_search_icon_content_description),
                     tint = textColor
                 )
             },
@@ -75,7 +75,7 @@ fun RmSearchBar(
                     ) {
                         Icon(
                             painter = painterResource(Res.drawable.ic_erase_input),
-                            contentDescription = stringResource(Res.string.check_all_advice_screen_erase_input_content_description),
+                            contentDescription = stringResource(Res.string.search_bar_erase_input_content_description),
                             tint = textColor,
                             modifier = Modifier.size(24.dp),
                         )

@@ -30,16 +30,10 @@ import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllMyFosterHom
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllMyFosterHomesFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetFosterHomeFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetFosterHomeFromRemoteRepository
-import com.findmeahometeam.reskiume.domain.usecases.fosterHome.InsertAcceptedNonHumanAnimalGenderForFosterHomeInLocalRepository
-import com.findmeahometeam.reskiume.domain.usecases.fosterHome.InsertAcceptedNonHumanAnimalTypeForFosterHomeInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.InsertFosterHomeInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.InsertFosterHomeInRemoteRepository
-import com.findmeahometeam.reskiume.domain.usecases.fosterHome.InsertResidentNonHumanAnimalForFosterHomeInLocalRepository
-import com.findmeahometeam.reskiume.domain.usecases.fosterHome.ModifyAcceptedNonHumanAnimalGenderForFosterHomeInLocalRepository
-import com.findmeahometeam.reskiume.domain.usecases.fosterHome.ModifyAcceptedNonHumanAnimalTypeForFosterHomeInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.ModifyFosterHomeInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.ModifyFosterHomeInRemoteRepository
-import com.findmeahometeam.reskiume.domain.usecases.fosterHome.ModifyResidentNonHumanAnimalForFosterHomeInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.image.GetCompleteImagePathFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteAllCacheFromLocalRepository
@@ -98,14 +92,8 @@ val domainModule = module {
     factoryOf(::GetFosterHomeFromLocalRepository)
     factoryOf(::GetFosterHomeFromRemoteRepository)
     factoryOf(::InsertFosterHomeInLocalRepository)
-    factoryOf(::InsertResidentNonHumanAnimalForFosterHomeInLocalRepository)
-    factoryOf(::InsertAcceptedNonHumanAnimalTypeForFosterHomeInLocalRepository)
-    factoryOf(::InsertAcceptedNonHumanAnimalGenderForFosterHomeInLocalRepository)
     factoryOf(::InsertFosterHomeInRemoteRepository)
     factoryOf(::ModifyFosterHomeInLocalRepository)
-    factoryOf(::ModifyResidentNonHumanAnimalForFosterHomeInLocalRepository)
-    factoryOf(::ModifyAcceptedNonHumanAnimalTypeForFosterHomeInLocalRepository)
-    factoryOf(::ModifyAcceptedNonHumanAnimalGenderForFosterHomeInLocalRepository)
     factoryOf(::ModifyFosterHomeInRemoteRepository)
 
     // image

@@ -14,7 +14,7 @@ class LocalFosterHomeRepositoryImpl(
 
     override suspend fun insertFosterHome(
         fosterHomeEntity: FosterHomeEntity,
-        onInsertFosterHome: (rowId: Long) -> Unit
+        onInsertFosterHome: suspend (rowId: Long) -> Unit
     ) {
         onInsertFosterHome(reskiumeDatabase.getFosterHomeDao().insertFosterHome(fosterHomeEntity))
     }
@@ -51,7 +51,7 @@ class LocalFosterHomeRepositoryImpl(
 
     override suspend fun modifyFosterHome(
         fosterHomeEntity: FosterHomeEntity,
-        onModifyFosterHome: (rowsUpdated: Int) -> Unit
+        onModifyFosterHome: suspend (rowsUpdated: Int) -> Unit
     ) {
         onModifyFosterHome(reskiumeDatabase.getFosterHomeDao().modifyFosterHome(fosterHomeEntity))
     }

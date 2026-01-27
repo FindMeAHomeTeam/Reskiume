@@ -11,7 +11,7 @@ interface LocalFosterHomeRepository {
 
     suspend fun insertFosterHome(
         fosterHomeEntity: FosterHomeEntity,
-        onInsertFosterHome: (rowId: Long) -> Unit
+        onInsertFosterHome: suspend (rowId: Long) -> Unit
     )
 
     suspend fun insertAcceptedNonHumanAnimalTypeForFosterHome(
@@ -31,7 +31,7 @@ interface LocalFosterHomeRepository {
 
     suspend fun modifyFosterHome(
         fosterHomeEntity: FosterHomeEntity,
-        onModifyFosterHome: (rowsUpdated: Int) -> Unit
+        onModifyFosterHome: suspend (rowsUpdated: Int) -> Unit
     )
 
     suspend fun modifyAcceptedNonHumanAnimalTypeForFosterHome(

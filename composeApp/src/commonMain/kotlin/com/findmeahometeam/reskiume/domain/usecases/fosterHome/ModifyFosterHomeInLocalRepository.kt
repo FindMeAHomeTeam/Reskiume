@@ -11,12 +11,78 @@ class ModifyFosterHomeInLocalRepository(
 ) {
     suspend operator fun invoke(
         fosterHome: FosterHome,
-        onModifyFosterHome: (rowsUpdated: Int) -> Unit
+        onModifyFosterHome: (isUpdated: Boolean) -> Unit
     ) {
         localFosterHomeRepository.modifyFosterHome(
             fosterHome.copy(savedBy = getMyUid()).toEntity(),
-            onModifyFosterHome
+            onModifyFosterHome = { rowsUpdated ->
+                if (rowsUpdated > 0) {
+                    var isSuccess = modifyAllAcceptedNonHumanAnimalTypes(fosterHome)
+
+                    if (isSuccess) {
+                        isSuccess = modifyAllAcceptedNonHumanAnimalGenders(fosterHome)
+
+                        if(isSuccess){
+                            isSuccess = modifyAllResidentNonHumanAnimals(fosterHome)
+                        }
+                    }
+                    onModifyFosterHome(isSuccess)
+                } else {
+                    onModifyFosterHome(false)
+                }
+            }
         )
+    }
+
+    private suspend fun modifyAllAcceptedNonHumanAnimalTypes(fosterHome: FosterHome): Boolean {
+        var isSuccess = true
+        fosterHome.allAcceptedNonHumanAnimalTypes.forEach { acceptedNonHumanAnimalTypeForFosterHome ->
+            if (isSuccess) {
+                localFosterHomeRepository.modifyAcceptedNonHumanAnimalTypeForFosterHome(
+                    acceptedNonHumanAnimalTypeForFosterHome.toEntity(),
+                    onModifyAcceptedNonHumanAnimalType = { rowsUpdated ->
+                        if (rowsUpdated <= 0) {
+                            isSuccess = false
+                        }
+                    }
+                )
+            }
+        }
+        return isSuccess
+    }
+
+    private suspend fun modifyAllAcceptedNonHumanAnimalGenders(fosterHome: FosterHome): Boolean {
+        var isSuccess = true
+        fosterHome.allAcceptedNonHumanAnimalGenders.forEach { acceptedNonHumanAnimalGenderForFosterHome ->
+            if (isSuccess) {
+                localFosterHomeRepository.modifyAcceptedNonHumanAnimalGenderForFosterHome(
+                    acceptedNonHumanAnimalGenderForFosterHome.toEntity(),
+                    onModifyAcceptedNonHumanAnimalGender = { rowsUpdated ->
+                        if (rowsUpdated <= 0) {
+                            isSuccess = false
+                        }
+                    }
+                )
+            }
+        }
+        return isSuccess
+    }
+
+    private suspend fun modifyAllResidentNonHumanAnimals(fosterHome: FosterHome): Boolean {
+        var isSuccess = true
+        fosterHome.allResidentNonHumanAnimals.forEach { acceptedNonHumanAnimalGenderForFosterHome ->
+            if (isSuccess) {
+                localFosterHomeRepository.modifyResidentNonHumanAnimalIdForFosterHome(
+                    acceptedNonHumanAnimalGenderForFosterHome.toEntityForId(),
+                    onModifyResidentNonHumanAnimalId = { rowsUpdated ->
+                        if (rowsUpdated <= 0) {
+                            isSuccess = false
+                        }
+                    }
+                )
+            }
+        }
+        return isSuccess
     }
 
     private suspend fun getMyUid(): String = authRepository.authState.firstOrNull()?.uid ?: ""

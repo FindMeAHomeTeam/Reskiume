@@ -142,6 +142,7 @@ class FireStoreRemoteFosterHomeRepositoryForIosDelegateImpl: FireStoreRemoteFost
             .collection(Section.fosterHomes.path)
             .whereField("country", isEqualTo: country)
             .whereField("city", isEqualTo: city)
+            .whereField("available", isEqualTo: true)
             .getDocuments()
         
         var remoteFosterHomes: [RemoteFosterHome] = []
@@ -176,6 +177,7 @@ class FireStoreRemoteFosterHomeRepositoryForIosDelegateImpl: FireStoreRemoteFost
             .whereField("longitude", isLessThanOrEqualTo: activistLongitude + rangeLongitude)
             .whereField("latitude", isGreaterThanOrEqualTo: activistLatitude - rangeLatitude)
             .whereField("latitude", isLessThanOrEqualTo: activistLatitude + rangeLatitude)
+            .whereField("available", isEqualTo: true)
             .getDocuments()
         
         var remoteFosterHomes: [RemoteFosterHome] = []

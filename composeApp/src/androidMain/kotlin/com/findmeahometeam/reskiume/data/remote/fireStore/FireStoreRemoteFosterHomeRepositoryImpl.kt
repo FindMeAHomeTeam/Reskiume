@@ -168,6 +168,7 @@ class FireStoreRemoteFosterHomeRepositoryImpl(
                 .collection(Section.FOSTER_HOMES.path)
                 .whereEqualTo("country", country)
                 .whereEqualTo("city", city)
+                .whereEqualTo("available", true)
                 .get()
                 .await()
 
@@ -199,6 +200,7 @@ class FireStoreRemoteFosterHomeRepositoryImpl(
                 .whereLessThanOrEqualTo("longitude", activistLongitude + rangeLongitude)
                 .whereGreaterThanOrEqualTo("latitude", activistLatitude - rangeLatitude)
                 .whereLessThanOrEqualTo("latitude", activistLatitude + rangeLatitude)
+                .whereEqualTo("available", true)
                 .get()
                 .await()
 

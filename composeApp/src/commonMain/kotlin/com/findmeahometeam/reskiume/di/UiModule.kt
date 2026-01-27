@@ -2,6 +2,8 @@ package com.findmeahometeam.reskiume.di
 
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProviderImpl
+import com.findmeahometeam.reskiume.ui.fosterHomes.checkAllFosterHomes.CheckAllFosterHomesViewmodel
+import com.findmeahometeam.reskiume.ui.fosterHomes.checkFosterHome.CheckFosterHomeUtil
 import com.findmeahometeam.reskiume.ui.home.HomeViewmodel
 import com.findmeahometeam.reskiume.ui.profile.ProfileViewmodel
 import com.findmeahometeam.reskiume.ui.profile.checkAllAdvice.CheckAllAdviceViewmodel
@@ -43,4 +45,5 @@ val uiModule = module {
     viewModelOf(::CreateNonHumanAnimalViewmodel)
     singleOf(::DeleteNonHumanAnimalUtil)
     viewModelOf(::CheckAllAdviceViewmodel)
+    viewModelOf(::CheckAllFosterHomesViewmodel)
 }

@@ -1,5 +1,6 @@
 package com.findmeahometeam.reskiume.data.util.translator
 
+import com.findmeahometeam.reskiume.domain.repository.util.translator.Translator
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.UserAgent
@@ -17,9 +18,9 @@ import io.ktor.http.isSuccess
  * @author bush, py-googletrans + contributors
  * @modified Find me a home team
  */
-class Translator(
+class TranslatorImpl(
     private val client: HttpClient
-) {
+): Translator {
 
     init {
         client.config {
@@ -58,10 +59,10 @@ class Translator(
      *
      * @see Translation
      */
-    suspend fun translate(
+    override suspend fun translate(
         textToTranslate: String,
-        sourceLanguage: Language = Language.AUTO,
-        targetLanguage: Language = Language.ENGLISH
+        sourceLanguage: Language,
+        targetLanguage: Language
     ): Translation {
         require(targetLanguage != Language.AUTO) {
             "The target language cannot be Language.AUTO!"

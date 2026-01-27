@@ -65,6 +65,7 @@ import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromLocalRe
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.InsertReviewInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.InsertReviewInRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.util.translator.TranslateMessage
 import com.plusmobileapps.konnectivity.Konnectivity
 import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
@@ -152,4 +153,7 @@ val domainModule = module {
     factoryOf(::InsertUserInRemoteDataSource)
     factoryOf(::ModifyUserInLocalDataSource)
     factoryOf(::ModifyUserInRemoteDataSource)
+
+    // util translator
+    factoryOf(::TranslateMessage)
 }

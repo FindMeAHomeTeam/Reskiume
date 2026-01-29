@@ -194,15 +194,29 @@
     <string name="check_all_foster_homes_screen_search_foster_homes_button">🔎 Search foster homes</string>
     <string name="check_all_foster_homes_screen_search_available_foster_homes">Available foster homes</string>
     <string name="check_all_foster_homes_screen_no_foster_home_found">⚠️ No foster home found, but consider creating a rescue event or searching social media networks.</string>
+    <string name="check_all_foster_homes_screen_turn_on_location">Please, turn on the location to get your position</string>
+    <string name="check_all_foster_homes_screen_km">%1$d Km · %2$s</string>
     <string name="check_all_foster_homes_screen_non_human_animal_gender_female">Female</string>
     <string name="check_all_foster_homes_screen_non_human_animal_gender_male">Male</string>
     <string name="check_all_foster_homes_screen_non_human_animal_gender_both">Both</string>
+
+    <!-- Location permission -->
+    <string name="location_permission_title">Location permission</string>
+    <string name="location_permission_message">You can grant the location permission to display foster homes near you. We will never track your location.</string>
+    <string name="location_permission_grant_permission_button">Grant permission</string>
+    <string name="location_permission_do_not_grant_permission_button">Later</string>
+    <string name="location_go_to_settings_title">Go to settings</string>
+    <string name="location_grant_in_settings_message">Location permissions can be enabled in settings. Remember, we will never track you.</string>
+    <string name="location_open_settings_button">Open settings</string>
+    <string name="location_turn_on_location_title">Turn on location services manually</string>
+    <string name="location_turn_on_location_message">Please activate location services manually so we know where you are and can show nearby shelters after clicking search.</string>
+    <string name="location_turn_on_location_open_settings_button">Open settings</string>
+    <string name="location_turn_on_later_location_button">Later</string>
 
     <!-- Foster home list item -->
     <string name="foster_home_list_item_accepted_non_human_animal">Accept %1$s</string>
     <string name="foster_home_list_item_accepted_more_non_human_animal">➕ And more</string>
     <string name="foster_home_list_item_residents_non_human_animal">Residents</string>
-
 
     <!-- Check all advice -->
     <string name="check_all_advice_screen_title">Check all advice</string>

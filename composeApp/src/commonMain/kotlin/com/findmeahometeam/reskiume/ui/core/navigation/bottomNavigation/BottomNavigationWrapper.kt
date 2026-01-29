@@ -19,8 +19,7 @@ fun BottomNavigationWrapper(
     mainNavHostController: NavHostController
 ) {
 
-    // TODO start destination
-    NavHost(navController = bottomNavHostController, startDestination = Routes.PROFILE.route) {
+    NavHost(navController = bottomNavHostController, startDestination = Routes.CHECK_ALL_FOSTER_HOMES.route) {
 
         composable(route = Routes.CHECK_ALL_FOSTER_HOMES.route) {
             CheckAllFosterHomesScreen { fosterHomeId: String ->

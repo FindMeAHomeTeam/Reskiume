@@ -91,6 +91,9 @@ kotlin {
             implementation(libs.image.picker.kmp)
 
             implementation(libs.konnectivity)
+
+            implementation(libs.moko.permissions.compose)
+            implementation(libs.moko.permissions.location)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

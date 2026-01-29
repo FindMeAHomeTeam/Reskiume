@@ -8,5 +8,7 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>This app needs access to the camera to take photos</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>You can grant the location permission to display foster homes near you. We will never track your location.</string>
 </dict>
 </plist>

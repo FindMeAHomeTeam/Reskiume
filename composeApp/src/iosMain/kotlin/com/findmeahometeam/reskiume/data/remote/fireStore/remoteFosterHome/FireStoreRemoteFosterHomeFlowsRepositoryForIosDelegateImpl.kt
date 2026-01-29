@@ -24,7 +24,6 @@ class FireStoreRemoteFosterHomeFlowsRepositoryForIosDelegateImpl :
         MutableSharedFlow(extraBufferCapacity = 1)
 
     override fun updateRemoteFosterHomeListFlow(delegate: List<RemoteFosterHome>) {
-        println("updateRemoteFosterHomeListFlow: $delegate")
         _remoteFosterHomeListState.tryEmit(delegate)
     }
 

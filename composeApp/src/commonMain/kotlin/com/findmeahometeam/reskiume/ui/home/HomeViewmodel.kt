@@ -26,7 +26,7 @@ class HomeViewmodel(
         } else {
             val user: User? = getUserFromLocalDataSource(authUser.uid)
             if (user == null) {
-                log.e("HomeViewmodel", "User data not found")
+                log.e("HomeViewmodel", "User ${authUser.uid} not found")
                 UiState.Idle()
             } else {
                 UiState.Success(Unit)

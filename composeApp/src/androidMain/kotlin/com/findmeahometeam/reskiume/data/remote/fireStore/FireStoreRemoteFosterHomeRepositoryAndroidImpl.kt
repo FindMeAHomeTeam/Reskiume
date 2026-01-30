@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 
-class FireStoreRemoteFosterHomeRepositoryImpl(
+class FireStoreRemoteFosterHomeRepositoryAndroidImpl(
     private val firebaseFirestore: FirebaseFirestore,
     private val log: Log
 ) : FireStoreRemoteFosterHomeRepository {

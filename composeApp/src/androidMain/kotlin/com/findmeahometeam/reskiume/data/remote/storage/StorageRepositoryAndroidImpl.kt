@@ -18,24 +18,29 @@ class StorageRepositoryAndroidImpl(
 
     private fun getStorageReference(
         section: Section,
-        userUid: String,
+        uid: String,
         extraId: String = ""
     ): StorageReference {
         return when {
             section == Section.USERS -> storageRef
                 .child(Section.USERS.path)
-                .child(userUid)
-                .child("$userUid.webp")
+                .child(uid)
+                .child("$uid.webp")
 
             section == Section.NON_HUMAN_ANIMALS -> storageRef
                 .child(Section.NON_HUMAN_ANIMALS.path)
-                .child(userUid)
+                .child(uid)
+                .child("$extraId.webp")
+
+            section == Section.FOSTER_HOMES -> storageRef
+                .child(Section.FOSTER_HOMES.path)
+                .child(uid)
                 .child("$extraId.webp")
 
             else -> storageRef
                 .child(Section.USERS.path)
-                .child(userUid)
-                .child("$userUid.webp")
+                .child(uid)
+                .child("$uid.webp")
         }
     }
 
@@ -74,6 +79,7 @@ class StorageRepositoryAndroidImpl(
         val localFile = when {
             section == Section.USERS -> File(context.filesDir, "$userUid.webp")
             section == Section.NON_HUMAN_ANIMALS -> File(context.filesDir, "$userUid$extraId.webp")
+            section == Section.FOSTER_HOMES -> File(context.filesDir, "$userUid$extraId.webp")
             else -> File(context.filesDir, "$userUid.webp")
         }
 

@@ -22,6 +22,10 @@ class StorageRepositoryForIosDelegateImpl: StorageRepository {
                 .child(Section.nonHumanAnimals.path)
                 .child(userUid)
                 .child("\(extraId).webp")
+        case Section.fosterHomes: storageRef
+                .child(Section.fosterHomes.path)
+                .child(userUid)
+                .child("\(extraId).webp")
         default: storageRef
         }
     }
@@ -66,6 +70,7 @@ class StorageRepositoryForIosDelegateImpl: StorageRepository {
         let fileName: String = switch section {
         case Section.users: "\(userUid).webp"
         case Section.nonHumanAnimals: "\(userUid)\(extraId).webp"
+        case Section.fosterHomes: "\(userUid)\(extraId).webp"
         default: "\(userUid).webp"
         }
         if let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {

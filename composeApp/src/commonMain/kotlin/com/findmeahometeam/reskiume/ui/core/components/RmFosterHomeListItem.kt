@@ -33,6 +33,7 @@ import com.findmeahometeam.reskiume.ui.core.primaryPink
 import com.findmeahometeam.reskiume.ui.core.tertiaryGreen
 import org.jetbrains.compose.resources.stringResource
 import reskiume.composeapp.generated.resources.Res
+import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_km
 import reskiume.composeapp.generated.resources.foster_home_list_item_accepted_more_non_human_animal
 import reskiume.composeapp.generated.resources.foster_home_list_item_accepted_non_human_animal
 import reskiume.composeapp.generated.resources.foster_home_list_item_residents_non_human_animal
@@ -86,7 +87,11 @@ fun RmFosterHomeListItem(
 
                     RmText(
                         modifier = Modifier.fillMaxWidth(),
-                        text = if (distance == null) city else "$distance · $city",
+                        text = if (distance == null) {
+                            city
+                        } else {
+                            stringResource(Res.string.check_all_foster_homes_screen_km, distance, city)
+                        },
                         color = Color.White
                     )
                 }

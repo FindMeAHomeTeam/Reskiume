@@ -43,7 +43,9 @@ import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteFos
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepositoryForIosDelegateWrapper
 import com.findmeahometeam.reskiume.domain.repository.util.analytics.AnalyticsForIosWrapper
+import com.findmeahometeam.reskiume.domain.repository.util.location.LocationRepository
 import com.findmeahometeam.reskiume.domain.repository.util.log.CrashlyticsForIosWrapper
+import com.findmeahometeam.reskiume.ui.location.LocationRepositoryIosImpl
 import com.findmeahometeam.reskiume.ui.profile.giveFeedback.GiveFeedback
 import com.findmeahometeam.reskiume.ui.profile.giveFeedback.GiveFeedbackImpl
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
@@ -81,4 +83,5 @@ actual val platformModule: Module = module {
     singleOf(::FireStoreRemoteFosterHomeRepositoryIosImpl) bind FireStoreRemoteFosterHomeRepository::class
     singleOf(::FireStoreRemoteFosterHomeFlowsRepositoryForIosDelegateImpl) bind FireStoreRemoteFosterHomeFlowsRepositoryForIosDelegate::class
     singleOf(::FireStoreRemoteFosterHomeRepositoryForIosDelegateWrapperImpl) bind FireStoreRemoteFosterHomeRepositoryForIosDelegateWrapper::class
+    singleOf(::LocationRepositoryIosImpl) bind LocationRepository::class
 }

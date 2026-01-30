@@ -1,12 +1,13 @@
 package com.findmeahometeam.reskiume.di
 
+import androidx.activity.ComponentActivity
 import com.findmeahometeam.reskiume.data.database.ReskiumeDatabase
 import com.findmeahometeam.reskiume.data.database.getDatabase
 import com.findmeahometeam.reskiume.data.remote.auth.AuthRepositoryAndroidImpl
-import com.findmeahometeam.reskiume.data.remote.fireStore.FireStoreRemoteFosterHomeRepositoryImpl
 import com.findmeahometeam.reskiume.data.remote.database.nonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepositoryAndroidImpl
 import com.findmeahometeam.reskiume.data.remote.database.remoteReview.RealtimeDatabaseRemoteReviewRepositoryAndroidImpl
 import com.findmeahometeam.reskiume.data.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepositoryAndroidImpl
+import com.findmeahometeam.reskiume.data.remote.fireStore.FireStoreRemoteFosterHomeRepositoryAndroidImpl
 import com.findmeahometeam.reskiume.data.remote.storage.StorageRepositoryAndroidImpl
 import com.findmeahometeam.reskiume.data.util.analytics.Analytics
 import com.findmeahometeam.reskiume.data.util.analytics.AnalyticsAndroidImpl
@@ -18,6 +19,8 @@ import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteRevi
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteFosterHome.FireStoreRemoteFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
+import com.findmeahometeam.reskiume.domain.repository.util.location.LocationRepository
+import com.findmeahometeam.reskiume.ui.location.LocationRepositoryAndroidImpl
 import com.findmeahometeam.reskiume.ui.profile.giveFeedback.GiveFeedback
 import com.findmeahometeam.reskiume.ui.profile.giveFeedback.GiveFeedbackImpl
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
@@ -50,5 +53,6 @@ actual val platformModule: Module = module {
     singleOf(::ManageImagePathImpl) bind ManageImagePath::class
     single<HttpClient> { HttpClient(Android) }
     single<FirebaseFirestore> { Firebase.firestore }
-    singleOf(::FireStoreRemoteFosterHomeRepositoryImpl) bind FireStoreRemoteFosterHomeRepository::class
+    singleOf(::FireStoreRemoteFosterHomeRepositoryAndroidImpl) bind FireStoreRemoteFosterHomeRepository::class
+    singleOf(::LocationRepositoryAndroidImpl) bind LocationRepository::class
 }

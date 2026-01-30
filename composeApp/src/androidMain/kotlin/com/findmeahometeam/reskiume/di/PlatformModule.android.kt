@@ -29,12 +29,14 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
+import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
 actual val platformModule: Module = module {
+    single<ComponentActivity> { androidContext() as ComponentActivity }
     singleOf(::LogAndroidImpl) bind Log::class
     singleOf(::AnalyticsAndroidImpl) bind Analytics::class
     singleOf(::AuthRepositoryAndroidImpl) bind AuthRepository::class

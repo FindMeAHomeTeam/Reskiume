@@ -17,7 +17,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             App {
                 androidLogger()
-                androidContext(this@MainActivity.applicationContext)
+                androidContext(this@MainActivity)
             }
         }
     }

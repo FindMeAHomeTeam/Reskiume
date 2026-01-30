@@ -23,8 +23,7 @@ class ProfileViewmodel(
             } else {
                 val user: User? = getUserFromLocalDataSource(authUser.uid)
                 if (user == null) {
-                    log.e("ProfileViewmodel", "User data not found")
-                    ProfileUiState.Error("ProfileViewmodel - User data not found")
+                    ProfileUiState.Error("ProfileViewmodel - User ${authUser.uid} not found")
                 } else {
                     ProfileUiState.Success(
                         user = user.copy(

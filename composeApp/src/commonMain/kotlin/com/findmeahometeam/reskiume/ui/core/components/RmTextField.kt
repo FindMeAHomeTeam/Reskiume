@@ -6,6 +6,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import com.findmeahometeam.reskiume.ui.core.backgroundColorForItems
 import com.findmeahometeam.reskiume.ui.core.primaryGreen
 import com.findmeahometeam.reskiume.ui.core.textColor
@@ -17,7 +18,10 @@ fun RmTextField(
     text: String,
     label: String,
     trailingIcon: DrawableResource? = null,
+    trailingIconTint: Color = textColor,
     readOnly: Boolean = false,
+    isError: Boolean = false,
+    supportingText: @Composable (() -> Unit)? = null,
     modifier: Modifier = Modifier,
     onValueChange: (String) -> Unit
 ) {
@@ -27,11 +31,13 @@ fun RmTextField(
         value = text,
         label = { Text(text = label) },
         onValueChange = onValueChange,
+        isError = isError,
+        supportingText = supportingText,
         trailingIcon = {
             if (trailingIcon != null) {
                 Icon(
                     painter = painterResource(trailingIcon),
-                    tint = textColor,
+                    tint = trailingIconTint,
                     contentDescription = null
                 )
             }

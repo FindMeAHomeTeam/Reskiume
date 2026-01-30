@@ -21,7 +21,7 @@ class GetDataByManagingObjectLocalCacheTimestamp(
     @OptIn(ExperimentalTime::class)
     suspend operator fun <T> invoke(
         cachedObjectId: String,
-        savedBy: String = "",
+        savedBy: String = " ",
         section: Section,
         onCompletionInsertCache: suspend () -> T,
         onCompletionUpdateCache: suspend () -> T,
@@ -44,7 +44,7 @@ class GetDataByManagingObjectLocalCacheTimestamp(
                     repository.insertLocalCacheEntity(
                         LocalCache(
                             cachedObjectId = cachedObjectId,
-                            savedBy = savedBy.ifBlank { cachedObjectId },
+                            savedBy = savedBy.ifEmpty { cachedObjectId },
                             section = section,
                             timestamp = Clock.System.now().epochSeconds
                         ).toEntity()

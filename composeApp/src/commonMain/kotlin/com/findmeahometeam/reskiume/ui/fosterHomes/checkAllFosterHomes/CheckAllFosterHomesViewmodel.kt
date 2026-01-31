@@ -24,6 +24,9 @@ import com.findmeahometeam.reskiume.domain.usecases.image.GetCompleteImagePathFr
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.util.location.GetIfLocationEnabledFromLocationRepository
+import com.findmeahometeam.reskiume.domain.usecases.util.location.GetLocationFromLocationRepository
+import com.findmeahometeam.reskiume.domain.usecases.util.location.RequestEnableLocationFromLocationRepository
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.components.toUiState
 import com.findmeahometeam.reskiume.ui.util.StringProvider
@@ -34,13 +37,16 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
 import reskiume.composeapp.generated.resources.Res
+import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_location_search_option
 import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_place_search_option
-import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_position_search_option
+import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_turn_on_location
 import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -51,6 +57,7 @@ import kotlin.math.sqrt
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class CheckAllFosterHomesViewmodel(
     private val stringProvider: StringProvider,
     private val observeAuthStateInAuthDataSource: ObserveAuthStateInAuthDataSource,
@@ -66,6 +73,10 @@ class CheckAllFosterHomesViewmodel(
     private val getCompleteImagePathFromLocalDataSource: GetCompleteImagePathFromLocalDataSource,
     private val getAllFosterHomesByLocationFromRemoteRepository: GetAllFosterHomesByLocationFromRemoteRepository,
     private val getAllFosterHomesByLocationFromLocalRepository: GetAllFosterHomesByLocationFromLocalRepository,
+    private val getIfLocationEnabledFromLocationRepository: GetIfLocationEnabledFromLocationRepository,
+    private val requestEnableLocationFromLocationRepository: RequestEnableLocationFromLocationRepository,
+    private val getLocationFromLocationRepository: GetLocationFromLocationRepository,
+    private val getStringProvider: StringProvider,
     private val log: Log
 ) : ViewModel() {
 
@@ -77,6 +88,50 @@ class CheckAllFosterHomesViewmodel(
     val allFosterHomesState: StateFlow<UiState<List<UiFosterHome>>> =
         _allFosterHomesState.asStateFlow()
 
+    private sealed class Query {
+
+        object Idle : Query()
+
+        class ByPlace(
+            val country: String,
+            val city: String,
+            val nonHumanAnimalType: NonHumanAnimalType
+        ) : Query()
+
+        class ByLocation(
+            val activistLongitude: Double,
+            val activistLatitude: Double,
+            val nonHumanAnimalType: NonHumanAnimalType
+        ) : Query()
+    }
+
+    private var _activeQuery: MutableStateFlow<Query> = MutableStateFlow(Query.Idle)
+
+    init {
+        viewModelScope.launch {
+
+            _activeQuery.flatMapLatest {
+                when (it) {
+                    Query.Idle -> flowOf(UiState.Idle())
+
+                    is Query.ByPlace -> getFetchAllFosterHomesStateByPlaceFlow(
+                        it.country,
+                        it.city,
+                        it.nonHumanAnimalType
+                    )
+
+                    is Query.ByLocation -> getFetchAllFosterHomesStateByLocationFlow(
+                        it.activistLongitude,
+                        it.activistLatitude,
+                        it.nonHumanAnimalType
+                    )
+                }
+            }.collect {
+                _allFosterHomesState.value = it
+            }
+        }
+    }
+
     fun allCountryItems(): Flow<List<Pair<Country, String>>> = flow {
 
         val value = Country.entries
@@ -87,7 +142,7 @@ class CheckAllFosterHomesViewmodel(
 
     fun allCityItems(selectedCountry: Country): Flow<List<Pair<City, String>>> = flow {
 
-        val list: List<Pair<City, String>> = if(selectedCountry == Country.UNSELECTED) {
+        val list: List<Pair<City, String>> = if (selectedCountry == Country.UNSELECTED) {
             emptyList()
         } else {
             City.entries
@@ -97,7 +152,6 @@ class CheckAllFosterHomesViewmodel(
         emit(list)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     fun fetchAllFosterHomesStateByPlace(
         country: String,
         city: String,
@@ -105,63 +159,108 @@ class CheckAllFosterHomesViewmodel(
     ) {
         _allFosterHomesState.value = UiState.Loading()
 
+        _activeQuery.value = Query.ByPlace(country, city, nonHumanAnimalType)
+    }
+
+    fun getIfLocationEnabled() = getIfLocationEnabledFromLocationRepository()
+
+    fun requestEnableLocation(onResul: (Boolean) -> Unit) {
+
+        requestEnableLocationFromLocationRepository(onResul)
+    }
+
+    fun updateLocation(onResult: (longitude: Double, latitude: Double) -> Unit) {
+
         viewModelScope.launch {
-
-            observeAuthStateInAuthDataSource()
-                .flatMapConcat { authUser: AuthUser? ->
-
-                    myUserId = authUser?.uid ?: ""
-
-                    getDataByManagingObjectLocalCacheTimestamp(
-                        cachedObjectId = country + city,
-                        savedBy = authUser?.uid ?: "",
-                        section = Section.FOSTER_HOMES,
-                        onCompletionInsertCache = {
-                            getAllFosterHomesByCountryAndCityFromRemoteRepository(
-                                country,
-                                city,
-                                viewModelScope
-                            ).downloadImageAndManageFosterHomesInLocalRepository()
-                        },
-                        onCompletionUpdateCache = {
-                            getAllFosterHomesByCountryAndCityFromRemoteRepository(
-                                country,
-                                city,
-                                viewModelScope
-                            ).downloadImageAndModifyFosterHomesInLocalRepository()
-                        },
-                        onVerifyCacheIsRecent = {
-                            getAllFosterHomesByCountryAndCityFromLocalRepository(
-                                country,
-                                city,
-                                viewModelScope
-                            )
-                        }
-                    ).map {
-                        it.flatMap { fosterHome ->
-                            fosterHome.allAcceptedNonHumanAnimalTypes.mapNotNull { acceptedNonHumanAnimalTypeForFosterHome ->
-                                if (acceptedNonHumanAnimalTypeForFosterHome.acceptedNonHumanAnimalType == nonHumanAnimalType) {
-                                    UiFosterHome(
-                                        fosterHome.copy(
-                                            imageUrl = if (fosterHome.imageUrl.isEmpty()) {
-                                                fosterHome.imageUrl
-                                            } else {
-                                                getCompleteImagePathFromLocalDataSource(fosterHome.imageUrl)
-                                            }
-                                        )
-                                    )
-                                } else {
-                                    null
-                                }
-                            }
-                        }.sortedBy { uiFosterHome -> uiFosterHome.fosterHome.city }
-                    }
-                }.toUiState()
-                .collect {
-                    _allFosterHomesState.value = it
-                }
+            val locationPair: Pair<Double, Double> = getLocationFromLocationRepository()
+            onResult(locationPair.first, locationPair.second)
+            log.d(
+                "CheckAllFosterHomesViewmodel",
+                "Longitude and latitude: $locationPair"
+            )
         }
     }
+
+    fun fetchAllFosterHomesStateByLocation(
+        activistLongitude: Double,
+        activistLatitude: Double,
+        nonHumanAnimalType: NonHumanAnimalType
+    ) {
+        if (activistLongitude == 0.0 && activistLatitude == 0.0) {
+
+            viewModelScope.launch {
+
+                val errorMessage =
+                    getStringProvider.getStringResource(Res.string.check_all_foster_homes_screen_turn_on_location)
+                log.d(
+                    "CheckAllFosterHomesViewmodel",
+                    errorMessage
+                )
+                _allFosterHomesState.value = UiState.Error(errorMessage)
+                _activeQuery.value = Query.Idle
+            }
+            return
+        }
+        _allFosterHomesState.value = UiState.Loading()
+        _activeQuery.value =
+            Query.ByLocation(activistLongitude, activistLatitude, nonHumanAnimalType)
+    }
+
+    private fun getFetchAllFosterHomesStateByPlaceFlow(
+        country: String,
+        city: String,
+        nonHumanAnimalType: NonHumanAnimalType
+    ): Flow<UiState<List<UiFosterHome>>> =
+        observeAuthStateInAuthDataSource()
+            .flatMapConcat { authUser: AuthUser? ->
+
+                myUserId = authUser?.uid ?: " "
+
+                getDataByManagingObjectLocalCacheTimestamp(
+                    cachedObjectId = country + city,
+                    savedBy = myUserId,
+                    section = Section.FOSTER_HOMES,
+                    onCompletionInsertCache = {
+                        getAllFosterHomesByCountryAndCityFromRemoteRepository(
+                            country,
+                            city,
+                            viewModelScope
+                        ).downloadImageAndManageFosterHomesInLocalRepository()
+                    },
+                    onCompletionUpdateCache = {
+                        getAllFosterHomesByCountryAndCityFromRemoteRepository(
+                            country,
+                            city,
+                            viewModelScope
+                        ).downloadImageAndModifyFosterHomesInLocalRepository()
+                    },
+                    onVerifyCacheIsRecent = {
+                        getAllFosterHomesByCountryAndCityFromLocalRepository(
+                            country,
+                            city,
+                            viewModelScope
+                        )
+                    }
+                ).map {
+                    it.flatMap { fosterHome ->
+                        fosterHome.allAcceptedNonHumanAnimalTypes.mapNotNull { acceptedNonHumanAnimalTypeForFosterHome ->
+                            if (acceptedNonHumanAnimalTypeForFosterHome.acceptedNonHumanAnimalType == nonHumanAnimalType) {
+                                UiFosterHome(
+                                    fosterHome.copy(
+                                        imageUrl = if (fosterHome.imageUrl.isEmpty()) {
+                                            fosterHome.imageUrl
+                                        } else {
+                                            getCompleteImagePathFromLocalDataSource(fosterHome.imageUrl)
+                                        }
+                                    )
+                                )
+                            } else {
+                                null
+                            }
+                        }
+                    }.sortedBy { uiFosterHome -> uiFosterHome.fosterHome.city }
+                }
+            }.toUiState()
 
     private fun Flow<List<FosterHome>>.downloadImageAndManageFosterHomesInLocalRepository(): Flow<List<FosterHome>> =
         this.map { fosterHomeList ->
@@ -177,7 +276,10 @@ class CheckAllFosterHomesViewmodel(
                     val fosterHomeWithLocalImage =
                         fosterHome.copy(imageUrl = localImagePath.ifBlank { fosterHome.imageUrl })
 
-                    val localFosterHome: FosterHome? = getFosterHomeFromLocalRepository(fosterHome.id, viewModelScope).firstOrNull()
+                    val localFosterHome: FosterHome? = getFosterHomeFromLocalRepository(
+                        fosterHome.id,
+                        viewModelScope
+                    ).firstOrNull()
 
                     if (localFosterHome == null) {
                         insertFosterHomeInLocalRepository(fosterHomeWithLocalImage)
@@ -190,7 +292,10 @@ class CheckAllFosterHomesViewmodel(
                         "CheckAllFosterHomesViewmodel",
                         "Foster home ${fosterHome.id} has no avatar image to save locally."
                     )
-                    val localFosterHome: FosterHome? = getFosterHomeFromLocalRepository(fosterHome.id, viewModelScope).firstOrNull()
+                    val localFosterHome: FosterHome? = getFosterHomeFromLocalRepository(
+                        fosterHome.id,
+                        viewModelScope
+                    ).firstOrNull()
 
                     if (localFosterHome == null) {
                         insertFosterHomeInLocalRepository(fosterHome)
@@ -321,84 +426,75 @@ class CheckAllFosterHomesViewmodel(
             }
         }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    fun fetchAllFosterHomesStateByLocation(
+    private fun getFetchAllFosterHomesStateByLocationFlow(
         activistLongitude: Double,
         activistLatitude: Double,
         nonHumanAnimalType: NonHumanAnimalType
-    ) {
-        _allFosterHomesState.value = UiState.Loading()
+    ): Flow<UiState<List<UiFosterHome>>> =
+        observeAuthStateInAuthDataSource()
+            .flatMapConcat { authUser: AuthUser? ->
 
-        viewModelScope.launch {
+                myUserId = authUser?.uid ?: " "
 
-            observeAuthStateInAuthDataSource()
-                .flatMapConcat { authUser: AuthUser? ->
-
-                    myUserId = authUser?.uid ?: ""
-
-                    getDataByManagingObjectLocalCacheTimestamp(
-                        cachedObjectId = "$activistLongitude$activistLatitude",
-                        savedBy = authUser?.uid ?: "",
-                        section = Section.FOSTER_HOMES,
-                        onCompletionInsertCache = {
-                            getAllFosterHomesByLocationFromRemoteRepository(
-                                activistLongitude = activistLongitude,
-                                activistLatitude = activistLatitude,
-                                rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
-                                rangeLatitude = getRangeLat(),
-                                coroutineScope = viewModelScope
-                            ).downloadImageAndManageFosterHomesInLocalRepository()
-                        },
-                        onCompletionUpdateCache = {
-                            getAllFosterHomesByLocationFromRemoteRepository(
-                                activistLongitude = activistLongitude,
-                                activistLatitude = activistLatitude,
-                                rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
-                                rangeLatitude = getRangeLat(),
-                                coroutineScope = viewModelScope
-                            ).downloadImageAndModifyFosterHomesInLocalRepository()
-                        },
-                        onVerifyCacheIsRecent = {
-                            getAllFosterHomesByLocationFromLocalRepository(
-                                activistLongitude = activistLongitude,
-                                activistLatitude = activistLatitude,
-                                rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
-                                rangeLatitude = getRangeLat(),
-                                coroutineScope = viewModelScope
-                            )
-                        }
-                    ).map {
-                        it.flatMap { fosterHome ->
-                            fosterHome.allAcceptedNonHumanAnimalTypes.mapNotNull { acceptedNonHumanAnimalTypeForFosterHome ->
-                                if (acceptedNonHumanAnimalTypeForFosterHome.acceptedNonHumanAnimalType == nonHumanAnimalType) {
-                                    UiFosterHome(
-                                        fosterHome = fosterHome.copy(
-                                            imageUrl = if (fosterHome.imageUrl.isEmpty()) {
-                                                fosterHome.imageUrl
-                                            } else {
-                                                getCompleteImagePathFromLocalDataSource(fosterHome.imageUrl)
-                                            }
-                                        ),
-                                        distance = calculateDistanceHaversineKm(
-                                            activistLatitude,
-                                            activistLongitude,
-                                            fosterHome.latitude,
-                                            fosterHome.longitude
-                                        )
-                                    )
-                                } else {
-                                    null
-                                }
-                            }
-                        }.sortedBy { uiFosterHome -> uiFosterHome.distance }
+                getDataByManagingObjectLocalCacheTimestamp(
+                    cachedObjectId = "$activistLongitude$activistLatitude",
+                    savedBy = myUserId,
+                    section = Section.FOSTER_HOMES,
+                    onCompletionInsertCache = {
+                        getAllFosterHomesByLocationFromRemoteRepository(
+                            activistLongitude = activistLongitude,
+                            activistLatitude = activistLatitude,
+                            rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
+                            rangeLatitude = getRangeLat(),
+                            coroutineScope = viewModelScope
+                        ).downloadImageAndManageFosterHomesInLocalRepository()
+                    },
+                    onCompletionUpdateCache = {
+                        getAllFosterHomesByLocationFromRemoteRepository(
+                            activistLongitude = activistLongitude,
+                            activistLatitude = activistLatitude,
+                            rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
+                            rangeLatitude = getRangeLat(),
+                            coroutineScope = viewModelScope
+                        ).downloadImageAndModifyFosterHomesInLocalRepository()
+                    },
+                    onVerifyCacheIsRecent = {
+                        getAllFosterHomesByLocationFromLocalRepository(
+                            activistLongitude = activistLongitude,
+                            activistLatitude = activistLatitude,
+                            rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
+                            rangeLatitude = getRangeLat(),
+                            coroutineScope = viewModelScope
+                        )
                     }
+                ).map {
+                    it.flatMap { fosterHome ->
+                        fosterHome.allAcceptedNonHumanAnimalTypes.mapNotNull { acceptedNonHumanAnimalTypeForFosterHome ->
+                            if (acceptedNonHumanAnimalTypeForFosterHome.acceptedNonHumanAnimalType == nonHumanAnimalType) {
+                                UiFosterHome(
+                                    fosterHome = fosterHome.copy(
+                                        imageUrl = if (fosterHome.imageUrl.isEmpty()) {
+                                            fosterHome.imageUrl
+                                        } else {
+                                            getCompleteImagePathFromLocalDataSource(fosterHome.imageUrl)
+                                        }
+                                    ),
+                                    distance = calculateDistanceHaversineKm(
+                                        activistLatitude,
+                                        activistLongitude,
+                                        fosterHome.latitude,
+                                        fosterHome.longitude
+                                    )
+                                )
+                            } else {
+                                null
+                            }
+                        }
+                    }.sortedBy { uiFosterHome -> uiFosterHome.distance }
                 }
-                .toUiState()
-                .collect {
-                    _allFosterHomesState.value = it
-                }
-        }
-    }
+            }
+            .toUiState()
+
 
     private fun getRangeLon(maxDistanceInKm: Double = 150.0, activistLatitude: Double): Double =
         1.0 * maxDistanceInKm / (111.320 * cos((activistLatitude * PI) / (180)))
@@ -407,17 +503,16 @@ class CheckAllFosterHomesViewmodel(
         1.0 * maxDistanceInKm / 110.574
 
     // Calculate the distance in km between two points using the Haversine formula
-    // and rounds the result to 2 decimal places
-    fun calculateDistanceHaversineKm(
+    // and rounds the result to one decimal place
+    private fun calculateDistanceHaversineKm(
         lat1: Double,
         lng1: Double,
         lat2: Double,
         lng2: Double
     ): Double {
-
         if (lat1 == lat2 && lng1 == lng2) return 0.0
 
-        val radEarth = 6.3781 * 10.0.pow(3.0)
+        val radEarth = 6378.1
 
         val phi1 = lat1 * (PI / 180.0)
         val phi2 = lat2 * (PI / 180.0)
@@ -431,7 +526,7 @@ class CheckAllFosterHomesViewmodel(
 
         val distance = radEarth * cal2
 
-        return round(distance * 10.0.pow(2)) / 10.0.pow(2)
+        return round(distance * 10.0) / 10.0
     }
 }
 
@@ -442,5 +537,5 @@ data class UiFosterHome(
 
 enum class SearchOption(val stringResource: StringResource) {
     COUNTRY_CITY(Res.string.check_all_foster_homes_screen_place_search_option),
-    LOCATION(Res.string.check_all_foster_homes_screen_position_search_option),
+    LOCATION(Res.string.check_all_foster_homes_screen_location_search_option),
 }

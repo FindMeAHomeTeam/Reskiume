@@ -187,7 +187,7 @@
     <!-- Check all foster homes -->
     <string name="check_all_foster_homes_screen_title">Search foster homes by</string>
     <string name="check_all_foster_homes_screen_place_search_option">🌐 place</string>
-    <string name="check_all_foster_homes_screen_position_search_option">📍 position</string>
+    <string name="check_all_foster_homes_screen_location_search_option">📍 location</string>
     <string name="check_all_foster_homes_screen_country_label">🌍 Country</string>
     <string name="check_all_foster_homes_screen_city_label">🌇 City</string>
     <string name="check_all_foster_homes_screen_non_human_animal_type_label">🐷🐱 Non-human animal type</string>

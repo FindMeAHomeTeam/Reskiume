@@ -34,16 +34,22 @@ import com.findmeahometeam.reskiume.domain.model.fosterHome.City
 import com.findmeahometeam.reskiume.domain.model.fosterHome.Country
 import com.findmeahometeam.reskiume.domain.model.toStringResource
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
+import com.findmeahometeam.reskiume.ui.core.components.ManagePermissionState
 import com.findmeahometeam.reskiume.ui.core.components.RmButton
+import com.findmeahometeam.reskiume.ui.core.components.RmDialog
 import com.findmeahometeam.reskiume.ui.core.components.RmDisplaySingleChoiceSegmentedButtonRow
 import com.findmeahometeam.reskiume.ui.core.components.RmDropDownMenu
 import com.findmeahometeam.reskiume.ui.core.components.RmFosterHomeListItem
+import com.findmeahometeam.reskiume.ui.core.components.RmManagePermission
 import com.findmeahometeam.reskiume.ui.core.components.RmResultState
 import com.findmeahometeam.reskiume.ui.core.components.RmScaffold
 import com.findmeahometeam.reskiume.ui.core.components.RmSearchBarWithSuggestions
 import com.findmeahometeam.reskiume.ui.core.components.RmSecondaryText
 import com.findmeahometeam.reskiume.ui.core.components.RmText
+import com.findmeahometeam.reskiume.ui.core.components.StringsForDialog
 import com.findmeahometeam.reskiume.ui.core.components.UiState
+import dev.icerock.moko.permissions.Permission
+import dev.icerock.moko.permissions.location.COARSE_LOCATION
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import reskiume.composeapp.generated.resources.Res
@@ -54,6 +60,17 @@ import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_non
 import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_search_available_foster_homes
 import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_search_foster_homes_button
 import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_title
+import reskiume.composeapp.generated.resources.location_go_to_settings_title
+import reskiume.composeapp.generated.resources.location_grant_in_settings_message
+import reskiume.composeapp.generated.resources.location_open_settings_button
+import reskiume.composeapp.generated.resources.location_permission_do_not_grant_permission_button
+import reskiume.composeapp.generated.resources.location_permission_grant_permission_button
+import reskiume.composeapp.generated.resources.location_permission_message
+import reskiume.composeapp.generated.resources.location_permission_title
+import reskiume.composeapp.generated.resources.location_turn_on_later_location_button
+import reskiume.composeapp.generated.resources.location_turn_on_location_message
+import reskiume.composeapp.generated.resources.location_turn_on_location_open_settings_button
+import reskiume.composeapp.generated.resources.location_turn_on_location_title
 
 @Composable
 fun CheckAllFosterHomesScreen(
@@ -80,12 +97,18 @@ fun CheckAllFosterHomesScreen(
     var nonHumanAnimalType: NonHumanAnimalType by rememberSaveable {
         mutableStateOf(NonHumanAnimalType.UNSELECTED)
     }
+    var managePermissionState: ManagePermissionState by rememberSaveable {
+        mutableStateOf(
+            ManagePermissionState.IDLE
+        )
+    }
+    var displayDialogToRequestLocationActivation: Boolean by rememberSaveable { mutableStateOf(false) }
+
     val uiFosterHomeListState: UiState<List<UiFosterHome>> by checkAllFosterHomesViewmodel.allFosterHomesState.collectAsState()
     val isSearchButtonEnabled: Boolean by remember(
         selectedCountry,
         selectedCity,
-        activistLongitude,
-        activistLatitude,
+        managePermissionState,
         nonHumanAnimalType,
         uiFosterHomeListState
     ) {
@@ -96,7 +119,7 @@ fun CheckAllFosterHomesScreen(
                     if (searchOption == SearchOption.COUNTRY_CITY) {
                         selectedCountry != Country.UNSELECTED && selectedCity != City.UNSELECTED
                     } else {
-                        activistLongitude != 0.0 && activistLatitude != 0.0
+                        managePermissionState == ManagePermissionState.PERMISSION_GRANTED
                     }
         }
     }
@@ -121,6 +144,72 @@ fun CheckAllFosterHomesScreen(
                 }
             ) { searchOp ->
                 searchOption = searchOp
+
+                if (searchOption == SearchOption.LOCATION) {
+
+                    managePermissionState = ManagePermissionState.CHECK_PERMISSION
+                    displayDialogToRequestLocationActivation = !checkAllFosterHomesViewmodel.getIfLocationEnabled()
+                }
+            }
+
+            if (searchOption == SearchOption.LOCATION) {
+
+                RmManagePermission(
+                    permission = Permission.COARSE_LOCATION,
+                    stringsForDialogExplainingPermission = StringsForDialog(
+                        emoji = "📍",
+                        title = stringResource(Res.string.location_permission_title),
+                        message = stringResource(Res.string.location_permission_message),
+                        allowMessage = stringResource(Res.string.location_permission_grant_permission_button),
+                        denyMessage = stringResource(Res.string.location_permission_do_not_grant_permission_button)
+                    ),
+                    stringsForDialogToOpenSettings = StringsForDialog(
+                        emoji = "⚙️",
+                        title = stringResource(Res.string.location_go_to_settings_title),
+                        message = stringResource(Res.string.location_grant_in_settings_message),
+                        allowMessage = stringResource(Res.string.location_open_settings_button),
+                        denyMessage = stringResource(Res.string.location_permission_do_not_grant_permission_button),
+                    ),
+                    managePermissionState = managePermissionState,
+                    updateManagePermissionState = {
+                        managePermissionState = it
+                    },
+                    onPermissionGranted = {
+                        if (checkAllFosterHomesViewmodel.getIfLocationEnabled()) {
+
+                            checkAllFosterHomesViewmodel.updateLocation { longitude, latitude ->
+                                activistLongitude = longitude
+                                activistLatitude = latitude
+                            }
+                        }
+                    }
+                )
+            }
+
+            if (managePermissionState == ManagePermissionState.PERMISSION_GRANTED && displayDialogToRequestLocationActivation) {
+
+                RmDialog(
+                    emoji = "⚙️",
+                    title = stringResource(Res.string.location_turn_on_location_title),
+                    message = stringResource(Res.string.location_turn_on_location_message),
+                    allowMessage = stringResource(Res.string.location_turn_on_location_open_settings_button),
+                    denyMessage = stringResource(Res.string.location_turn_on_later_location_button),
+                    onClickAllow = {
+                        checkAllFosterHomesViewmodel.requestEnableLocation { isEnabled ->
+                            if (isEnabled) {
+
+                                checkAllFosterHomesViewmodel.updateLocation { longitude, latitude ->
+                                    activistLongitude = longitude
+                                    activistLatitude = latitude
+                                }
+                                displayDialogToRequestLocationActivation = false
+                            }
+                        }
+                    },
+                    onClickDeny = {
+                        displayDialogToRequestLocationActivation = false
+                    }
+                )
             }
 
             AnimatedVisibility(

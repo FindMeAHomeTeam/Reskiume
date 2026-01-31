@@ -114,7 +114,7 @@ fun CheckAllFosterHomesScreen(
     ) {
         derivedStateOf {
             nonHumanAnimalType != NonHumanAnimalType.UNSELECTED &&
-                    uiFosterHomeListState != UiState.Loading<List<UiFosterHome>>() &&
+                    uiFosterHomeListState !is UiState.Loading &&
 
                     if (searchOption == SearchOption.COUNTRY_CITY) {
                         selectedCountry != Country.UNSELECTED && selectedCity != City.UNSELECTED

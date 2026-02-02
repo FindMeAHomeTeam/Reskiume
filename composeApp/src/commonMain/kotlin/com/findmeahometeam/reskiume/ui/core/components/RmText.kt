@@ -6,6 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import com.findmeahometeam.reskiume.ui.core.textColor
@@ -17,7 +18,9 @@ fun RmText(
     textAlign: TextAlign = TextAlign.Start,
     fontWeight: FontWeight = FontWeight.Normal,
     fontSize: TextUnit = 14.sp,
-    color: Color = textColor
+    color: Color = textColor,
+    overflow: TextOverflow = TextOverflow.Ellipsis,
+    maxLines: Int = Int.MAX_VALUE
 ) {
     Text(
         modifier = modifier,
@@ -25,6 +28,8 @@ fun RmText(
         textAlign = textAlign,
         fontWeight = fontWeight,
         fontSize = fontSize,
-        color = color
+        color = color,
+        overflow = overflow,
+        maxLines = maxLines
     )
 }

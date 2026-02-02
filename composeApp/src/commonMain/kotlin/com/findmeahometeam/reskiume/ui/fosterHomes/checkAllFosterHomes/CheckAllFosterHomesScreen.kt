@@ -246,7 +246,7 @@ fun CheckAllFosterHomesScreen(
                         Spacer(modifier = Modifier.width(8.dp))
                     }
 
-                    if (isCityVisible) {
+                    if (isCityVisible && cityItems.isNotEmpty()) {
                         RmSearchBarWithSuggestions(
                             modifier = Modifier.weight(1f),
                             onFocusChanged = {

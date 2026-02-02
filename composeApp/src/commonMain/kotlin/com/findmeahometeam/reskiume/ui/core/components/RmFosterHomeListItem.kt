@@ -17,23 +17,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.intl.Locale
-import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.findmeahometeam.reskiume.domain.model.Gender
-import com.findmeahometeam.reskiume.domain.model.fosterHome.AcceptedNonHumanAnimalGenderForFosterHome
-import com.findmeahometeam.reskiume.domain.model.fosterHome.AcceptedNonHumanAnimalTypeForFosterHome
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
+import com.findmeahometeam.reskiume.domain.model.fosterHome.AcceptedNonHumanAnimalForFosterHome
 import com.findmeahometeam.reskiume.domain.model.fosterHome.ResidentNonHumanAnimalForFosterHome
 import com.findmeahometeam.reskiume.domain.model.toStringResource
 import com.findmeahometeam.reskiume.ui.core.backgroundColorForItems
-import com.findmeahometeam.reskiume.ui.core.primaryBlue
 import com.findmeahometeam.reskiume.ui.core.primaryGreen
-import com.findmeahometeam.reskiume.ui.core.primaryPink
 import com.findmeahometeam.reskiume.ui.core.tertiaryGreen
 import org.jetbrains.compose.resources.stringResource
 import reskiume.composeapp.generated.resources.Res
 import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_km
+import reskiume.composeapp.generated.resources.foster_home_list_item_accepted_both_genders_non_human_animal
 import reskiume.composeapp.generated.resources.foster_home_list_item_accepted_more_non_human_animal
 import reskiume.composeapp.generated.resources.foster_home_list_item_accepted_non_human_animal
 import reskiume.composeapp.generated.resources.foster_home_list_item_residents_non_human_animal
@@ -43,8 +40,7 @@ fun RmFosterHomeListItem(
     modifier: Modifier = Modifier,
     title: String,
     imageUrl: String,
-    allAcceptedNonHumanAnimalTypes: List<AcceptedNonHumanAnimalTypeForFosterHome>,
-    allAcceptedNonHumanAnimalGenders: List<AcceptedNonHumanAnimalGenderForFosterHome>,
+    allAcceptedNonHumanAnimals: List<AcceptedNonHumanAnimalForFosterHome>,
     allResidentNonHumanAnimalForFosterHome: List<ResidentNonHumanAnimalForFosterHome>,
     distance: Double?,
     city: String,
@@ -81,7 +77,8 @@ fun RmFosterHomeListItem(
                         text = title,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = Color.White,
+                        maxLines = 1
                     )
                     Spacer(modifier = Modifier.height(5.dp))
 
@@ -90,9 +87,14 @@ fun RmFosterHomeListItem(
                         text = if (distance == null) {
                             city
                         } else {
-                            stringResource(Res.string.check_all_foster_homes_screen_km, distance, city)
+                            stringResource(
+                                Res.string.check_all_foster_homes_screen_km,
+                                distance,
+                                city
+                            )
                         },
-                        color = Color.White
+                        color = Color.White,
+                        maxLines = 1
                     )
                 }
                 Spacer(modifier = Modifier.height(5.dp))
@@ -106,26 +108,11 @@ fun RmFosterHomeListItem(
                     horizontalAlignment = Alignment.Start,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    val genderColor = getGenderColor(allAcceptedNonHumanAnimalGenders)
                     RmText(
-                        text = stringResource(
-                            resource = Res.string.foster_home_list_item_accepted_non_human_animal,
-                            if (allAcceptedNonHumanAnimalGenders.size == 1) {
-                                val gender =
-                                    stringResource(allAcceptedNonHumanAnimalGenders[0].acceptedNonHumanAnimalGender.toStringResource())
-                                gender
-                                    .substring(3)
-                                    .toLowerCase(Locale.current)
-                            } else {
-                                ""
-                            }
-                        ),
-                        color = genderColor
+                        text = stringResource(resource = Res.string.foster_home_list_item_accepted_non_human_animal),
+                        color = Color.Black
                     )
-                    ListAcceptedNonHumanAnimals(
-                        allAcceptedNonHumanAnimalTypes = allAcceptedNonHumanAnimalTypes,
-                        color = genderColor
-                    )
+                    ListAcceptedNonHumanAnimals(allAcceptedNonHumanAnimals)
                 }
 
                 if (allResidentNonHumanAnimalForFosterHome.isNotEmpty()) {
@@ -152,42 +139,60 @@ fun RmFosterHomeListItem(
     }
 }
 
-private fun getGenderColor(allAcceptedNonHumanAnimalGenders: List<AcceptedNonHumanAnimalGenderForFosterHome>): Color {
-    return if (allAcceptedNonHumanAnimalGenders.size == 1) {
-        if (allAcceptedNonHumanAnimalGenders[0].acceptedNonHumanAnimalGender == Gender.FEMALE) {
-            primaryPink
-        } else {
-            primaryBlue
-        }
-    } else {
-        Color.Black
-    }
-}
-
 @Composable
-private fun ListAcceptedNonHumanAnimals(
-    allAcceptedNonHumanAnimalTypes: List<AcceptedNonHumanAnimalTypeForFosterHome>,
-    color: Color
-) {
+private fun ListAcceptedNonHumanAnimals(allAcceptedNonHumanAnimals: List<AcceptedNonHumanAnimalForFosterHome>) {
 
-    allAcceptedNonHumanAnimalTypes.forEachIndexed { index, accepted ->
-        if (index <= 2) {
+    val nonHumanAnimalHashMap = HashMap<NonHumanAnimalType, Set<Gender>>()
+    var counter = 0
+
+    allAcceptedNonHumanAnimals.forEach { accepted ->
+
+        nonHumanAnimalHashMap[accepted.acceptedNonHumanAnimalType] =
+            nonHumanAnimalHashMap[accepted.acceptedNonHumanAnimalType]?.plus(accepted.acceptedNonHumanAnimalGender)
+                ?: setOf(accepted.acceptedNonHumanAnimalGender)
+    }
+
+    nonHumanAnimalHashMap.forEach { (nonHumanAnimalType, genders) ->
+
+        if (counter <= 2) {
+
+            var genderText = ""
+            val nonHumanAnimalText: String = stringResource(nonHumanAnimalType.toStringResource())
+
+            genders.forEach {
+
+                val gender = stringResource(it.toStringResource())
+                    .substring(3)
+                    .lowercase()
+
+                genderText = if (genderText.isBlank()) {
+                    gender
+                } else {
+                    stringResource(
+                        Res.string.foster_home_list_item_accepted_both_genders_non_human_animal,
+                        genderText,
+                        gender
+                    )
+                }
+            }
             Spacer(modifier = Modifier.height(5.dp))
-            RmText(
+            RmTextBold(
                 modifier = Modifier.fillMaxWidth(),
-                text = stringResource(accepted.acceptedNonHumanAnimalType.toStringResource()),
+                text = "$nonHumanAnimalText: $genderText",
+                textToBold = nonHumanAnimalText,
                 fontSize = 16.sp,
-                color = color
+                color = Color.Black,
+                maxLines = 1
             )
         }
+        counter++
     }
-    if (allAcceptedNonHumanAnimalTypes.size > 3) {
+    if (counter > 3) {
         Spacer(modifier = Modifier.height(5.dp))
         RmText(
             modifier = Modifier.fillMaxWidth(),
             text = stringResource(Res.string.foster_home_list_item_accepted_more_non_human_animal),
-            fontSize = 16.sp,
-            color = color
+            fontSize = 16.sp
         )
     }
 }
@@ -213,7 +218,8 @@ private fun ListResidentNonHumanAnimals(allResidentNonHumanAnimalForFosterHome: 
             modifier = Modifier.fillMaxWidth(),
             text = stringResource(Res.string.foster_home_list_item_accepted_more_non_human_animal),
             fontSize = 16.sp,
-            color = Color.Black
+            color = Color.Black,
+            maxLines = 1
         )
     }
 }

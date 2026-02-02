@@ -20,7 +20,7 @@ import io.ktor.http.isSuccess
  */
 class TranslatorImpl(
     private val client: HttpClient
-): Translator {
+) : Translator {
 
     init {
         client.config {
@@ -54,7 +54,7 @@ class TranslatorImpl(
      * @param sourceLanguage The language of [textToTranslate]. By default, this is [Language.AUTO].
      * @param targetLanguage The language to translate [textToTranslate] to. By default, this is [Language.ENGLISH].
      *
-     * @return A [Translation] containing the translated text and other related data.
+     * @return A translated text of [Translation].
      * @throws TranslationException If the HTTP request could not be completed.
      *
      * @see Translation
@@ -63,7 +63,7 @@ class TranslatorImpl(
         textToTranslate: String,
         sourceLanguage: Language,
         targetLanguage: Language
-    ): Translation {
+    ): String {
         require(targetLanguage != Language.AUTO) {
             "The target language cannot be Language.AUTO!"
         }
@@ -75,17 +75,30 @@ class TranslatorImpl(
                 parameter("hl", targetLanguage.code)
                 parameter("q", textToTranslate)
             }
-        return Translation(
+        val translation = Translation(
             sourceText = textToTranslate,
             targetLanguage = targetLanguage,
             rawData = response.bodyAsText()
         )
+        return translation.translatedText
     }
+
     private fun HttpRequestBuilder.constantParameters() {
         parameter("client", "gtx")
 
         // dt params: check out https://github.com/ssut/py-googletrans
-        arrayOf("at", "bd", "ex", "ld", "md", "qca", "rw", "rm", "ss", "t").forEach { parameter("dt", it) }
+        arrayOf(
+            "at",
+            "bd",
+            "ex",
+            "ld",
+            "md",
+            "qca",
+            "rw",
+            "rm",
+            "ss",
+            "t"
+        ).forEach { parameter("dt", it) }
         parameter("ie", "UTF-8")
         parameter("oe", "UTF-8")
         parameter("otf", 1)
@@ -97,5 +110,8 @@ class TranslatorImpl(
     /**
      * Indicates an exception/error relating to the translation's HTTP request.
      */
-    class TranslationException(message: String, cause: Throwable? = null) : Exception(message, cause)
+    class TranslationException(
+        message: String,
+        cause: Throwable? = null
+    ) : Exception(message, cause)
 }

@@ -2,6 +2,7 @@ package com.findmeahometeam.reskiume.data.database.entity.fosterHome
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.findmeahometeam.reskiume.domain.model.Gender
 import com.findmeahometeam.reskiume.domain.model.fosterHome.AcceptedNonHumanAnimalForFosterHome
@@ -15,6 +16,9 @@ import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
             childColumns = ["fosterHomeId"],
             onDelete = ForeignKey.CASCADE
         )
+    ],
+    indices = [
+        Index("fosterHomeId")
     ]
 )
 data class AcceptedNonHumanAnimalEntityForFosterHome(

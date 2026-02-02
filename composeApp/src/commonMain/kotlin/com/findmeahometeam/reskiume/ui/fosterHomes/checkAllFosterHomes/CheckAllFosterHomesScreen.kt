@@ -287,7 +287,8 @@ fun CheckAllFosterHomesScreen(
 
             RmButton(
                 text = stringResource(Res.string.check_all_foster_homes_screen_search_foster_homes_button),
-                enabled = isSearchButtonEnabled
+                enabled = isSearchButtonEnabled,
+                displayPleaseWait = uiFosterHomeListState is UiState.Loading
             ) {
                 if (searchOption == SearchOption.COUNTRY_CITY) {
                     checkAllFosterHomesViewmodel.fetchAllFosterHomesStateByPlace(

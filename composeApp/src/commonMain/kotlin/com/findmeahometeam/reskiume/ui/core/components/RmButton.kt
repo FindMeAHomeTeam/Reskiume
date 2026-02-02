@@ -11,12 +11,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import com.findmeahometeam.reskiume.ui.core.primaryGreen
+import org.jetbrains.compose.resources.stringResource
+import reskiume.composeapp.generated.resources.Res
+import reskiume.composeapp.generated.resources.button_please_wait
 
 @Composable
 fun RmButton(
     text: String,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    displayPleaseWait: Boolean = false,
     containerColor: Color = primaryGreen,
     disabledContainerColor: Color = if (isSystemInDarkTheme()) {
         Color.LightGray.copy(alpha = 0.2f)
@@ -37,7 +41,7 @@ fun RmButton(
     ) {
         RmText(
             modifier = Modifier.fillMaxWidth(),
-            text = text,
+            text = if (displayPleaseWait) stringResource(Res.string.button_please_wait) else text,
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.ExtraBold,
             fontSize = 18.sp,

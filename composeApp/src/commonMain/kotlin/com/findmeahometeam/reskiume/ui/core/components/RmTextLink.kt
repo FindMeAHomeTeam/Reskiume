@@ -13,8 +13,11 @@ import com.findmeahometeam.reskiume.ui.core.primaryGreen
 import com.findmeahometeam.reskiume.ui.core.textColor
 
 @Composable
-fun RmTextLink(text: String, textToLink: String, onClick: () -> Unit) {
-
+fun RmTextLink(
+    text: String,
+    textToLink: String,
+    onClick: () -> Unit
+) {
     val startIndex = text.indexOf(textToLink)
     val endIndex = startIndex + textToLink.length
     val annotatedLinkString: AnnotatedString = buildAnnotatedString {

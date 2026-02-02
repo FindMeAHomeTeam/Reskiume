@@ -1,8 +1,10 @@
 package com.findmeahometeam.reskiume.ui.location
 
 import android.Manifest
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -19,6 +21,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.first
 import java.util.UUID
+import kotlin.time.Clock
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.ExperimentalTime
 
 private const val WAITING_TIME: Int = 2 * 60 * 1000 // 2 min
 
@@ -26,9 +31,29 @@ class LocationRepositoryAndroidImpl(
     private val componentActivity: ComponentActivity
 ) : LocationRepository {
 
-    override fun isLocationEnabled(): Boolean {
-        val locationManager = componentActivity.getSystemService(Context.LOCATION_SERVICE) as? LocationManager
-            ?: return false
+    override fun observeIfLocationEnabledFlow(): Flow<Boolean> = callbackFlow {
+
+        trySend(isLocationEnabled())
+
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                trySend(isLocationEnabled())
+            }
+        }
+        componentActivity.registerReceiver(
+            receiver,
+            IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION)
+        )
+
+        awaitClose {
+            componentActivity.unregisterReceiver(receiver)
+        }
+    }
+
+    private fun isLocationEnabled(): Boolean {
+        val locationManager =
+            componentActivity.getSystemService(Context.LOCATION_SERVICE) as? LocationManager
+                ?: return false
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
                 locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
     }
@@ -61,6 +86,7 @@ class LocationRepositoryAndroidImpl(
         return activityResultRegistry.register(key, contract, callback)
     }
 
+    @OptIn(ExperimentalTime::class)
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_COARSE_LOCATION])
     override suspend fun getLocation(): Pair<Double, Double> {
 
@@ -78,7 +104,7 @@ class LocationRepositoryAndroidImpl(
         }
 
         val bestLocation: Location? = locations
-            .filter { System.currentTimeMillis() - it.time < WAITING_TIME }
+            .filter { it.time - Clock.System.now().epochSeconds.milliseconds.inWholeMilliseconds < WAITING_TIME }
             .minByOrNull { it.accuracy }
 
         return if (providers.isEmpty()) {

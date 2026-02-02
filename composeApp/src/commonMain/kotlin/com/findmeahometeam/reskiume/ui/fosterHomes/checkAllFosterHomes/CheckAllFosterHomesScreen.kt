@@ -296,11 +296,7 @@ fun CheckAllFosterHomesScreen(
                         nonHumanAnimalType = nonHumanAnimalType
                     )
                 } else {
-                    checkAllFosterHomesViewmodel.fetchAllFosterHomesStateByLocation(
-                        activistLongitude = activistLongitude,
-                        activistLatitude = activistLatitude,
-                        nonHumanAnimalType = nonHumanAnimalType
-                    )
+                    checkAllFosterHomesViewmodel.fetchAllFosterHomesStateByLocation(nonHumanAnimalType)
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))

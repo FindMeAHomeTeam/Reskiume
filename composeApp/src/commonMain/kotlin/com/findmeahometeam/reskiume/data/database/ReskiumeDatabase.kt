@@ -9,8 +9,7 @@ import com.findmeahometeam.reskiume.data.database.dao.LocalCacheDao
 import com.findmeahometeam.reskiume.data.database.dao.NonHumanAnimalDao
 import com.findmeahometeam.reskiume.data.database.dao.ReviewDao
 import com.findmeahometeam.reskiume.data.database.dao.UserDao
-import com.findmeahometeam.reskiume.data.database.entity.fosterHome.AcceptedNonHumanAnimalGenderEntityForFosterHome
-import com.findmeahometeam.reskiume.data.database.entity.fosterHome.AcceptedNonHumanAnimalTypeEntityForFosterHome
+import com.findmeahometeam.reskiume.data.database.entity.fosterHome.AcceptedNonHumanAnimalEntityForFosterHome
 import com.findmeahometeam.reskiume.data.database.entity.fosterHome.FosterHomeEntity
 import com.findmeahometeam.reskiume.data.database.entity.LocalCacheEntity
 import com.findmeahometeam.reskiume.data.database.entity.NonHumanAnimalEntity
@@ -27,8 +26,7 @@ const val DATABASE_NAME = "reskiume_database.db"
         ReviewEntity::class,
         NonHumanAnimalEntity::class,
         FosterHomeEntity::class,
-        AcceptedNonHumanAnimalTypeEntityForFosterHome::class,
-        AcceptedNonHumanAnimalGenderEntityForFosterHome::class,
+        AcceptedNonHumanAnimalEntityForFosterHome::class,
         ResidentNonHumanAnimalIdEntityForFosterHome::class
     ], version = 1
 )

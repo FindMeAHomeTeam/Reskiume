@@ -4,8 +4,7 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.Relation
-import com.findmeahometeam.reskiume.domain.model.fosterHome.AcceptedNonHumanAnimalGenderForFosterHome
-import com.findmeahometeam.reskiume.domain.model.fosterHome.AcceptedNonHumanAnimalTypeForFosterHome
+import com.findmeahometeam.reskiume.domain.model.fosterHome.AcceptedNonHumanAnimalForFosterHome
 import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
 import com.findmeahometeam.reskiume.domain.model.fosterHome.ResidentNonHumanAnimalForFosterHome
 
@@ -25,8 +24,7 @@ data class FosterHomeEntity(
     val available: Boolean
 ) {
     fun toDomain(
-        allAcceptedNonHumanAnimalTypes: List<AcceptedNonHumanAnimalTypeForFosterHome>,
-        allAcceptedNonHumanAnimalGenders: List<AcceptedNonHumanAnimalGenderForFosterHome>,
+        allAcceptedNonHumanAnimals: List<AcceptedNonHumanAnimalForFosterHome>,
         allResidentNonHumanAnimals: List<ResidentNonHumanAnimalForFosterHome>
     ): FosterHome {
         return FosterHome(
@@ -42,8 +40,7 @@ data class FosterHomeEntity(
             country = country,
             city = city,
             available = available,
-            allAcceptedNonHumanAnimalTypes = allAcceptedNonHumanAnimalTypes,
-            allAcceptedNonHumanAnimalGenders = allAcceptedNonHumanAnimalGenders,
+            allAcceptedNonHumanAnimals = allAcceptedNonHumanAnimals,
             allResidentNonHumanAnimals = allResidentNonHumanAnimals
         )
     }
@@ -55,12 +52,7 @@ data class FosterHomeWithAllNonHumanAnimalData(
         parentColumn = "id",
         entityColumn = "fosterHomeId"
     )
-    val allAcceptedNonHumanAnimalTypes: List<AcceptedNonHumanAnimalTypeEntityForFosterHome>,
-    @Relation(
-        parentColumn = "id",
-        entityColumn = "fosterHomeId"
-    )
-    val allAcceptedNonHumanAnimalGenders: List<AcceptedNonHumanAnimalGenderEntityForFosterHome>,
+    val allAcceptedNonHumanAnimals: List<AcceptedNonHumanAnimalEntityForFosterHome>,
     @Relation(
         parentColumn = "id",
         entityColumn = "fosterHomeId"

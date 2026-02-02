@@ -3,8 +3,9 @@ package com.findmeahometeam.reskiume.data.database.entity.fosterHome
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import com.findmeahometeam.reskiume.domain.model.fosterHome.AcceptedNonHumanAnimalGenderForFosterHome
 import com.findmeahometeam.reskiume.domain.model.Gender
+import com.findmeahometeam.reskiume.domain.model.fosterHome.AcceptedNonHumanAnimalForFosterHome
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
 
 @Entity(
     foreignKeys = [
@@ -16,16 +17,18 @@ import com.findmeahometeam.reskiume.domain.model.Gender
         )
     ]
 )
-data class AcceptedNonHumanAnimalGenderEntityForFosterHome(
+data class AcceptedNonHumanAnimalEntityForFosterHome(
     @PrimaryKey(autoGenerate = true)
-    val acceptedNonHumanAnimalGenderId: Int = 0,
+    val acceptedNonHumanAnimalId: Int = 0,
     val fosterHomeId: String,
+    val acceptedNonHumanAnimalType: NonHumanAnimalType,
     val acceptedNonHumanAnimalGender: Gender
 ) {
-    fun toDomain(): AcceptedNonHumanAnimalGenderForFosterHome {
-        return AcceptedNonHumanAnimalGenderForFosterHome(
-            acceptedNonHumanAnimalGenderId = acceptedNonHumanAnimalGenderId,
+    fun toDomain(): AcceptedNonHumanAnimalForFosterHome {
+        return AcceptedNonHumanAnimalForFosterHome(
+            acceptedNonHumanAnimalId = acceptedNonHumanAnimalId,
             fosterHomeId = fosterHomeId,
+            acceptedNonHumanAnimalType = acceptedNonHumanAnimalType,
             acceptedNonHumanAnimalGender = acceptedNonHumanAnimalGender
         )
     }

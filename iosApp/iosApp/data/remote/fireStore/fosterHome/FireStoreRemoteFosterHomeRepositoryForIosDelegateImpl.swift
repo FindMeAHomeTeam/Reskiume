@@ -198,21 +198,12 @@ class FireStoreRemoteFosterHomeRepositoryForIosDelegateImpl: FireStoreRemoteFost
         fireStoreRemoteFosterHomeFlowsRepositoryForIosDelegate.updateRemoteFosterHomeListFlow(delegate: remoteFosterHomes)
     }
     
-    private func remoteAcceptedNonHumanAnimalTypeForFosterHomeTodictArray(from items: [RemoteAcceptedNonHumanAnimalTypeForFosterHome]?) -> [[String: Any]] {
+    private func remoteAcceptedNonHumanAnimalForFosterHomeTodictArray(from items: [RemoteAcceptedNonHumanAnimalForFosterHome]?) -> [[String: Any]] {
         (items ?? []).map {
             [
-                "acceptedNonHumanAnimalTypeId": $0.acceptedNonHumanAnimalTypeId ?? 0,
+                "acceptedNonHumanAnimalId": $0.acceptedNonHumanAnimalId ?? 0,
                 "fosterHomeId": $0.fosterHomeId!,
-                "acceptedNonHumanAnimalType": $0.acceptedNonHumanAnimalType?.name ?? NonHumanAnimalType.unselected
-            ]
-        }
-    }
-
-    private func remoteAcceptedNonHumanAnimalGenderForFosterHomeTodictArray(from items: [RemoteAcceptedNonHumanAnimalGenderForFosterHome]?) -> [[String: Any]] {
-        (items ?? []).map {
-            [
-                "acceptedNonHumanAnimalGenderId": $0.acceptedNonHumanAnimalGenderId ?? 0,
-                "fosterHomeId": $0.fosterHomeId!,
+                "acceptedNonHumanAnimalType": $0.acceptedNonHumanAnimalType?.name ?? NonHumanAnimalType.unselected,
                 "acceptedNonHumanAnimalGender": $0.acceptedNonHumanAnimalGender?.name ?? Gender.unselected
             ]
         }
@@ -236,8 +227,7 @@ class FireStoreRemoteFosterHomeRepositoryForIosDelegateImpl: FireStoreRemoteFost
             "description": remoteFosterHome.description_!,
             "conditions": remoteFosterHome.conditions!,
             "imageUrl": remoteFosterHome.imageUrl!,
-            "allAcceptedNonHumanAnimalTypes": remoteAcceptedNonHumanAnimalTypeForFosterHomeTodictArray(from: remoteFosterHome.allAcceptedNonHumanAnimalTypes!),
-            "allAcceptedNonHumanAnimalGenders": remoteAcceptedNonHumanAnimalGenderForFosterHomeTodictArray(from: remoteFosterHome.allAcceptedNonHumanAnimalGenders!),
+            "allAcceptedNonHumanAnimals": remoteAcceptedNonHumanAnimalForFosterHomeTodictArray(from: remoteFosterHome.allAcceptedNonHumanAnimals!),
             "allResidentNonHumanAnimalIds": remoteResidentNonHumanAnimalIdForFosterHomeTodictArray(from: remoteFosterHome.allResidentNonHumanAnimalIds!),
             "longitude": remoteFosterHome.longitude!,
             "latitude": remoteFosterHome.latitude!,

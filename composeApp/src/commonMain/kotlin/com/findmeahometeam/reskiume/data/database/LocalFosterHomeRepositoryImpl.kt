@@ -1,7 +1,6 @@
 package com.findmeahometeam.reskiume.data.database
 
-import com.findmeahometeam.reskiume.data.database.entity.fosterHome.AcceptedNonHumanAnimalGenderEntityForFosterHome
-import com.findmeahometeam.reskiume.data.database.entity.fosterHome.AcceptedNonHumanAnimalTypeEntityForFosterHome
+import com.findmeahometeam.reskiume.data.database.entity.fosterHome.AcceptedNonHumanAnimalEntityForFosterHome
 import com.findmeahometeam.reskiume.data.database.entity.fosterHome.FosterHomeEntity
 import com.findmeahometeam.reskiume.data.database.entity.fosterHome.FosterHomeWithAllNonHumanAnimalData
 import com.findmeahometeam.reskiume.data.database.entity.fosterHome.ResidentNonHumanAnimalIdEntityForFosterHome
@@ -19,23 +18,13 @@ class LocalFosterHomeRepositoryImpl(
         onInsertFosterHome(reskiumeDatabase.getFosterHomeDao().insertFosterHome(fosterHomeEntity))
     }
 
-    override suspend fun insertAcceptedNonHumanAnimalTypeForFosterHome(
-        acceptedNonHumanAnimalType: AcceptedNonHumanAnimalTypeEntityForFosterHome,
+    override suspend fun insertAcceptedNonHumanAnimalForFosterHome(
+        acceptedNonHumanAnimal: AcceptedNonHumanAnimalEntityForFosterHome,
         onInsertAcceptedNonHumanAnimalType: (rowId: Long) -> Unit
     ) {
         onInsertAcceptedNonHumanAnimalType(
             reskiumeDatabase.getFosterHomeDao()
-                .insertAcceptedNonHumanAnimalTypeForFosterHome(acceptedNonHumanAnimalType)
-        )
-    }
-
-    override suspend fun insertAcceptedNonHumanAnimalGenderForFosterHome(
-        acceptedNonHumanAnimalGender: AcceptedNonHumanAnimalGenderEntityForFosterHome,
-        onInsertAcceptedNonHumanAnimalGender: (rowId: Long) -> Unit
-    ) {
-        onInsertAcceptedNonHumanAnimalGender(
-            reskiumeDatabase.getFosterHomeDao()
-                .insertAcceptedNonHumanAnimalGenderForFosterHome(acceptedNonHumanAnimalGender)
+                .insertAcceptedNonHumanAnimalForFosterHome(acceptedNonHumanAnimal)
         )
     }
 
@@ -56,23 +45,13 @@ class LocalFosterHomeRepositoryImpl(
         onModifyFosterHome(reskiumeDatabase.getFosterHomeDao().modifyFosterHome(fosterHomeEntity))
     }
 
-    override suspend fun modifyAcceptedNonHumanAnimalTypeForFosterHome(
-        acceptedNonHumanAnimalType: AcceptedNonHumanAnimalTypeEntityForFosterHome,
-        onModifyAcceptedNonHumanAnimalType: (rowsUpdated: Int) -> Unit
+    override suspend fun modifyAcceptedNonHumanAnimalForFosterHome(
+        acceptedNonHumanAnimal: AcceptedNonHumanAnimalEntityForFosterHome,
+        onModifyAcceptedNonHumanAnimal: (rowsUpdated: Int) -> Unit
     ) {
-        onModifyAcceptedNonHumanAnimalType(
+        onModifyAcceptedNonHumanAnimal(
             reskiumeDatabase.getFosterHomeDao()
-                .modifyAcceptedNonHumanAnimalTypeForFosterHome(acceptedNonHumanAnimalType)
-        )
-    }
-
-    override suspend fun modifyAcceptedNonHumanAnimalGenderForFosterHome(
-        acceptedNonHumanAnimalGender: AcceptedNonHumanAnimalGenderEntityForFosterHome,
-        onModifyAcceptedNonHumanAnimalGender: (rowsUpdated: Int) -> Unit
-    ) {
-        onModifyAcceptedNonHumanAnimalGender(
-            reskiumeDatabase.getFosterHomeDao()
-                .modifyAcceptedNonHumanAnimalGenderForFosterHome(acceptedNonHumanAnimalGender)
+                .modifyAcceptedNonHumanAnimalForFosterHome(acceptedNonHumanAnimal)
         )
     }
 

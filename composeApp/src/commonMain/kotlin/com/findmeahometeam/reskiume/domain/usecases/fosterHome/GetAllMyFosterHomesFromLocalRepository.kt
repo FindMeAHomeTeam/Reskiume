@@ -22,8 +22,7 @@ class GetAllMyFosterHomesFromLocalRepository(
             .map { list ->
                 list.map { fosterHomeWithAllNonHumanAnimalData: FosterHomeWithAllNonHumanAnimalData ->
                     fosterHomeWithAllNonHumanAnimalData.fosterHomeEntity.toDomain(
-                        allAcceptedNonHumanAnimalTypes = fosterHomeWithAllNonHumanAnimalData.allAcceptedNonHumanAnimalTypes.map { it.toDomain() },
-                        allAcceptedNonHumanAnimalGenders = fosterHomeWithAllNonHumanAnimalData.allAcceptedNonHumanAnimalGenders.map { it.toDomain() },
+                        allAcceptedNonHumanAnimals = fosterHomeWithAllNonHumanAnimalData.allAcceptedNonHumanAnimals.map { it.toDomain() },
                         allResidentNonHumanAnimals = fosterHomeWithAllNonHumanAnimalData.allResidentNonHumanAnimalIds.map {
                             it.toDomain(
                                 onFetchNonHumanAnimal = { nonHumanAnimalId: String, caregiverId: String ->

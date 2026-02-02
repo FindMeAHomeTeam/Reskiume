@@ -6,8 +6,7 @@ import androidx.room.OnConflictStrategy.Companion.REPLACE
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.findmeahometeam.reskiume.data.database.entity.fosterHome.AcceptedNonHumanAnimalGenderEntityForFosterHome
-import com.findmeahometeam.reskiume.data.database.entity.fosterHome.AcceptedNonHumanAnimalTypeEntityForFosterHome
+import com.findmeahometeam.reskiume.data.database.entity.fosterHome.AcceptedNonHumanAnimalEntityForFosterHome
 import com.findmeahometeam.reskiume.data.database.entity.fosterHome.FosterHomeEntity
 import com.findmeahometeam.reskiume.data.database.entity.fosterHome.FosterHomeWithAllNonHumanAnimalData
 import com.findmeahometeam.reskiume.data.database.entity.fosterHome.ResidentNonHumanAnimalIdEntityForFosterHome
@@ -20,10 +19,7 @@ interface FosterHomeDao {
     suspend fun insertFosterHome(fosterHomeEntity: FosterHomeEntity): Long
 
     @Insert(onConflict = REPLACE)
-    suspend fun insertAcceptedNonHumanAnimalTypeForFosterHome(acceptedNonHumanAnimalType: AcceptedNonHumanAnimalTypeEntityForFosterHome): Long
-
-    @Insert(onConflict = REPLACE)
-    suspend fun insertAcceptedNonHumanAnimalGenderForFosterHome(acceptedNonHumanAnimalGender: AcceptedNonHumanAnimalGenderEntityForFosterHome): Long
+    suspend fun insertAcceptedNonHumanAnimalForFosterHome(acceptedNonHumanAnimal: AcceptedNonHumanAnimalEntityForFosterHome): Long
 
     @Insert(onConflict = REPLACE)
     suspend fun insertResidentNonHumanAnimalIdForFosterHome(residentNonHumanAnimalId: ResidentNonHumanAnimalIdEntityForFosterHome): Long
@@ -32,10 +28,7 @@ interface FosterHomeDao {
     suspend fun modifyFosterHome(fosterHomeEntity: FosterHomeEntity): Int
 
     @Update
-    suspend fun modifyAcceptedNonHumanAnimalTypeForFosterHome(acceptedNonHumanAnimalType: AcceptedNonHumanAnimalTypeEntityForFosterHome): Int
-
-    @Update
-    suspend fun modifyAcceptedNonHumanAnimalGenderForFosterHome(acceptedNonHumanAnimalGender: AcceptedNonHumanAnimalGenderEntityForFosterHome): Int
+    suspend fun modifyAcceptedNonHumanAnimalForFosterHome(acceptedNonHumanAnimal: AcceptedNonHumanAnimalEntityForFosterHome): Int
 
     @Update
     suspend fun modifyResidentNonHumanAnimalIdForFosterHome(residentNonHumanAnimalId: ResidentNonHumanAnimalIdEntityForFosterHome): Int

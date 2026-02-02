@@ -12,8 +12,7 @@ data class RemoteFosterHome(
     val description: String? = "",
     val conditions: String? = "",
     val imageUrl: String? = "",
-    val allAcceptedNonHumanAnimalTypes: List<RemoteAcceptedNonHumanAnimalTypeForFosterHome>? = emptyList(),
-    val allAcceptedNonHumanAnimalGenders: List<RemoteAcceptedNonHumanAnimalGenderForFosterHome>? = emptyList(),
+    val allAcceptedNonHumanAnimals: List<RemoteAcceptedNonHumanAnimalForFosterHome>? = emptyList(),
     val allResidentNonHumanAnimalIds: List<RemoteResidentNonHumanAnimalIdForFosterHome>? = emptyList(),
     val longitude: Double? = 0.0,
     val latitude: Double? = 0.0,
@@ -29,8 +28,7 @@ data class RemoteFosterHome(
             "description" to description,
             "conditions" to conditions,
             "imageUrl" to imageUrl,
-            "allAcceptedNonHumanAnimalTypes" to allAcceptedNonHumanAnimalTypes,
-            "allAcceptedNonHumanAnimalGenders" to allAcceptedNonHumanAnimalGenders,
+            "allAcceptedNonHumanAnimals" to allAcceptedNonHumanAnimals,
             "allResidentNonHumanAnimalIds" to allResidentNonHumanAnimalIds,
             "longitude" to longitude,
             "latitude" to latitude,
@@ -48,10 +46,8 @@ data class RemoteFosterHome(
             description = description ?: "",
             conditions = conditions ?: "",
             imageUrl = imageUrl ?: "",
-            allAcceptedNonHumanAnimalTypes =
-                allAcceptedNonHumanAnimalTypes?.map { it.toDomain() } ?: emptyList(),
-            allAcceptedNonHumanAnimalGenders =
-                allAcceptedNonHumanAnimalGenders?.map { it.toDomain() } ?: emptyList(),
+            allAcceptedNonHumanAnimals =
+                allAcceptedNonHumanAnimals?.map { it.toDomain() } ?: emptyList(),
             allResidentNonHumanAnimals =
                 allResidentNonHumanAnimalIds?.map { it.toDomain(onFetchNonHumanAnimal) } ?: emptyList(),
             longitude = longitude ?: 0.0,

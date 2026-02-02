@@ -20,8 +20,7 @@ class GetFosterHomeFromLocalRepository(
     ): Flow<FosterHome?> = flow {
         val result: FosterHome? = localFosterHomeRepository.getFosterHome(id)?.let { fosterHomeWithAllNonHumanAnimalData ->
             fosterHomeWithAllNonHumanAnimalData.fosterHomeEntity.toDomain(
-                allAcceptedNonHumanAnimalTypes = fosterHomeWithAllNonHumanAnimalData.allAcceptedNonHumanAnimalTypes.map { it.toDomain() },
-                allAcceptedNonHumanAnimalGenders = fosterHomeWithAllNonHumanAnimalData.allAcceptedNonHumanAnimalGenders.map { it.toDomain() },
+                allAcceptedNonHumanAnimals = fosterHomeWithAllNonHumanAnimalData.allAcceptedNonHumanAnimals.map { it.toDomain() },
                 allResidentNonHumanAnimals = fosterHomeWithAllNonHumanAnimalData.allResidentNonHumanAnimalIds.map {
                     it.toDomain(
                         onFetchNonHumanAnimal = { nonHumanAnimalId: String, caregiverId: String ->

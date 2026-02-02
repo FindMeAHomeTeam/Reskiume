@@ -1,7 +1,6 @@
 package com.findmeahometeam.reskiume.domain.repository.local
 
-import com.findmeahometeam.reskiume.data.database.entity.fosterHome.AcceptedNonHumanAnimalGenderEntityForFosterHome
-import com.findmeahometeam.reskiume.data.database.entity.fosterHome.AcceptedNonHumanAnimalTypeEntityForFosterHome
+import com.findmeahometeam.reskiume.data.database.entity.fosterHome.AcceptedNonHumanAnimalEntityForFosterHome
 import com.findmeahometeam.reskiume.data.database.entity.fosterHome.FosterHomeEntity
 import com.findmeahometeam.reskiume.data.database.entity.fosterHome.FosterHomeWithAllNonHumanAnimalData
 import com.findmeahometeam.reskiume.data.database.entity.fosterHome.ResidentNonHumanAnimalIdEntityForFosterHome
@@ -14,14 +13,9 @@ interface LocalFosterHomeRepository {
         onInsertFosterHome: suspend (rowId: Long) -> Unit
     )
 
-    suspend fun insertAcceptedNonHumanAnimalTypeForFosterHome(
-        acceptedNonHumanAnimalType: AcceptedNonHumanAnimalTypeEntityForFosterHome,
+    suspend fun insertAcceptedNonHumanAnimalForFosterHome(
+        acceptedNonHumanAnimal: AcceptedNonHumanAnimalEntityForFosterHome,
         onInsertAcceptedNonHumanAnimalType: (rowId: Long) -> Unit
-    )
-
-    suspend fun insertAcceptedNonHumanAnimalGenderForFosterHome(
-        acceptedNonHumanAnimalGender: AcceptedNonHumanAnimalGenderEntityForFosterHome,
-        onInsertAcceptedNonHumanAnimalGender: (rowId: Long) -> Unit
     )
 
     suspend fun insertResidentNonHumanAnimalIdForFosterHome(
@@ -34,14 +28,9 @@ interface LocalFosterHomeRepository {
         onModifyFosterHome: suspend (rowsUpdated: Int) -> Unit
     )
 
-    suspend fun modifyAcceptedNonHumanAnimalTypeForFosterHome(
-        acceptedNonHumanAnimalType: AcceptedNonHumanAnimalTypeEntityForFosterHome,
-        onModifyAcceptedNonHumanAnimalType: (rowsUpdated: Int) -> Unit
-    )
-
-    suspend fun modifyAcceptedNonHumanAnimalGenderForFosterHome(
-        acceptedNonHumanAnimalGender: AcceptedNonHumanAnimalGenderEntityForFosterHome,
-        onModifyAcceptedNonHumanAnimalGender: (rowsUpdated: Int) -> Unit
+    suspend fun modifyAcceptedNonHumanAnimalForFosterHome(
+        acceptedNonHumanAnimal: AcceptedNonHumanAnimalEntityForFosterHome,
+        onModifyAcceptedNonHumanAnimal: (rowsUpdated: Int) -> Unit
     )
 
     suspend fun modifyResidentNonHumanAnimalIdForFosterHome(

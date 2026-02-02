@@ -17,14 +17,10 @@ class ModifyFosterHomeInLocalRepository(
             fosterHome.copy(savedBy = getMyUid()).toEntity(),
             onModifyFosterHome = { rowsUpdated ->
                 if (rowsUpdated > 0) {
-                    var isSuccess = modifyAllAcceptedNonHumanAnimalTypes(fosterHome)
+                    var isSuccess = modifyAllAcceptedNonHumanAnimals(fosterHome)
 
                     if (isSuccess) {
-                        isSuccess = modifyAllAcceptedNonHumanAnimalGenders(fosterHome)
-
-                        if(isSuccess){
-                            isSuccess = modifyAllResidentNonHumanAnimals(fosterHome)
-                        }
+                        isSuccess = modifyAllResidentNonHumanAnimals(fosterHome)
                     }
                     onModifyFosterHome(isSuccess)
                 } else {
@@ -34,30 +30,13 @@ class ModifyFosterHomeInLocalRepository(
         )
     }
 
-    private suspend fun modifyAllAcceptedNonHumanAnimalTypes(fosterHome: FosterHome): Boolean {
+    private suspend fun modifyAllAcceptedNonHumanAnimals(fosterHome: FosterHome): Boolean {
         var isSuccess = true
-        fosterHome.allAcceptedNonHumanAnimalTypes.forEach { acceptedNonHumanAnimalTypeForFosterHome ->
+        fosterHome.allAcceptedNonHumanAnimals.forEach { acceptedNonHumanAnimalForFosterHome ->
             if (isSuccess) {
-                localFosterHomeRepository.modifyAcceptedNonHumanAnimalTypeForFosterHome(
-                    acceptedNonHumanAnimalTypeForFosterHome.toEntity(),
-                    onModifyAcceptedNonHumanAnimalType = { rowsUpdated ->
-                        if (rowsUpdated <= 0) {
-                            isSuccess = false
-                        }
-                    }
-                )
-            }
-        }
-        return isSuccess
-    }
-
-    private suspend fun modifyAllAcceptedNonHumanAnimalGenders(fosterHome: FosterHome): Boolean {
-        var isSuccess = true
-        fosterHome.allAcceptedNonHumanAnimalGenders.forEach { acceptedNonHumanAnimalGenderForFosterHome ->
-            if (isSuccess) {
-                localFosterHomeRepository.modifyAcceptedNonHumanAnimalGenderForFosterHome(
-                    acceptedNonHumanAnimalGenderForFosterHome.toEntity(),
-                    onModifyAcceptedNonHumanAnimalGender = { rowsUpdated ->
+                localFosterHomeRepository.modifyAcceptedNonHumanAnimalForFosterHome(
+                    acceptedNonHumanAnimalForFosterHome.toEntity(),
+                    onModifyAcceptedNonHumanAnimal = { rowsUpdated ->
                         if (rowsUpdated <= 0) {
                             isSuccess = false
                         }

@@ -7,8 +7,7 @@ struct RemoteFosterHomeDTO: Codable {
     let description: String?
     let conditions: String?
     let imageUrl: String?
-    let allAcceptedNonHumanAnimalTypes: [RemoteAcceptedNonHumanAnimalTypeForFosterHomeDTO]?
-    let allAcceptedNonHumanAnimalGenders: [RemoteAcceptedNonHumanAnimalGenderForFosterHomeDTO]?
+    let allAcceptedNonHumanAnimals: [RemoteAcceptedNonHumanAnimalForFosterHomeDTO]?
     let allResidentNonHumanAnimalIds: [RemoteResidentNonHumanAnimalIdForFosterHomeDTO]?
     let longitude: Double?
     let latitude: Double?
@@ -18,11 +17,8 @@ struct RemoteFosterHomeDTO: Codable {
 
     func toKotlin() -> RemoteFosterHome {
         
-        let nonHumanAnimalTypesKotlin: [RemoteAcceptedNonHumanAnimalTypeForFosterHome] =
-            (allAcceptedNonHumanAnimalTypes ?? []).map { $0.toKotlin() }
-        
-        let gendersKotlin: [RemoteAcceptedNonHumanAnimalGenderForFosterHome] =
-            (allAcceptedNonHumanAnimalGenders ?? []).map { $0.toKotlin() }
+        let nonHumanAnimalTypesKotlin: [RemoteAcceptedNonHumanAnimalForFosterHome] =
+            (allAcceptedNonHumanAnimals ?? []).map { $0.toKotlin() }
         
         let residentsKotlin: [RemoteResidentNonHumanAnimalIdForFosterHome] =
             (allResidentNonHumanAnimalIds ?? []).map { $0.toKotlin() }
@@ -34,8 +30,7 @@ struct RemoteFosterHomeDTO: Codable {
             description: description ?? "",
             conditions: conditions ?? "",
             imageUrl: imageUrl ?? "",
-            allAcceptedNonHumanAnimalTypes: nonHumanAnimalTypesKotlin,
-            allAcceptedNonHumanAnimalGenders: gendersKotlin,
+            allAcceptedNonHumanAnimals: nonHumanAnimalTypesKotlin,
             allResidentNonHumanAnimalIds: residentsKotlin,
             longitude: KotlinDouble(double: longitude ?? 0.0),
             latitude: KotlinDouble(double: latitude ?? 0.0),

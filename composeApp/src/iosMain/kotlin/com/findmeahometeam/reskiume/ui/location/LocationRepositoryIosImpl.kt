@@ -3,6 +3,9 @@ package com.findmeahometeam.reskiume.ui.location
 import com.findmeahometeam.reskiume.domain.repository.util.location.LocationRepository
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import platform.CoreLocation.CLAuthorizationStatus
 import platform.CoreLocation.CLLocation
@@ -12,13 +15,49 @@ import platform.CoreLocation.kCLAuthorizationStatusAuthorizedAlways
 import platform.CoreLocation.kCLAuthorizationStatusAuthorizedWhenInUse
 import platform.CoreLocation.kCLAuthorizationStatusNotDetermined
 import platform.Foundation.NSError
+import platform.Foundation.NSNotificationCenter
+import platform.Foundation.NSOperationQueue
+import platform.UIKit.UIApplicationWillEnterForegroundNotification
 import platform.darwin.NSObject
+import platform.darwin.NSObjectProtocol
 import kotlin.coroutines.resume
 
 class LocationRepositoryIosImpl : LocationRepository {
 
-    override fun isLocationEnabled(): Boolean =
-        CLLocationManager.locationServicesEnabled()
+    override fun observeIfLocationEnabledFlow(): Flow<Boolean> = callbackFlow {
+
+        fun isLocationEnabled(): Boolean = CLLocationManager.locationServicesEnabled()
+
+        val locationManager: CLLocationManager = CLLocationManager().apply {
+
+            delegate = object : NSObject(), CLLocationManagerDelegateProtocol {
+                override fun locationManager(
+                    manager: CLLocationManager,
+                    didChangeAuthorizationStatus: CLAuthorizationStatus
+                ) {
+                    trySend(isLocationEnabled())
+                }
+            }
+        }
+
+        // Emit initial value
+        trySend(isLocationEnabled())
+
+        // Also re-check when coming back from Settings
+        val center: NSNotificationCenter = NSNotificationCenter.defaultCenter
+        val token: NSObjectProtocol = center.addObserverForName(
+            name = UIApplicationWillEnterForegroundNotification,
+            `object` = null,
+            queue = NSOperationQueue.mainQueue
+        ) { _ ->
+            trySend(isLocationEnabled())
+        }
+
+        awaitClose {
+            center.removeObserver(token)
+            locationManager.delegate = null
+        }
+    }
 
     override fun requestEnableLocation(onResult: (Boolean) -> Unit) {
         val locationManager = CLLocationManager()
@@ -70,6 +109,16 @@ class LocationRepositoryIosImpl : LocationRepository {
         return suspendCancellableCoroutine { continuation ->
 
             val locationManager = CLLocationManager()
+            var isCompleted = false
+
+            fun onComplete(value: CLLocation?) {
+                if (isCompleted) return
+
+                isCompleted = true
+                locationManager.stopUpdatingLocation()
+                locationManager.delegate = null
+                continuation.resume(value)
+            }
             locationManager.delegate = object : NSObject(), CLLocationManagerDelegateProtocol {
 
                 override fun locationManager(
@@ -77,17 +126,19 @@ class LocationRepositoryIosImpl : LocationRepository {
                     didUpdateLocations: List<*>
                 ) {
                     val location: CLLocation? = didUpdateLocations.firstOrNull() as? CLLocation
-                    locationManager.stopUpdatingLocation()
-                    continuation.resume(location)
+                    onComplete(location)
                 }
 
                 override fun locationManager(
                     manager: CLLocationManager,
                     didFailWithError: NSError
                 ) {
-                    locationManager.stopUpdatingLocation()
-                    continuation.resume(null)
+                    onComplete(null)
                 }
+            }
+            continuation.invokeOnCancellation {
+                locationManager.stopUpdatingLocation()
+                locationManager.delegate = null
             }
             locationManager.requestWhenInUseAuthorization()
             locationManager.startUpdatingLocation()

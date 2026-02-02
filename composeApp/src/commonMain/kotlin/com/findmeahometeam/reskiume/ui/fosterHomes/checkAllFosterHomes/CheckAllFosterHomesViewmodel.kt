@@ -24,8 +24,8 @@ import com.findmeahometeam.reskiume.domain.usecases.image.GetCompleteImagePathFr
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
-import com.findmeahometeam.reskiume.domain.usecases.util.location.GetIfLocationEnabledFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.GetLocationFromLocationRepository
+import com.findmeahometeam.reskiume.domain.usecases.util.location.ObserveIfLocationEnabledFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.RequestEnableLocationFromLocationRepository
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.components.toUiState
@@ -73,7 +73,7 @@ class CheckAllFosterHomesViewmodel(
     private val getCompleteImagePathFromLocalDataSource: GetCompleteImagePathFromLocalDataSource,
     private val getAllFosterHomesByLocationFromRemoteRepository: GetAllFosterHomesByLocationFromRemoteRepository,
     private val getAllFosterHomesByLocationFromLocalRepository: GetAllFosterHomesByLocationFromLocalRepository,
-    private val getIfLocationEnabledFromLocationRepository: GetIfLocationEnabledFromLocationRepository,
+    private val observeIfLocationEnabledFromLocationRepository: ObserveIfLocationEnabledFromLocationRepository,
     private val requestEnableLocationFromLocationRepository: RequestEnableLocationFromLocationRepository,
     private val getLocationFromLocationRepository: GetLocationFromLocationRepository,
     private val getStringProvider: StringProvider,
@@ -162,7 +162,7 @@ class CheckAllFosterHomesViewmodel(
         _activeQuery.value = Query.ByPlace(country, city, nonHumanAnimalType)
     }
 
-    fun getIfLocationEnabled() = getIfLocationEnabledFromLocationRepository()
+    fun observeIfLocationEnabled(): Flow<Boolean> = observeIfLocationEnabledFromLocationRepository()
 
     fun requestEnableLocation(onResul: (Boolean) -> Unit) {
 

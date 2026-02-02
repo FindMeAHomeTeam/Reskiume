@@ -16,6 +16,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -92,8 +94,7 @@ fun CheckAllFosterHomesScreen(
         selectedCountry
     ).collectAsState(initial = emptyList())
     var searchOption: SearchOption by rememberSaveable { mutableStateOf(SearchOption.COUNTRY_CITY) }
-    var activistLongitude: Double by rememberSaveable { mutableStateOf(0.0) }
-    var activistLatitude: Double by rememberSaveable { mutableStateOf(0.0) }
+    val isLocationEnabledState: State<Boolean> = checkAllFosterHomesViewmodel.observeIfLocationEnabled().collectAsState(initial = false)
     var nonHumanAnimalType: NonHumanAnimalType by rememberSaveable {
         mutableStateOf(NonHumanAnimalType.UNSELECTED)
     }
@@ -120,6 +121,8 @@ fun CheckAllFosterHomesScreen(
                         selectedCountry != Country.UNSELECTED && selectedCity != City.UNSELECTED
                     } else {
                         managePermissionState == ManagePermissionState.PERMISSION_GRANTED
+                                && isLocationEnabledState.value
+                                && !displayDialogToRequestLocationActivation
                     }
         }
     }
@@ -148,7 +151,7 @@ fun CheckAllFosterHomesScreen(
                 if (searchOption == SearchOption.LOCATION) {
 
                     managePermissionState = ManagePermissionState.CHECK_PERMISSION
-                    displayDialogToRequestLocationActivation = !checkAllFosterHomesViewmodel.getIfLocationEnabled()
+                    displayDialogToRequestLocationActivation = !isLocationEnabledState.value
                 }
             }
 
@@ -174,42 +177,39 @@ fun CheckAllFosterHomesScreen(
                     updateManagePermissionState = {
                         managePermissionState = it
                     },
-                    onPermissionGranted = {
-                        if (checkAllFosterHomesViewmodel.getIfLocationEnabled()) {
-
-                            checkAllFosterHomesViewmodel.updateLocation { longitude, latitude ->
-                                activistLongitude = longitude
-                                activistLatitude = latitude
-                            }
-                        }
-                    }
+                    onPermissionGranted = {}
                 )
             }
 
-            if (managePermissionState == ManagePermissionState.PERMISSION_GRANTED && displayDialogToRequestLocationActivation) {
+            if (managePermissionState == ManagePermissionState.PERMISSION_GRANTED) {
 
-                RmDialog(
-                    emoji = "⚙️",
-                    title = stringResource(Res.string.location_turn_on_location_title),
-                    message = stringResource(Res.string.location_turn_on_location_message),
-                    allowMessage = stringResource(Res.string.location_turn_on_location_open_settings_button),
-                    denyMessage = stringResource(Res.string.location_turn_on_later_location_button),
-                    onClickAllow = {
-                        checkAllFosterHomesViewmodel.requestEnableLocation { isEnabled ->
-                            if (isEnabled) {
+                if (displayDialogToRequestLocationActivation) {
 
-                                checkAllFosterHomesViewmodel.updateLocation { longitude, latitude ->
-                                    activistLongitude = longitude
-                                    activistLatitude = latitude
+                    RmDialog(
+                        emoji = "⚙️",
+                        title = stringResource(Res.string.location_turn_on_location_title),
+                        message = stringResource(Res.string.location_turn_on_location_message),
+                        allowMessage = stringResource(Res.string.location_turn_on_location_open_settings_button),
+                        denyMessage = stringResource(Res.string.location_turn_on_later_location_button),
+                        onClickAllow = {
+                            checkAllFosterHomesViewmodel.requestEnableLocation { isEnabled ->
+                                if (isEnabled) {
+                                    displayDialogToRequestLocationActivation = false
                                 }
-                                displayDialogToRequestLocationActivation = false
                             }
+                        },
+                        onClickDeny = {
+                            displayDialogToRequestLocationActivation = false
                         }
-                    },
-                    onClickDeny = {
-                        displayDialogToRequestLocationActivation = false
+                    )
+                } else {
+                    LaunchedEffect(isLocationEnabledState.value) {
+
+                        if (isLocationEnabledState.value) {
+                            checkAllFosterHomesViewmodel.updateLocation()
+                        }
                     }
-                )
+                }
             }
 
             AnimatedVisibility(

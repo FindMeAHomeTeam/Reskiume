@@ -261,21 +261,25 @@ class CheckAllFosterHomesViewmodel(
                         )
                     }
                 ).map {
-                    it.flatMap { fosterHome ->
-                        fosterHome.allAcceptedNonHumanAnimalTypes.mapNotNull { acceptedNonHumanAnimalTypeForFosterHome ->
-                            if (acceptedNonHumanAnimalTypeForFosterHome.acceptedNonHumanAnimalType == nonHumanAnimalType) {
-                                UiFosterHome(
-                                    fosterHome.copy(
-                                        imageUrl = if (fosterHome.imageUrl.isEmpty()) {
-                                            fosterHome.imageUrl
-                                        } else {
-                                            getCompleteImagePathFromLocalDataSource(fosterHome.imageUrl)
-                                        }
-                                    )
+                    it.mapNotNull { fosterHome ->
+
+                        val nonHumanAnimalTypeSet: Set<NonHumanAnimalType> =
+                            fosterHome.allAcceptedNonHumanAnimals.map { acceptedNonHumanAnimalForFosterHome ->
+                                acceptedNonHumanAnimalForFosterHome.acceptedNonHumanAnimalType
+                            }.toSet()
+
+                        if (nonHumanAnimalTypeSet.contains(nonHumanAnimalType)) {
+                            UiFosterHome(
+                                fosterHome.copy(
+                                    imageUrl = if (fosterHome.imageUrl.isEmpty()) {
+                                        fosterHome.imageUrl
+                                    } else {
+                                        getCompleteImagePathFromLocalDataSource(fosterHome.imageUrl)
+                                    }
                                 )
-                            } else {
-                                null
-                            }
+                            )
+                        } else {
+                            null
                         }
                     }.sortedBy { uiFosterHome -> uiFosterHome.fosterHome.city }
                 }
@@ -487,27 +491,31 @@ class CheckAllFosterHomesViewmodel(
                         )
                     }
                 ).map {
-                    it.flatMap { fosterHome ->
-                        fosterHome.allAcceptedNonHumanAnimalTypes.mapNotNull { acceptedNonHumanAnimalTypeForFosterHome ->
-                            if (acceptedNonHumanAnimalTypeForFosterHome.acceptedNonHumanAnimalType == nonHumanAnimalType) {
-                                UiFosterHome(
-                                    fosterHome = fosterHome.copy(
-                                        imageUrl = if (fosterHome.imageUrl.isEmpty()) {
-                                            fosterHome.imageUrl
-                                        } else {
-                                            getCompleteImagePathFromLocalDataSource(fosterHome.imageUrl)
-                                        }
-                                    ),
-                                    distance = calculateDistanceHaversineKm(
-                                        activistLatitude,
-                                        activistLongitude,
-                                        fosterHome.latitude,
-                                        fosterHome.longitude
-                                    )
+                    it.mapNotNull { fosterHome ->
+
+                        val nonHumanAnimalTypeSet: Set<NonHumanAnimalType> =
+                            fosterHome.allAcceptedNonHumanAnimals.map { acceptedNonHumanAnimalForFosterHome ->
+                                acceptedNonHumanAnimalForFosterHome.acceptedNonHumanAnimalType
+                            }.toSet()
+
+                        if (nonHumanAnimalTypeSet.contains(nonHumanAnimalType)) {
+                            UiFosterHome(
+                                fosterHome = fosterHome.copy(
+                                    imageUrl = if (fosterHome.imageUrl.isEmpty()) {
+                                        fosterHome.imageUrl
+                                    } else {
+                                        getCompleteImagePathFromLocalDataSource(fosterHome.imageUrl)
+                                    }
+                                ),
+                                distance = calculateDistanceHaversineKm(
+                                    activistLatitude,
+                                    activistLongitude,
+                                    fosterHome.latitude,
+                                    fosterHome.longitude
                                 )
-                            } else {
-                                null
-                            }
+                            )
+                        } else {
+                            null
                         }
                     }.sortedBy { uiFosterHome -> uiFosterHome.distance }
                 }

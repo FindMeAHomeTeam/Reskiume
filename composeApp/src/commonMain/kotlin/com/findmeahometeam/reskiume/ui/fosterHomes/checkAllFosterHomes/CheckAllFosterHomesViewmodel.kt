@@ -57,6 +57,8 @@ import kotlin.math.sqrt
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
+private const val WAITING_TIME: Int = 2 * 60 // 2 min
+
 @OptIn(ExperimentalCoroutinesApi::class)
 class CheckAllFosterHomesViewmodel(
     private val stringProvider: StringProvider,
@@ -81,6 +83,12 @@ class CheckAllFosterHomesViewmodel(
 ) : ViewModel() {
 
     private var myUserId: String = ""
+
+    private var activistLongitude: Double = 0.0
+
+    private var activistLatitude: Double = 0.0
+
+    private var locationTimestamp: Long = 0
 
     private val _allFosterHomesState: MutableStateFlow<UiState<List<UiFosterHome>>> =
         MutableStateFlow(UiState.Idle())
@@ -169,41 +177,52 @@ class CheckAllFosterHomesViewmodel(
         requestEnableLocationFromLocationRepository(onResul)
     }
 
-    fun updateLocation(onResult: (longitude: Double, latitude: Double) -> Unit) {
+    @OptIn(ExperimentalTime::class)
+    suspend fun updateLocation() {
+        val locationPair: Pair<Double, Double> = getLocationFromLocationRepository()
+        activistLongitude = locationPair.first
+        activistLatitude = locationPair.second
+        locationTimestamp = Clock.System.now().epochSeconds
 
-        viewModelScope.launch {
-            val locationPair: Pair<Double, Double> = getLocationFromLocationRepository()
-            onResult(locationPair.first, locationPair.second)
-            log.d(
-                "CheckAllFosterHomesViewmodel",
-                "Longitude and latitude: $locationPair"
-            )
-        }
+        log.d(
+            "CheckAllFosterHomesViewmodel",
+            "Longitude and latitude: $locationPair"
+        )
     }
 
-    fun fetchAllFosterHomesStateByLocation(
-        activistLongitude: Double,
-        activistLatitude: Double,
-        nonHumanAnimalType: NonHumanAnimalType
-    ) {
-        if (activistLongitude == 0.0 && activistLatitude == 0.0) {
+    @OptIn(ExperimentalTime::class)
+    fun fetchAllFosterHomesStateByLocation(nonHumanAnimalType: NonHumanAnimalType) {
 
-            viewModelScope.launch {
+        viewModelScope.launch {
 
-                val errorMessage =
-                    getStringProvider.getStringResource(Res.string.check_all_foster_homes_screen_turn_on_location)
-                log.d(
-                    "CheckAllFosterHomesViewmodel",
-                    errorMessage
-                )
-                _allFosterHomesState.value = UiState.Error(errorMessage)
-                _activeQuery.value = Query.Idle
+            val currentTime: Long = Clock.System.now().epochSeconds
+            if (currentTime - locationTimestamp >= WAITING_TIME) {
+
+                // Init values
+                activistLongitude = 0.0
+                activistLatitude = 0.0
+
+                updateLocation()
             }
-            return
+            if (activistLongitude == 0.0 && activistLatitude == 0.0) {
+
+                viewModelScope.launch {
+
+                    val errorMessage =
+                        getStringProvider.getStringResource(Res.string.check_all_foster_homes_screen_turn_on_location)
+                    log.d(
+                        "CheckAllFosterHomesViewmodel",
+                        errorMessage
+                    )
+                    _allFosterHomesState.value = UiState.Error(errorMessage)
+                    _activeQuery.value = Query.Idle
+                }
+                return@launch
+            }
+            _allFosterHomesState.value = UiState.Loading()
+            _activeQuery.value =
+                Query.ByLocation(activistLongitude, activistLatitude, nonHumanAnimalType)
         }
-        _allFosterHomesState.value = UiState.Loading()
-        _activeQuery.value =
-            Query.ByLocation(activistLongitude, activistLatitude, nonHumanAnimalType)
     }
 
     private fun getFetchAllFosterHomesStateByPlaceFlow(

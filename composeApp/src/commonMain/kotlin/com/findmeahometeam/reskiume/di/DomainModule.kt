@@ -59,7 +59,7 @@ import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromLocalRe
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.InsertReviewInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.InsertReviewInRemoteRepository
-import com.findmeahometeam.reskiume.domain.usecases.util.location.GetIfLocationEnabledFromLocationRepository
+import com.findmeahometeam.reskiume.domain.usecases.util.location.ObserveIfLocationEnabledFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.GetLocationFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.RequestEnableLocationFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.translator.TranslateMessage
@@ -147,7 +147,7 @@ val domainModule = module {
 
     // util translator
     factoryOf(::TranslateMessage)
-    factoryOf(::GetIfLocationEnabledFromLocationRepository)
+    factoryOf(::ObserveIfLocationEnabledFromLocationRepository)
     factoryOf(::RequestEnableLocationFromLocationRepository)
     factoryOf(::GetLocationFromLocationRepository)
 }

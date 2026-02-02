@@ -214,7 +214,8 @@
     <string name="location_turn_on_later_location_button">Later</string>
 
     <!-- Foster home list item -->
-    <string name="foster_home_list_item_accepted_non_human_animal">Accept %1$s</string>
+    <string name="foster_home_list_item_accepted_non_human_animal">Accept: </string>
+    <string name="foster_home_list_item_accepted_both_genders_non_human_animal">%1$s &amp; %2$s</string>
     <string name="foster_home_list_item_accepted_more_non_human_animal">➕ And more</string>
     <string name="foster_home_list_item_residents_non_human_animal">Residents</string>
 
@@ -238,5 +239,8 @@
     <string name="check_advice_screen_title">Check advice</string>
     <string name="check_advice_screen_author">Advice author: %1$s</string>
     <string name="check_advice_screen_author_image_content_description">Advice author image</string>
+
+    <!-- Button -->
+    <string name="button_please_wait">Please wait</string>
 
 </resources>

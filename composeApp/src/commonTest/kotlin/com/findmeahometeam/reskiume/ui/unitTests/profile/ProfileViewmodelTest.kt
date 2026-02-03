@@ -76,7 +76,7 @@ class ProfileViewmodelTest : CoroutineTestDispatcher() {
             }
             getProfileViewmodel(authRepository).state.test {
                 assertEquals(
-                    ProfileUiState.Error("ProfileViewmodel - User data not found"),
+                    ProfileUiState.Error("ProfileViewmodel - User wrongUid not found"),
                     awaitItem()
                 )
                 awaitComplete()

@@ -63,7 +63,7 @@ class ProfileViewmodelIntegrationTest : CoroutineTestDispatcher() {
             val localUserRepository: LocalUserRepository = FakeLocalUserRepository(mutableListOf(user))
             getProfileViewmodel(authRepository, localUserRepository).state.test {
                 assertEquals(
-                    ProfileUiState.Error("ProfileViewmodel - User data not found"),
+                    ProfileUiState.Error("ProfileViewmodel - User wrongUid not found"),
                     awaitItem()
                 )
                 awaitComplete()

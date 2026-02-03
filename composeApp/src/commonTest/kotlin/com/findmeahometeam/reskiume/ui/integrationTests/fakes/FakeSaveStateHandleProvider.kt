@@ -8,6 +8,7 @@ import kotlin.jvm.JvmSuppressWildcards
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 
+@Suppress("UNCHECKED_CAST")
 class FakeSaveStateHandleProvider(
     private val objectRoute: Any = CheckReviews(user.uid)
 ): SaveStateHandleProvider {

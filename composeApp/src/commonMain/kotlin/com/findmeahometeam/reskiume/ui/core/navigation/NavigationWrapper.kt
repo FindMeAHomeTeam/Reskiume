@@ -29,6 +29,10 @@ fun NavigationWrapper() {
             HomeScreen(mainNavController)
         }
 
+        composable<CheckFosterHome> {
+            //
+        }
+
         composable(route = Routes.CREATE_ACCOUNT.route) {
             CreateAccountScreen(
                 onBackPressed = { mainNavController.navigateUp() },

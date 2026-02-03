@@ -18,6 +18,9 @@ enum class Routes(val route: String) {
 }
 
 @Serializable
+class CheckFosterHome(val fosterHomeId: String)
+
+@Serializable
 class CheckReviews(val uid: String)
 
 @Serializable

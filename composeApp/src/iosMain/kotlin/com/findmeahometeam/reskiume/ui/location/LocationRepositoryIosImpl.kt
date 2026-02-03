@@ -59,7 +59,7 @@ class LocationRepositoryIosImpl : LocationRepository {
         }
     }
 
-    override fun requestEnableLocation(onResult: (Boolean) -> Unit) {
+    override fun requestEnableLocation(onResult: (isEnabled: Boolean) -> Unit) {
         val locationManager = CLLocationManager()
 
         // Check authorization status

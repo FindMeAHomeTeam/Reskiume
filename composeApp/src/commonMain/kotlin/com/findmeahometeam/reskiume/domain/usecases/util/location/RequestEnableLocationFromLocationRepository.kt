@@ -4,5 +4,5 @@ import com.findmeahometeam.reskiume.domain.repository.util.location.LocationRepo
 
 class RequestEnableLocationFromLocationRepository(private val locationRepository: LocationRepository) {
 
-    operator fun invoke(onResult: (Boolean) -> Unit) = locationRepository.requestEnableLocation(onResult)
+    operator fun invoke(onResult: (isEnabled: Boolean) -> Unit) = locationRepository.requestEnableLocation(onResult)
 }

@@ -172,7 +172,7 @@ class CheckAllFosterHomesViewmodel(
 
     fun observeIfLocationEnabled(): Flow<Boolean> = observeIfLocationEnabledFromLocationRepository()
 
-    fun requestEnableLocation(onResul: (Boolean) -> Unit) {
+    fun requestEnableLocation(onResul: (isEnabled: Boolean) -> Unit) {
 
         requestEnableLocationFromLocationRepository(onResul)
     }

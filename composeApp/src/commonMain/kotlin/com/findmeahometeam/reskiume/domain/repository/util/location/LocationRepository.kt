@@ -5,6 +5,6 @@ import kotlinx.coroutines.flow.Flow
 interface LocationRepository {
 
     fun observeIfLocationEnabledFlow(): Flow<Boolean>
-    fun requestEnableLocation(onResult: (Boolean) -> Unit)
+    fun requestEnableLocation(onResult: (isEnabled: Boolean) -> Unit)
     suspend fun getLocation(): Pair<Double, Double>
 }

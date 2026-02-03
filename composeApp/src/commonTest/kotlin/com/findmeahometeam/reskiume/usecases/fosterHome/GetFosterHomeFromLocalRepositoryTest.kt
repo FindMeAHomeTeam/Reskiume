@@ -40,7 +40,7 @@ class GetFosterHomeFromLocalRepositoryTest: CoroutineTestDispatcher() {
         GetFosterHomeFromLocalRepository(localFosterHomeRepository, checkNonHumanAnimalUtil)
 
     @Test
-    fun `given a local foster home_when the app retrieves it to list it_then app gets a flow of FosterHome`() =
+    fun `given a local foster home_when the app retrieves it to display it_then app gets a flow of FosterHome`() =
         runTest {
             getFosterHomeFromLocalRepository(
                 fosterHome.id,

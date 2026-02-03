@@ -2,7 +2,7 @@ package com.findmeahometeam.reskiume.usecases.fosterHome
 
 import com.findmeahometeam.reskiume.domain.repository.local.LocalFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.DeleteAllMyFosterHomesFromLocalRepository
-import com.findmeahometeam.reskiume.user
+import com.findmeahometeam.reskiume.fosterHome
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
@@ -15,7 +15,7 @@ class DeleteAllMyFosterHomesFromLocalRepositoryTest {
 
     private val localFosterHomeRepository: LocalFosterHomeRepository = mock {
         everySuspend {
-            deleteAllMyFosterHomes(user.uid, any())
+            deleteAllMyFosterHomes(fosterHome.ownerId, any())
         } returns Unit
     }
 
@@ -23,11 +23,11 @@ class DeleteAllMyFosterHomesFromLocalRepositoryTest {
         DeleteAllMyFosterHomesFromLocalRepository(localFosterHomeRepository)
 
     @Test
-    fun `given local foster home_when the app deletes them on account deletion_then deleteAllMyFosterHomes is called`() =
+    fun `given my own local foster homes_when the app deletes them on account deletion_then deleteAllMyFosterHomes is called`() =
         runTest {
-            deleteAllMyFosterHomesFromLocalRepository(user.uid, {})
+            deleteAllMyFosterHomesFromLocalRepository(fosterHome.ownerId) {}
             verifySuspend {
-                localFosterHomeRepository.deleteAllMyFosterHomes(user.uid, any())
+                localFosterHomeRepository.deleteAllMyFosterHomes(fosterHome.ownerId, any())
             }
         }
 }

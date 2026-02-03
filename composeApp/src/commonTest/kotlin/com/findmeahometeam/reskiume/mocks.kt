@@ -1,14 +1,18 @@
 package com.findmeahometeam.reskiume
 
+import com.findmeahometeam.reskiume.data.database.entity.fosterHome.FosterHomeWithAllNonHumanAnimalData
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.domain.model.AgeCategory
+import com.findmeahometeam.reskiume.domain.model.Gender
 import com.findmeahometeam.reskiume.domain.model.LocalCache
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
 import com.findmeahometeam.reskiume.domain.model.Review
-import com.findmeahometeam.reskiume.domain.model.Gender
 import com.findmeahometeam.reskiume.domain.model.User
+import com.findmeahometeam.reskiume.domain.model.fosterHome.AcceptedNonHumanAnimalForFosterHome
+import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
+import com.findmeahometeam.reskiume.domain.model.fosterHome.ResidentNonHumanAnimalForFosterHome
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.UiReview
 
 // Mocked user data for testing
@@ -91,3 +95,49 @@ val nonHumanAnimal = NonHumanAnimal(
     gender = Gender.MALE
 )
 
+// Mocked fosterHome data for testing
+
+val fosterHome = FosterHome(
+    id = "123" + user.uid,
+    ownerId = user.uid,
+    savedBy = "",
+    title = "my foster home",
+    description = "my description",
+    conditions = "my conditions",
+    imageUrl = "fosterHomeImageUrl.webp",
+    allAcceptedNonHumanAnimals = listOf(
+        AcceptedNonHumanAnimalForFosterHome(
+            acceptedNonHumanAnimalId = 1,
+            fosterHomeId = "123" + user.uid,
+            acceptedNonHumanAnimalType = NonHumanAnimalType.CAT,
+            acceptedNonHumanAnimalGender = Gender.FEMALE
+        ),
+        AcceptedNonHumanAnimalForFosterHome(
+            acceptedNonHumanAnimalId = 2,
+            fosterHomeId = "123" + user.uid,
+            acceptedNonHumanAnimalType = NonHumanAnimalType.DOG,
+            acceptedNonHumanAnimalGender = Gender.MALE
+        )
+    ),
+    allResidentNonHumanAnimals = listOf(
+        ResidentNonHumanAnimalForFosterHome(
+            residentNonHumanAnimal = nonHumanAnimal,
+            fosterHomeId = "123" + user.uid
+        )
+    ),
+    longitude = -5.0236,
+    latitude = 37.8925,
+    country = "spain",
+    city = "cordoba",
+    available = true
+)
+
+const val activistLongitude = -4.771596621727628
+
+const val activistLatitude = 37.891891891891895
+
+val fosterHomeWithAllNonHumanAnimalData = FosterHomeWithAllNonHumanAnimalData(
+    fosterHomeEntity = fosterHome.toEntity(),
+    allAcceptedNonHumanAnimals = fosterHome.allAcceptedNonHumanAnimals.map { it.toEntity() },
+    allResidentNonHumanAnimalIds = fosterHome.allResidentNonHumanAnimals.map { it.toEntityForId() }
+)

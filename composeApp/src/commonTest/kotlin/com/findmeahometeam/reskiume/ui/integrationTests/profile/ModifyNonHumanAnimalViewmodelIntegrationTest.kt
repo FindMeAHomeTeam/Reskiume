@@ -39,7 +39,7 @@ import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeManageImagePat
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeRealtimeDatabaseRemoteNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeSaveStateHandleProvider
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeStorageRepository
-import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
+import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtilImpl
 import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.DeleteNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.ModifyNonHumanAnimalViewmodel
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
@@ -114,7 +114,7 @@ class ModifyNonHumanAnimalViewmodelIntegrationTest : CoroutineTestDispatcher() {
         val getCompleteImagePathFromLocalDataSource =
             GetCompleteImagePathFromLocalDataSource(manageImagePath)
 
-        val checkNonHumanAnimalUtil = CheckNonHumanAnimalUtil(
+        val checkNonHumanAnimalUtil = CheckNonHumanAnimalUtilImpl(
             observeAuthStateInAuthDataSource,
             getDataByManagingObjectLocalCacheTimestamp,
             getNonHumanAnimalFromRemoteRepository,

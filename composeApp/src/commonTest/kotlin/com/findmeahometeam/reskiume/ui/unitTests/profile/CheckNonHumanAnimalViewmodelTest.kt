@@ -26,8 +26,8 @@ import com.findmeahometeam.reskiume.nonHumanAnimal
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckNonHumanAnimal
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
+import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtilImpl
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalViewmodel
-import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.plusmobileapps.konnectivity.Konnectivity
 import com.plusmobileapps.konnectivity.NetworkConnection
@@ -235,7 +235,7 @@ class CheckNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
         val getCompleteImagePathFromLocalDataSource =
             GetCompleteImagePathFromLocalDataSource(manageImagePath)
 
-        val checkNonHumanAnimalUtil = CheckNonHumanAnimalUtil(
+        val checkNonHumanAnimalUtil = CheckNonHumanAnimalUtilImpl(
             observeAuthStateInAuthDataSource,
             getDataByManagingObjectLocalCacheTimestamp,
             getNonHumanAnimalFromRemoteRepository,

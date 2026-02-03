@@ -3,13 +3,13 @@ package com.findmeahometeam.reskiume.di
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProviderImpl
 import com.findmeahometeam.reskiume.ui.fosterHomes.checkAllFosterHomes.CheckAllFosterHomesViewmodel
-import com.findmeahometeam.reskiume.ui.fosterHomes.checkFosterHome.CheckFosterHomeUtil
 import com.findmeahometeam.reskiume.ui.home.HomeViewmodel
 import com.findmeahometeam.reskiume.ui.profile.ProfileViewmodel
 import com.findmeahometeam.reskiume.ui.profile.checkAllAdvice.CheckAllAdviceViewmodel
 import com.findmeahometeam.reskiume.ui.profile.checkAllNonHumanAnimals.CheckAllNonHumanAnimalsViewmodel
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalViewmodel
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
+import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtilImpl
 import com.findmeahometeam.reskiume.ui.profile.createAccount.CreateAccountViewmodel
 import com.findmeahometeam.reskiume.ui.profile.deleteAccount.DeleteAccountViewmodel
 import com.findmeahometeam.reskiume.ui.profile.loginAccount.LoginAccountViewmodel
@@ -41,7 +41,7 @@ val uiModule = module {
     viewModelOf(::CheckAllNonHumanAnimalsViewmodel)
     viewModelOf(::ModifyNonHumanAnimalViewmodel)
     viewModelOf(::CheckNonHumanAnimalViewmodel)
-    singleOf(::CheckNonHumanAnimalUtil)
+    singleOf(::CheckNonHumanAnimalUtilImpl) bind CheckNonHumanAnimalUtil::class
     viewModelOf(::CreateNonHumanAnimalViewmodel)
     singleOf(::DeleteNonHumanAnimalUtil)
     viewModelOf(::CheckAllAdviceViewmodel)

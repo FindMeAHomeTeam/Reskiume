@@ -61,7 +61,7 @@ private const val WAITING_TIME: Int = 2 * 60 // 2 min
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CheckAllFosterHomesViewmodel(
-    private val stringProvider: StringProvider,
+    private val getStringProvider: StringProvider,
     private val observeAuthStateInAuthDataSource: ObserveAuthStateInAuthDataSource,
     private val getDataByManagingObjectLocalCacheTimestamp: GetDataByManagingObjectLocalCacheTimestamp,
     private val getAllFosterHomesByCountryAndCityFromRemoteRepository: GetAllFosterHomesByCountryAndCityFromRemoteRepository,
@@ -78,7 +78,6 @@ class CheckAllFosterHomesViewmodel(
     private val observeIfLocationEnabledFromLocationRepository: ObserveIfLocationEnabledFromLocationRepository,
     private val requestEnableLocationFromLocationRepository: RequestEnableLocationFromLocationRepository,
     private val getLocationFromLocationRepository: GetLocationFromLocationRepository,
-    private val getStringProvider: StringProvider,
     private val log: Log
 ) : ViewModel() {
 
@@ -144,7 +143,7 @@ class CheckAllFosterHomesViewmodel(
 
         val value = Country.entries
             .filter { it != Country.UNSELECTED }
-            .map { it to stringProvider.getStringResource(it.toStringResource()) }
+            .map { it to getStringProvider.getStringResource(it.toStringResource()) }
         emit(value)
     }
 
@@ -155,7 +154,7 @@ class CheckAllFosterHomesViewmodel(
         } else {
             City.entries
                 .filter { it != City.UNSELECTED && it.country == selectedCountry }
-                .map { it to stringProvider.getStringResource(it.toStringResource()) }
+                .map { it to getStringProvider.getStringResource(it.toStringResource()) }
         }
         emit(list)
     }

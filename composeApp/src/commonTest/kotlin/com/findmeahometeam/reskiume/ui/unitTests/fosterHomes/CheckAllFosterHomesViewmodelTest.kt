@@ -43,6 +43,7 @@ import com.findmeahometeam.reskiume.nonHumanAnimal
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.fosterHomes.checkAllFosterHomes.CheckAllFosterHomesViewmodel
 import com.findmeahometeam.reskiume.ui.fosterHomes.checkAllFosterHomes.UiFosterHome
+import com.findmeahometeam.reskiume.ui.profile.checkAllMyFosterHomes.CheckAllMyFosterHomesUtilImpl
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.findmeahometeam.reskiume.ui.util.StringProvider
@@ -433,6 +434,16 @@ class CheckAllFosterHomesViewmodelTest : CoroutineTestDispatcher() {
 
         val modifyCacheInLocalRepository = ModifyCacheInLocalRepository(localCacheRepository)
 
+        val checkAllMyFosterHomesUtil = CheckAllMyFosterHomesUtilImpl(
+            downloadImageToLocalDataSource,
+            getFosterHomeFromLocalRepository,
+            insertFosterHomeInLocalRepository,
+            insertCacheInLocalRepository,
+            modifyFosterHomeInLocalRepository,
+            modifyCacheInLocalRepository,
+            log
+        )
+
         val getAllFosterHomesByCountryAndCityFromLocalRepository =
             GetAllFosterHomesByCountryAndCityFromLocalRepository(
                 localFosterHomeRepository,
@@ -468,12 +479,7 @@ class CheckAllFosterHomesViewmodelTest : CoroutineTestDispatcher() {
             observeAuthStateInAuthDataSource,
             getDataByManagingObjectLocalCacheTimestamp,
             getAllFosterHomesByCountryAndCityFromRemoteRepository,
-            downloadImageToLocalDataSource,
-            getFosterHomeFromLocalRepository,
-            insertFosterHomeInLocalRepository,
-            insertCacheInLocalRepository,
-            modifyFosterHomeInLocalRepository,
-            modifyCacheInLocalRepository,
+            checkAllMyFosterHomesUtil,
             getAllFosterHomesByCountryAndCityFromLocalRepository,
             getCompleteImagePathFromLocalDataSource,
             getAllFosterHomesByLocationFromRemoteRepository,
@@ -584,7 +590,7 @@ class CheckAllFosterHomesViewmodelTest : CoroutineTestDispatcher() {
             }
             verify {
                 log.e(
-                    "CheckAllFosterHomesViewmodel",
+                    "CheckAllMyFosterHomesUtilImpl",
                     "Error adding the foster home ${fosterHome.id} to local database"
                 )
             }
@@ -613,7 +619,7 @@ class CheckAllFosterHomesViewmodelTest : CoroutineTestDispatcher() {
             }
             verify {
                 log.e(
-                    "CheckAllFosterHomesViewmodel",
+                    "CheckAllMyFosterHomesUtilImpl",
                     "Error adding ${fosterHome.id} to local cache in section ${Section.FOSTER_HOMES}"
                 )
             }
@@ -703,7 +709,7 @@ class CheckAllFosterHomesViewmodelTest : CoroutineTestDispatcher() {
             }
             verify {
                 log.e(
-                    "CheckAllFosterHomesViewmodel",
+                    "CheckAllMyFosterHomesUtilImpl",
                     "Error modifying the foster home ${fosterHome.id} in local database"
                 )
             }
@@ -735,7 +741,7 @@ class CheckAllFosterHomesViewmodelTest : CoroutineTestDispatcher() {
             }
             verify {
                 log.e(
-                    "CheckAllFosterHomesViewmodel",
+                    "CheckAllMyFosterHomesUtilImpl",
                     "Error updating ${fosterHome.id} in local cache in section ${Section.FOSTER_HOMES}"
                 )
             }

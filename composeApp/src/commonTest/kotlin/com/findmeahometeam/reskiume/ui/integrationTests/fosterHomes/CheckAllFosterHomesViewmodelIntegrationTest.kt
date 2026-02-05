@@ -50,6 +50,7 @@ import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLog
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeManageImagePath
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeStorageRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeStringProvider
+import com.findmeahometeam.reskiume.ui.profile.checkAllMyFosterHomes.CheckAllMyFosterHomesUtilImpl
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.findmeahometeam.reskiume.ui.util.StringProvider
@@ -117,6 +118,16 @@ class CheckAllFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() {
 
         val modifyCacheInLocalRepository = ModifyCacheInLocalRepository(localCacheRepository)
 
+        val checkAllMyFosterHomesUtil = CheckAllMyFosterHomesUtilImpl(
+            downloadImageToLocalDataSource,
+            getFosterHomeFromLocalRepository,
+            insertFosterHomeInLocalRepository,
+            insertCacheInLocalRepository,
+            modifyFosterHomeInLocalRepository,
+            modifyCacheInLocalRepository,
+            log
+        )
+
         val getAllFosterHomesByCountryAndCityFromLocalRepository =
             GetAllFosterHomesByCountryAndCityFromLocalRepository(
                 localFosterHomeRepository,
@@ -152,12 +163,7 @@ class CheckAllFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() {
             observeAuthStateInAuthDataSource,
             getDataByManagingObjectLocalCacheTimestamp,
             getAllFosterHomesByCountryAndCityFromRemoteRepository,
-            downloadImageToLocalDataSource,
-            getFosterHomeFromLocalRepository,
-            insertFosterHomeInLocalRepository,
-            insertCacheInLocalRepository,
-            modifyFosterHomeInLocalRepository,
-            modifyCacheInLocalRepository,
+            checkAllMyFosterHomesUtil,
             getAllFosterHomesByCountryAndCityFromLocalRepository,
             getCompleteImagePathFromLocalDataSource,
             getAllFosterHomesByLocationFromRemoteRepository,

@@ -6,6 +6,9 @@ import com.findmeahometeam.reskiume.ui.fosterHomes.checkAllFosterHomes.CheckAllF
 import com.findmeahometeam.reskiume.ui.home.HomeViewmodel
 import com.findmeahometeam.reskiume.ui.profile.ProfileViewmodel
 import com.findmeahometeam.reskiume.ui.profile.checkAllAdvice.CheckAllAdviceViewmodel
+import com.findmeahometeam.reskiume.ui.profile.checkAllMyFosterHomes.CheckAllMyFosterHomesUtil
+import com.findmeahometeam.reskiume.ui.profile.checkAllMyFosterHomes.CheckAllMyFosterHomesUtilImpl
+import com.findmeahometeam.reskiume.ui.profile.checkAllMyFosterHomes.CheckAllMyFosterHomesViewmodel
 import com.findmeahometeam.reskiume.ui.profile.checkAllNonHumanAnimals.CheckAllNonHumanAnimalsViewmodel
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalViewmodel
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
@@ -46,4 +49,6 @@ val uiModule = module {
     singleOf(::DeleteNonHumanAnimalUtil)
     viewModelOf(::CheckAllAdviceViewmodel)
     viewModelOf(::CheckAllFosterHomesViewmodel)
+    viewModelOf(::CheckAllMyFosterHomesViewmodel)
+    singleOf(::CheckAllMyFosterHomesUtilImpl) bind CheckAllMyFosterHomesUtil::class
 }

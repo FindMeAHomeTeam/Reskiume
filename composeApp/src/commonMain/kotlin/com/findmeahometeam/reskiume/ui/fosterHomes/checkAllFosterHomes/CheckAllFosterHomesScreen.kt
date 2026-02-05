@@ -76,7 +76,8 @@ import reskiume.composeapp.generated.resources.location_turn_on_location_title
 
 @Composable
 fun CheckAllFosterHomesScreen(
-    onFosterHomeClicked: (fosterHomeId: String) -> Unit
+    onFosterHomeClicked: (fosterHomeId: String) -> Unit,
+    onCreateFosterHome: () -> Unit
 ) {
     val checkAllFosterHomesViewmodel: CheckAllFosterHomesViewmodel =
         koinViewModel<CheckAllFosterHomesViewmodel>()

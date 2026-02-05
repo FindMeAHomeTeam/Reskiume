@@ -219,6 +219,10 @@
     <string name="foster_home_list_item_accepted_more_non_human_animal">➕ And more</string>
     <string name="foster_home_list_item_residents_non_human_animal">Residents</string>
 
+    <!-- Check all my foster homes -->
+    <string name="check_all_my_foster_homes_screen_title">Check my foster homes</string>
+    <string name="check_all_my_foster_homes_screen_no_foster_homes">🏠 You don't have any foster homes, but consider creating one.</string>
+
     <!-- Check all advice -->
     <string name="check_all_advice_screen_title">Check all advice</string>
     <string name="check_all_advice_screen_seek_advice">Seek advice</string>

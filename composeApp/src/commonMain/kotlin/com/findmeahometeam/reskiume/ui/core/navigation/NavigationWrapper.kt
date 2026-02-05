@@ -9,6 +9,7 @@ import androidx.navigation.toRoute
 import com.findmeahometeam.reskiume.ui.home.HomeScreen
 import com.findmeahometeam.reskiume.ui.profile.checkAdvice.CheckAdviceScreen
 import com.findmeahometeam.reskiume.ui.profile.checkAllAdvice.CheckAllAdviceScreen
+import com.findmeahometeam.reskiume.ui.profile.checkAllMyFosterHomes.CheckAllMyFosterHomesScreen
 import com.findmeahometeam.reskiume.ui.profile.checkAllNonHumanAnimals.CheckAllNonHumanAnimalsScreen
 import com.findmeahometeam.reskiume.ui.profile.createAccount.CreateAccountScreen
 import com.findmeahometeam.reskiume.ui.profile.deleteAccount.DeleteAccountScreen
@@ -27,6 +28,18 @@ fun NavigationWrapper() {
 
         composable(route = Routes.HOME_SCREEN.route) {
             HomeScreen(mainNavController)
+        }
+
+        composable<CheckAllMyFosterHomes> {
+            CheckAllMyFosterHomesScreen(
+                onBackPressed = { mainNavController.navigateUp() },
+                onFosterHomeClicked = { fosterHomeId ->
+                    mainNavController.navigate(CheckFosterHome(fosterHomeId))
+                },
+                onCreateFosterHome = {
+                    //
+                }
+            )
         }
 
         composable<CheckFosterHome> {

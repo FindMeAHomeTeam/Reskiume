@@ -28,6 +28,8 @@ import com.findmeahometeam.reskiume.domain.usecases.util.location.GetLocationFro
 import com.findmeahometeam.reskiume.domain.usecases.util.location.ObserveIfLocationEnabledFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.RequestEnableLocationFromLocationRepository
 import com.findmeahometeam.reskiume.ui.core.components.UiState
+import com.findmeahometeam.reskiume.ui.core.components.UiState.Error
+import com.findmeahometeam.reskiume.ui.core.components.UiState.Idle
 import com.findmeahometeam.reskiume.ui.core.components.toUiState
 import com.findmeahometeam.reskiume.ui.util.StringProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -90,7 +92,7 @@ class CheckAllFosterHomesViewmodel(
     private var locationTimestamp: Long = 0
 
     private val _allFosterHomesState: MutableStateFlow<UiState<List<UiFosterHome>>> =
-        MutableStateFlow(UiState.Idle())
+        MutableStateFlow(Idle())
 
     val allFosterHomesState: StateFlow<UiState<List<UiFosterHome>>> =
         _allFosterHomesState.asStateFlow()
@@ -110,6 +112,8 @@ class CheckAllFosterHomesViewmodel(
             val activistLatitude: Double,
             val nonHumanAnimalType: NonHumanAnimalType
         ) : Query()
+
+        class Error(val errorMessage: String) : Query()
     }
 
     private var _activeQuery: MutableStateFlow<Query> = MutableStateFlow(Query.Idle)
@@ -119,7 +123,7 @@ class CheckAllFosterHomesViewmodel(
 
             _activeQuery.flatMapLatest {
                 when (it) {
-                    Query.Idle -> flowOf(UiState.Idle())
+                    Query.Idle -> flowOf(Idle())
 
                     is Query.ByPlace -> getFetchAllFosterHomesStateByPlaceFlow(
                         it.country,
@@ -132,6 +136,8 @@ class CheckAllFosterHomesViewmodel(
                         it.activistLatitude,
                         it.nonHumanAnimalType
                     )
+
+                    is Query.Error -> flowOf(Error(it.errorMessage))
                 }
             }.collect {
                 _allFosterHomesState.value = it
@@ -205,17 +211,13 @@ class CheckAllFosterHomesViewmodel(
             }
             if (activistLongitude == 0.0 && activistLatitude == 0.0) {
 
-                viewModelScope.launch {
-
-                    val errorMessage =
-                        getStringProvider.getStringResource(Res.string.check_all_foster_homes_screen_turn_on_location)
-                    log.d(
-                        "CheckAllFosterHomesViewmodel",
-                        errorMessage
-                    )
-                    _allFosterHomesState.value = UiState.Error(errorMessage)
-                    _activeQuery.value = Query.Idle
-                }
+                val errorMessage =
+                    getStringProvider.getStringResource(Res.string.check_all_foster_homes_screen_turn_on_location)
+                log.d(
+                    "CheckAllFosterHomesViewmodel",
+                    errorMessage
+                )
+                _activeQuery.value = Query.Error(errorMessage)
                 return@launch
             }
             _allFosterHomesState.value = UiState.Loading()

@@ -132,6 +132,11 @@ class CheckAllFosterHomesViewmodelTest : CoroutineTestDispatcher() {
                 cachedObjectId = fosterHome.country + fosterHome.city,
                 section = Section.FOSTER_HOMES
             ).toEntity(),
+        getLocalCacheEntityReturnForFosterHome: LocalCacheEntity? =
+            localCache.copy(
+                cachedObjectId = fosterHome.id,
+                section = Section.FOSTER_HOMES
+            ).toEntity(),
         getLocalCacheEntityReturnForLocation: LocalCacheEntity? =
             localCache.copy(
                 cachedObjectId = "${activistLongitude}${activistLatitude}",
@@ -181,7 +186,7 @@ class CheckAllFosterHomesViewmodelTest : CoroutineTestDispatcher() {
                     fosterHome.id,
                     Section.FOSTER_HOMES
                 )
-            } returns getLocalCacheEntityReturnForCountryCity
+            } returns getLocalCacheEntityReturnForFosterHome
 
             everySuspend {
                 getLocalCacheEntity(
@@ -521,6 +526,7 @@ class CheckAllFosterHomesViewmodelTest : CoroutineTestDispatcher() {
         runTest {
             val checkAllFosterHomesViewmodel = getCheckAllFosterHomesViewmodel(
                 getLocalCacheEntityReturnForCountryCity = null,
+                getLocalCacheEntityReturnForFosterHome = null,
                 fosterHomeWithAllNonHumanAnimalLocalDataReturn = null
             )
             checkAllFosterHomesViewmodel.fetchAllFosterHomesStateByPlace(
@@ -548,6 +554,7 @@ class CheckAllFosterHomesViewmodelTest : CoroutineTestDispatcher() {
                     )
                 ),
                 getLocalCacheEntityReturnForCountryCity = null,
+                getLocalCacheEntityReturnForFosterHome = null,
                 fosterHomeWithAllNonHumanAnimalLocalDataReturn = null
             )
             checkAllFosterHomesViewmodel.fetchAllFosterHomesStateByPlace(
@@ -573,6 +580,7 @@ class CheckAllFosterHomesViewmodelTest : CoroutineTestDispatcher() {
         runTest {
             val checkAllFosterHomesViewmodel = getCheckAllFosterHomesViewmodel(
                 getLocalCacheEntityReturnForCountryCity = null,
+                getLocalCacheEntityReturnForFosterHome = null,
                 fosterHomeWithAllNonHumanAnimalLocalDataReturn = null,
                 insertedFosterHomeInLocalRowIdArg = 0
             )
@@ -602,6 +610,7 @@ class CheckAllFosterHomesViewmodelTest : CoroutineTestDispatcher() {
         runTest {
             val checkAllFosterHomesViewmodel = getCheckAllFosterHomesViewmodel(
                 getLocalCacheEntityReturnForCountryCity = null,
+                getLocalCacheEntityReturnForFosterHome = null,
                 fosterHomeWithAllNonHumanAnimalLocalDataReturn = null,
                 localCacheIdInsertedInLocalDatasourceArg = 0
             )
@@ -634,6 +643,11 @@ class CheckAllFosterHomesViewmodelTest : CoroutineTestDispatcher() {
                     cachedObjectId = fosterHome.country + fosterHome.city,
                     section = Section.FOSTER_HOMES,
                     timestamp = 123L
+                ).toEntity(),
+                getLocalCacheEntityReturnForFosterHome = localCache.copy(
+                    cachedObjectId = fosterHome.id,
+                    section = Section.FOSTER_HOMES,
+                    timestamp = 123L
                 ).toEntity()
             )
             checkAllFosterHomesViewmodel.fetchAllFosterHomesStateByPlace(
@@ -657,6 +671,11 @@ class CheckAllFosterHomesViewmodelTest : CoroutineTestDispatcher() {
             val checkAllFosterHomesViewmodel = getCheckAllFosterHomesViewmodel(
                 getLocalCacheEntityReturnForCountryCity = localCache.copy(
                     cachedObjectId = fosterHome.country + fosterHome.city,
+                    section = Section.FOSTER_HOMES,
+                    timestamp = 123L
+                ).toEntity(),
+                getLocalCacheEntityReturnForFosterHome = localCache.copy(
+                    cachedObjectId = fosterHome.id,
                     section = Section.FOSTER_HOMES,
                     timestamp = 123L
                 ).toEntity(),
@@ -693,6 +712,11 @@ class CheckAllFosterHomesViewmodelTest : CoroutineTestDispatcher() {
                     section = Section.FOSTER_HOMES,
                     timestamp = 123L
                 ).toEntity(),
+                getLocalCacheEntityReturnForFosterHome = localCache.copy(
+                    cachedObjectId = fosterHome.id,
+                    section = Section.FOSTER_HOMES,
+                    timestamp = 123L
+                ).toEntity(),
                 modifiedFosterHomeInLocalRowsUpdatedArg = 0
             )
             checkAllFosterHomesViewmodel.fetchAllFosterHomesStateByPlace(
@@ -722,6 +746,11 @@ class CheckAllFosterHomesViewmodelTest : CoroutineTestDispatcher() {
             val checkAllFosterHomesViewmodel = getCheckAllFosterHomesViewmodel(
                 getLocalCacheEntityReturnForCountryCity = localCache.copy(
                     cachedObjectId = fosterHome.country + fosterHome.city,
+                    section = Section.FOSTER_HOMES,
+                    timestamp = 123L
+                ).toEntity(),
+                getLocalCacheEntityReturnForFosterHome = localCache.copy(
+                    cachedObjectId = fosterHome.id,
                     section = Section.FOSTER_HOMES,
                     timestamp = 123L
                 ).toEntity(),

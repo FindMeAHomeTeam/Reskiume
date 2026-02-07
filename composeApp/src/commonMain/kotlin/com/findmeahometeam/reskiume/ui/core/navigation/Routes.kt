@@ -24,6 +24,15 @@ class CheckFosterHome(val fosterHomeId: String)
 class CheckAllMyFosterHomes(val myUid: String)
 
 @Serializable
+class ModifyFosterHome(
+    val fosterHomeId: String,
+    val ownerId: String
+)
+
+@Serializable
+class CreateFosterHome(val ownerId: String)
+
+@Serializable
 class CheckReviews(val uid: String)
 
 @Serializable

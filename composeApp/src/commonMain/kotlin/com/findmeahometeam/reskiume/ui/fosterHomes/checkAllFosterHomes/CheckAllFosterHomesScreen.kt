@@ -54,6 +54,7 @@ import com.findmeahometeam.reskiume.ui.core.components.UiState
 import dev.icerock.moko.permissions.Permission
 import dev.icerock.moko.permissions.location.COARSE_LOCATION
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import reskiume.composeapp.generated.resources.Res
 import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_city_label
@@ -83,16 +84,17 @@ fun CheckAllFosterHomesScreen(
     val checkAllFosterHomesViewmodel: CheckAllFosterHomesViewmodel =
         koinViewModel<CheckAllFosterHomesViewmodel>()
 
+    val placeUtil: PlaceUtil = koinInject<PlaceUtil>()
 
     var isCountryVisible: Boolean by rememberSaveable { mutableStateOf(true) }
     val countryFieldState = rememberTextFieldState()
     var selectedCountry: Country by rememberSaveable { mutableStateOf(Country.UNSELECTED) }
-    val countryItems: List<Pair<Country, String>> by checkAllFosterHomesViewmodel.allCountryItems()
+    val countryItems: List<Pair<Country, String>> by placeUtil.allCountryItems()
         .collectAsState(initial = emptyList())
     var isCityVisible: Boolean by rememberSaveable { mutableStateOf(false) }
     val cityFieldState = rememberTextFieldState()
     var selectedCity: City by rememberSaveable { mutableStateOf(City.UNSELECTED) }
-    val cityItems: List<Pair<City, String>> by checkAllFosterHomesViewmodel.allCityItems(
+    val cityItems: List<Pair<City, String>> by placeUtil.allCityItems(
         selectedCountry
     ).collectAsState(initial = emptyList())
 

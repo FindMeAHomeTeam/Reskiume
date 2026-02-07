@@ -6,10 +6,7 @@ import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
-import com.findmeahometeam.reskiume.domain.model.fosterHome.City
-import com.findmeahometeam.reskiume.domain.model.fosterHome.Country
 import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
-import com.findmeahometeam.reskiume.domain.model.fosterHome.toStringResource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllFosterHomesByCountryAndCityFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllFosterHomesByCountryAndCityFromRemoteRepository
@@ -33,7 +30,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -56,8 +52,8 @@ private const val WAITING_TIME: Int = 2 * 60 // 2 min
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CheckAllFosterHomesViewmodel(
+    observeAuthStateInAuthDataSource: ObserveAuthStateInAuthDataSource,
     private val getStringProvider: StringProvider,
-    private val observeAuthStateInAuthDataSource: ObserveAuthStateInAuthDataSource,
     private val getDataByManagingObjectLocalCacheTimestamp: GetDataByManagingObjectLocalCacheTimestamp,
     private val getAllFosterHomesByCountryAndCityFromRemoteRepository: GetAllFosterHomesByCountryAndCityFromRemoteRepository,
     private val checkAllMyFosterHomesUtil: CheckAllMyFosterHomesUtil,
@@ -84,6 +80,11 @@ class CheckAllFosterHomesViewmodel(
 
     val allFosterHomesState: StateFlow<UiState<List<UiFosterHome>>> =
         _allFosterHomesState.asStateFlow()
+
+    val authState: Flow<AuthUser?> = observeAuthStateInAuthDataSource().map { authUser ->
+        myUid = authUser?.uid ?: " "
+        authUser
+    }
 
     private sealed class Query {
 
@@ -131,26 +132,6 @@ class CheckAllFosterHomesViewmodel(
                 _allFosterHomesState.value = it
             }
         }
-    }
-
-    fun allCountryItems(): Flow<List<Pair<Country, String>>> = flow {
-
-        val value = Country.entries
-            .filter { it != Country.UNSELECTED }
-            .map { it to getStringProvider.getStringResource(it.toStringResource()) }
-        emit(value)
-    }
-
-    fun allCityItems(selectedCountry: Country): Flow<List<Pair<City, String>>> = flow {
-
-        val list: List<Pair<City, String>> = if (selectedCountry == Country.UNSELECTED) {
-            emptyList()
-        } else {
-            City.entries
-                .filter { it != City.UNSELECTED && it.country == selectedCountry }
-                .map { it to getStringProvider.getStringResource(it.toStringResource()) }
-        }
-        emit(list)
     }
 
     fun fetchAllFosterHomesStateByPlace(
@@ -219,10 +200,8 @@ class CheckAllFosterHomesViewmodel(
         city: String,
         nonHumanAnimalType: NonHumanAnimalType
     ): Flow<UiState<List<UiFosterHome>>> =
-        observeAuthStateInAuthDataSource()
-            .flatMapConcat { authUser: AuthUser? ->
-
-                myUid = authUser?.uid ?: " "
+        flowOf(myUid)
+            .flatMapConcat { myUid: String ->
 
                 getDataByManagingObjectLocalCacheTimestamp(
                     cachedObjectId = country + city,
@@ -289,10 +268,8 @@ class CheckAllFosterHomesViewmodel(
         activistLatitude: Double,
         nonHumanAnimalType: NonHumanAnimalType
     ): Flow<UiState<List<UiFosterHome>>> =
-        observeAuthStateInAuthDataSource()
-            .flatMapConcat { authUser: AuthUser? ->
-
-                myUid = authUser?.uid ?: " "
+        flowOf(myUid)
+            .flatMapConcat { myUid: String ->
 
                 getDataByManagingObjectLocalCacheTimestamp(
                     cachedObjectId = "$activistLongitude$activistLatitude",

@@ -9,6 +9,7 @@ import com.findmeahometeam.reskiume.ui.core.navigation.CheckAllMyFosterHomes
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckAllNonHumanAnimals
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckFosterHome
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckReviews
+import com.findmeahometeam.reskiume.ui.core.navigation.ModifyFosterHome
 import com.findmeahometeam.reskiume.ui.core.navigation.Routes
 import com.findmeahometeam.reskiume.ui.fosterHomes.checkAllFosterHomes.CheckAllFosterHomesScreen
 import com.findmeahometeam.reskiume.ui.profile.ProfileScreen
@@ -27,11 +28,11 @@ fun BottomNavigationWrapper(
 
         composable(route = Routes.CHECK_ALL_FOSTER_HOMES.route) {
             CheckAllFosterHomesScreen(
-                onFosterHomeClicked = { fosterHomeId: String ->
-                    mainNavHostController.navigate(CheckFosterHome(fosterHomeId))
+                onModifyFosterHome = { fosterHomeId: String, ownerId: String ->
+                    mainNavHostController.navigate(ModifyFosterHome(fosterHomeId, ownerId))
                 },
-                onCreateFosterHome = {
-                    //
+                onCheckFosterHome = { fosterHomeId: String ->
+                    mainNavHostController.navigate(CheckFosterHome(fosterHomeId))
                 }
             )
         }

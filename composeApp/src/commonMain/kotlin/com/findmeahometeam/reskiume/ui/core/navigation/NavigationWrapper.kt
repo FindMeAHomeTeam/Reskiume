@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.findmeahometeam.reskiume.ui.fosterHomes.modifyFosterHome.ModifyFosterHomeScreen
 import com.findmeahometeam.reskiume.ui.home.HomeScreen
 import com.findmeahometeam.reskiume.ui.profile.checkAdvice.CheckAdviceScreen
 import com.findmeahometeam.reskiume.ui.profile.checkAllAdvice.CheckAllAdviceScreen
@@ -32,14 +33,25 @@ fun NavigationWrapper() {
 
         composable<CheckAllMyFosterHomes> {
             CheckAllMyFosterHomesScreen(
+                myUid = it.toRoute<CheckAllMyFosterHomes>().myUid,
                 onBackPressed = { mainNavController.navigateUp() },
-                onFosterHomeClicked = { fosterHomeId ->
-                    mainNavController.navigate(CheckFosterHome(fosterHomeId))
+                onCreateFosterHome = { ownerId: String ->
+                    mainNavController.navigate(CreateFosterHome(ownerId))
                 },
-                onCreateFosterHome = {
-                    //
+                onModifyFosterHome = { fosterHomeId: String, ownerId: String ->
+                    mainNavController.navigate(ModifyFosterHome(fosterHomeId, ownerId))
                 }
             )
+        }
+
+        composable<CreateFosterHome> {
+            //
+        }
+
+        composable<ModifyFosterHome> {
+            ModifyFosterHomeScreen {
+                mainNavController.navigateUp()
+            }
         }
 
         composable<CheckFosterHome> {

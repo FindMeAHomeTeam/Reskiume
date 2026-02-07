@@ -1,8 +1,6 @@
 package com.findmeahometeam.reskiume.ui.profile.checkAllMyFosterHomes
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
+import com.findmeahometeam.reskiume.ui.core.components.RmButton
 import com.findmeahometeam.reskiume.ui.core.components.RmFosterHomeListItem
 import com.findmeahometeam.reskiume.ui.core.components.RmResultState
 import com.findmeahometeam.reskiume.ui.core.components.RmScaffold
@@ -31,13 +30,15 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import reskiume.composeapp.generated.resources.Res
 import reskiume.composeapp.generated.resources.check_all_my_foster_homes_screen_no_foster_homes
+import reskiume.composeapp.generated.resources.check_all_my_foster_homes_screen_register_foster_home
 import reskiume.composeapp.generated.resources.check_all_my_foster_homes_screen_title
 
 @Composable
 fun CheckAllMyFosterHomesScreen(
+    myUid: String,
     onBackPressed: () -> Unit,
-    onFosterHomeClicked: (fosterHomeId: String) -> Unit,
-    onCreateFosterHome: () -> Unit
+    onModifyFosterHome: (fosterHomeId: String, ownerId: String) -> Unit,
+    onCreateFosterHome: (ownerId: String) -> Unit
 ) {
     val checkAllMyFosterHomesViewmodel: CheckAllMyFosterHomesViewmodel =
         koinViewModel<CheckAllMyFosterHomesViewmodel>()
@@ -47,10 +48,7 @@ fun CheckAllMyFosterHomesScreen(
 
     RmScaffold(
         onBackPressed = onBackPressed,
-        title = stringResource(Res.string.check_all_my_foster_homes_screen_title),
-        floatingActionButton = {
-            //
-        }
+        title = stringResource(Res.string.check_all_my_foster_homes_screen_title)
     ) { padding ->
         Column(
             modifier = Modifier
@@ -62,21 +60,15 @@ fun CheckAllMyFosterHomesScreen(
         ) {
             RmResultState(fosterHomeListState) { fosterHomeList: List<FosterHome> ->
 
-                AnimatedVisibility(visible = fosterHomeList.isEmpty()) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Spacer(modifier = Modifier.weight(1f))
-                        RmText(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = stringResource(Res.string.check_all_my_foster_homes_screen_no_foster_homes),
-                            textAlign = TextAlign.Center,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Black
-                        )
-                        Spacer(modifier = Modifier.weight(1f))
-                    }
+                if (fosterHomeList.isEmpty()) {
+                    Spacer(modifier = Modifier.weight(1f))
+                    RmText(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = stringResource(Res.string.check_all_my_foster_homes_screen_no_foster_homes),
+                        textAlign = TextAlign.Center,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Black
+                    )
                 }
                 if (fosterHomeList.isNotEmpty()) {
 
@@ -95,7 +87,10 @@ fun CheckAllMyFosterHomesScreen(
                                 distance = null,
                                 city = fosterHome.city,
                                 onClick = {
-                                    onFosterHomeClicked(fosterHome.id)
+                                    onModifyFosterHome(
+                                        fosterHome.id,
+                                        fosterHome.ownerId
+                                    )
                                 },
                                 isEnabled = fosterHome.available
                             )
@@ -104,6 +99,14 @@ fun CheckAllMyFosterHomesScreen(
                     }
                 }
             }
+            Spacer(modifier = Modifier.weight(1f))
+            RmButton(
+                text = stringResource(Res.string.check_all_my_foster_homes_screen_register_foster_home),
+                onClick = {
+                    onCreateFosterHome(myUid)
+                }
+            )
+            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }

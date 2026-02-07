@@ -31,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
 import com.findmeahometeam.reskiume.domain.model.fosterHome.City
 import com.findmeahometeam.reskiume.domain.model.fosterHome.Country
@@ -76,8 +77,8 @@ import reskiume.composeapp.generated.resources.location_turn_on_location_title
 
 @Composable
 fun CheckAllFosterHomesScreen(
-    onFosterHomeClicked: (fosterHomeId: String) -> Unit,
-    onCreateFosterHome: () -> Unit
+    onModifyFosterHome: (fosterHomeId: String, ownerId: String) -> Unit,
+    onCheckFosterHome: (fosterHomeId: String) -> Unit
 ) {
     val checkAllFosterHomesViewmodel: CheckAllFosterHomesViewmodel =
         koinViewModel<CheckAllFosterHomesViewmodel>()
@@ -94,8 +95,10 @@ fun CheckAllFosterHomesScreen(
     val cityItems: List<Pair<City, String>> by checkAllFosterHomesViewmodel.allCityItems(
         selectedCountry
     ).collectAsState(initial = emptyList())
+
     var searchOption: SearchOption by rememberSaveable { mutableStateOf(SearchOption.COUNTRY_CITY) }
-    val isLocationEnabledState: State<Boolean> = checkAllFosterHomesViewmodel.observeIfLocationEnabled().collectAsState(initial = false)
+    val isLocationEnabledState: State<Boolean> =
+        checkAllFosterHomesViewmodel.observeIfLocationEnabled().collectAsState(initial = false)
     var nonHumanAnimalType: NonHumanAnimalType by rememberSaveable {
         mutableStateOf(NonHumanAnimalType.UNSELECTED)
     }
@@ -106,6 +109,7 @@ fun CheckAllFosterHomesScreen(
     }
     var displayDialogToRequestLocationActivation: Boolean by rememberSaveable { mutableStateOf(false) }
 
+    val authState: AuthUser? by checkAllFosterHomesViewmodel.authState.collectAsState(initial = null)
     val uiFosterHomeListState: UiState<List<UiFosterHome>> by checkAllFosterHomesViewmodel.allFosterHomesState.collectAsState()
     val isSearchButtonEnabled: Boolean by remember(
         selectedCountry,
@@ -298,7 +302,9 @@ fun CheckAllFosterHomesScreen(
                         nonHumanAnimalType = nonHumanAnimalType
                     )
                 } else {
-                    checkAllFosterHomesViewmodel.fetchAllFosterHomesStateByLocation(nonHumanAnimalType)
+                    checkAllFosterHomesViewmodel.fetchAllFosterHomesStateByLocation(
+                        nonHumanAnimalType
+                    )
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
@@ -345,7 +351,14 @@ fun CheckAllFosterHomesScreen(
                                 distance = uiFosterHome.distance,
                                 city = uiFosterHome.fosterHome.city,
                                 onClick = {
-                                    onFosterHomeClicked(uiFosterHome.fosterHome.id)
+                                    if (authState?.uid == uiFosterHome.fosterHome.ownerId) {
+                                        onModifyFosterHome(
+                                            uiFosterHome.fosterHome.id,
+                                            uiFosterHome.fosterHome.ownerId
+                                        )
+                                    } else {
+                                        onCheckFosterHome(uiFosterHome.fosterHome.id)
+                                    }
                                 }
                             )
                             Spacer(modifier = Modifier.height(8.dp))

@@ -9,11 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -23,7 +20,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -33,6 +29,7 @@ import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.components.RmDialog
 import com.findmeahometeam.reskiume.ui.core.components.RmDisplaySingleChoiceSegmentedButtonRow
+import com.findmeahometeam.reskiume.ui.core.components.RmExtendedFloatingActionButton
 import com.findmeahometeam.reskiume.ui.core.components.RmListAvatarType
 import com.findmeahometeam.reskiume.ui.core.components.RmListItem
 import com.findmeahometeam.reskiume.ui.core.components.RmResultState
@@ -41,10 +38,7 @@ import com.findmeahometeam.reskiume.ui.core.components.RmSearchBar
 import com.findmeahometeam.reskiume.ui.core.components.RmText
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckAdvice
-import com.findmeahometeam.reskiume.ui.core.primaryGreen
-import com.findmeahometeam.reskiume.ui.core.tertiaryGreen
 import com.findmeahometeam.reskiume.ui.profile.giveFeedback.GiveFeedback
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
@@ -179,22 +173,10 @@ private fun DisplayExtendedFloatingActionButton(checkAllAdviceViewmodel: CheckAl
             stringResource(Res.string.check_all_advice_screen_option_advice_mail_subject)
         val sendAdviceBody =
             stringResource(Res.string.check_all_advice_screen_option_advice_mail_body)
-        ExtendedFloatingActionButton(
-            icon = {
-                Icon(
-                    modifier = Modifier.size(24.dp),
-                    painter = painterResource(Res.drawable.ic_mail),
-                    contentDescription = null,
-                    tint = primaryGreen
-                )
-            },
-            text = {
-                RmText(
-                    text = stringResource(Res.string.check_all_advice_screen_option_send_advice_button),
-                    color = Color.Black
-                )
-            },
-            containerColor = tertiaryGreen,
+
+        RmExtendedFloatingActionButton(
+            drawableResource = Res.drawable.ic_mail,
+            text = stringResource(Res.string.check_all_advice_screen_option_send_advice_button),
             onClick = {
                 giveFeedback.sendEmail(
                     subject = sendAdviceSubject,

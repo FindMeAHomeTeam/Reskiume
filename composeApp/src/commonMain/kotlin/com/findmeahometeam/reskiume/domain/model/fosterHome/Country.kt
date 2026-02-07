@@ -205,6 +205,9 @@ enum class Country(val englishName: String) {
     ZIMBABWE("zimbabwe")*/
 }
 
+fun String.toCountry(): Country =
+    Country.entries.firstOrNull { it.englishName == this } ?: Country.UNSELECTED
+
 fun Country.toStringResource(): StringResource {
     return when(this) {
         Country.UNSELECTED -> Res.string.unselected_country

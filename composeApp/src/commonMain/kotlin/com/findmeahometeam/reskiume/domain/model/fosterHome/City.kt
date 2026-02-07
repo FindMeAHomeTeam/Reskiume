@@ -351,6 +351,9 @@ enum class City(
     YORK("york", Country.UNITED_KINGDOM),
 }
 
+fun String.toCity(): City =
+    City.entries.firstOrNull { it.englishName == this } ?: City.UNSELECTED
+
 fun City.toStringResource(): StringResource {
     return when (this) {
         City.UNSELECTED -> Res.string.unselected_city

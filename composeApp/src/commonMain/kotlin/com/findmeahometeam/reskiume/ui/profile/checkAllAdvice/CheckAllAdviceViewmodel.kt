@@ -98,8 +98,7 @@ class CheckAllAdviceViewmodel(
             val author =
                 checkActivistUtil.getUser(
                     activistUid = userId,
-                    myUserUid = myUid ?: "",
-                    coroutineScope = viewModelScope
+                    myUserUid = myUid ?: ""
                 )
             onAuthorFetched(author)
         }

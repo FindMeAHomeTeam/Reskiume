@@ -5,7 +5,6 @@ import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
 import com.findmeahometeam.reskiume.domain.repository.local.LocalFosterHomeRepository
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
@@ -18,8 +17,7 @@ class GetAllFosterHomesByLocationFromLocalRepository(
         activistLongitude: Double,
         activistLatitude: Double,
         rangeLongitude: Double,
-        rangeLatitude: Double,
-        coroutineScope: CoroutineScope
+        rangeLatitude: Double
     ): Flow<List<FosterHome>> =
         localFosterHomeRepository.getAllFosterHomesByLocation(
             activistLongitude,
@@ -28,23 +26,24 @@ class GetAllFosterHomesByLocationFromLocalRepository(
             rangeLatitude
         ).map { list ->
             list.map { fosterHomeWithAllNonHumanAnimalData: FosterHomeWithAllNonHumanAnimalData ->
+
                 fosterHomeWithAllNonHumanAnimalData.fosterHomeEntity.toDomain(
                     allAcceptedNonHumanAnimals = fosterHomeWithAllNonHumanAnimalData.allAcceptedNonHumanAnimals.map { it.toDomain() },
                     allResidentNonHumanAnimals = fosterHomeWithAllNonHumanAnimalData.allResidentNonHumanAnimalIds.map {
+
                         it.toDomain(
                             onFetchNonHumanAnimal = { nonHumanAnimalId: String, caregiverId: String ->
-                                checkNonHumanAnimalUtil
-                                    .getNonHumanAnimalFlow(
-                                        coroutineScope = coroutineScope,
-                                        nonHumanAnimalId = nonHumanAnimalId,
-                                        caregiverId = caregiverId
-                                    ).map { uiState ->
-                                        if (uiState is UiState.Success) {
-                                            uiState.data
-                                        } else {
-                                            null
-                                        }
-                                    }.firstOrNull()
+
+                                checkNonHumanAnimalUtil.getNonHumanAnimalFlow(
+                                    nonHumanAnimalId = nonHumanAnimalId,
+                                    caregiverId = caregiverId
+                                ).map { uiState ->
+                                    if (uiState is UiState.Success) {
+                                        uiState.data
+                                    } else {
+                                        null
+                                    }
+                                }.firstOrNull()
                             }
                         )
                     }

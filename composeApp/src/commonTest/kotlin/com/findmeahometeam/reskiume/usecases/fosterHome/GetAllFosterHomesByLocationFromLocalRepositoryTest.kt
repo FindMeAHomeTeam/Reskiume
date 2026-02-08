@@ -14,7 +14,6 @@ import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHuman
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
-import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -36,7 +35,6 @@ class GetAllFosterHomesByLocationFromLocalRepositoryTest: CoroutineTestDispatche
     private val checkNonHumanAnimalUtil: CheckNonHumanAnimalUtil = mock {
         every {
             getNonHumanAnimalFlow(
-                coroutineScope = any(),
                 nonHumanAnimalId = nonHumanAnimal.id,
                 caregiverId = nonHumanAnimal.caregiverId
             )
@@ -53,8 +51,7 @@ class GetAllFosterHomesByLocationFromLocalRepositoryTest: CoroutineTestDispatche
                 activistLongitude,
                 activistLatitude,
                 fosterHome.longitude,
-                fosterHome.latitude,
-                this
+                fosterHome.latitude
             ).test {
                 assertEquals(listOf(fosterHome), awaitItem())
                 awaitComplete()

@@ -6,7 +6,7 @@ class DeleteFosterHomeFromLocalRepository(private val localFosterHomeRepository:
     
     suspend operator fun invoke(
         id: String,
-        onDeleteFosterHome: (rowsDeleted: Int) -> Unit
+        onDeleteFosterHome: suspend (rowsDeleted: Int) -> Unit
     ) {
         localFosterHomeRepository.deleteFosterHome(id, onDeleteFosterHome)
     }

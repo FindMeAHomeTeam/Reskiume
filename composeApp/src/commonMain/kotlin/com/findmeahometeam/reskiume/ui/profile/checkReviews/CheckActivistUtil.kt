@@ -10,11 +10,9 @@ import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSou
 import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInLocalDataSource
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 
 class CheckActivistUtil(
     private val getDataByManagingObjectLocalCacheTimestamp: GetDataByManagingObjectLocalCacheTimestamp,
@@ -28,8 +26,7 @@ class CheckActivistUtil(
 ) {
     suspend fun getUser(
         activistUid: String,
-        myUserUid: String,
-        coroutineScope: CoroutineScope
+        myUserUid: String
     ): User? {
 
         val user: User? = getDataByManagingObjectLocalCacheTimestamp(
@@ -38,12 +35,12 @@ class CheckActivistUtil(
             section = Section.USERS,
             onCompletionInsertCache = {
                 getUserFromRemoteDataSource(activistUid)
-                    .saveImageAndInsertUserInLocalRepository(coroutineScope)
+                    .saveImageAndInsertUserInLocalRepository()
                     .firstOrNull()
             },
             onCompletionUpdateCache = {
                 getUserFromRemoteDataSource(activistUid)
-                    .saveImageAndModifyUserInLocalRepository(coroutineScope)
+                    .saveImageAndModifyUserInLocalRepository()
                     .firstOrNull()
             },
             onVerifyCacheIsRecent = {
@@ -59,7 +56,7 @@ class CheckActivistUtil(
         )
     }
 
-    private fun Flow<User?>.saveImageAndInsertUserInLocalRepository(coroutineScope: CoroutineScope): Flow<User?> =
+    private fun Flow<User?>.saveImageAndInsertUserInLocalRepository(): Flow<User?> =
         this.map { user ->
 
             user?.let { activist ->
@@ -73,7 +70,7 @@ class CheckActivistUtil(
                     val activistWithLocalImage =
                         activist.copy(image = localImagePath.ifBlank { activist.image })
 
-                    insertUserInLocalRepository(activistWithLocalImage, coroutineScope)
+                    insertUserInLocalRepository(activistWithLocalImage)
 
                     activistWithLocalImage
                 } else {
@@ -81,35 +78,32 @@ class CheckActivistUtil(
                         "CheckUserUtil",
                         "User ${activist.uid} has no avatar image to save locally."
                     )
-                    insertUserInLocalRepository(activist, coroutineScope)
+                    insertUserInLocalRepository(activist)
 
                     activist
                 }
             }
         }
 
-    private fun insertUserInLocalRepository(user: User, coroutineScope: CoroutineScope) {
+    private suspend fun insertUserInLocalRepository(user: User) {
 
-        coroutineScope.launch {
+        insertUserInLocalDataSource(user) { rowId ->
 
-            insertUserInLocalDataSource(user) { rowId ->
-
-                if (rowId > 0) {
-                    log.d(
-                        "CheckUserUtil",
-                        "User ${user.uid} added to local database"
-                    )
-                } else {
-                    log.e(
-                        "CheckUserUtil",
-                        "Error adding user ${user.uid} to local database"
-                    )
-                }
+            if (rowId > 0) {
+                log.d(
+                    "CheckUserUtil",
+                    "User ${user.uid} added to local database"
+                )
+            } else {
+                log.e(
+                    "CheckUserUtil",
+                    "Error adding user ${user.uid} to local database"
+                )
             }
         }
     }
 
-    private fun Flow<User?>.saveImageAndModifyUserInLocalRepository(coroutineScope: CoroutineScope): Flow<User?> =
+    private fun Flow<User?>.saveImageAndModifyUserInLocalRepository(): Flow<User?> =
         this.map { user ->
 
             user?.let { activist ->
@@ -123,7 +117,7 @@ class CheckActivistUtil(
                     val activistWithLocalImage =
                         activist.copy(image = localImagePath.ifBlank { activist.image })
 
-                    modifyUserInLocalRepository(activistWithLocalImage, coroutineScope)
+                    modifyUserInLocalRepository(activistWithLocalImage)
 
                     activistWithLocalImage
                 } else {
@@ -131,29 +125,26 @@ class CheckActivistUtil(
                         "CheckUserUtil",
                         "User ${activist.uid} has no avatar image to save locally."
                     )
-                    modifyUserInLocalRepository(activist, coroutineScope)
+                    modifyUserInLocalRepository(activist)
                     activist
                 }
             }
         }
 
-    private fun modifyUserInLocalRepository(user: User, coroutineScope: CoroutineScope) {
+    private suspend fun modifyUserInLocalRepository(user: User) {
 
-        coroutineScope.launch {
+        modifyUserInLocalDataSource(user) { rowsUpdated: Int ->
 
-            modifyUserInLocalDataSource(user) { rowsUpdated: Int ->
-
-                if (rowsUpdated > 0) {
-                    log.d(
-                        "CheckUserUtil",
-                        "Modified user with uid ${user.uid} into local data source."
-                    )
-                } else {
-                    log.e(
-                        "CheckUserUtil",
-                        "Failed to modify user with uid ${user.uid} in local data source."
-                    )
-                }
+            if (rowsUpdated > 0) {
+                log.d(
+                    "CheckUserUtil",
+                    "Modified user with uid ${user.uid} into local data source."
+                )
+            } else {
+                log.e(
+                    "CheckUserUtil",
+                    "Failed to modify user with uid ${user.uid} in local data source."
+                )
             }
         }
     }

@@ -1,7 +1,6 @@
 package com.findmeahometeam.reskiume.ui.profile.checkReviews
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
@@ -121,7 +120,7 @@ class CheckReviewsViewmodel(
 
     private suspend fun getActivist(activistUid: String, myUserUid: String): User? {
 
-        return checkActivistUtil.getUser(activistUid, myUserUid, viewModelScope)
+        return checkActivistUtil.getUser(activistUid, myUserUid)
     }
 
     @OptIn(ExperimentalTime::class)

@@ -50,7 +50,6 @@ class ModifyNonHumanAnimalViewmodel(
 
     val nonHumanAnimalFlow: Flow<UiState<NonHumanAnimal>> =
         checkNonHumanAnimalUtil.getNonHumanAnimalFlow(
-            viewModelScope,
             nonHumanAnimalId,
             caregiverId
         )

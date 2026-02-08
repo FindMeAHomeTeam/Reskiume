@@ -10,11 +10,9 @@ import com.findmeahometeam.reskiume.domain.usecases.fosterHome.ModifyFosterHomeI
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -30,7 +28,6 @@ class CheckAllMyFosterHomesUtilImpl(
 
     override fun downloadImageAndManageFosterHomesInLocalRepositoryFromFlow(
         allFosterHomesFlow: Flow<List<FosterHome>>,
-        coroutineScope: CoroutineScope,
         myUid: String
     ): Flow<List<FosterHome>> =
         allFosterHomesFlow.map { fosterHomeList ->
@@ -47,20 +44,17 @@ class CheckAllMyFosterHomesUtilImpl(
                         fosterHome.copy(imageUrl = localImagePath.ifBlank { fosterHome.imageUrl })
 
                     val localFosterHome: FosterHome? = getFosterHomeFromLocalRepository(
-                        fosterHome.id,
-                        coroutineScope
+                        fosterHome.id
                     ).firstOrNull()
 
                     if (localFosterHome == null) {
                         insertFosterHomeInLocalRepository(
                             fosterHomeWithLocalImage,
-                            coroutineScope,
                             myUid
                         )
                     } else {
                         modifyFosterHomeInLocalRepository(
                             fosterHomeWithLocalImage,
-                            coroutineScope,
                             myUid
                         )
                     }
@@ -71,20 +65,17 @@ class CheckAllMyFosterHomesUtilImpl(
                         "Foster home ${fosterHome.id} has no avatar image to save locally."
                     )
                     val localFosterHome: FosterHome? = getFosterHomeFromLocalRepository(
-                        fosterHome.id,
-                        coroutineScope
+                        fosterHome.id
                     ).firstOrNull()
 
                     if (localFosterHome == null) {
                         insertFosterHomeInLocalRepository(
                             fosterHome,
-                            coroutineScope,
                             myUid
                         )
                     } else {
                         modifyFosterHomeInLocalRepository(
                             fosterHome,
-                            coroutineScope,
                             myUid
                         )
                     }
@@ -94,104 +85,90 @@ class CheckAllMyFosterHomesUtilImpl(
         }
 
     @OptIn(ExperimentalTime::class)
-    private fun insertFosterHomeInLocalRepository(
+    private suspend fun insertFosterHomeInLocalRepository(
         fosterHome: FosterHome,
-        coroutineScope: CoroutineScope,
         myUid: String
     ) {
-        coroutineScope.launch {
-
-            insertFosterHomeInLocalRepository(fosterHome) { isSuccess ->
-                if (isSuccess) {
-                    log.d(
-                        "CheckAllMyFosterHomesUtilImpl",
-                        "Foster home ${fosterHome.id} added to local database"
+        insertFosterHomeInLocalRepository(fosterHome) { isSuccess ->
+            if (isSuccess) {
+                log.d(
+                    "CheckAllMyFosterHomesUtilImpl",
+                    "Foster home ${fosterHome.id} added to local database"
+                )
+                insertCacheInLocalRepository(
+                    LocalCache(
+                        cachedObjectId = fosterHome.id,
+                        savedBy = myUid,
+                        section = Section.FOSTER_HOMES,
+                        timestamp = Clock.System.now().epochSeconds
                     )
-                    coroutineScope.launch {
+                ) { rowId ->
 
-                        insertCacheInLocalRepository(
-                            LocalCache(
-                                cachedObjectId = fosterHome.id,
-                                savedBy = myUid,
-                                section = Section.FOSTER_HOMES,
-                                timestamp = Clock.System.now().epochSeconds
-                            )
-                        ) { rowId ->
-
-                            if (rowId > 0) {
-                                log.d(
-                                    "CheckAllMyFosterHomesUtilImpl",
-                                    "${fosterHome.id} added to local cache in section ${Section.FOSTER_HOMES}"
-                                )
-                            } else {
-                                log.e(
-                                    "CheckAllMyFosterHomesUtilImpl",
-                                    "Error adding ${fosterHome.id} to local cache in section ${Section.FOSTER_HOMES}"
-                                )
-                            }
-                        }
+                    if (rowId > 0) {
+                        log.d(
+                            "CheckAllMyFosterHomesUtilImpl",
+                            "${fosterHome.id} added to local cache in section ${Section.FOSTER_HOMES}"
+                        )
+                    } else {
+                        log.e(
+                            "CheckAllMyFosterHomesUtilImpl",
+                            "Error adding ${fosterHome.id} to local cache in section ${Section.FOSTER_HOMES}"
+                        )
                     }
-                } else {
-                    log.e(
-                        "CheckAllMyFosterHomesUtilImpl",
-                        "Error adding the foster home ${fosterHome.id} to local database"
-                    )
                 }
+            } else {
+                log.e(
+                    "CheckAllMyFosterHomesUtilImpl",
+                    "Error adding the foster home ${fosterHome.id} to local database"
+                )
             }
         }
+
     }
 
     @OptIn(ExperimentalTime::class)
-    private fun modifyFosterHomeInLocalRepository(
+    private suspend fun modifyFosterHomeInLocalRepository(
         fosterHome: FosterHome,
-        coroutineScope: CoroutineScope,
         myUid: String
     ) {
-        coroutineScope.launch {
-
-            modifyFosterHomeInLocalRepository(fosterHome) { isSuccess ->
-                if (isSuccess) {
-                    log.d(
-                        "CheckAllMyFosterHomesUtilImpl",
-                        "Foster home ${fosterHome.id} modified in local database"
+        modifyFosterHomeInLocalRepository(fosterHome) { isSuccess ->
+            if (isSuccess) {
+                log.d(
+                    "CheckAllMyFosterHomesUtilImpl",
+                    "Foster home ${fosterHome.id} modified in local database"
+                )
+                modifyCacheInLocalRepository(
+                    LocalCache(
+                        cachedObjectId = fosterHome.id,
+                        savedBy = myUid,
+                        section = Section.FOSTER_HOMES,
+                        timestamp = Clock.System.now().epochSeconds
                     )
-                    coroutineScope.launch {
+                ) { rowsUpdated ->
 
-                        modifyCacheInLocalRepository(
-                            LocalCache(
-                                cachedObjectId = fosterHome.id,
-                                savedBy = myUid,
-                                section = Section.FOSTER_HOMES,
-                                timestamp = Clock.System.now().epochSeconds
-                            )
-                        ) { rowsUpdated ->
-
-                            if (rowsUpdated > 0) {
-                                log.d(
-                                    "CheckAllMyFosterHomesUtilImpl",
-                                    "${fosterHome.id} updated in local cache in section ${Section.FOSTER_HOMES}"
-                                )
-                            } else {
-                                log.e(
-                                    "CheckAllMyFosterHomesUtilImpl",
-                                    "Error updating ${fosterHome.id} in local cache in section ${Section.FOSTER_HOMES}"
-                                )
-                            }
-                        }
+                    if (rowsUpdated > 0) {
+                        log.d(
+                            "CheckAllMyFosterHomesUtilImpl",
+                            "${fosterHome.id} updated in local cache in section ${Section.FOSTER_HOMES}"
+                        )
+                    } else {
+                        log.e(
+                            "CheckAllMyFosterHomesUtilImpl",
+                            "Error updating ${fosterHome.id} in local cache in section ${Section.FOSTER_HOMES}"
+                        )
                     }
-                } else {
-                    log.e(
-                        "CheckAllMyFosterHomesUtilImpl",
-                        "Error modifying the foster home ${fosterHome.id} in local database"
-                    )
                 }
+            } else {
+                log.e(
+                    "CheckAllMyFosterHomesUtilImpl",
+                    "Error modifying the foster home ${fosterHome.id} in local database"
+                )
             }
         }
     }
 
     override fun downloadImageAndModifyFosterHomesInLocalRepositoryFromFlow(
         allFosterHomesFlow: Flow<List<FosterHome>>,
-        coroutineScope: CoroutineScope,
         myUid: String
     ): Flow<List<FosterHome>> =
         allFosterHomesFlow.map { fosterHomeList ->
@@ -209,7 +186,6 @@ class CheckAllMyFosterHomesUtilImpl(
 
                     modifyFosterHomeInLocalRepository(
                         fosterHomeWithLocalImage,
-                        coroutineScope,
                         myUid
                     )
                     fosterHomeWithLocalImage
@@ -220,7 +196,6 @@ class CheckAllMyFosterHomesUtilImpl(
                     )
                     modifyFosterHomeInLocalRepository(
                         fosterHome,
-                        coroutineScope,
                         myUid
                     )
                     fosterHome

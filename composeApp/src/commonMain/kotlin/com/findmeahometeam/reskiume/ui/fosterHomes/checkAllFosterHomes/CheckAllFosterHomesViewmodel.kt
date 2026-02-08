@@ -210,32 +210,27 @@ class CheckAllFosterHomesViewmodel(
                     onCompletionInsertCache = {
                         val allFosterHomesFlow: Flow<List<FosterHome>> = getAllFosterHomesByCountryAndCityFromRemoteRepository(
                             country,
-                            city,
-                            viewModelScope
+                            city
                         )
                         checkAllMyFosterHomesUtil.downloadImageAndManageFosterHomesInLocalRepositoryFromFlow(
                             allFosterHomesFlow,
-                            viewModelScope,
                             myUid
                         )
                     },
                     onCompletionUpdateCache = {
                         val allFosterHomesFlow: Flow<List<FosterHome>> = getAllFosterHomesByCountryAndCityFromRemoteRepository(
                             country,
-                            city,
-                            viewModelScope
+                            city
                         )
                         checkAllMyFosterHomesUtil.downloadImageAndModifyFosterHomesInLocalRepositoryFromFlow(
                             allFosterHomesFlow,
-                            viewModelScope,
                             myUid
                         )
                     },
                     onVerifyCacheIsRecent = {
                         getAllFosterHomesByCountryAndCityFromLocalRepository(
                             country,
-                            city,
-                            viewModelScope
+                            city
                         )
                     }
                 ).map {
@@ -280,12 +275,10 @@ class CheckAllFosterHomesViewmodel(
                             activistLongitude = activistLongitude,
                             activistLatitude = activistLatitude,
                             rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
-                            rangeLatitude = getRangeLat(),
-                            coroutineScope = viewModelScope
+                            rangeLatitude = getRangeLat()
                         )
                         checkAllMyFosterHomesUtil.downloadImageAndManageFosterHomesInLocalRepositoryFromFlow(
                             allFosterHomesFlow,
-                            viewModelScope,
                             myUid
                         )
                     },
@@ -294,12 +287,10 @@ class CheckAllFosterHomesViewmodel(
                             activistLongitude = activistLongitude,
                             activistLatitude = activistLatitude,
                             rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
-                            rangeLatitude = getRangeLat(),
-                            coroutineScope = viewModelScope
+                            rangeLatitude = getRangeLat()
                         )
                         checkAllMyFosterHomesUtil.downloadImageAndModifyFosterHomesInLocalRepositoryFromFlow(
                             allFosterHomesFlow,
-                            viewModelScope,
                             myUid
                         )
                     },
@@ -308,8 +299,7 @@ class CheckAllFosterHomesViewmodel(
                             activistLongitude = activistLongitude,
                             activistLatitude = activistLatitude,
                             rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
-                            rangeLatitude = getRangeLat(),
-                            coroutineScope = viewModelScope
+                            rangeLatitude = getRangeLat()
                         )
                     }
                 ).map {

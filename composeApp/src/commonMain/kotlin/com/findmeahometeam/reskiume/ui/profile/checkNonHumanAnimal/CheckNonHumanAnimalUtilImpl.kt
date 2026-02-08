@@ -14,13 +14,11 @@ import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetNonHumanAn
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.InsertNonHumanAnimalInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.ModifyNonHumanAnimalInLocalRepository
 import com.findmeahometeam.reskiume.ui.core.components.UiState
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 
 class CheckNonHumanAnimalUtilImpl(
     private val observeAuthStateInAuthDataSource: ObserveAuthStateInAuthDataSource,
@@ -33,11 +31,10 @@ class CheckNonHumanAnimalUtilImpl(
     private val getNonHumanAnimalFromLocalRepository: GetNonHumanAnimalFromLocalRepository,
     private val getCompleteImagePathFromLocalDataSource: GetCompleteImagePathFromLocalDataSource,
     private val log: Log
-): CheckNonHumanAnimalUtil {
+) : CheckNonHumanAnimalUtil {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun getNonHumanAnimalFlow(
-        coroutineScope: CoroutineScope,
         nonHumanAnimalId: String,
         caregiverId: String
     ): Flow<UiState<NonHumanAnimal>> =
@@ -51,13 +48,10 @@ class CheckNonHumanAnimalUtilImpl(
                     getNonHumanAnimalFromRemoteRepository(
                         nonHumanAnimalId,
                         caregiverId
-                    ).downloadImageAndInsertNonHumanAnimalInLocalRepository(coroutineScope)
+                    ).downloadImageAndInsertNonHumanAnimalInLocalRepository()
                         .map {
                             if (it == null) {
-                                deleteNonHumanAnimalCacheFromLocalDataSource(
-                                    nonHumanAnimalId,
-                                    coroutineScope
-                                )
+                                deleteNonHumanAnimalCacheFromLocalDataSource(nonHumanAnimalId)
                                 UiState.Error()
                             } else {
                                 UiState.Success(it)
@@ -68,13 +62,10 @@ class CheckNonHumanAnimalUtilImpl(
                     getNonHumanAnimalFromRemoteRepository(
                         nonHumanAnimalId,
                         caregiverId
-                    ).downloadImageAndModifyNonHumanAnimalInLocalRepository(coroutineScope)
+                    ).downloadImageAndModifyNonHumanAnimalInLocalRepository()
                         .map {
                             if (it == null) {
-                                deleteNonHumanAnimalCacheFromLocalDataSource(
-                                    nonHumanAnimalId,
-                                    coroutineScope
-                                )
+                                deleteNonHumanAnimalCacheFromLocalDataSource(nonHumanAnimalId)
                                 UiState.Error()
                             } else {
                                 UiState.Success(it)
@@ -86,10 +77,7 @@ class CheckNonHumanAnimalUtilImpl(
                         nonHumanAnimalId
                     )
                     if (nonHumanAnimal == null) {
-                        deleteNonHumanAnimalCacheFromLocalDataSource(
-                            nonHumanAnimalId,
-                            coroutineScope
-                        )
+                        deleteNonHumanAnimalCacheFromLocalDataSource(nonHumanAnimalId)
                         flowOf(UiState.Error())
                     } else {
                         flowOf(UiState.Success(nonHumanAnimal))
@@ -112,9 +100,7 @@ class CheckNonHumanAnimalUtilImpl(
             }
         }
 
-    private fun Flow<NonHumanAnimal?>.downloadImageAndInsertNonHumanAnimalInLocalRepository(
-        coroutineScope: CoroutineScope
-    ): Flow<NonHumanAnimal?> =
+    private fun Flow<NonHumanAnimal?>.downloadImageAndInsertNonHumanAnimalInLocalRepository(): Flow<NonHumanAnimal?> =
         this.map { nonHumanAnimal: NonHumanAnimal? ->
 
             when {
@@ -139,34 +125,28 @@ class CheckNonHumanAnimalUtilImpl(
                     val nonHumanAnimalWithLocalImage = nonHumanAnimal.copy(
                         imageUrl = localImagePath.ifBlank { nonHumanAnimal.imageUrl }
                     )
-                    coroutineScope.launch {
 
-                        insertNonHumanAnimalsInLocalRepository(nonHumanAnimalWithLocalImage)
-                    }
+                    insertNonHumanAnimalsInLocalRepository(nonHumanAnimalWithLocalImage)
                     nonHumanAnimalWithLocalImage
                 }
             }
         }
 
-    private fun deleteNonHumanAnimalCacheFromLocalDataSource(
-        id: String,
-        coroutineScope: CoroutineScope
+    private suspend fun deleteNonHumanAnimalCacheFromLocalDataSource(
+        id: String
     ) {
-        coroutineScope.launch {
+        deleteCacheFromLocalRepository(id) { rowsDeleted: Int ->
 
-            deleteCacheFromLocalRepository(id) { rowsDeleted: Int ->
-
-                if (rowsDeleted > 0) {
-                    log.d(
-                        "CheckNonHumanAnimalUtil",
-                        "Non human animal $id deleted in the local cache in section ${Section.NON_HUMAN_ANIMALS}"
-                    )
-                } else {
-                    log.e(
-                        "CheckNonHumanAnimalUtil",
-                        "Error deleting the non human animal $id in the local cache in section ${Section.NON_HUMAN_ANIMALS}"
-                    )
-                }
+            if (rowsDeleted > 0) {
+                log.d(
+                    "CheckNonHumanAnimalUtil",
+                    "Non human animal $id deleted in the local cache in section ${Section.NON_HUMAN_ANIMALS}"
+                )
+            } else {
+                log.e(
+                    "CheckNonHumanAnimalUtil",
+                    "Error deleting the non human animal $id in the local cache in section ${Section.NON_HUMAN_ANIMALS}"
+                )
             }
         }
     }
@@ -188,9 +168,7 @@ class CheckNonHumanAnimalUtilImpl(
         }
     }
 
-    private fun Flow<NonHumanAnimal?>.downloadImageAndModifyNonHumanAnimalInLocalRepository(
-        coroutineScope: CoroutineScope
-    ): Flow<NonHumanAnimal?> =
+    private fun Flow<NonHumanAnimal?>.downloadImageAndModifyNonHumanAnimalInLocalRepository(): Flow<NonHumanAnimal?> =
         this.map { nonHumanAnimal: NonHumanAnimal? ->
 
             when {
@@ -219,10 +197,7 @@ class CheckNonHumanAnimalUtilImpl(
                         imageUrl = localImagePath.ifBlank { nonHumanAnimal.imageUrl }
                     )
 
-                    coroutineScope.launch {
-
-                        modifyNonHumanAnimalsInLocalRepository(nonHumanAnimalWithLocalImage)
-                    }
+                    modifyNonHumanAnimalsInLocalRepository(nonHumanAnimalWithLocalImage)
                     nonHumanAnimalWithLocalImage
                 }
             }

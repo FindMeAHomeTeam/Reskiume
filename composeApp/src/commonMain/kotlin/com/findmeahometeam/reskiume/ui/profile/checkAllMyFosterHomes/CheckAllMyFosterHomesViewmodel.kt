@@ -1,7 +1,6 @@
 package com.findmeahometeam.reskiume.ui.profile.checkAllMyFosterHomes
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllMyFosterHomesFromLocalRepository
@@ -41,31 +40,24 @@ class CheckAllMyFosterHomesViewmodel(
                     section = Section.FOSTER_HOMES,
                     onCompletionInsertCache = {
                         val allFosterHomesFlow: Flow<List<FosterHome>> = getAllMyFosterHomesFromRemoteRepository(
-                            myUid,
-                            viewModelScope
+                            myUid
                         )
                         checkAllMyFosterHomesUtil.downloadImageAndManageFosterHomesInLocalRepositoryFromFlow(
                             allFosterHomesFlow,
-                            viewModelScope,
                             myUid
                         )
                     },
                     onCompletionUpdateCache = {
                         val allFosterHomesFlow: Flow<List<FosterHome>> = getAllMyFosterHomesFromRemoteRepository(
-                            myUid,
-                            viewModelScope
+                            myUid
                         )
                         checkAllMyFosterHomesUtil.downloadImageAndModifyFosterHomesInLocalRepositoryFromFlow(
                             allFosterHomesFlow,
-                            viewModelScope,
                             myUid
                         )
                     },
                     onVerifyCacheIsRecent = {
-                        getAllMyFosterHomesFromLocalRepository(
-                            myUid,
-                            viewModelScope
-                        )
+                        getAllMyFosterHomesFromLocalRepository(myUid)
                     }
                 ).map {
                     it.map { fosterHome ->

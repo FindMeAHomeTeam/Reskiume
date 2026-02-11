@@ -17,6 +17,8 @@ import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHuma
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.InsertNonHumanAnimalInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.ModifyNonHumanAnimalInLocalRepository
+import com.findmeahometeam.reskiume.ui.core.components.UiState
+import com.findmeahometeam.reskiume.ui.core.components.toUiState
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckAllNonHumanAnimals
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -46,34 +48,35 @@ class CheckAllNonHumanAnimalsViewmodel(
     private val caregiverId =
         saveStateHandleProvider.provideObjectRoute(CheckAllNonHumanAnimals::class).caregiverId
 
-    val nonHumanAnimalListFlow: Flow<List<NonHumanAnimal>> =
-        observeAuthStateInAuthDataSource().flatMapConcat { authUser: AuthUser? ->
+    val nonHumanAnimalListFlow: Flow<UiState<List<NonHumanAnimal>>> =
+        observeAuthStateInAuthDataSource()
+            .flatMapConcat { authUser: AuthUser? ->
 
-            getDataByManagingObjectLocalCacheTimestamp(
-                cachedObjectId = caregiverId,
-                savedBy = authUser?.uid ?: "",
-                section = Section.NON_HUMAN_ANIMALS,
-                onCompletionInsertCache = {
-                    getAllNonHumanAnimalsFromRemoteRepository(caregiverId).downloadImageAndInsertNonHumanAnimalsInLocalRepository()
-                },
-                onCompletionUpdateCache = {
-                    getAllNonHumanAnimalsFromRemoteRepository(caregiverId).downloadImageAndModifyNonHumanAnimalsInLocalRepository()
-                },
-                onVerifyCacheIsRecent = {
-                    getAllNonHumanAnimalsFromLocalRepository(caregiverId)
+                getDataByManagingObjectLocalCacheTimestamp(
+                    cachedObjectId = caregiverId,
+                    savedBy = authUser?.uid ?: "",
+                    section = Section.NON_HUMAN_ANIMALS,
+                    onCompletionInsertCache = {
+                        getAllNonHumanAnimalsFromRemoteRepository(caregiverId).downloadImageAndInsertNonHumanAnimalsInLocalRepository()
+                    },
+                    onCompletionUpdateCache = {
+                        getAllNonHumanAnimalsFromRemoteRepository(caregiverId).downloadImageAndModifyNonHumanAnimalsInLocalRepository()
+                    },
+                    onVerifyCacheIsRecent = {
+                        getAllNonHumanAnimalsFromLocalRepository(caregiverId)
+                    }
+                ).map {
+                    it.map { nonHumanAnimal ->
+                        nonHumanAnimal.copy(
+                            imageUrl = if (nonHumanAnimal.imageUrl.isEmpty()) {
+                                nonHumanAnimal.imageUrl
+                            } else {
+                                getCompleteImagePathFromLocalDataSource(nonHumanAnimal.imageUrl)
+                            }
+                        )
+                    }
                 }
-            ).map {
-                it.map { nonHumanAnimal ->
-                    nonHumanAnimal.copy(
-                        imageUrl = if(nonHumanAnimal.imageUrl.isEmpty()) {
-                            nonHumanAnimal.imageUrl
-                        } else {
-                            getCompleteImagePathFromLocalDataSource(nonHumanAnimal.imageUrl)
-                        }
-                    )
-                }
-            }
-        }
+            }.toUiState()
 
     private fun Flow<List<NonHumanAnimal>>.downloadImageAndInsertNonHumanAnimalsInLocalRepository(): Flow<List<NonHumanAnimal>> =
         this.map { nonHumanAnimalList ->

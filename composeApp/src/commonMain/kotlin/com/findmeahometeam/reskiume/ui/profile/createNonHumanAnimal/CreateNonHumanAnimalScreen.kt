@@ -24,6 +24,7 @@ import com.findmeahometeam.reskiume.domain.model.AgeCategory
 import com.findmeahometeam.reskiume.domain.model.Gender
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
+import com.findmeahometeam.reskiume.domain.model.toEmoji
 import com.findmeahometeam.reskiume.domain.model.toStringResource
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.components.RmAddPhoto
@@ -114,10 +115,10 @@ fun CreateNonHumanAnimalScreen(
             Spacer(modifier = Modifier.height(8.dp))
             RmDropDownMenu(
                 dropDownLabel = stringResource(Res.string.create_non_human_animal_screen_non_human_animal_type),
-                defaultElementText = stringResource(nonHumanAnimalType.toStringResource()),
+                defaultElementText = nonHumanAnimalType.toEmoji() + " " + stringResource(nonHumanAnimalType.toStringResource()),
                 items = NonHumanAnimalType.entries.mapNotNull {
                     if (it != NonHumanAnimalType.UNSELECTED) {
-                        Pair(it, stringResource(it.toStringResource()))
+                        Pair(it, it.toEmoji() + " " + stringResource(it.toStringResource()))
                     } else {
                         null
                     }
@@ -128,10 +129,10 @@ fun CreateNonHumanAnimalScreen(
             Spacer(modifier = Modifier.height(8.dp))
             RmDropDownMenu(
                 dropDownLabel = stringResource(Res.string.create_non_human_animal_screen_non_human_animal_gender),
-                defaultElementText = stringResource(gender.toStringResource()),
+                defaultElementText = gender.toEmoji() + " " + stringResource(gender.toStringResource()),
                 items = Gender.entries.mapNotNull {
                     if (it != Gender.UNSELECTED) {
-                        Pair(it, stringResource(it.toStringResource()))
+                        Pair(it, it.toEmoji() + " " + stringResource(it.toStringResource()))
                     } else {
                         null
                     }
@@ -142,10 +143,10 @@ fun CreateNonHumanAnimalScreen(
             Spacer(modifier = Modifier.height(8.dp))
             RmDropDownMenu(
                 dropDownLabel = stringResource(Res.string.create_non_human_animal_screen_non_human_animal_age_category),
-                defaultElementText = stringResource(ageCategory.toStringResource()),
+                defaultElementText = ageCategory.toEmoji() + " " + stringResource(ageCategory.toStringResource()),
                 items = AgeCategory.entries.mapNotNull {
                     if (it != AgeCategory.UNSELECTED) {
-                        Pair(it, stringResource(it.toStringResource()))
+                        Pair(it, it.toEmoji() + " " + stringResource(it.toStringResource()))
                     } else {
                         null
                     }

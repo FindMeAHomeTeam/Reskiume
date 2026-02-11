@@ -35,6 +35,7 @@ import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
 import com.findmeahometeam.reskiume.domain.model.fosterHome.City
 import com.findmeahometeam.reskiume.domain.model.fosterHome.Country
+import com.findmeahometeam.reskiume.domain.model.toEmoji
 import com.findmeahometeam.reskiume.domain.model.toStringResource
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.components.ManagePermissionState
@@ -280,10 +281,10 @@ fun CheckAllFosterHomesScreen(
 
             RmDropDownMenu(
                 dropDownLabel = stringResource(Res.string.check_all_foster_homes_screen_non_human_animal_type_label),
-                defaultElementText = stringResource(nonHumanAnimalType.toStringResource()),
+                defaultElementText = nonHumanAnimalType.toEmoji() + " " + stringResource(nonHumanAnimalType.toStringResource()),
                 items = NonHumanAnimalType.entries.mapNotNull {
                     if (it != NonHumanAnimalType.UNSELECTED) {
-                        Pair(it, stringResource(it.toStringResource()))
+                        Pair(it, it.toEmoji() + " " + stringResource(it.toStringResource()))
                     } else {
                         null
                     }

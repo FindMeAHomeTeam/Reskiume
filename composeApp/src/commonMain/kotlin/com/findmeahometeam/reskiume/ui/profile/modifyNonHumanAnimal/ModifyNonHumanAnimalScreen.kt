@@ -24,6 +24,7 @@ import com.findmeahometeam.reskiume.domain.model.AgeCategory
 import com.findmeahometeam.reskiume.domain.model.Gender
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
+import com.findmeahometeam.reskiume.domain.model.toEmoji
 import com.findmeahometeam.reskiume.domain.model.toStringResource
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.components.RmAddPhoto
@@ -68,7 +69,16 @@ fun ModifyNonHumanAnimalScreen(
     RmScaffold(
         title = stringResource(
             Res.string.modify_non_human_animal_screen_non_human_animal_profile_title,
-            if (nonHumanAnimalState is UiState.Success) (nonHumanAnimalState as UiState.Success<NonHumanAnimal>).data.name else ""
+            if (nonHumanAnimalState is UiState.Success) {
+                (nonHumanAnimalState as UiState.Success<NonHumanAnimal>).data.name
+            } else {
+                ""
+            },
+            if (nonHumanAnimalState is UiState.Success) {
+                "- ${stringResource((nonHumanAnimalState as UiState.Success<NonHumanAnimal>).data.adoptionState.toStringResource())}"
+            } else {
+                ""
+            }
         ),
         onBackPressed = onBackPressed,
     ) { padding ->
@@ -137,10 +147,10 @@ fun ModifyNonHumanAnimalScreen(
                 Spacer(modifier = Modifier.height(8.dp))
                 RmDropDownMenu(
                     dropDownLabel = stringResource(Res.string.modify_non_human_animal_screen_non_human_animal_type),
-                    defaultElementText = stringResource(nonHumanAnimal.nonHumanAnimalType.toStringResource()),
+                    defaultElementText = nonHumanAnimal.nonHumanAnimalType.toEmoji() + " " + stringResource(nonHumanAnimal.nonHumanAnimalType.toStringResource()),
                     items = NonHumanAnimalType.entries.mapNotNull {
                         if (it != NonHumanAnimalType.UNSELECTED) {
-                            Pair(it, stringResource(it.toStringResource()))
+                            Pair(it, it.toEmoji() + " " + stringResource(it.toStringResource()))
                         } else {
                             null
                         }
@@ -151,10 +161,10 @@ fun ModifyNonHumanAnimalScreen(
                 Spacer(modifier = Modifier.height(8.dp))
                 RmDropDownMenu(
                     dropDownLabel = stringResource(Res.string.modify_non_human_animal_screen_non_human_animal_gender),
-                    defaultElementText = stringResource(nonHumanAnimal.gender.toStringResource()),
+                    defaultElementText = nonHumanAnimal.gender.toEmoji() + " " + stringResource(nonHumanAnimal.gender.toStringResource()),
                     items = Gender.entries.mapNotNull {
                         if (it != Gender.UNSELECTED) {
-                            Pair(it, stringResource(it.toStringResource()))
+                            Pair(it, it.toEmoji() + " " + stringResource(it.toStringResource()))
                         } else {
                             null
                         }
@@ -165,10 +175,10 @@ fun ModifyNonHumanAnimalScreen(
                 Spacer(modifier = Modifier.height(8.dp))
                 RmDropDownMenu(
                     dropDownLabel = stringResource(Res.string.modify_non_human_animal_screen_non_human_animal_age_category),
-                    defaultElementText = stringResource(nonHumanAnimal.ageCategory.toStringResource()),
+                    defaultElementText = nonHumanAnimal.ageCategory.toEmoji() + " " + stringResource(nonHumanAnimal.ageCategory.toStringResource()),
                     items = AgeCategory.entries.mapNotNull {
                         if (it != AgeCategory.UNSELECTED) {
-                            Pair(it, stringResource(it.toStringResource()))
+                            Pair(it, it.toEmoji() + " " + stringResource(it.toStringResource()))
                         } else {
                             null
                         }

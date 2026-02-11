@@ -2,6 +2,7 @@ package com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -27,8 +29,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.findmeahometeam.reskiume.domain.model.AdoptionState
 import com.findmeahometeam.reskiume.domain.model.Gender
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
+import com.findmeahometeam.reskiume.domain.model.toEmoji
 import com.findmeahometeam.reskiume.domain.model.toStringResource
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.components.RmImage
@@ -37,6 +41,8 @@ import com.findmeahometeam.reskiume.ui.core.components.RmScaffold
 import com.findmeahometeam.reskiume.ui.core.components.RmText
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.primaryGreen
+import com.findmeahometeam.reskiume.ui.core.secondaryGreen
+import com.findmeahometeam.reskiume.ui.core.tertiaryGreen
 import com.findmeahometeam.reskiume.ui.core.textColor
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -52,7 +58,6 @@ import reskiume.composeapp.generated.resources.ic_male
 fun CheckNonHumanAnimalScreen(
     onBackPressed: () -> Unit,
 ) {
-
     val checkNonHumanAnimalViewmodel: CheckNonHumanAnimalViewmodel =
         koinViewModel<CheckNonHumanAnimalViewmodel>()
 
@@ -81,15 +86,34 @@ fun CheckNonHumanAnimalScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Spacer(modifier = Modifier.height(8.dp))
-                RmImage(
-                    imagePath = nonHumanAnimal.imageUrl,
-                    contentDescription =
-                        stringResource(
-                            Res.string.check_non_human_animal_screen_non_human_animal_avatar_content_description,
-                            nonHumanAnimal.name
-                        ),
-                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(15.dp))
-                )
+                Box {
+                    RmImage(
+                        imagePath = nonHumanAnimal.imageUrl,
+                        contentDescription =
+                            stringResource(
+                                Res.string.check_non_human_animal_screen_non_human_animal_avatar_content_description,
+                                nonHumanAnimal.name
+                            ),
+                        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(15.dp))
+                    )
+                    Box(
+                        modifier = Modifier.wrapContentSize()
+                            .background(
+                                color = when(nonHumanAnimal.adoptionState) {
+                                    AdoptionState.LOOKING_FOR_ADOPTION -> tertiaryGreen
+                                    AdoptionState.REHOMED -> secondaryGreen
+                                    AdoptionState.ADOPTED -> primaryGreen
+                                },
+                                shape = RoundedCornerShape(15.dp)
+                            )
+                            .padding(8.dp)
+                    ) {
+                        RmText(
+                            text = stringResource(nonHumanAnimal.adoptionState.toStringResource()),
+                            color = Color.Black
+                        )
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(10.dp))
                 Row {
@@ -103,9 +127,15 @@ fun CheckNonHumanAnimalScreen(
                             fontWeight = FontWeight.ExtraBold
                         )
                         Row(modifier = Modifier.padding(10.dp)) {
-                            RmText(text = stringResource(nonHumanAnimal.nonHumanAnimalType.toStringResource()))
+                            RmText(
+                                text = nonHumanAnimal.nonHumanAnimalType.toEmoji()
+                                        + " " + stringResource(nonHumanAnimal.nonHumanAnimalType.toStringResource())
+                            )
                             RmText(text = " · ")
-                            RmText(text = stringResource(nonHumanAnimal.ageCategory.toStringResource()))
+                            RmText(
+                                text = nonHumanAnimal.ageCategory.toEmoji()
+                                        + " " + stringResource(nonHumanAnimal.ageCategory.toStringResource())
+                            )
                         }
                     }
                     Column(
@@ -129,7 +159,8 @@ fun CheckNonHumanAnimalScreen(
                                 tint = Color.White
                             )
                             RmText(
-                                text = stringResource(nonHumanAnimal.gender.toStringResource()),
+                                text = nonHumanAnimal.gender.toEmoji()
+                                        + " " + stringResource(nonHumanAnimal.gender.toStringResource()),
                                 color = Color.White
                             )
                         }

@@ -1,6 +1,7 @@
 package com.findmeahometeam.reskiume.ui.profile.checkAllMyFosterHomes
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -56,7 +57,8 @@ fun CheckAllMyFosterHomesScreen(
                 .background(backgroundColor)
                 .padding(padding)
                 .padding(horizontal = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
             RmResultState(fosterHomeListState) { fosterHomeList: List<FosterHome> ->
 
@@ -73,7 +75,7 @@ fun CheckAllMyFosterHomesScreen(
                 if (fosterHomeList.isNotEmpty()) {
 
                     Spacer(modifier = Modifier.height(8.dp))
-                    LazyColumn {
+                    LazyColumn(modifier = Modifier.weight(1f)) {
                         items(
                             items = fosterHomeList,
                             key = { it.hashCode() }
@@ -99,14 +101,16 @@ fun CheckAllMyFosterHomesScreen(
                     }
                 }
             }
-            Spacer(modifier = Modifier.weight(1f))
-            RmButton(
-                text = stringResource(Res.string.check_all_my_foster_homes_screen_register_foster_home),
-                onClick = {
-                    onCreateFosterHome(myUid)
-                }
-            )
-            Spacer(modifier = Modifier.height(8.dp))
+            Column {
+                Spacer(modifier = Modifier.height(8.dp))
+                RmButton(
+                    text = stringResource(Res.string.check_all_my_foster_homes_screen_register_foster_home),
+                    onClick = {
+                        onCreateFosterHome(myUid)
+                    }
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
         }
     }
 }

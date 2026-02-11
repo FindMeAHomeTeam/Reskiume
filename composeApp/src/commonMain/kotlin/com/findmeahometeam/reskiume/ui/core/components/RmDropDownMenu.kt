@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -17,21 +18,23 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextStyle
 import com.findmeahometeam.reskiume.ui.core.backgroundColorForItems
 import reskiume.composeapp.generated.resources.Res
 import reskiume.composeapp.generated.resources.ic_arrow_drop_down
 import reskiume.composeapp.generated.resources.ic_arrow_drop_up
 
 @Composable
-fun <T : Enum<T>> RmDropDownMenu(
+fun <T> RmDropDownMenu(
     modifier: Modifier = Modifier,
     dropDownLabel: String,
     defaultElementText: String,
     items: List<Pair<T, String>>,
+    textStyleForTextField: TextStyle = LocalTextStyle.current,
     onClick: (T) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var value by remember { mutableStateOf(defaultElementText) }
+    var defaultText by remember(defaultElementText) { mutableStateOf(defaultElementText) }
     var textFieldWidth by remember { mutableStateOf(0) }
     val focusRequester = remember { FocusRequester() }
 
@@ -44,8 +47,10 @@ fun <T : Enum<T>> RmDropDownMenu(
                     textFieldWidth = coordinates.size.width
                 },
             readOnly = true,
-            text = value,
+            text = defaultText,
             label = dropDownLabel,
+            singleLine = true,
+            textStyle = textStyleForTextField,
             trailingIcon = if (expanded) {
                 Res.drawable.ic_arrow_drop_up
             } else {
@@ -75,7 +80,7 @@ fun <T : Enum<T>> RmDropDownMenu(
                     text = { RmText(element.second) },
                     onClick = {
                         expanded = false
-                        value = element.second
+                        defaultText = element.second
                         onClick(element.first)
                     }
                 )

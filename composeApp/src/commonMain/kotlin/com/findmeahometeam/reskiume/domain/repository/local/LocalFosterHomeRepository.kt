@@ -19,7 +19,7 @@ interface LocalFosterHomeRepository {
     )
 
     suspend fun insertResidentNonHumanAnimalIdForFosterHome(
-        residentNonHumanAnimalId: ResidentNonHumanAnimalIdEntityForFosterHome,
+        residentNonHumanAnimal: ResidentNonHumanAnimalIdEntityForFosterHome,
         onInsertResidentNonHumanAnimalId: (rowId: Long) -> Unit
     )
 
@@ -38,7 +38,17 @@ interface LocalFosterHomeRepository {
         onModifyResidentNonHumanAnimalId: (rowsUpdated: Int) -> Unit
     )
 
-    suspend fun deleteFosterHome(id: String, onDeleteFosterHome: (rowsDeleted: Int) -> Unit)
+    suspend fun deleteFosterHome(id: String, onDeleteFosterHome: suspend (rowsDeleted: Int) -> Unit)
+
+    suspend fun deleteAcceptedNonHumanAnimal(
+        acceptedNonHumanAnimalId: Long,
+        onDeleteAcceptedNonHumanAnimal: (rowsDeleted: Int) -> Unit
+    )
+
+    suspend fun deleteResidentNonHumanAnimal(
+        residentNonHumanAnimalId: String,
+        onDeleteResidentNonHumanAnimalId: (rowsDeleted: Int) -> Unit
+    )
 
     suspend fun deleteAllMyFosterHomes(
         ownerId: String,

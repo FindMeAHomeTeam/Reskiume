@@ -29,12 +29,12 @@ class LocalFosterHomeRepositoryImpl(
     }
 
     override suspend fun insertResidentNonHumanAnimalIdForFosterHome(
-        residentNonHumanAnimalId: ResidentNonHumanAnimalIdEntityForFosterHome,
+        residentNonHumanAnimal: ResidentNonHumanAnimalIdEntityForFosterHome,
         onInsertResidentNonHumanAnimalId: (rowId: Long) -> Unit
     ) {
         onInsertResidentNonHumanAnimalId(
             reskiumeDatabase.getFosterHomeDao()
-                .insertResidentNonHumanAnimalIdForFosterHome(residentNonHumanAnimalId)
+                .insertResidentNonHumanAnimalIdForFosterHome(residentNonHumanAnimal)
         )
     }
 
@@ -67,9 +67,23 @@ class LocalFosterHomeRepositoryImpl(
 
     override suspend fun deleteFosterHome(
         id: String,
-        onDeleteFosterHome: (rowsDeleted: Int) -> Unit
+        onDeleteFosterHome: suspend (rowsDeleted: Int) -> Unit
     ) {
         onDeleteFosterHome(reskiumeDatabase.getFosterHomeDao().deleteFosterHome(id))
+    }
+
+    override suspend fun deleteAcceptedNonHumanAnimal(
+        acceptedNonHumanAnimalId: Long,
+        onDeleteAcceptedNonHumanAnimal: (rowsDeleted: Int) -> Unit
+    ) {
+        onDeleteAcceptedNonHumanAnimal(reskiumeDatabase.getFosterHomeDao().deleteAcceptedNonHumanAnimalEntityForFosterHome(acceptedNonHumanAnimalId))
+    }
+
+    override suspend fun deleteResidentNonHumanAnimal(
+        residentNonHumanAnimalId: String,
+        onDeleteResidentNonHumanAnimalId: (rowsDeleted: Int) -> Unit
+    ) {
+        onDeleteResidentNonHumanAnimalId(reskiumeDatabase.getFosterHomeDao().deleteResidentNonHumanAnimalIdEntityForFosterHome(residentNonHumanAnimalId))
     }
 
     override suspend fun deleteAllMyFosterHomes(

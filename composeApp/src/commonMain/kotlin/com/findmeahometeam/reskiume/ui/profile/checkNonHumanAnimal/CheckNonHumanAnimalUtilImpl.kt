@@ -108,7 +108,7 @@ class CheckNonHumanAnimalUtilImpl(
 
                 nonHumanAnimal.imageUrl.isBlank() -> {
                     log.d(
-                        "CheckNonHumanAnimalUtil",
+                        "CheckNonHumanAnimalUtilImpl",
                         "Non human animal ${nonHumanAnimal.id} has no avatar image to save locally."
                     )
                     insertNonHumanAnimalsInLocalRepository(nonHumanAnimal)
@@ -139,12 +139,12 @@ class CheckNonHumanAnimalUtilImpl(
 
             if (rowsDeleted > 0) {
                 log.d(
-                    "CheckNonHumanAnimalUtil",
+                    "CheckNonHumanAnimalUtilImpl",
                     "Non human animal $id deleted in the local cache in section ${Section.NON_HUMAN_ANIMALS}"
                 )
             } else {
                 log.e(
-                    "CheckNonHumanAnimalUtil",
+                    "CheckNonHumanAnimalUtilImpl",
                     "Error deleting the non human animal $id in the local cache in section ${Section.NON_HUMAN_ANIMALS}"
                 )
             }
@@ -156,12 +156,12 @@ class CheckNonHumanAnimalUtilImpl(
         insertNonHumanAnimalInLocalRepository(nonHumanAnimal) {
             if (it > 0) {
                 log.d(
-                    "CheckNonHumanAnimalUtil",
+                    "CheckNonHumanAnimalUtilImpl",
                     "Non human animal ${nonHumanAnimal.id} added to local database"
                 )
             } else {
                 log.e(
-                    "CheckNonHumanAnimalUtil",
+                    "CheckNonHumanAnimalUtilImpl",
                     "Error adding the non human animal ${nonHumanAnimal.id} to local database"
                 )
             }
@@ -178,7 +178,7 @@ class CheckNonHumanAnimalUtilImpl(
 
                 nonHumanAnimal.imageUrl.isBlank() -> {
                     log.d(
-                        "CheckNonHumanAnimalUtil",
+                        "CheckNonHumanAnimalUtilImpl",
                         "Non human animal ${nonHumanAnimal.id} has no avatar image to save locally."
                     )
                     modifyNonHumanAnimalsInLocalRepository(nonHumanAnimal)
@@ -208,12 +208,12 @@ class CheckNonHumanAnimalUtilImpl(
         modifyNonHumanAnimalInLocalRepository(nonHumanAnimal) {
             if (it > 0) {
                 log.d(
-                    "CheckNonHumanAnimalUtil",
+                    "CheckNonHumanAnimalUtilImpl",
                     "Non human animal ${nonHumanAnimal.id} modified in local database"
                 )
             } else {
                 log.e(
-                    "CheckNonHumanAnimalUtil",
+                    "CheckNonHumanAnimalUtilImpl",
                     "Error modifying the non human animal ${nonHumanAnimal.id} in local database"
                 )
             }

@@ -126,7 +126,7 @@
     <string name="check_non_human_animal_screen_non_human_animal_description">Description</string>
 
     <!-- Modify non-human animal -->
-    <string name="modify_non_human_animal_screen_non_human_animal_profile_title">%1$s's profile</string>
+    <string name="modify_non_human_animal_screen_non_human_animal_profile_title">%1$s's profile %2$s</string>
     <string name="modify_non_human_animal_screen_non_human_animal_name">Name</string>
     <string name="modify_non_human_animal_screen_non_human_animal_type">Type</string>
     <string name="modify_non_human_animal_screen_non_human_animal_gender">Gender</string>
@@ -141,31 +141,36 @@
 
     <!-- No human animal types -->
     <string name="non_human_animal_type_unselected">Unselected</string>
-    <string name="non_human_animal_type_dog">🐶 Dog</string>
-    <string name="non_human_animal_type_cat">🐱 Cat</string>
-    <string name="non_human_animal_type_bird">🕊️ Bird</string>
-    <string name="non_human_animal_type_rabbit">🐰 Rabbit</string>
-    <string name="non_human_animal_type_rodent">🐭 Rodent</string>
-    <string name="non_human_animal_type_ferret">🦦 Ferret</string>
-    <string name="non_human_animal_type_reptile">🦎 Reptile</string>
-    <string name="non_human_animal_type_fish">🐠 Fish</string>
-    <string name="non_human_animal_type_equid">🐴 Equid</string>
-    <string name="non_human_animal_type_hog">🐷 Hog</string>
-    <string name="non_human_animal_type_ovine">🐑 Ovine</string>
-    <string name="non_human_animal_type_bobine">🐮 Bobine</string>
-    <string name="non_human_animal_type_other">❤️ Other</string>
+    <string name="non_human_animal_type_dog">Dog</string>
+    <string name="non_human_animal_type_cat">Cat</string>
+    <string name="non_human_animal_type_bird">Bird</string>
+    <string name="non_human_animal_type_rabbit">Rabbit</string>
+    <string name="non_human_animal_type_rodent">Rodent</string>
+    <string name="non_human_animal_type_ferret">Ferret</string>
+    <string name="non_human_animal_type_reptile">Reptile</string>
+    <string name="non_human_animal_type_fish">Fish</string>
+    <string name="non_human_animal_type_equid">Equid</string>
+    <string name="non_human_animal_type_hog">Hog</string>
+    <string name="non_human_animal_type_ovine">Ovine</string>
+    <string name="non_human_animal_type_bobine">Bobine</string>
+    <string name="non_human_animal_type_other">Other</string>
 
     <!-- No human animal genders -->
     <string name="non_human_animal_gender_unselected">Unselected</string>
-    <string name="non_human_animal_gender_female">🩷 Female</string>
-    <string name="non_human_animal_gender_male">💙 Male</string>
+    <string name="non_human_animal_gender_female">Female</string>
+    <string name="non_human_animal_gender_male">Male</string>
 
     <!-- No human animal age category -->
     <string name="non_human_animal_age_category_unselected">Unselected</string>
-    <string name="non_human_animal_age_category_baby">💞 Baby</string>
-    <string name="non_human_animal_age_category_young">💝 Young</string>
-    <string name="non_human_animal_age_category_adult">♥️ Adult</string>
-    <string name="non_human_animal_age_category_senior">💖 Senior</string>
+    <string name="non_human_animal_age_category_baby">Baby</string>
+    <string name="non_human_animal_age_category_young">Young</string>
+    <string name="non_human_animal_age_category_adult">Adult</string>
+    <string name="non_human_animal_age_category_senior">Senior</string>
+
+    <!-- No human animal adoption state -->
+    <string name="non_human_animal_looking_for_adoption">Looking for adoption</string>
+    <string name="non_human_animal_rehomed">🏠 Rehomed</string>
+    <string name="non_human_animal_adopted">🎉 Adopted</string>
 
     <!-- Create a non human animal -->
     <string name="create_non_human_animal_screen_title">Create a non-human animal</string>
@@ -199,6 +204,7 @@
     <string name="check_all_foster_homes_screen_non_human_animal_gender_female">Female</string>
     <string name="check_all_foster_homes_screen_non_human_animal_gender_male">Male</string>
     <string name="check_all_foster_homes_screen_non_human_animal_gender_both">Both</string>
+    <string name="check_all_foster_homes_screen_register_foster_home">+  Register a foster home</string>
 
     <!-- Location permission -->
     <string name="location_permission_title">Location permission</string>
@@ -216,12 +222,50 @@
     <!-- Foster home list item -->
     <string name="foster_home_list_item_accepted_non_human_animal">Accept: </string>
     <string name="foster_home_list_item_accepted_both_genders_non_human_animal">%1$s &amp; %2$s</string>
-    <string name="foster_home_list_item_accepted_more_non_human_animal">➕ And more</string>
+    <string name="foster_home_list_item_more_non_human_animal">➕ And more</string>
     <string name="foster_home_list_item_residents_non_human_animal">Residents</string>
+    <string name="foster_home_list_item_disabled_foster_home">Disabled</string>
 
     <!-- Check all my foster homes -->
     <string name="check_all_my_foster_homes_screen_title">Check my foster homes</string>
     <string name="check_all_my_foster_homes_screen_no_foster_homes">🏠 You don't have any foster homes, but consider creating one.</string>
+    <string name="check_all_my_foster_homes_screen_register_foster_home">+  Register a foster home</string>
+
+    <!-- Modify foster home -->
+    <string name="modify_foster_home_screen_title">Modify %1$s from %2$s (%3$s)</string>
+    <string name="modify_foster_home_screen_foster_home_title">Title</string>
+    <string name="modify_foster_home_screen_foster_home_description">Description</string>
+    <string name="modify_foster_home_screen_foster_home_conditions">Conditions</string>
+    <string name="modify_foster_home_screen_foster_home_accepted_non_human_animals">Accepted non-human animals</string>
+    <string name="modify_foster_home_screen_foster_home_resident_non_human_animals">Resident non-human animals</string>
+    <string name="modify_foster_home_screen_foster_home_longitude">Longitude</string>
+    <string name="modify_foster_home_screen_foster_home_latitude">Latitude</string>
+    <string name="modify_foster_home_screen_foster_home_country">Country</string>
+    <string name="modify_foster_home_screen_foster_home_city">City</string>
+    <string name="modify_foster_home_screen_foster_home_availability">Availability</string>
+    <string name="modify_foster_home_screen_delete_foster_home_text">Delete %1$s</string>
+    <string name="modify_foster_home_screen_delete_foster_home_button">Delete</string>
+    <string name="modify_foster_home_screen_dismiss_delete_foster_home_button">Dismiss</string>
+    <string name="modify_foster_home_screen_delete_foster_home_title">Do you want to delete %1$s?</string>
+    <string name="modify_foster_home_screen_delete_foster_home_message">This action can not be undone</string>
+    <string name="modify_foster_home_screen_save_foster_home_changes_button">Save %1$s's changes</string>
+    <string name="modify_foster_home_screen_available_label">Available</string>
+    <string name="modify_foster_home_screen_unavailable_label">Not available</string>
+    <string name="modify_foster_home_availability_description">Update this foster home's availability to receive rehome requests</string>
+
+    <!-- Accepted non human animal list creator -->
+    <string name="accepted_non_human_animal_list_creator_title">Add accepted non-human animals:</string>
+    <string name="accepted_non_human_animal_list_creator_non_human_animal_type_label">Type</string>
+    <string name="accepted_non_human_animal_list_creator_non_human_animal_gender_label">Gender</string>
+    <string name="accepted_non_human_animal_list_creator_add_content_description">Add a non-human animal type and gender</string>
+    <string name="accepted_non_human_animal_list_creator_delete_content_description">Delete a non-human animal type and gender</string>
+
+    <!-- Resident non human animal list creator -->
+    <string name="resident_non_human_animal_list_creator_title">Add resident non-human animals:</string>
+    <string name="resident_non_human_animal_list_creator_non_human_animal_label">Non-human animal</string>
+    <string name="resident_non_human_animal_list_creator_unselected_non_human_animal_label">Unselected</string>
+    <string name="resident_non_human_animal_list_creator_add_content_description">Add a non-human animal</string>
+    <string name="resident_non_human_animal_list_creator_delete_content_description">Delete a non-human animal</string>
 
     <!-- Check all advice -->
     <string name="check_all_advice_screen_title">Check all advice</string>

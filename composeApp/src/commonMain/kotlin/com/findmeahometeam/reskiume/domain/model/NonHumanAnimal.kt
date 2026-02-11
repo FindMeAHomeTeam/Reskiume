@@ -5,6 +5,7 @@ import com.findmeahometeam.reskiume.data.remote.response.RemoteNonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType.*
 import org.jetbrains.compose.resources.StringResource
 import reskiume.composeapp.generated.resources.Res
+import reskiume.composeapp.generated.resources.non_human_animal_adopted
 import reskiume.composeapp.generated.resources.non_human_animal_age_category_adult
 import reskiume.composeapp.generated.resources.non_human_animal_age_category_baby
 import reskiume.composeapp.generated.resources.non_human_animal_age_category_senior
@@ -13,6 +14,8 @@ import reskiume.composeapp.generated.resources.non_human_animal_age_category_you
 import reskiume.composeapp.generated.resources.non_human_animal_gender_female
 import reskiume.composeapp.generated.resources.non_human_animal_gender_male
 import reskiume.composeapp.generated.resources.non_human_animal_gender_unselected
+import reskiume.composeapp.generated.resources.non_human_animal_looking_for_adoption
+import reskiume.composeapp.generated.resources.non_human_animal_rehomed
 import reskiume.composeapp.generated.resources.non_human_animal_type_bird
 import reskiume.composeapp.generated.resources.non_human_animal_type_bobine
 import reskiume.composeapp.generated.resources.non_human_animal_type_cat
@@ -43,7 +46,6 @@ data class NonHumanAnimal(
     val adoptionState: AdoptionState = AdoptionState.LOOKING_FOR_ADOPTION,
     val fosterHomeId: String = ""
 ) {
-
     @OptIn(ExperimentalTime::class)
     private fun setId(): String =
         id.ifBlank { Clock.System.now().epochSeconds.toString() + caregiverId }
@@ -147,5 +149,50 @@ fun Gender.toStringResource(): StringResource {
         Gender.UNSELECTED -> Res.string.non_human_animal_gender_unselected
         Gender.FEMALE -> Res.string.non_human_animal_gender_female
         Gender.MALE -> Res.string.non_human_animal_gender_male
+    }
+}
+
+fun AdoptionState.toStringResource(): StringResource {
+    return when (this) {
+        AdoptionState.LOOKING_FOR_ADOPTION -> Res.string.non_human_animal_looking_for_adoption
+        AdoptionState.REHOMED -> Res.string.non_human_animal_rehomed
+        AdoptionState.ADOPTED -> Res.string.non_human_animal_adopted
+    }
+}
+
+fun AgeCategory.toEmoji(): String {
+    return when (this) {
+        AgeCategory.UNSELECTED -> ""
+        AgeCategory.BABY -> "💞"
+        AgeCategory.YOUNG -> "💝"
+        AgeCategory.ADULT -> "♥️"
+        AgeCategory.SENIOR -> "💖"
+    }
+}
+
+fun NonHumanAnimalType.toEmoji(): String {
+    return when (this) {
+        UNSELECTED -> ""
+        DOG -> "🐶"
+        CAT -> "🐱"
+        BIRD -> "🕊"
+        RABBIT -> "🐰"
+        RODENT -> "🐭"
+        FERRET -> "🦦"
+        REPTILE -> "🦎"
+        FISH -> "🐠"
+        EQUID -> "🐴"
+        HOG -> "🐷"
+        OVINE -> "🐑"
+        BOBINE -> "🐮"
+        OTHER -> "❤️"
+    }
+}
+
+fun Gender.toEmoji(): String {
+    return when (this) {
+        Gender.UNSELECTED -> ""
+        Gender.FEMALE -> "🩷"
+        Gender.MALE -> "💙"
     }
 }

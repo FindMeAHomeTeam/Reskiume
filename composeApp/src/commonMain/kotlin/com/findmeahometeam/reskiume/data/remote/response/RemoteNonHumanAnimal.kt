@@ -1,5 +1,6 @@
 package com.findmeahometeam.reskiume.data.remote.response
 
+import com.findmeahometeam.reskiume.domain.model.AdoptionState
 import com.findmeahometeam.reskiume.domain.model.AgeCategory
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
@@ -13,7 +14,9 @@ data class RemoteNonHumanAnimal(
     val description: String? = "",
     val imageUrl: String? = "",
     val nonHumanAnimalType: NonHumanAnimalType? = NonHumanAnimalType.UNSELECTED,
-    val gender: Gender? = Gender.UNSELECTED
+    val gender: Gender? = Gender.UNSELECTED,
+    val adoptionState: AdoptionState? = AdoptionState.LOOKING_FOR_ADOPTION,
+    val fosterHomeId: String? = ""
 ) {
     fun toMap(): Map<String, Any?> {
         return mapOf(
@@ -24,7 +27,9 @@ data class RemoteNonHumanAnimal(
             "description" to description,
             "imageUrl" to imageUrl,
             "nonHumanAnimalType" to nonHumanAnimalType,
-            "gender" to gender
+            "gender" to gender,
+            "adoptionState" to adoptionState,
+            "fosterHomeId" to fosterHomeId
         )
     }
 
@@ -38,7 +43,9 @@ data class RemoteNonHumanAnimal(
             description = description ?: "",
             imageUrl = imageUrl ?: "",
             nonHumanAnimalType = nonHumanAnimalType ?: NonHumanAnimalType.UNSELECTED,
-            gender = gender ?: Gender.UNSELECTED
+            gender = gender ?: Gender.UNSELECTED,
+            adoptionState = adoptionState ?: AdoptionState.LOOKING_FOR_ADOPTION,
+            fosterHomeId = fosterHomeId ?: ""
         )
     }
 }

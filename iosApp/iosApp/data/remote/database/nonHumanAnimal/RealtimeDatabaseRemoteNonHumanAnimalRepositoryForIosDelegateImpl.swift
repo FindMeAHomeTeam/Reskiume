@@ -50,7 +50,9 @@ class RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateImpl: Realtime
                                         description: nonHumanAnimalNsDictionary["description"] as? String ?? "",
                                         imageUrl: nonHumanAnimalNsDictionary["imageUrl"] as? String ?? "",
                                         nonHumanAnimalType: NonHumanAnimalType.entries.first(where: { $0.name == (nonHumanAnimalNsDictionary["nonHumanAnimalType"] as? String ?? NonHumanAnimalType.unselected.name) }) ?? NonHumanAnimalType.unselected,
-                                        gender: Gender.entries.first(where: { $0.name == (nonHumanAnimalNsDictionary["gender"] as? String ?? Gender.unselected.name) }) ?? Gender.unselected
+                                        gender: Gender.entries.first(where: { $0.name == (nonHumanAnimalNsDictionary["gender"] as? String ?? Gender.unselected.name) }) ?? Gender.unselected,
+                                        adoptionState: AdoptionState.entries.first(where: { $0.name == (nonHumanAnimalNsDictionary["adoptionState"] as? String ?? AdoptionState.lookingForAdoption.name) }) ?? AdoptionState.lookingForAdoption,
+                                        fosterHomeId: nonHumanAnimalNsDictionary["fosterHomeId"] as? String ?? ""
                                     )
                                     remoteNonHumanAnimals.append(remoteNonHumanAnimal)
                                 }
@@ -82,7 +84,9 @@ class RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateImpl: Realtime
                                     description: nonHumanAnimalNsDictionary?["description"] as? String ?? "",
                                     imageUrl: nonHumanAnimalNsDictionary?["imageUrl"] as? String ?? "",
                                     nonHumanAnimalType: NonHumanAnimalType.entries.first(where: { $0.name == (nonHumanAnimalNsDictionary?["nonHumanAnimalType"] as? String ?? NonHumanAnimalType.unselected.name) }) ?? NonHumanAnimalType.unselected,
-                                    gender: Gender.entries.first(where: { $0.name == (nonHumanAnimalNsDictionary?["gender"] as? String ?? Gender.unselected.name) }) ?? Gender.unselected
+                                    gender: Gender.entries.first(where: { $0.name == (nonHumanAnimalNsDictionary?["gender"] as? String ?? Gender.unselected.name) }) ?? Gender.unselected,
+                                    adoptionState: AdoptionState.entries.first(where: { $0.name == (nonHumanAnimalNsDictionary?["adoptionState"] as? String ?? AdoptionState.lookingForAdoption.name) }) ?? AdoptionState.lookingForAdoption,
+                                    fosterHomeId: nonHumanAnimalNsDictionary?["fosterHomeId"] as? String ?? ""
                                 )
                                 realtimeDatabaseRemoteNonHumanAnimalFlowsRepositoryForIosDelegate.updateRemoteNonHumanAnimalListFlow(delegate: [remoteNonHumanAnimal])
                                 
@@ -115,7 +119,9 @@ class RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateImpl: Realtime
             "description": remoteNonHumanAnimal.description_!,
             "imageUrl": remoteNonHumanAnimal.imageUrl!,
             "nonHumanAnimalType": remoteNonHumanAnimal.nonHumanAnimalType!.name,
-            "gender": remoteNonHumanAnimal.gender!.name
+            "gender": remoteNonHumanAnimal.gender!.name,
+            "adoptionState": remoteNonHumanAnimal.adoptionState!.name,
+            "fosterHomeId": remoteNonHumanAnimal.fosterHomeId!
         ]
     }
     

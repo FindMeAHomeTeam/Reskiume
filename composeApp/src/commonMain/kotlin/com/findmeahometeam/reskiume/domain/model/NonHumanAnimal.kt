@@ -39,7 +39,9 @@ data class NonHumanAnimal(
     val description: String,
     val imageUrl: String,
     val nonHumanAnimalType: NonHumanAnimalType,
-    val gender: Gender
+    val gender: Gender,
+    val adoptionState: AdoptionState = AdoptionState.LOOKING_FOR_ADOPTION,
+    val fosterHomeId: String = ""
 ) {
 
     @OptIn(ExperimentalTime::class)
@@ -56,7 +58,9 @@ data class NonHumanAnimal(
             description = description,
             imageUrl = imageUrl,
             nonHumanAnimalType = nonHumanAnimalType,
-            gender = gender
+            gender = gender,
+            adoptionState = adoptionState,
+            fosterHomeId = fosterHomeId
         )
     }
 
@@ -69,7 +73,9 @@ data class NonHumanAnimal(
             description = description,
             imageUrl = imageUrl,
             nonHumanAnimalType = nonHumanAnimalType,
-            gender = gender
+            gender = gender,
+            adoptionState = adoptionState,
+            fosterHomeId = fosterHomeId
         )
     }
 }
@@ -101,6 +107,10 @@ enum class NonHumanAnimalType {
 
 enum class Gender {
     UNSELECTED, FEMALE, MALE
+}
+
+enum class AdoptionState {
+    LOOKING_FOR_ADOPTION, REHOMED, ADOPTED
 }
 
 fun AgeCategory.toStringResource(): StringResource {

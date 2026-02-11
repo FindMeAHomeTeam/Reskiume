@@ -11,6 +11,7 @@ import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDa
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlin.time.Clock
@@ -48,12 +49,12 @@ class CheckAllMyFosterHomesUtilImpl(
                     ).firstOrNull()
 
                     if (localFosterHome == null) {
-                        insertFosterHomeInLocalRepository(
+                        insertFosterHomeInLocalRepo(
                             fosterHomeWithLocalImage,
                             myUid
                         )
                     } else {
-                        modifyFosterHomeInLocalRepository(
+                        modifyFosterHomeInLocalRepo(
                             fosterHomeWithLocalImage,
                             myUid
                         )
@@ -69,12 +70,12 @@ class CheckAllMyFosterHomesUtilImpl(
                     ).firstOrNull()
 
                     if (localFosterHome == null) {
-                        insertFosterHomeInLocalRepository(
+                        insertFosterHomeInLocalRepo(
                             fosterHome,
                             myUid
                         )
                     } else {
-                        modifyFosterHomeInLocalRepository(
+                        modifyFosterHomeInLocalRepo(
                             fosterHome,
                             myUid
                         )
@@ -85,7 +86,7 @@ class CheckAllMyFosterHomesUtilImpl(
         }
 
     @OptIn(ExperimentalTime::class)
-    private suspend fun insertFosterHomeInLocalRepository(
+    private suspend fun insertFosterHomeInLocalRepo(
         fosterHome: FosterHome,
         myUid: String
     ) {
@@ -127,19 +128,24 @@ class CheckAllMyFosterHomesUtilImpl(
     }
 
     @OptIn(ExperimentalTime::class)
-    private suspend fun modifyFosterHomeInLocalRepository(
-        fosterHome: FosterHome,
+    private suspend fun modifyFosterHomeInLocalRepo(
+        updatedFosterHome: FosterHome,
         myUid: String
     ) {
-        modifyFosterHomeInLocalRepository(fosterHome) { isSuccess ->
+        val previousFosterHome = getFosterHomeFromLocalRepository(updatedFosterHome.id).first()!!
+
+        modifyFosterHomeInLocalRepository(
+            updatedFosterHome,
+            previousFosterHome
+        ) { isSuccess ->
             if (isSuccess) {
                 log.d(
                     "CheckAllMyFosterHomesUtilImpl",
-                    "Foster home ${fosterHome.id} modified in local database"
+                    "Foster home ${updatedFosterHome.id} modified in local database"
                 )
                 modifyCacheInLocalRepository(
                     LocalCache(
-                        cachedObjectId = fosterHome.id,
+                        cachedObjectId = updatedFosterHome.id,
                         savedBy = myUid,
                         section = Section.FOSTER_HOMES,
                         timestamp = Clock.System.now().epochSeconds
@@ -149,19 +155,19 @@ class CheckAllMyFosterHomesUtilImpl(
                     if (rowsUpdated > 0) {
                         log.d(
                             "CheckAllMyFosterHomesUtilImpl",
-                            "${fosterHome.id} updated in local cache in section ${Section.FOSTER_HOMES}"
+                            "${updatedFosterHome.id} updated in local cache in section ${Section.FOSTER_HOMES}"
                         )
                     } else {
                         log.e(
                             "CheckAllMyFosterHomesUtilImpl",
-                            "Error updating ${fosterHome.id} in local cache in section ${Section.FOSTER_HOMES}"
+                            "Error updating ${updatedFosterHome.id} in local cache in section ${Section.FOSTER_HOMES}"
                         )
                     }
                 }
             } else {
                 log.e(
                     "CheckAllMyFosterHomesUtilImpl",
-                    "Error modifying the foster home ${fosterHome.id} in local database"
+                    "Error modifying the foster home ${updatedFosterHome.id} in local database"
                 )
             }
         }
@@ -184,7 +190,7 @@ class CheckAllMyFosterHomesUtilImpl(
                     val fosterHomeWithLocalImage =
                         fosterHome.copy(imageUrl = localImagePath.ifBlank { fosterHome.imageUrl })
 
-                    modifyFosterHomeInLocalRepository(
+                    modifyFosterHomeInLocalRepo(
                         fosterHomeWithLocalImage,
                         myUid
                     )
@@ -194,7 +200,7 @@ class CheckAllMyFosterHomesUtilImpl(
                         "CheckAllMyFosterHomesUtilImpl",
                         "Foster home ${fosterHome.id} has no avatar image to save locally."
                     )
-                    modifyFosterHomeInLocalRepository(
+                    modifyFosterHomeInLocalRepo(
                         fosterHome,
                         myUid
                     )

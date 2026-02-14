@@ -9,6 +9,7 @@ import com.findmeahometeam.reskiume.domain.model.LocalCache
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetNonHumanAnimalFromLocalRepository
@@ -16,6 +17,7 @@ import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetNonHumanAn
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.ModifyNonHumanAnimalInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.ModifyNonHumanAnimalInRemoteRepository
 import com.findmeahometeam.reskiume.ui.core.components.UiState
+import com.findmeahometeam.reskiume.ui.core.components.toUiState
 import com.findmeahometeam.reskiume.ui.core.navigation.ModifyNonHumanAnimal
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
@@ -23,6 +25,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -30,6 +33,7 @@ import kotlin.time.ExperimentalTime
 class ModifyNonHumanAnimalViewmodel(
     saveStateHandleProvider: SaveStateHandleProvider,
     checkNonHumanAnimalUtil: CheckNonHumanAnimalUtil,
+    private val getImagePathForFileNameFromLocalDataSource: GetImagePathForFileNameFromLocalDataSource,
     private val deleteNonHumanAnimalUtil: DeleteNonHumanAnimalUtil,
     private val getNonHumanAnimalFromRemoteRepository: GetNonHumanAnimalFromRemoteRepository,
     private val deleteImageFromRemoteDataSource: DeleteImageFromRemoteDataSource,
@@ -52,7 +56,15 @@ class ModifyNonHumanAnimalViewmodel(
         checkNonHumanAnimalUtil.getNonHumanAnimalFlow(
             nonHumanAnimalId,
             caregiverId
-        )
+        ).map {
+            it.copy(
+                imageUrl = if (it.imageUrl.isEmpty()) {
+                    it.imageUrl
+                } else {
+                    getImagePathForFileNameFromLocalDataSource(it.imageUrl)
+                }
+            )
+        }.toUiState()
 
     private val _manageChangesUiState: MutableStateFlow<UiState<Unit>> =
         MutableStateFlow(UiState.Idle())

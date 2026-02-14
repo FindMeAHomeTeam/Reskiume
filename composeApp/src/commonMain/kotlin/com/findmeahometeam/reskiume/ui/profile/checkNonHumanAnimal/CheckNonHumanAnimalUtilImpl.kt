@@ -6,19 +6,18 @@ import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.image.GetCompleteImagePathFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteCacheFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetNonHumanAnimalFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetNonHumanAnimalFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.InsertNonHumanAnimalInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.ModifyNonHumanAnimalInLocalRepository
-import com.findmeahometeam.reskiume.ui.core.components.UiState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 
 class CheckNonHumanAnimalUtilImpl(
     private val observeAuthStateInAuthDataSource: ObserveAuthStateInAuthDataSource,
@@ -29,7 +28,6 @@ class CheckNonHumanAnimalUtilImpl(
     private val insertNonHumanAnimalInLocalRepository: InsertNonHumanAnimalInLocalRepository,
     private val modifyNonHumanAnimalInLocalRepository: ModifyNonHumanAnimalInLocalRepository,
     private val getNonHumanAnimalFromLocalRepository: GetNonHumanAnimalFromLocalRepository,
-    private val getCompleteImagePathFromLocalDataSource: GetCompleteImagePathFromLocalDataSource,
     private val log: Log
 ) : CheckNonHumanAnimalUtil {
 
@@ -37,10 +35,10 @@ class CheckNonHumanAnimalUtilImpl(
     override fun getNonHumanAnimalFlow(
         nonHumanAnimalId: String,
         caregiverId: String
-    ): Flow<UiState<NonHumanAnimal>> =
+    ): Flow<NonHumanAnimal> =
         observeAuthStateInAuthDataSource().flatMapConcat { authUser: AuthUser? ->
 
-            getDataByManagingObjectLocalCacheTimestamp<Flow<UiState<NonHumanAnimal>>>(
+            getDataByManagingObjectLocalCacheTimestamp(
                 cachedObjectId = nonHumanAnimalId,
                 savedBy = authUser?.uid ?: "",
                 section = Section.NON_HUMAN_ANIMALS,
@@ -49,13 +47,11 @@ class CheckNonHumanAnimalUtilImpl(
                         nonHumanAnimalId,
                         caregiverId
                     ).downloadImageAndInsertNonHumanAnimalInLocalRepository()
-                        .map {
+                        .mapNotNull {
                             if (it == null) {
                                 deleteNonHumanAnimalCacheFromLocalDataSource(nonHumanAnimalId)
-                                UiState.Error()
-                            } else {
-                                UiState.Success(it)
                             }
+                            it
                         }
                 },
                 onCompletionUpdateCache = {
@@ -63,13 +59,11 @@ class CheckNonHumanAnimalUtilImpl(
                         nonHumanAnimalId,
                         caregiverId
                     ).downloadImageAndModifyNonHumanAnimalInLocalRepository()
-                        .map {
+                        .mapNotNull {
                             if (it == null) {
                                 deleteNonHumanAnimalCacheFromLocalDataSource(nonHumanAnimalId)
-                                UiState.Error()
-                            } else {
-                                UiState.Success(it)
                             }
+                            it
                         }
                 },
                 onVerifyCacheIsRecent = {
@@ -78,26 +72,12 @@ class CheckNonHumanAnimalUtilImpl(
                     )
                     if (nonHumanAnimal == null) {
                         deleteNonHumanAnimalCacheFromLocalDataSource(nonHumanAnimalId)
-                        flowOf(UiState.Error())
+                        flowOf()
                     } else {
-                        flowOf(UiState.Success(nonHumanAnimal))
+                        flowOf(nonHumanAnimal)
                     }
                 }
-            ).map {
-                if (it is UiState.Success) {
-                    UiState.Success(
-                        it.data.copy(
-                            imageUrl = if (it.data.imageUrl.isEmpty()) {
-                                it.data.imageUrl
-                            } else {
-                                getCompleteImagePathFromLocalDataSource(it.data.imageUrl)
-                            }
-                        )
-                    )
-                } else {
-                    it
-                }
-            }
+            )
         }
 
     private fun Flow<NonHumanAnimal?>.downloadImageAndInsertNonHumanAnimalInLocalRepository(): Flow<NonHumanAnimal?> =

@@ -260,13 +260,13 @@ class ModifyAccountViewmodel(
             if (rowsModified > 0) {
                 log.d(
                     "ModifyAccountViewmodel",
-                    "saveUserChangesInLocalDataSource: User updated successfully in local data source"
+                    "saveUserChangesInLocalDataSource: User ${user.uid} updated successfully in the local data source"
                 )
                 _uiState.value = UiState.Success(Unit)
             } else {
                 log.e(
                     "ModifyAccountViewmodel",
-                    "saveUserChangesInLocalDataSource: failed to update user in local data source"
+                    "saveUserChangesInLocalDataSource: failed to update user ${user.uid} in the local data source"
                 )
                 _uiState.value = UiState.Error()
             }

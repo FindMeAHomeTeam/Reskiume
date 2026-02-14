@@ -4,18 +4,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.findmeahometeam.reskiume.data.remote.response.AuthResult
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
-import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.data.util.Section
+import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.LocalCache
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.usecases.authUser.CreateUserWithEmailAndPasswordInAuthDataSource
-import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.DeleteUserFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.user.DeleteUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInRemoteDataSource
-import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
-import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -157,7 +157,7 @@ class CreateAccountViewmodel(
                 if (rowId > 0) {
                     log.d(
                         "CreateAccountViewmodel",
-                        "User created successfully"
+                        "User ${user.uid} created successfully"
                     )
                     saveUserCacheLocally(user.uid)
                 } else {

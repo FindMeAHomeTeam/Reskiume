@@ -9,6 +9,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QueryDocumentSnapshot
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 
@@ -117,74 +118,68 @@ class FireStoreRemoteFosterHomeRepositoryAndroidImpl(
         id: String,
         ownerId: String
     ): Flow<RemoteFosterHome?> = flow {
-        try {
-            val querySnapshot = firebaseFirestore
-                .collection(Section.FOSTER_HOMES.path)
-                .document(id)
-                .get()
-                .await()
+        val querySnapshot = firebaseFirestore
+            .collection(Section.FOSTER_HOMES.path)
+            .document(id)
+            .get()
+            .await()
 
-            val result: RemoteFosterHome? = querySnapshot.toObject(RemoteFosterHome::class.java)
-            emit(result)
+        val result: RemoteFosterHome? = querySnapshot.toObject(RemoteFosterHome::class.java)
+        emit(result)
 
-        } catch (e: Exception) {
-            log.e(
-                "FireStoreRemoteFosterHomeRepositoryImpl",
-                "getRemoteFosterHome: Error retrieving the remote foster home $id from the owner $ownerId: ${e.message}"
-            )
-            emit(null)
-        }
+    }.catch { e ->
+        log.e(
+            "FireStoreRemoteFosterHomeRepositoryImpl",
+            "getRemoteFosterHome: Error retrieving the remote foster home $id from the owner $ownerId: ${e.message}"
+        )
+        emit(null)
     }
 
     override fun getAllMyRemoteFosterHomes(ownerId: String): Flow<List<RemoteFosterHome?>> = flow {
-        try {
-            val querySnapshot = firebaseFirestore
-                .collection(Section.FOSTER_HOMES.path)
-                .whereEqualTo("ownerId", ownerId)
-                .get()
-                .await()
+        val querySnapshot = firebaseFirestore
+            .collection(Section.FOSTER_HOMES.path)
+            .whereEqualTo("ownerId", ownerId)
+            .get()
+            .await()
 
-            val result: List<RemoteFosterHome?> =
-                querySnapshot.documents.map { documentSnapshot: DocumentSnapshot ->
-                    documentSnapshot.toObject(RemoteFosterHome::class.java)
-                }
-            emit(result)
+        val result: List<RemoteFosterHome?> =
+            querySnapshot.documents.map { documentSnapshot: DocumentSnapshot ->
+                documentSnapshot.toObject(RemoteFosterHome::class.java)
+            }
+        emit(result)
 
-        } catch (e: Exception) {
-            log.e(
-                "FireStoreRemoteFosterHomeRepositoryImpl",
-                "getAllMyRemoteFosterHomes: Error retrieving all remote foster homes from the owner $ownerId: ${e.message}"
-            )
-            emit(emptyList())
-        }
+    }.catch { e ->
+        log.e(
+            "FireStoreRemoteFosterHomeRepositoryImpl",
+            "getAllMyRemoteFosterHomes: Error retrieving all remote foster homes from the owner $ownerId: ${e.message}"
+        )
+        emit(emptyList())
     }
 
     override fun getAllRemoteFosterHomesByCountryAndCity(
         country: String,
         city: String
     ): Flow<List<RemoteFosterHome?>> = flow {
-        try {
-            val querySnapshot = firebaseFirestore
-                .collection(Section.FOSTER_HOMES.path)
-                .whereEqualTo("country", country)
-                .whereEqualTo("city", city)
-                .whereEqualTo("available", true)
-                .get()
-                .await()
+        val querySnapshot = firebaseFirestore
+            .collection(Section.FOSTER_HOMES.path)
+            .whereEqualTo("country", country)
+            .whereEqualTo("city", city)
+            .whereEqualTo("available", true)
+            .get()
+            .await()
 
-            val result: List<RemoteFosterHome?> =
-                querySnapshot.documents.map { documentSnapshot: DocumentSnapshot ->
-                    documentSnapshot.toObject(RemoteFosterHome::class.java)
-                }
-            emit(result)
+        val result: List<RemoteFosterHome?> =
+            querySnapshot.documents.map { documentSnapshot: DocumentSnapshot ->
+                documentSnapshot.toObject(RemoteFosterHome::class.java)
+            }
+        emit(result)
 
-        } catch (e: Exception) {
-            log.e(
-                "FireStoreRemoteFosterHomeRepositoryImpl",
-                "getAllRemoteFosterHomesByCountryAndCity: Error retrieving all remote foster homes by country and city ($country, $city): ${e.message}"
-            )
-            emit(emptyList())
-        }
+    }.catch { e ->
+        log.e(
+            "FireStoreRemoteFosterHomeRepositoryImpl",
+            "getAllRemoteFosterHomesByCountryAndCity: Error retrieving all remote foster homes by country and city ($country, $city): ${e.message}"
+        )
+        emit(emptyList())
     }
 
     override fun getAllRemoteFosterHomesByLocation(
@@ -193,29 +188,27 @@ class FireStoreRemoteFosterHomeRepositoryAndroidImpl(
         rangeLongitude: Double,
         rangeLatitude: Double
     ): Flow<List<RemoteFosterHome?>> = flow {
-        try {
-            val querySnapshot = firebaseFirestore
-                .collection(Section.FOSTER_HOMES.path)
-                .whereGreaterThanOrEqualTo("longitude", activistLongitude - rangeLongitude)
-                .whereLessThanOrEqualTo("longitude", activistLongitude + rangeLongitude)
-                .whereGreaterThanOrEqualTo("latitude", activistLatitude - rangeLatitude)
-                .whereLessThanOrEqualTo("latitude", activistLatitude + rangeLatitude)
-                .whereEqualTo("available", true)
-                .get()
-                .await()
+        val querySnapshot = firebaseFirestore
+            .collection(Section.FOSTER_HOMES.path)
+            .whereGreaterThanOrEqualTo("longitude", activistLongitude - rangeLongitude)
+            .whereLessThanOrEqualTo("longitude", activistLongitude + rangeLongitude)
+            .whereGreaterThanOrEqualTo("latitude", activistLatitude - rangeLatitude)
+            .whereLessThanOrEqualTo("latitude", activistLatitude + rangeLatitude)
+            .whereEqualTo("available", true)
+            .get()
+            .await()
 
-            val result: List<RemoteFosterHome?> =
-                querySnapshot.documents.map { documentSnapshot: DocumentSnapshot ->
-                    documentSnapshot.toObject(RemoteFosterHome::class.java)
-                }
-            emit(result)
+        val result: List<RemoteFosterHome?> =
+            querySnapshot.documents.map { documentSnapshot: DocumentSnapshot ->
+                documentSnapshot.toObject(RemoteFosterHome::class.java)
+            }
+        emit(result)
 
-        } catch (e: Exception) {
-            log.e(
-                "FireStoreRemoteFosterHomeRepositoryImpl",
-                "getAllRemoteFosterHomesByCountryAndCity: Error retrieving all remote foster homes by location: ${e.message}"
-            )
-            emit(emptyList())
-        }
+    }.catch { e ->
+        log.e(
+            "FireStoreRemoteFosterHomeRepositoryImpl",
+            "getAllRemoteFosterHomesByCountryAndCity: Error retrieving all remote foster homes by location: ${e.message}"
+        )
+        emit(emptyList())
     }
 }

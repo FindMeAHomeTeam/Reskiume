@@ -69,8 +69,8 @@ class StorageRepositoryForIosDelegateImpl: StorageRepository {
         
         let fileName: String = switch section {
         case Section.users: "\(userUid).webp"
-        case Section.nonHumanAnimals: "\(userUid)\(extraId).webp"
-        case Section.fosterHomes: "\(userUid)\(extraId).webp"
+        case Section.nonHumanAnimals: "\(extraId).webp"
+        case Section.fosterHomes: "\(extraId).webp"
         default: "\(userUid).webp"
         }
         if let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {

@@ -21,22 +21,19 @@ class StorageRepositoryAndroidImpl(
         uid: String,
         extraId: String = ""
     ): StorageReference {
-        return when {
-            section == Section.USERS -> storageRef
+        return when (section) {
+            Section.USERS -> storageRef
                 .child(Section.USERS.path)
                 .child(uid)
                 .child("$uid.webp")
-
-            section == Section.NON_HUMAN_ANIMALS -> storageRef
+            Section.NON_HUMAN_ANIMALS -> storageRef
                 .child(Section.NON_HUMAN_ANIMALS.path)
                 .child(uid)
                 .child("$extraId.webp")
-
-            section == Section.FOSTER_HOMES -> storageRef
+            Section.FOSTER_HOMES -> storageRef
                 .child(Section.FOSTER_HOMES.path)
                 .child(uid)
                 .child("$extraId.webp")
-
             else -> storageRef
                 .child(Section.USERS.path)
                 .child(uid)
@@ -76,10 +73,10 @@ class StorageRepositoryAndroidImpl(
         onImageSaved: (imagePath: String) -> Unit
     ) {
         val imageRef: StorageReference = getStorageReference(section, userUid, extraId)
-        val localFile = when {
-            section == Section.USERS -> File(context.filesDir, "$userUid.webp")
-            section == Section.NON_HUMAN_ANIMALS -> File(context.filesDir, "$userUid$extraId.webp")
-            section == Section.FOSTER_HOMES -> File(context.filesDir, "$userUid$extraId.webp")
+        val localFile = when (section) {
+            Section.USERS -> File(context.filesDir, "$userUid.webp")
+            Section.NON_HUMAN_ANIMALS -> File(context.filesDir, "$extraId.webp")
+            Section.FOSTER_HOMES -> File(context.filesDir, "$extraId.webp")
             else -> File(context.filesDir, "$userUid.webp")
         }
 

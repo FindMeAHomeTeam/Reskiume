@@ -5,10 +5,8 @@ import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.AdoptionState
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteFosterHome.FireStoreRemoteFosterHomeRepository
-import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.map
 
 class DeleteFosterHomeFromRemoteRepository(
     private val fireStoreRemoteFosterHomeRepository: FireStoreRemoteFosterHomeRepository,
@@ -49,14 +47,7 @@ class DeleteFosterHomeFromRemoteRepository(
                         checkNonHumanAnimalUtil.getNonHumanAnimalFlow(
                             nonHumanAnimalId = nonHumanAnimalId,
                             caregiverId = caregiverId
-                        ).map { uiState ->
-
-                            if (uiState is UiState.Success) {
-                                uiState.data
-                            } else {
-                                null
-                            }
-                        }.firstOrNull()
+                        ).firstOrNull()
                     }
                 )
                 realtimeDatabaseRemoteNonHumanAnimalRepository.modifyRemoteNonHumanAnimal(

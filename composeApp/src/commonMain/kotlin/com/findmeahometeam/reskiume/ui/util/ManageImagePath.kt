@@ -1,5 +1,7 @@
 package com.findmeahometeam.reskiume.ui.util
 
 interface ManageImagePath {
-    fun getCompleteImagePath(imagePath: String): String
+    fun getImagePathForFileName(fileName: String): String
+
+    fun getFileNameFromLocalImagePath(localImagePath: String): String
 }

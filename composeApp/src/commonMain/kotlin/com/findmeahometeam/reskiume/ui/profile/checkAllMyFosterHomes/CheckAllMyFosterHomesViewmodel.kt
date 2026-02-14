@@ -5,7 +5,7 @@ import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllMyFosterHomesFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllMyFosterHomesFromRemoteRepository
-import com.findmeahometeam.reskiume.domain.usecases.image.GetCompleteImagePathFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.components.toUiState
@@ -23,7 +23,7 @@ class CheckAllMyFosterHomesViewmodel(
     private val getAllMyFosterHomesFromRemoteRepository: GetAllMyFosterHomesFromRemoteRepository,
     private val checkAllMyFosterHomesUtil: CheckAllMyFosterHomesUtil,
     private val getAllMyFosterHomesFromLocalRepository: GetAllMyFosterHomesFromLocalRepository,
-    private val getCompleteImagePathFromLocalDataSource: GetCompleteImagePathFromLocalDataSource
+    private val getImagePathForFileNameFromLocalDataSource: GetImagePathForFileNameFromLocalDataSource
 ) : ViewModel() {
 
     private val myUid =
@@ -65,7 +65,7 @@ class CheckAllMyFosterHomesViewmodel(
                             imageUrl = if (fosterHome.imageUrl.isEmpty()) {
                                 fosterHome.imageUrl
                             } else {
-                                getCompleteImagePathFromLocalDataSource(fosterHome.imageUrl)
+                                getImagePathForFileNameFromLocalDataSource(fosterHome.imageUrl)
                             }
                         )
                     }.sortedBy { fosterHome -> fosterHome.available }

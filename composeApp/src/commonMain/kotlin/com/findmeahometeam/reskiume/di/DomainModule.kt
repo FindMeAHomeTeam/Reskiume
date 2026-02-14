@@ -34,7 +34,7 @@ import com.findmeahometeam.reskiume.domain.usecases.fosterHome.InsertFosterHomeI
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.InsertFosterHomeInRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.ModifyFosterHomeInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.ModifyFosterHomeInRemoteRepository
-import com.findmeahometeam.reskiume.domain.usecases.image.GetCompleteImagePathFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteAllCacheFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteCacheFromLocalRepository
@@ -104,7 +104,7 @@ val domainModule = module {
     factoryOf(::DeleteImageFromRemoteDataSource)
     factoryOf(::DownloadImageToLocalDataSource)
     factoryOf(::UploadImageToRemoteDataSource)
-    factoryOf(::GetCompleteImagePathFromLocalDataSource)
+    factoryOf(::GetImagePathForFileNameFromLocalDataSource)
 
     // localCache
     factoryOf(::InsertCacheInLocalRepository)

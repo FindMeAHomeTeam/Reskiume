@@ -9,7 +9,7 @@ import com.findmeahometeam.reskiume.domain.model.LocalCache
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.image.GetCompleteImagePathFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
@@ -41,7 +41,7 @@ class CheckAllNonHumanAnimalsViewmodel(
     private val modifyNonHumanAnimalInLocalRepository: ModifyNonHumanAnimalInLocalRepository,
     private val modifyCacheInLocalRepository: ModifyCacheInLocalRepository,
     private val getAllNonHumanAnimalsFromLocalRepository: GetAllNonHumanAnimalsFromLocalRepository,
-    private val getCompleteImagePathFromLocalDataSource: GetCompleteImagePathFromLocalDataSource,
+    private val getImagePathForFileNameFromLocalDataSource: GetImagePathForFileNameFromLocalDataSource,
     private val log: Log
 ) : ViewModel() {
 
@@ -71,7 +71,7 @@ class CheckAllNonHumanAnimalsViewmodel(
                             imageUrl = if (nonHumanAnimal.imageUrl.isEmpty()) {
                                 nonHumanAnimal.imageUrl
                             } else {
-                                getCompleteImagePathFromLocalDataSource(nonHumanAnimal.imageUrl)
+                                getImagePathForFileNameFromLocalDataSource(nonHumanAnimal.imageUrl)
                             }
                         )
                     }

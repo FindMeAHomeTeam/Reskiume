@@ -8,7 +8,7 @@ import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
-import com.findmeahometeam.reskiume.domain.usecases.image.GetCompleteImagePathFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeAuthRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalUserRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLog
@@ -28,8 +28,8 @@ class ProfileViewmodelIntegrationTest : CoroutineTestDispatcher() {
 
     private val manageImagePath: ManageImagePath = FakeManageImagePath()
 
-    private val getCompleteImagePathFromLocalDataSource =
-        GetCompleteImagePathFromLocalDataSource(manageImagePath)
+    private val getImagePathForFileNameFromLocalDataSource =
+        GetImagePathForFileNameFromLocalDataSource(manageImagePath)
 
     private fun getProfileViewmodel(
         authRepository: AuthRepository = FakeAuthRepository(),
@@ -40,7 +40,7 @@ class ProfileViewmodelIntegrationTest : CoroutineTestDispatcher() {
         return ProfileViewmodel(
             observeAuthStateInAuthDataSource,
             getUserFromLocalDataSource,
-            getCompleteImagePathFromLocalDataSource,
+            getImagePathForFileNameFromLocalDataSource,
             log
         )
     }

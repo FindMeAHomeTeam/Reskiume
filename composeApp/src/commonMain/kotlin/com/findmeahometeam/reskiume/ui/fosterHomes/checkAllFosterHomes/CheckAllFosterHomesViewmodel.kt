@@ -12,7 +12,7 @@ import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllFosterHomes
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllFosterHomesByCountryAndCityFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllFosterHomesByLocationFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllFosterHomesByLocationFromRemoteRepository
-import com.findmeahometeam.reskiume.domain.usecases.image.GetCompleteImagePathFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.domain.usecases.util.location.GetLocationFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.ObserveIfLocationEnabledFromLocationRepository
@@ -58,7 +58,7 @@ class CheckAllFosterHomesViewmodel(
     private val getAllFosterHomesByCountryAndCityFromRemoteRepository: GetAllFosterHomesByCountryAndCityFromRemoteRepository,
     private val checkAllMyFosterHomesUtil: CheckAllMyFosterHomesUtil,
     private val getAllFosterHomesByCountryAndCityFromLocalRepository: GetAllFosterHomesByCountryAndCityFromLocalRepository,
-    private val getCompleteImagePathFromLocalDataSource: GetCompleteImagePathFromLocalDataSource,
+    private val getImagePathForFileNameFromLocalDataSource: GetImagePathForFileNameFromLocalDataSource,
     private val getAllFosterHomesByLocationFromRemoteRepository: GetAllFosterHomesByLocationFromRemoteRepository,
     private val getAllFosterHomesByLocationFromLocalRepository: GetAllFosterHomesByLocationFromLocalRepository,
     private val observeIfLocationEnabledFromLocationRepository: ObserveIfLocationEnabledFromLocationRepository,
@@ -247,7 +247,7 @@ class CheckAllFosterHomesViewmodel(
                                     imageUrl = if (fosterHome.imageUrl.isEmpty()) {
                                         fosterHome.imageUrl
                                     } else {
-                                        getCompleteImagePathFromLocalDataSource(fosterHome.imageUrl)
+                                        getImagePathForFileNameFromLocalDataSource(fosterHome.imageUrl)
                                     }
                                 )
                             )
@@ -316,7 +316,7 @@ class CheckAllFosterHomesViewmodel(
                                     imageUrl = if (fosterHome.imageUrl.isEmpty()) {
                                         fosterHome.imageUrl
                                     } else {
-                                        getCompleteImagePathFromLocalDataSource(fosterHome.imageUrl)
+                                        getImagePathForFileNameFromLocalDataSource(fosterHome.imageUrl)
                                     }
                                 ),
                                 distance = calculateDistanceHaversineKm(

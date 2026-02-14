@@ -15,7 +15,7 @@ import com.findmeahometeam.reskiume.domain.usecases.fosterHome.ModifyFosterHomeI
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.ModifyFosterHomeInRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
-import com.findmeahometeam.reskiume.domain.usecases.image.GetCompleteImagePathFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromLocalRepository
@@ -37,7 +37,7 @@ import kotlin.time.ExperimentalTime
 class ModifyFosterHomeViewmodel(
     saveStateHandleProvider: SaveStateHandleProvider,
     private val getFosterHomeFromLocalRepository: GetFosterHomeFromLocalRepository,
-    private val getCompleteImagePathFromLocalDataSource: GetCompleteImagePathFromLocalDataSource,
+    private val getImagePathForFileNameFromLocalDataSource: GetImagePathForFileNameFromLocalDataSource,
     getAllNonHumanAnimalsFromLocalRepository: GetAllNonHumanAnimalsFromLocalRepository,
     private val getFosterHomeFromRemoteRepository: GetFosterHomeFromRemoteRepository,
     private val deleteImageFromRemoteDataSource: DeleteImageFromRemoteDataSource,
@@ -64,7 +64,7 @@ class ModifyFosterHomeViewmodel(
                 imageUrl = if (fosterHome.imageUrl.isEmpty()) {
                     fosterHome.imageUrl
                 } else {
-                    getCompleteImagePathFromLocalDataSource(fosterHome.imageUrl)
+                    getImagePathForFileNameFromLocalDataSource(fosterHome.imageUrl)
                 }
             )
         }.toUiState()

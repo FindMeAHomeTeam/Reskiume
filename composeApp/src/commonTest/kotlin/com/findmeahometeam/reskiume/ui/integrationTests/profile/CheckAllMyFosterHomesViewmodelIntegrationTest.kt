@@ -9,7 +9,7 @@ import com.findmeahometeam.reskiume.domain.repository.local.LocalFosterHomeRepos
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteFosterHome.FireStoreRemoteFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllMyFosterHomesFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllMyFosterHomesFromRemoteRepository
-import com.findmeahometeam.reskiume.domain.usecases.image.GetCompleteImagePathFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.fosterHome
 import com.findmeahometeam.reskiume.fosterHomeWithAllNonHumanAnimalData
@@ -59,8 +59,8 @@ class CheckAllMyFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() 
                 checkNonHumanAnimalUtil
             )
 
-        val getCompleteImagePathFromLocalDataSource =
-            GetCompleteImagePathFromLocalDataSource(manageImagePath)
+        val getImagePathForFileNameFromLocalDataSource =
+            GetImagePathForFileNameFromLocalDataSource(manageImagePath)
 
         val getAllMyFosterHomesFromLocalRepository =
             GetAllMyFosterHomesFromLocalRepository(
@@ -74,7 +74,7 @@ class CheckAllMyFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() 
             getAllMyFosterHomesFromRemoteRepository,
             checkAllMyFosterHomesUtil,
             getAllMyFosterHomesFromLocalRepository,
-            getCompleteImagePathFromLocalDataSource
+            getImagePathForFileNameFromLocalDataSource
         )
     }
 

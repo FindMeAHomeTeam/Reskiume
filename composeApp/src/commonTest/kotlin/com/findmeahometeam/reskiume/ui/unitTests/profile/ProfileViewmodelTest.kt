@@ -8,7 +8,7 @@ import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
-import com.findmeahometeam.reskiume.domain.usecases.image.GetCompleteImagePathFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
 import com.findmeahometeam.reskiume.ui.profile.ProfileViewmodel
 import com.findmeahometeam.reskiume.ui.profile.ProfileViewmodel.ProfileUiState
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
@@ -33,13 +33,13 @@ class ProfileViewmodelTest : CoroutineTestDispatcher() {
     }
 
     val manageImagePath: ManageImagePath = mock {
-        every { getCompleteImagePath(user.image) } returns user.image
+        every { getImagePathForFileName(user.image) } returns user.image
     }
 
     private val getUserFromLocalDataSource = GetUserFromLocalDataSource(localUserRepository)
 
-    private val getCompleteImagePathFromLocalDataSource =
-        GetCompleteImagePathFromLocalDataSource(manageImagePath)
+    private val getImagePathForFileNameFromLocalDataSource =
+        GetImagePathForFileNameFromLocalDataSource(manageImagePath)
 
     private val log: Log = mock {
         every { d(any(), any()) } returns Unit
@@ -51,7 +51,7 @@ class ProfileViewmodelTest : CoroutineTestDispatcher() {
         return ProfileViewmodel(
             observeAuthStateInAuthDataSource,
             getUserFromLocalDataSource,
-            getCompleteImagePathFromLocalDataSource,
+            getImagePathForFileNameFromLocalDataSource,
             log
         )
     }

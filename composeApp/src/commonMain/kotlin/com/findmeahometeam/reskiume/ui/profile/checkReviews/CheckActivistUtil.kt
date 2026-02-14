@@ -4,7 +4,7 @@ import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.image.GetCompleteImagePathFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
@@ -21,7 +21,7 @@ class CheckActivistUtil(
     private val downloadImageToLocalDataSource: DownloadImageToLocalDataSource,
     private val insertUserInLocalDataSource: InsertUserInLocalDataSource,
     private val modifyUserInLocalDataSource: ModifyUserInLocalDataSource,
-    private val getCompleteImagePathFromLocalDataSource: GetCompleteImagePathFromLocalDataSource,
+    private val getImagePathForFileNameFromLocalDataSource: GetImagePathForFileNameFromLocalDataSource,
     private val log: Log
 ) {
     suspend fun getUser(
@@ -51,7 +51,7 @@ class CheckActivistUtil(
             image = if (user.image.isBlank()) {
                 user.image
             } else {
-                getCompleteImagePathFromLocalDataSource(user.image)
+                getImagePathForFileNameFromLocalDataSource(user.image)
             }
         )
     }

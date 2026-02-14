@@ -8,9 +8,11 @@ import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
 import com.findmeahometeam.reskiume.domain.repository.local.LocalFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
+import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import kotlinx.coroutines.flow.firstOrNull
 
 class ModifyFosterHomeInLocalRepository(
+    private val manageImagePath: ManageImagePath,
     private val localFosterHomeRepository: LocalFosterHomeRepository,
     private val localNonHumanAnimalRepository: LocalNonHumanAnimalRepository,
     private val authRepository: AuthRepository,
@@ -21,14 +23,19 @@ class ModifyFosterHomeInLocalRepository(
         previousFosterHome: FosterHome,
         onModifyFosterHome: suspend (isUpdated: Boolean) -> Unit
     ) {
+        val imageFileName = manageImagePath.getFileNameFromLocalImagePath(updatedFosterHome.imageUrl)
+        val modifiedFosterHome = updatedFosterHome.copy(
+            savedBy = getMyUid(),
+            imageUrl = imageFileName
+        )
         localFosterHomeRepository.modifyFosterHome(
-            updatedFosterHome.copy(savedBy = getMyUid()).toEntity(),
+            modifiedFosterHome.toEntity(),
             onModifyFosterHome = { rowsUpdated ->
                 if (rowsUpdated > 0) {
-                    var isSuccess = manageAllAcceptedNonHumanAnimals(updatedFosterHome, previousFosterHome)
+                    var isSuccess = manageAllAcceptedNonHumanAnimals(modifiedFosterHome, previousFosterHome)
 
                     if (isSuccess) {
-                        isSuccess = manageAllResidentNonHumanAnimals(updatedFosterHome, previousFosterHome)
+                        isSuccess = manageAllResidentNonHumanAnimals(modifiedFosterHome, previousFosterHome)
                     }
                     onModifyFosterHome(isSuccess)
                 } else {

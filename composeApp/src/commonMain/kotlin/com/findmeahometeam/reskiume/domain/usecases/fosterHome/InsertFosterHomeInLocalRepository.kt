@@ -6,10 +6,12 @@ import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
 import com.findmeahometeam.reskiume.domain.repository.local.LocalFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
+import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import kotlinx.coroutines.flow.firstOrNull
 
 class InsertFosterHomeInLocalRepository(
     private val localFosterHomeRepository: LocalFosterHomeRepository,
+    private val manageImagePath: ManageImagePath,
     private val localNonHumanAnimalRepository: LocalNonHumanAnimalRepository,
     private val authRepository: AuthRepository,
     private val log: Log
@@ -18,14 +20,19 @@ class InsertFosterHomeInLocalRepository(
         fosterHome: FosterHome,
         onInsertFosterHome: suspend (isSuccess: Boolean) -> Unit
     ) {
+        val imageFileName = manageImagePath.getFileNameFromLocalImagePath(fosterHome.imageUrl)
+        val createdFosterHome = fosterHome.copy(
+            savedBy = getMyUid(),
+            imageUrl = imageFileName
+        )
         localFosterHomeRepository.insertFosterHome(
-            fosterHome.copy(savedBy = getMyUid()).toEntity(),
+            createdFosterHome.toEntity(),
             onInsertFosterHome = { rowId ->
                 if (rowId > 0) {
-                    var isSuccess = insertAllAcceptedNonHumanAnimals(fosterHome)
+                    var isSuccess = insertAllAcceptedNonHumanAnimals(createdFosterHome)
 
                     if (isSuccess) {
-                        isSuccess = insertAllResidentNonHumanAnimals(fosterHome)
+                        isSuccess = insertAllResidentNonHumanAnimals(createdFosterHome)
                     }
                     onInsertFosterHome(isSuccess)
                 } else {
@@ -64,10 +71,12 @@ class InsertFosterHomeInLocalRepository(
                         }
                     }
                 )
+                val imageFileName = manageImagePath.getFileNameFromLocalImagePath(residentNonHumanAnimalForFosterHome.residentNonHumanAnimal!!.imageUrl)
                 localNonHumanAnimalRepository.modifyNonHumanAnimal(
-                    residentNonHumanAnimalForFosterHome.residentNonHumanAnimal!!.copy(
+                    residentNonHumanAnimalForFosterHome.residentNonHumanAnimal.copy(
                         adoptionState = AdoptionState.REHOMED,
-                        fosterHomeId = fosterHome.id
+                        fosterHomeId = fosterHome.id,
+                        imageUrl = imageFileName
                     ).toEntity()
                 ) { rowsUpdated ->
                     if (rowsUpdated > 0) {

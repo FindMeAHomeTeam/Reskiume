@@ -5,9 +5,9 @@ import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalR
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class GetAllNonHumanAnimalsFromLocalRepository(private val localNonHumanAnimalRepository: LocalNonHumanAnimalRepository) {
-    operator fun invoke(): Flow<List<NonHumanAnimal>> =
-        localNonHumanAnimalRepository.getAllNonHumanAnimals()
+class GetAllMyNonHumanAnimalsFromLocalRepository(private val localNonHumanAnimalRepository: LocalNonHumanAnimalRepository) {
+    operator fun invoke(caregiverId: String): Flow<List<NonHumanAnimal>> =
+        localNonHumanAnimalRepository.getAllMyNonHumanAnimals(caregiverId)
             .map { list ->
                 list.map {
                     it.toDomain()

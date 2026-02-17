@@ -27,6 +27,9 @@ class LocalNonHumanAnimalRepositoryImpl(
     override suspend fun getNonHumanAnimal(id: String): NonHumanAnimalEntity? =
         reskiumeDatabase.getNonHumanAnimalDao().getNonHumanAnimal(id)
 
-    override fun getAllNonHumanAnimals(caregiverId: String): Flow<List<NonHumanAnimalEntity>> =
-        reskiumeDatabase.getNonHumanAnimalDao().getAllNonHumanAnimals(caregiverId)
+    override fun getAllMyNonHumanAnimals(caregiverId: String): Flow<List<NonHumanAnimalEntity>> =
+        reskiumeDatabase.getNonHumanAnimalDao().getAllMyNonHumanAnimals(caregiverId)
+
+    override fun getAllNonHumanAnimals(): Flow<List<NonHumanAnimalEntity>> =
+        reskiumeDatabase.getNonHumanAnimalDao().getAllNonHumanAnimals()
 }

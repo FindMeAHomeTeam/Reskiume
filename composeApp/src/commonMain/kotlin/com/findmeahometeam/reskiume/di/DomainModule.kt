@@ -45,6 +45,7 @@ import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.DeleteAllNonH
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.DeleteAllNonHumanAnimalsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.DeleteNonHumanAnimalFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.DeleteNonHumanAnimalFromRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllMyNonHumanAnimalsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetNonHumanAnimalFromLocalRepository
@@ -118,6 +119,7 @@ val domainModule = module {
     factoryOf(::DeleteAllNonHumanAnimalsFromRemoteRepository)
     factoryOf(::DeleteNonHumanAnimalFromLocalRepository)
     factoryOf(::DeleteNonHumanAnimalFromRemoteRepository)
+    factoryOf(::GetAllMyNonHumanAnimalsFromLocalRepository)
     factoryOf(::GetAllNonHumanAnimalsFromLocalRepository)
     factoryOf(::GetAllNonHumanAnimalsFromRemoteRepository)
     factoryOf(::GetNonHumanAnimalFromLocalRepository)

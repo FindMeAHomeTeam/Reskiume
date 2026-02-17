@@ -13,6 +13,8 @@ import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInA
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteAllCacheFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.DeleteAllNonHumanAnimalsFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.DeleteAllNonHumanAnimalsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.DeleteReviewsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.DeleteReviewsFromRemoteRepository
@@ -22,7 +24,6 @@ import com.findmeahometeam.reskiume.domain.usecases.user.DeleteUsersFromLocalDat
 import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.ui.core.components.UiState
-import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.DeleteNonHumanAnimalUtil
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,8 +33,9 @@ import kotlinx.coroutines.launch
 
 class DeleteAccountViewmodel(
     observeAuthStateInAuthDataSource: ObserveAuthStateInAuthDataSource,
-    private val deleteNonHumanAnimalUtil: DeleteNonHumanAnimalUtil,
     private val getAllNonHumanAnimalsFromRemoteRepository: GetAllNonHumanAnimalsFromRemoteRepository,
+    private val deleteAllNonHumanAnimalsFromRemoteRepository: DeleteAllNonHumanAnimalsFromRemoteRepository,
+    private val deleteAllNonHumanAnimalsFromLocalRepository: DeleteAllNonHumanAnimalsFromLocalRepository,
     private val getReviewsFromRemoteRepository: GetReviewsFromRemoteRepository,
     private val deleteReviewsFromRemoteRepository: DeleteReviewsFromRemoteRepository,
     private val deleteReviewsFromLocalRepository: DeleteReviewsFromLocalRepository,
@@ -92,24 +94,59 @@ class DeleteAccountViewmodel(
 
             if (allNonHumanAnimals.isEmpty()) {
                 onComplete()
-            }
+            } else {
 
-            allNonHumanAnimals.forEachIndexed { index: Int, nonHumanAnimal ->
+                deleteNonHumanAnimalsFromRemoteRepository(uid) {
 
-                deleteNonHumanAnimalUtil.deleteNonHumanAnimal(
-                    id = nonHumanAnimal.id,
-                    caregiverId = nonHumanAnimal.caregiverId,
-                    coroutineScope = viewModelScope,
-                    onError = {
-                        _state.value = UiState.Error()
-                    },
-                    onComplete = {
+                    deleteNonHumanAnimalsFromLocalRepository(uid) {
 
-                        if (index + 1 == allNonHumanAnimals.size) {
-                            onComplete()
-                        }
+                        onComplete()
                     }
-                )
+                }
+            }
+        }
+    }
+
+    private fun deleteNonHumanAnimalsFromRemoteRepository(uid: String, onSuccess: () -> Unit) {
+
+        viewModelScope.launch {
+
+            deleteAllNonHumanAnimalsFromRemoteRepository(uid) { databaseResult ->
+
+                if (databaseResult is DatabaseResult.Success) {
+                    log.d(
+                        "DeleteAccountViewmodel",
+                        "deleteNonHumanAnimalsFromRemoteRepository: deleted non human animals from caregiver $uid from remote repository"
+                    )
+                    onSuccess()
+                } else {
+                    log.e(
+                        "DeleteAccountViewmodel",
+                        "deleteNonHumanAnimalsFromRemoteRepository: failed to delete non human animals from caregiver $uid from remote repository: ${(databaseResult as DatabaseResult.Error).message}"
+                    )
+                }
+            }
+        }
+    }
+
+    private fun deleteNonHumanAnimalsFromLocalRepository(uid: String, onSuccess: () -> Unit) {
+
+        viewModelScope.launch {
+
+            deleteAllNonHumanAnimalsFromLocalRepository(uid) { rowsDeleted ->
+
+                if (rowsDeleted > 0) {
+                    log.d(
+                        "DeleteAccountViewmodel",
+                        "deleteNonHumanAnimalsFromLocalRepository: deleted $rowsDeleted non human animals from caregiver $uid from local repository"
+                    )
+                    onSuccess()
+                } else {
+                    log.e(
+                        "DeleteAccountViewmodel",
+                        "deleteNonHumanAnimalsFromLocalRepository: failed to delete non human animals from caregiver $uid from local repository"
+                    )
+                }
             }
         }
     }

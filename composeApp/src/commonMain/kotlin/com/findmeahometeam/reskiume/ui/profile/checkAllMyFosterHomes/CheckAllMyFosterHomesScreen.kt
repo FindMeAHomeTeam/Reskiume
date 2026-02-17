@@ -19,7 +19,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.components.RmButton
 import com.findmeahometeam.reskiume.ui.core.components.RmFosterHomeListItem
@@ -27,6 +26,7 @@ import com.findmeahometeam.reskiume.ui.core.components.RmResultState
 import com.findmeahometeam.reskiume.ui.core.components.RmScaffold
 import com.findmeahometeam.reskiume.ui.core.components.RmText
 import com.findmeahometeam.reskiume.ui.core.components.UiState
+import com.findmeahometeam.reskiume.ui.fosterHomes.checkAllFosterHomes.UiFosterHome
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import reskiume.composeapp.generated.resources.Res
@@ -38,13 +38,13 @@ import reskiume.composeapp.generated.resources.check_all_my_foster_homes_screen_
 fun CheckAllMyFosterHomesScreen(
     myUid: String,
     onBackPressed: () -> Unit,
-    onModifyFosterHome: (fosterHomeId: String, ownerId: String) -> Unit,
+    onModifyFosterHome: (fosterHomeId: String) -> Unit,
     onCreateFosterHome: (ownerId: String) -> Unit
 ) {
     val checkAllMyFosterHomesViewmodel: CheckAllMyFosterHomesViewmodel =
         koinViewModel<CheckAllMyFosterHomesViewmodel>()
 
-    val fosterHomeListState: UiState<List<FosterHome>> by checkAllMyFosterHomesViewmodel.fetchAllMyFosterHomes()
+    val uiFosterHomeListState: UiState<List<UiFosterHome>> by checkAllMyFosterHomesViewmodel.fetchAllMyFosterHomes()
         .collectAsState(initial = UiState.Loading())
 
     RmScaffold(
@@ -60,9 +60,9 @@ fun CheckAllMyFosterHomesScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            RmResultState(fosterHomeListState) { fosterHomeList: List<FosterHome> ->
+            RmResultState(uiFosterHomeListState) { uiFosterHomeList: List<UiFosterHome> ->
 
-                if (fosterHomeList.isEmpty()) {
+                if (uiFosterHomeList.isEmpty()) {
                     Spacer(modifier = Modifier.weight(1f))
                     RmText(
                         modifier = Modifier.fillMaxWidth(),
@@ -71,30 +71,28 @@ fun CheckAllMyFosterHomesScreen(
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Black
                     )
+                    Spacer(modifier = Modifier.weight(1f))
                 }
-                if (fosterHomeList.isNotEmpty()) {
+                if (uiFosterHomeList.isNotEmpty()) {
 
                     Spacer(modifier = Modifier.height(8.dp))
                     LazyColumn(modifier = Modifier.weight(1f)) {
                         items(
-                            items = fosterHomeList,
+                            items = uiFosterHomeList,
                             key = { it.hashCode() }
-                        ) { fosterHome ->
+                        ) { uiFosterHome ->
                             RmFosterHomeListItem(
                                 modifier = Modifier.animateItem(),
-                                title = fosterHome.title,
-                                imageUrl = fosterHome.imageUrl,
-                                allAcceptedNonHumanAnimals = fosterHome.allAcceptedNonHumanAnimals,
-                                allResidentNonHumanAnimalForFosterHome = fosterHome.allResidentNonHumanAnimals,
+                                title = uiFosterHome.fosterHome.title,
+                                imageUrl = uiFosterHome.fosterHome.imageUrl,
+                                allAcceptedNonHumanAnimals = uiFosterHome.fosterHome.allAcceptedNonHumanAnimals,
+                                allResidentNonHumanAnimals = uiFosterHome.uiAllResidentNonHumanAnimals,
                                 distance = null,
-                                city = fosterHome.city,
+                                city = uiFosterHome.fosterHome.city,
                                 onClick = {
-                                    onModifyFosterHome(
-                                        fosterHome.id,
-                                        fosterHome.ownerId
-                                    )
+                                    onModifyFosterHome(uiFosterHome.fosterHome.id)
                                 },
-                                isEnabled = fosterHome.available
+                                isEnabled = uiFosterHome.fosterHome.available
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                         }

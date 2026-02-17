@@ -29,6 +29,7 @@ class DeleteNonHumanAnimalUtil(
         id: String,
         caregiverId: String,
         coroutineScope: CoroutineScope,
+        onlyDeleteOnLocal: Boolean = false, // In case the user is not owner of the remote data
         onError: () -> Unit,
         onComplete: () -> Unit
     ) {
@@ -36,6 +37,7 @@ class DeleteNonHumanAnimalUtil(
             caregiverId,
             id,
             coroutineScope,
+            onlyDeleteOnLocal,
             onError
         ) {
             deleteCurrentImageFromLocalDataSource(
@@ -46,6 +48,8 @@ class DeleteNonHumanAnimalUtil(
                 deleteNonHumanAnimalFromRemoteDataSource(
                     id,
                     caregiverId,
+                    coroutineScope,
+                    onlyDeleteOnLocal,
                     onError
                 ) {
                     deleteNonHumanAnimalFromLocalDataSource(
@@ -68,9 +72,14 @@ class DeleteNonHumanAnimalUtil(
         caregiverId: String,
         nonHumanAnimalId: String,
         coroutineScope: CoroutineScope,
+        onlyDeleteOnLocal: Boolean,
         onError: () -> Unit,
         onSuccess: () -> Unit
     ) {
+        if (onlyDeleteOnLocal) {
+            onSuccess()
+            return
+        }
         coroutineScope.launch {
 
             getNonHumanAnimalFromRemoteRepository(
@@ -139,26 +148,35 @@ class DeleteNonHumanAnimalUtil(
     private fun deleteNonHumanAnimalFromRemoteDataSource(
         id: String,
         caregiverId: String,
+        coroutineScope: CoroutineScope,
+        onlyDeleteOnLocal: Boolean,
         onError: () -> Unit,
         onSuccess: () -> Unit
     ) {
-        deleteNonHumanAnimalFromRemoteRepository(
-            id,
-            caregiverId
-        ) { databaseResult: DatabaseResult ->
+        if (onlyDeleteOnLocal) {
+            onSuccess()
+            return
+        }
+        coroutineScope.launch {
 
-            if (databaseResult is DatabaseResult.Success) {
-                log.d(
-                    "DeleteNonHumanAnimalUtil",
-                    "deleteNonHumanAnimalFromRemoteDataSource: Non human animal $id deleted in the remote data source"
-                )
-                onSuccess()
-            } else {
-                log.e(
-                    "DeleteNonHumanAnimalUtil",
-                    "deleteNonHumanAnimalFromRemoteDataSource: Error deleting the non human animal $id in the remote data source"
-                )
-                onError()
+            deleteNonHumanAnimalFromRemoteRepository(
+                id,
+                caregiverId
+            ) { databaseResult: DatabaseResult ->
+
+                if (databaseResult is DatabaseResult.Success) {
+                    log.d(
+                        "DeleteNonHumanAnimalUtil",
+                        "deleteNonHumanAnimalFromRemoteDataSource: Non human animal $id deleted in the remote data source"
+                    )
+                    onSuccess()
+                } else {
+                    log.e(
+                        "DeleteNonHumanAnimalUtil",
+                        "deleteNonHumanAnimalFromRemoteDataSource: Error deleting the non human animal $id in the remote data source"
+                    )
+                    onError()
+                }
             }
         }
     }

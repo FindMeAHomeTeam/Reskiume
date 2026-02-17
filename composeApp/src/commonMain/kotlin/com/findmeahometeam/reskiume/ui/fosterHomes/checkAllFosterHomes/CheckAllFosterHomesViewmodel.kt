@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
 import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
@@ -22,12 +23,14 @@ import com.findmeahometeam.reskiume.ui.core.components.UiState.Error
 import com.findmeahometeam.reskiume.ui.core.components.UiState.Idle
 import com.findmeahometeam.reskiume.ui.core.components.toUiState
 import com.findmeahometeam.reskiume.ui.profile.checkAllMyFosterHomes.CheckAllMyFosterHomesUtil
+import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.util.StringProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -58,6 +61,7 @@ class CheckAllFosterHomesViewmodel(
     private val getAllFosterHomesByCountryAndCityFromRemoteRepository: GetAllFosterHomesByCountryAndCityFromRemoteRepository,
     private val checkAllMyFosterHomesUtil: CheckAllMyFosterHomesUtil,
     private val getAllFosterHomesByCountryAndCityFromLocalRepository: GetAllFosterHomesByCountryAndCityFromLocalRepository,
+    private val checkNonHumanAnimalUtil: CheckNonHumanAnimalUtil,
     private val getImagePathForFileNameFromLocalDataSource: GetImagePathForFileNameFromLocalDataSource,
     private val getAllFosterHomesByLocationFromRemoteRepository: GetAllFosterHomesByLocationFromRemoteRepository,
     private val getAllFosterHomesByLocationFromLocalRepository: GetAllFosterHomesByLocationFromLocalRepository,
@@ -208,20 +212,22 @@ class CheckAllFosterHomesViewmodel(
                     savedBy = myUid,
                     section = Section.FOSTER_HOMES,
                     onCompletionInsertCache = {
-                        val allFosterHomesFlow: Flow<List<FosterHome>> = getAllFosterHomesByCountryAndCityFromRemoteRepository(
-                            country,
-                            city
-                        )
+                        val allFosterHomesFlow: Flow<List<FosterHome>> =
+                            getAllFosterHomesByCountryAndCityFromRemoteRepository(
+                                country,
+                                city
+                            )
                         checkAllMyFosterHomesUtil.downloadImageAndManageFosterHomesInLocalRepositoryFromFlow(
                             allFosterHomesFlow,
                             myUid
                         )
                     },
                     onCompletionUpdateCache = {
-                        val allFosterHomesFlow: Flow<List<FosterHome>> = getAllFosterHomesByCountryAndCityFromRemoteRepository(
-                            country,
-                            city
-                        )
+                        val allFosterHomesFlow: Flow<List<FosterHome>> =
+                            getAllFosterHomesByCountryAndCityFromRemoteRepository(
+                                country,
+                                city
+                            )
                         checkAllMyFosterHomesUtil.downloadImageAndModifyFosterHomesInLocalRepositoryFromFlow(
                             allFosterHomesFlow,
                             myUid
@@ -243,13 +249,21 @@ class CheckAllFosterHomesViewmodel(
 
                         if (nonHumanAnimalTypeSet.contains(nonHumanAnimalType)) {
                             UiFosterHome(
-                                fosterHome.copy(
+                                fosterHome = fosterHome.copy(
                                     imageUrl = if (fosterHome.imageUrl.isEmpty()) {
                                         fosterHome.imageUrl
                                     } else {
                                         getImagePathForFileNameFromLocalDataSource(fosterHome.imageUrl)
                                     }
-                                )
+                                ),
+                                uiAllResidentNonHumanAnimals = fosterHome.allResidentNonHumanAnimals.mapNotNull { residentNonHumanAnimal ->
+
+                                    checkNonHumanAnimalUtil.getNonHumanAnimalFlow(
+                                        residentNonHumanAnimal.nonHumanAnimalId,
+                                        residentNonHumanAnimal.caregiverId,
+                                        viewModelScope
+                                    ).firstOrNull()
+                                }
                             )
                         } else {
                             null
@@ -271,24 +285,26 @@ class CheckAllFosterHomesViewmodel(
                     savedBy = myUid,
                     section = Section.FOSTER_HOMES,
                     onCompletionInsertCache = {
-                        val allFosterHomesFlow: Flow<List<FosterHome>> = getAllFosterHomesByLocationFromRemoteRepository(
-                            activistLongitude = activistLongitude,
-                            activistLatitude = activistLatitude,
-                            rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
-                            rangeLatitude = getRangeLat()
-                        )
+                        val allFosterHomesFlow: Flow<List<FosterHome>> =
+                            getAllFosterHomesByLocationFromRemoteRepository(
+                                activistLongitude = activistLongitude,
+                                activistLatitude = activistLatitude,
+                                rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
+                                rangeLatitude = getRangeLat()
+                            )
                         checkAllMyFosterHomesUtil.downloadImageAndManageFosterHomesInLocalRepositoryFromFlow(
                             allFosterHomesFlow,
                             myUid
                         )
                     },
                     onCompletionUpdateCache = {
-                        val allFosterHomesFlow: Flow<List<FosterHome>> = getAllFosterHomesByLocationFromRemoteRepository(
-                            activistLongitude = activistLongitude,
-                            activistLatitude = activistLatitude,
-                            rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
-                            rangeLatitude = getRangeLat()
-                        )
+                        val allFosterHomesFlow: Flow<List<FosterHome>> =
+                            getAllFosterHomesByLocationFromRemoteRepository(
+                                activistLongitude = activistLongitude,
+                                activistLatitude = activistLatitude,
+                                rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
+                                rangeLatitude = getRangeLat()
+                            )
                         checkAllMyFosterHomesUtil.downloadImageAndModifyFosterHomesInLocalRepositoryFromFlow(
                             allFosterHomesFlow,
                             myUid
@@ -319,6 +335,14 @@ class CheckAllFosterHomesViewmodel(
                                         getImagePathForFileNameFromLocalDataSource(fosterHome.imageUrl)
                                     }
                                 ),
+                                uiAllResidentNonHumanAnimals = fosterHome.allResidentNonHumanAnimals.mapNotNull { residentNonHumanAnimal ->
+
+                                    checkNonHumanAnimalUtil.getNonHumanAnimalFlow(
+                                        residentNonHumanAnimal.nonHumanAnimalId,
+                                        residentNonHumanAnimal.caregiverId,
+                                        viewModelScope
+                                    ).firstOrNull()
+                                },
                                 distance = calculateDistanceHaversineKm(
                                     activistLatitude,
                                     activistLongitude,
@@ -371,6 +395,7 @@ class CheckAllFosterHomesViewmodel(
 
 data class UiFosterHome(
     val fosterHome: FosterHome,
+    val uiAllResidentNonHumanAnimals: List<NonHumanAnimal>,
     val distance: Double? = null
 )
 

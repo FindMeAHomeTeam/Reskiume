@@ -1,6 +1,5 @@
 package com.findmeahometeam.reskiume.data.remote.response.fosterHome
 
-import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
 import kotlinx.serialization.Serializable
 
@@ -38,7 +37,7 @@ data class RemoteFosterHome(
         )
     }
 
-    suspend fun toDomain(onFetchNonHumanAnimal: suspend (nonHumanAnimalId: String, caregiverId: String) -> NonHumanAnimal?): FosterHome {
+    fun toDomain(): FosterHome {
         return FosterHome(
             id = id ?: "",
             ownerId = ownerId ?: "",
@@ -49,7 +48,7 @@ data class RemoteFosterHome(
             allAcceptedNonHumanAnimals =
                 allAcceptedNonHumanAnimals?.map { it.toDomain() } ?: emptyList(),
             allResidentNonHumanAnimals =
-                allResidentNonHumanAnimalIds?.map { it.toDomain(onFetchNonHumanAnimal) } ?: emptyList(),
+                allResidentNonHumanAnimalIds?.map { it.toDomain() } ?: emptyList(),
             longitude = longitude ?: 0.0,
             latitude = latitude ?: 0.0,
             country = country ?: "",

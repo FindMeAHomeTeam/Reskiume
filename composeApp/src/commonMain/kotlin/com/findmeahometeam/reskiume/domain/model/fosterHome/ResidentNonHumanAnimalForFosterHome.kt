@@ -2,24 +2,24 @@ package com.findmeahometeam.reskiume.domain.model.fosterHome
 
 import com.findmeahometeam.reskiume.data.database.entity.fosterHome.ResidentNonHumanAnimalIdEntityForFosterHome
 import com.findmeahometeam.reskiume.data.remote.response.fosterHome.RemoteResidentNonHumanAnimalIdForFosterHome
-import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 
 data class ResidentNonHumanAnimalForFosterHome(
-    val residentNonHumanAnimal: NonHumanAnimal?,
+    val nonHumanAnimalId: String,
+    val caregiverId: String,
     val fosterHomeId: String
 ) {
-    fun toEntityForId(): ResidentNonHumanAnimalIdEntityForFosterHome {
+    fun toEntity(): ResidentNonHumanAnimalIdEntityForFosterHome {
         return ResidentNonHumanAnimalIdEntityForFosterHome(
-            residentNonHumanAnimalId = residentNonHumanAnimal?.id ?: "",
-            caregiverId = residentNonHumanAnimal?.caregiverId ?: "",
+            nonHumanAnimalId = nonHumanAnimalId,
+            caregiverId = caregiverId,
             fosterHomeId = fosterHomeId
         )
     }
 
-    fun toRemoteForId(): RemoteResidentNonHumanAnimalIdForFosterHome {
+    fun toData(): RemoteResidentNonHumanAnimalIdForFosterHome {
         return RemoteResidentNonHumanAnimalIdForFosterHome(
-            residentNonHumanAnimalId = residentNonHumanAnimal?.id ?: "",
-            caregiverId = residentNonHumanAnimal?.caregiverId ?: "",
+            nonHumanAnimalId = nonHumanAnimalId,
+            caregiverId = caregiverId,
             fosterHomeId = fosterHomeId
         )
     }

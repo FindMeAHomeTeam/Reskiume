@@ -34,7 +34,7 @@ class FireStoreRemoteFosterHomeRepositoryForIosDelegateImpl: FireStoreRemoteFost
                     let city: String = queryFosterHome.city ?? ""
                     
                     let isFetchAllMyFosterHomes = ownerId != "" && fosterHomeId == ""
-                    let isFetchFosterHome = ownerId != "" && fosterHomeId != ""
+                    let isFetchFosterHome = fosterHomeId != ""
                     let isFetchAllFosterHomesByCountryAndCity = country != "" && city != ""
                     let isFetchAllFosterHomesByLocation = activistLongitude != 0.0 && activistLatitude != 0.0 && rangeLongitude != 0.0 && rangeLatitude != 0.0
                                             
@@ -210,7 +210,7 @@ class FireStoreRemoteFosterHomeRepositoryForIosDelegateImpl: FireStoreRemoteFost
     private func remoteResidentNonHumanAnimalIdForFosterHomeTodictArray(from items: [RemoteResidentNonHumanAnimalIdForFosterHome]?) -> [[String: Any]] {
         (items ?? []).map {
             [
-                "residentNonHumanAnimalId": $0.residentNonHumanAnimalId ?? "",
+                "nonHumanAnimalId": $0.nonHumanAnimalId ?? "",
                 "caregiverId": $0.caregiverId ?? "",
                 "fosterHomeId": $0.fosterHomeId!
             ]

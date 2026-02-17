@@ -1,13 +1,13 @@
 import ComposeApp
 
 struct RemoteResidentNonHumanAnimalIdForFosterHomeDTO: Codable {
-    let residentNonHumanAnimalId: String?
+    let nonHumanAnimalId: String?
     let caregiverId: String?
     let fosterHomeId: String?
     
     func toKotlin() -> RemoteResidentNonHumanAnimalIdForFosterHome {
         RemoteResidentNonHumanAnimalIdForFosterHome(
-            residentNonHumanAnimalId: residentNonHumanAnimalId ?? "",
+            nonHumanAnimalId: nonHumanAnimalId ?? "",
             caregiverId: caregiverId ?? "",
             fosterHomeId: fosterHomeId ?? ""
         )

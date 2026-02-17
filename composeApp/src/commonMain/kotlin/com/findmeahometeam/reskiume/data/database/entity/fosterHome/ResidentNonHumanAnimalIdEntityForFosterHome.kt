@@ -4,7 +4,6 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.fosterHome.ResidentNonHumanAnimalForFosterHome
 
 @Entity(
@@ -22,13 +21,14 @@ import com.findmeahometeam.reskiume.domain.model.fosterHome.ResidentNonHumanAnim
 )
 data class ResidentNonHumanAnimalIdEntityForFosterHome(
     @PrimaryKey
-    val residentNonHumanAnimalId: String,
+    val nonHumanAnimalId: String,
     val caregiverId: String,
     val fosterHomeId: String
 ) {
-    suspend fun toDomain(onFetchNonHumanAnimal: suspend (nonHumanAnimalId: String, caregiverId: String) -> NonHumanAnimal?): ResidentNonHumanAnimalForFosterHome {
+    fun toDomain(): ResidentNonHumanAnimalForFosterHome {
         return ResidentNonHumanAnimalForFosterHome(
-            residentNonHumanAnimal = onFetchNonHumanAnimal(residentNonHumanAnimalId, caregiverId),
+            nonHumanAnimalId = nonHumanAnimalId,
+            caregiverId = caregiverId,
             fosterHomeId = fosterHomeId
         )
     }

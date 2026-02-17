@@ -52,7 +52,7 @@ data class FosterHome(
             conditions = conditions,
             imageUrl = imageUrl,
             allAcceptedNonHumanAnimals = allAcceptedNonHumanAnimals.map { it.toRemote() },
-            allResidentNonHumanAnimalIds = allResidentNonHumanAnimals.map { it.toRemoteForId() },
+            allResidentNonHumanAnimalIds = allResidentNonHumanAnimals.map { it.toData() },
             longitude = longitude,
             latitude = latitude,
             country = country,

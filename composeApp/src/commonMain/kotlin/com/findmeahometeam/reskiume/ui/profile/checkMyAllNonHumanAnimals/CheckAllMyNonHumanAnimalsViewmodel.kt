@@ -19,7 +19,7 @@ import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.InsertNonHuma
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.ModifyNonHumanAnimalInLocalRepository
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.components.toUiState
-import com.findmeahometeam.reskiume.ui.core.navigation.CheckAllNonHumanAnimals
+import com.findmeahometeam.reskiume.ui.core.navigation.CheckAllMyNonHumanAnimals
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -46,7 +46,7 @@ class CheckAllMyNonHumanAnimalsViewmodel(
 ) : ViewModel() {
 
     private val caregiverId =
-        saveStateHandleProvider.provideObjectRoute(CheckAllNonHumanAnimals::class).caregiverId
+        saveStateHandleProvider.provideObjectRoute(CheckAllMyNonHumanAnimals::class).caregiverId
 
     val nonHumanAnimalListFlow: Flow<UiState<List<NonHumanAnimal>>> =
         observeAuthStateInAuthDataSource()

@@ -55,7 +55,8 @@ class ModifyNonHumanAnimalViewmodel(
     val nonHumanAnimalFlow: Flow<UiState<NonHumanAnimal>> =
         checkNonHumanAnimalUtil.getNonHumanAnimalFlow(
             nonHumanAnimalId,
-            caregiverId
+            caregiverId,
+            viewModelScope
         ).map {
             it.copy(
                 imageUrl = if (it.imageUrl.isEmpty()) {

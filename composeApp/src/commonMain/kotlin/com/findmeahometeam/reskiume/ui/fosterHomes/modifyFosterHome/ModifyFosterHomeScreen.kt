@@ -22,7 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.fosterHome.AcceptedNonHumanAnimalForFosterHome
-import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
 import com.findmeahometeam.reskiume.domain.model.fosterHome.ResidentNonHumanAnimalForFosterHome
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.components.RmAcceptedNonHumanAnimalListCreator
@@ -39,6 +38,7 @@ import com.findmeahometeam.reskiume.ui.core.components.RmTextLink
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.primaryGreen
 import com.findmeahometeam.reskiume.ui.core.tertiaryGreen
+import com.findmeahometeam.reskiume.ui.fosterHomes.checkAllFosterHomes.UiFosterHome
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import reskiume.composeapp.generated.resources.Res
@@ -56,6 +56,9 @@ import reskiume.composeapp.generated.resources.modify_foster_home_screen_foster_
 import reskiume.composeapp.generated.resources.modify_foster_home_screen_save_foster_home_changes_button
 import reskiume.composeapp.generated.resources.modify_foster_home_screen_title
 import reskiume.composeapp.generated.resources.modify_foster_home_screen_unavailable_label
+import reskiume.composeapp.generated.resources.modify_foster_home_screen_warning_foster_home_with_residents_message
+import reskiume.composeapp.generated.resources.modify_foster_home_screen_warning_foster_home_with_residents_ok_button
+import reskiume.composeapp.generated.resources.modify_foster_home_screen_warning_foster_home_with_residents_title
 
 @Composable
 fun ModifyFosterHomeScreen(
@@ -64,10 +67,10 @@ fun ModifyFosterHomeScreen(
     val modifyFosterHomeViewmodel: ModifyFosterHomeViewmodel =
         koinViewModel<ModifyFosterHomeViewmodel>()
 
-    val fosterHomeState: UiState<FosterHome> by modifyFosterHomeViewmodel.fosterHomeFlow.collectAsState(
+    val uiFosterHomeState: UiState<UiFosterHome> by modifyFosterHomeViewmodel.fosterHomeFlow.collectAsState(
         initial = UiState.Loading()
     )
-    val allAvailableNonHumanAnimals: List<NonHumanAnimal> by modifyFosterHomeViewmodel.allAvailableNonHumanAnimalsFlow.collectAsState(
+    val allAvailableNonHumanAnimals: List<NonHumanAnimal> by modifyFosterHomeViewmodel.allAvailableNonHumanAnimalsLookingForAdoptionFlow.collectAsState(
         initial = emptyList()
     )
     val manageChangesUiState: UiState<Unit> by modifyFosterHomeViewmodel.manageChangesUiState.collectAsState()
@@ -76,12 +79,12 @@ fun ModifyFosterHomeScreen(
 
     RmScaffold(
         title =
-            if (fosterHomeState is UiState.Success) {
+            if (uiFosterHomeState is UiState.Success) {
                 stringResource(
                     Res.string.modify_foster_home_screen_title,
-                    (fosterHomeState as UiState.Success<FosterHome>).data.title,
-                    (fosterHomeState as UiState.Success<FosterHome>).data.city,
-                    (fosterHomeState as UiState.Success<FosterHome>).data.country
+                    (uiFosterHomeState as UiState.Success<UiFosterHome>).data.fosterHome.title,
+                    (uiFosterHomeState as UiState.Success<UiFosterHome>).data.fosterHome.city,
+                    (uiFosterHomeState as UiState.Success<UiFosterHome>).data.fosterHome.country
                 )
             } else {
                 ""
@@ -99,24 +102,25 @@ fun ModifyFosterHomeScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            RmResultState(fosterHomeState) { fosterHome: FosterHome ->
+            RmResultState(uiFosterHomeState) { uiFosterHome: UiFosterHome ->
 
-                var title: String by rememberSaveable { mutableStateOf(fosterHome.title) }
-                var description: String by rememberSaveable { mutableStateOf(fosterHome.description) }
-                var conditions: String by rememberSaveable { mutableStateOf(fosterHome.conditions) }
-                var imageUrl: String by rememberSaveable { mutableStateOf(fosterHome.imageUrl) }
+                var title: String by rememberSaveable { mutableStateOf(uiFosterHome.fosterHome.title) }
+                var description: String by rememberSaveable { mutableStateOf(uiFosterHome.fosterHome.description) }
+                var conditions: String by rememberSaveable { mutableStateOf(uiFosterHome.fosterHome.conditions) }
+                var imageUrl: String by rememberSaveable { mutableStateOf(uiFosterHome.fosterHome.imageUrl) }
                 var allAcceptedNonHumanAnimals: List<AcceptedNonHumanAnimalForFosterHome> by rememberSaveable {
                     mutableStateOf(
-                        fosterHome.allAcceptedNonHumanAnimals
+                        uiFosterHome.fosterHome.allAcceptedNonHumanAnimals
                     )
                 }
-                var allResidentNonHumanAnimals: List<ResidentNonHumanAnimalForFosterHome> by rememberSaveable {
+                var uiAllResidentNonHumanAnimals: List<NonHumanAnimal> by rememberSaveable {
                     mutableStateOf(
-                        fosterHome.allResidentNonHumanAnimals
+                        uiFosterHome.uiAllResidentNonHumanAnimals
                     )
                 }
-                var isAvailable: Boolean by rememberSaveable { mutableStateOf(fosterHome.available) }
+                var isAvailable: Boolean by rememberSaveable { mutableStateOf(uiFosterHome.fosterHome.available) }
                 var displayDeleteDialog: Boolean by rememberSaveable { mutableStateOf(false) }
+                var displayFosterHomeWithResidentsDialog: Boolean by rememberSaveable { mutableStateOf(false) }
 
                 val isUpdateUserButtonEnabled by remember(
                     title,
@@ -124,7 +128,7 @@ fun ModifyFosterHomeScreen(
                     conditions,
                     imageUrl,
                     allAcceptedNonHumanAnimals,
-                    allResidentNonHumanAnimals,
+                    uiAllResidentNonHumanAnimals,
                     isAvailable,
                 ) {
                     derivedStateOf {
@@ -133,18 +137,18 @@ fun ModifyFosterHomeScreen(
                                 && description.isNotBlank()
                                 && conditions.isNotBlank()
                                 && allAcceptedNonHumanAnimals.isNotEmpty()
-                                && (imageUrl != fosterHome.imageUrl
-                                || title != fosterHome.title
-                                || description != fosterHome.description
-                                || conditions != fosterHome.conditions
-                                || allAcceptedNonHumanAnimals != fosterHome.allAcceptedNonHumanAnimals
-                                || allResidentNonHumanAnimals != fosterHome.allResidentNonHumanAnimals
-                                || isAvailable != fosterHome.available)
+                                && (imageUrl != uiFosterHome.fosterHome.imageUrl
+                                || title != uiFosterHome.fosterHome.title
+                                || description != uiFosterHome.fosterHome.description
+                                || conditions != uiFosterHome.fosterHome.conditions
+                                || allAcceptedNonHumanAnimals != uiFosterHome.fosterHome.allAcceptedNonHumanAnimals
+                                || uiAllResidentNonHumanAnimals != uiFosterHome.uiAllResidentNonHumanAnimals
+                                || isAvailable != uiFosterHome.fosterHome.available)
                     }
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
-                RmAddPhoto(currentImageUri = fosterHome.imageUrl) {
+                RmAddPhoto(currentImageUri = uiFosterHome.fosterHome.imageUrl) {
                     imageUrl = it
                 }
 
@@ -194,26 +198,25 @@ fun ModifyFosterHomeScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
                 RmAcceptedNonHumanAnimalListCreator(
-                    fosterHome.id,
-                    fosterHome.allAcceptedNonHumanAnimals
+                    uiFosterHome.fosterHome.id,
+                    uiFosterHome.fosterHome.allAcceptedNonHumanAnimals
                 ) {
                     allAcceptedNonHumanAnimals = it
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
                 RmResidentNonHumanAnimalListCreator(
-                    fosterHome.id,
                     allAvailableNonHumanAnimals,
-                    fosterHome.allResidentNonHumanAnimals
+                    uiFosterHome.uiAllResidentNonHumanAnimals
                 ) {
-                    allResidentNonHumanAnimals = it
+                    uiAllResidentNonHumanAnimals = it
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
                 RmTextLink(
                     text = stringResource(
                         Res.string.modify_foster_home_screen_delete_foster_home_text,
-                        fosterHome.title
+                        uiFosterHome.fosterHome.title
                     ),
                     textToLink = stringResource(Res.string.modify_foster_home_screen_delete_foster_home_button),
                     onClick = {
@@ -230,15 +233,15 @@ fun ModifyFosterHomeScreen(
                         emoji = "🗑️",
                         title = stringResource(
                             Res.string.modify_foster_home_screen_delete_foster_home_title,
-                            fosterHome.title
+                            uiFosterHome.fosterHome.title
                         ),
                         message = stringResource(Res.string.modify_foster_home_screen_delete_foster_home_message),
                         allowMessage = stringResource(Res.string.modify_foster_home_screen_delete_foster_home_button),
                         denyMessage = stringResource(Res.string.modify_foster_home_screen_dismiss_delete_foster_home_button),
                         onClickAllow = {
                             modifyFosterHomeViewmodel.deleteFosterHome(
-                                fosterHome.id,
-                                fosterHome.ownerId
+                                uiFosterHome.fosterHome.id,
+                                uiFosterHome.fosterHome.ownerId
                             )
                             displayDeleteDialog = false
                         },
@@ -274,14 +277,20 @@ fun ModifyFosterHomeScreen(
                     enabled = isUpdateUserButtonEnabled,
                     onClick = {
                         modifyFosterHomeViewmodel.saveFosterHomeChanges(
-                            isDifferentImage = imageUrl != fosterHome.imageUrl,
-                            modifiedFosterHome = fosterHome.copy(
+                            isDifferentImage = imageUrl != uiFosterHome.fosterHome.imageUrl,
+                            modifiedFosterHome = uiFosterHome.fosterHome.copy(
                                 imageUrl = imageUrl,
                                 title = title,
                                 description = description,
                                 conditions = conditions,
                                 allAcceptedNonHumanAnimals = allAcceptedNonHumanAnimals,
-                                allResidentNonHumanAnimals = allResidentNonHumanAnimals,
+                                allResidentNonHumanAnimals = uiAllResidentNonHumanAnimals.map {
+                                    ResidentNonHumanAnimalForFosterHome(
+                                        nonHumanAnimalId = it.id,
+                                        caregiverId = it.caregiverId,
+                                        fosterHomeId = uiFosterHome.fosterHome.id
+                                    )
+                                },
                                 available = isAvailable
                             )
                         )

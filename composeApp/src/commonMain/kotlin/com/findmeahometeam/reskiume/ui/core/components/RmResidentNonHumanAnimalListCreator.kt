@@ -25,7 +25,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
-import com.findmeahometeam.reskiume.domain.model.fosterHome.ResidentNonHumanAnimalForFosterHome
 import com.findmeahometeam.reskiume.domain.model.toEmoji
 import com.findmeahometeam.reskiume.ui.core.backgroundColorForItems
 import com.findmeahometeam.reskiume.ui.core.primaryGreen
@@ -45,20 +44,20 @@ import reskiume.composeapp.generated.resources.resident_non_human_animal_list_cr
 fun RmResidentNonHumanAnimalListCreator(
     fosterHomeId: String,
     allAvailableNonHumanAnimals: List<NonHumanAnimal>,
-    allResidentNonHumanAnimals: List<ResidentNonHumanAnimalForFosterHome>,
-    onAddResidentNonHumanAnimal: (List<ResidentNonHumanAnimalForFosterHome>) -> Unit
+    allResidentNonHumanAnimals: List<NonHumanAnimal>,
+    onAddResidentNonHumanAnimal: (List<NonHumanAnimal>) -> Unit
 ) {
     var availableNonHumanAnimals: List<NonHumanAnimal> by remember(allAvailableNonHumanAnimals) {
         mutableStateOf(
             allAvailableNonHumanAnimals
         )
     }
-    var residentNonHumanAnimals: List<ResidentNonHumanAnimalForFosterHome> by remember {
+    var residentNonHumanAnimals: List<NonHumanAnimal> by remember {
         mutableStateOf(
             allResidentNonHumanAnimals
         )
     }
-    var residentNonHumanAnimal: NonHumanAnimal? by remember { mutableStateOf(null) }
+    var selectedResidentNonHumanAnimal: NonHumanAnimal? by remember { mutableStateOf(null) }
 
     Column(
         modifier = Modifier
@@ -83,15 +82,15 @@ fun RmResidentNonHumanAnimalListCreator(
             RmDropDownMenu(
                 modifier = Modifier.weight(1f),
                 dropDownLabel = stringResource(Res.string.resident_non_human_animal_list_creator_non_human_animal_label),
-                defaultElementText = if (residentNonHumanAnimal == null) {
+                defaultElementText = if (selectedResidentNonHumanAnimal == null) {
                     stringResource(Res.string.resident_non_human_animal_list_creator_unselected_non_human_animal_label)
                 } else {
-                    residentNonHumanAnimal?.nonHumanAnimalType?.toEmoji() + " " + residentNonHumanAnimal?.name
+                    selectedResidentNonHumanAnimal?.nonHumanAnimalType?.toEmoji() + " " + selectedResidentNonHumanAnimal?.name
                 },
                 items = availableNonHumanAnimals.map {
                     Pair(it, it.nonHumanAnimalType.toEmoji() + " " + it.name)
                 },
-                onClick = { residentNonHumanAnimal = it },
+                onClick = { selectedResidentNonHumanAnimal = it },
             )
 
             IconButton(
@@ -99,21 +98,16 @@ fun RmResidentNonHumanAnimalListCreator(
                     .padding(start = 16.dp, top = 8.dp)
                     .size(32.dp),
                 onClick = {
-                    if (residentNonHumanAnimal != null) {
+                    if (selectedResidentNonHumanAnimal != null) {
 
                         val existingItems = residentNonHumanAnimals.filter {
-                            it.residentNonHumanAnimal == residentNonHumanAnimal
+                            it.id == selectedResidentNonHumanAnimal!!.id
                         }
                         if (existingItems.isEmpty()) {
-                            val residentNonHumanAnimalForFosterHome =
-                                ResidentNonHumanAnimalForFosterHome(
-                                    fosterHomeId = fosterHomeId,
-                                    residentNonHumanAnimal = residentNonHumanAnimal
-                                )
-                            availableNonHumanAnimals -= residentNonHumanAnimal!!
-                            residentNonHumanAnimals += residentNonHumanAnimalForFosterHome
+                            availableNonHumanAnimals -= selectedResidentNonHumanAnimal!!
+                            residentNonHumanAnimals += selectedResidentNonHumanAnimal!!
                             onAddResidentNonHumanAnimal(residentNonHumanAnimals)
-                            residentNonHumanAnimal = null
+                            selectedResidentNonHumanAnimal = null
                         }
                     }
                 }
@@ -147,8 +141,8 @@ fun RmResidentNonHumanAnimalListCreator(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     RmText(
-                        text = residentNonHumanAnimalForFosterHome.residentNonHumanAnimal?.nonHumanAnimalType?.toEmoji()
-                                + " " + residentNonHumanAnimalForFosterHome.residentNonHumanAnimal?.name,
+                        text = residentNonHumanAnimalForFosterHome.nonHumanAnimalType.toEmoji()
+                                + " " + residentNonHumanAnimalForFosterHome.name,
                         fontSize = 16.sp
                     )
 
@@ -156,9 +150,9 @@ fun RmResidentNonHumanAnimalListCreator(
                         modifier = Modifier.size(32.dp),
                         onClick = {
                             residentNonHumanAnimals.first {
-                                it.residentNonHumanAnimal == residentNonHumanAnimalForFosterHome.residentNonHumanAnimal
+                                it == residentNonHumanAnimalForFosterHome
                             }.also {
-                                availableNonHumanAnimals += it.residentNonHumanAnimal!!
+                                availableNonHumanAnimals += it
                                 residentNonHumanAnimals -= it
                                 onAddResidentNonHumanAnimal(residentNonHumanAnimals)
                             }

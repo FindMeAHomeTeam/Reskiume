@@ -15,5 +15,7 @@ interface LocalNonHumanAnimalRepository {
 
     suspend fun getNonHumanAnimal(id: String): NonHumanAnimalEntity?
 
-    fun getAllNonHumanAnimals(caregiverId: String): Flow<List<NonHumanAnimalEntity>>
+    fun getAllMyNonHumanAnimals(caregiverId: String): Flow<List<NonHumanAnimalEntity>>
+
+    fun getAllNonHumanAnimals(): Flow<List<NonHumanAnimalEntity>>
 }

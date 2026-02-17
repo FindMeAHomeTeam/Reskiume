@@ -27,5 +27,8 @@ interface NonHumanAnimalDao {
     suspend fun getNonHumanAnimal(id: String): NonHumanAnimalEntity?
 
     @Query("SELECT * FROM NonHumanAnimalEntity WHERE caregiverId = :caregiverId")
-    fun getAllNonHumanAnimals(caregiverId: String): Flow<List<NonHumanAnimalEntity>>
+    fun getAllMyNonHumanAnimals(caregiverId: String): Flow<List<NonHumanAnimalEntity>>
+
+    @Query("SELECT * FROM NonHumanAnimalEntity")
+    fun getAllNonHumanAnimals(): Flow<List<NonHumanAnimalEntity>>
 }

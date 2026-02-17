@@ -23,6 +23,8 @@ import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.components.toUiState
 import com.findmeahometeam.reskiume.ui.core.navigation.ModifyFosterHome
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
+import com.findmeahometeam.reskiume.ui.fosterHomes.checkAllFosterHomes.UiFosterHome
+import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -38,6 +40,7 @@ class ModifyFosterHomeViewmodel(
     saveStateHandleProvider: SaveStateHandleProvider,
     private val getFosterHomeFromLocalRepository: GetFosterHomeFromLocalRepository,
     private val getImagePathForFileNameFromLocalDataSource: GetImagePathForFileNameFromLocalDataSource,
+    private val checkNonHumanAnimalUtil: CheckNonHumanAnimalUtil,
     getAllNonHumanAnimalsFromLocalRepository: GetAllNonHumanAnimalsFromLocalRepository,
     private val getFosterHomeFromRemoteRepository: GetFosterHomeFromRemoteRepository,
     private val deleteImageFromRemoteDataSource: DeleteImageFromRemoteDataSource,
@@ -53,18 +56,25 @@ class ModifyFosterHomeViewmodel(
     private val fosterHomeId: String =
         saveStateHandleProvider.provideObjectRoute(ModifyFosterHome::class).fosterHomeId
 
-    private val ownerId: String =
-        saveStateHandleProvider.provideObjectRoute(ModifyFosterHome::class).ownerId
-
-    val fosterHomeFlow: Flow<UiState<FosterHome>> =
+    val fosterHomeFlow: Flow<UiState<UiFosterHome>> =
         getFosterHomeFromLocalRepository(
             fosterHomeId
         ).map { fosterHome: FosterHome? ->
-            fosterHome!!.copy(
-                imageUrl = if (fosterHome.imageUrl.isEmpty()) {
-                    fosterHome.imageUrl
-                } else {
-                    getImagePathForFileNameFromLocalDataSource(fosterHome.imageUrl)
+            UiFosterHome(
+                fosterHome = fosterHome!!.copy(
+                    imageUrl = if (fosterHome.imageUrl.isEmpty()) {
+                        fosterHome.imageUrl
+                    } else {
+                        getImagePathForFileNameFromLocalDataSource(fosterHome.imageUrl)
+                    }
+                ),
+                uiAllResidentNonHumanAnimals = fosterHome.allResidentNonHumanAnimals.mapNotNull { residentNonHumanAnimal ->
+
+                    checkNonHumanAnimalUtil.getNonHumanAnimalFlow(
+                        residentNonHumanAnimal.nonHumanAnimalId,
+                        residentNonHumanAnimal.caregiverId,
+                        viewModelScope
+                    ).firstOrNull()
                 }
             )
         }.toUiState()

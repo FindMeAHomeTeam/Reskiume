@@ -1,6 +1,7 @@
 package com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
 import com.findmeahometeam.reskiume.ui.core.components.UiState
@@ -23,7 +24,11 @@ class CheckNonHumanAnimalViewmodel(
         saveStateHandleProvider.provideObjectRoute(CheckNonHumanAnimal::class).caregiverId
 
     val nonHumanAnimalFlow: Flow<UiState<NonHumanAnimal>> =
-        checkNonHumanAnimalUtil.getNonHumanAnimalFlow(nonHumanAnimalId, caregiverId).map {
+        checkNonHumanAnimalUtil.getNonHumanAnimalFlow(
+            nonHumanAnimalId,
+            caregiverId,
+            viewModelScope
+        ).map {
             it.copy(
                 imageUrl = if (it.imageUrl.isEmpty()) {
                     it.imageUrl

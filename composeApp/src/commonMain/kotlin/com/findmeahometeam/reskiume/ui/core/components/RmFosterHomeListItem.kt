@@ -22,9 +22,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.findmeahometeam.reskiume.domain.model.Gender
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
 import com.findmeahometeam.reskiume.domain.model.fosterHome.AcceptedNonHumanAnimalForFosterHome
-import com.findmeahometeam.reskiume.domain.model.fosterHome.ResidentNonHumanAnimalForFosterHome
 import com.findmeahometeam.reskiume.domain.model.toEmoji
 import com.findmeahometeam.reskiume.domain.model.toStringResource
 import com.findmeahometeam.reskiume.ui.core.backgroundColorForItems
@@ -35,9 +35,9 @@ import org.jetbrains.compose.resources.stringResource
 import reskiume.composeapp.generated.resources.Res
 import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_km
 import reskiume.composeapp.generated.resources.foster_home_list_item_accepted_both_genders_non_human_animal
-import reskiume.composeapp.generated.resources.foster_home_list_item_more_non_human_animal
 import reskiume.composeapp.generated.resources.foster_home_list_item_accepted_non_human_animal
 import reskiume.composeapp.generated.resources.foster_home_list_item_disabled_foster_home
+import reskiume.composeapp.generated.resources.foster_home_list_item_more_non_human_animal
 import reskiume.composeapp.generated.resources.foster_home_list_item_residents_non_human_animal
 
 @Composable
@@ -46,7 +46,7 @@ fun RmFosterHomeListItem(
     title: String,
     imageUrl: String,
     allAcceptedNonHumanAnimals: List<AcceptedNonHumanAnimalForFosterHome>,
-    allResidentNonHumanAnimalForFosterHome: List<ResidentNonHumanAnimalForFosterHome>,
+    allResidentNonHumanAnimals: List<NonHumanAnimal>,
     distance: Double?,
     city: String,
     isEnabled: Boolean = true,
@@ -135,7 +135,7 @@ fun RmFosterHomeListItem(
                     ListAcceptedNonHumanAnimals(allAcceptedNonHumanAnimals)
                 }
 
-                if (allResidentNonHumanAnimalForFosterHome.isNotEmpty()) {
+                if (allResidentNonHumanAnimals.isNotEmpty()) {
 
                     Spacer(modifier = Modifier.height(5.dp))
                     Column(
@@ -151,7 +151,7 @@ fun RmFosterHomeListItem(
                             text = stringResource(Res.string.foster_home_list_item_residents_non_human_animal),
                             color = Color.Black
                         )
-                        ListResidentNonHumanAnimals(allResidentNonHumanAnimalForFosterHome)
+                        ListResidentNonHumanAnimals(allResidentNonHumanAnimals)
                     }
                 }
             }
@@ -218,14 +218,14 @@ private fun ListAcceptedNonHumanAnimals(allAcceptedNonHumanAnimals: List<Accepte
 }
 
 @Composable
-private fun ListResidentNonHumanAnimals(allResidentNonHumanAnimalForFosterHome: List<ResidentNonHumanAnimalForFosterHome>) {
+private fun ListResidentNonHumanAnimals(allResidentNonHumanAnimalForFosterHome: List<NonHumanAnimal>) {
 
-    allResidentNonHumanAnimalForFosterHome.forEachIndexed { index, resident ->
+    allResidentNonHumanAnimalForFosterHome.forEachIndexed { index, residentNonHumanAnimal ->
         if (index < 3) {
             Spacer(modifier = Modifier.height(5.dp))
             RmText(
                 modifier = Modifier.fillMaxWidth(),
-                text = resident.residentNonHumanAnimal!!.nonHumanAnimalType.toEmoji() + " " + resident.residentNonHumanAnimal.name,
+                text = residentNonHumanAnimal.nonHumanAnimalType.toEmoji() + " " + residentNonHumanAnimal.name,
                 fontSize = 16.sp,
                 color = Color.Black
             )

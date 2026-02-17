@@ -7,8 +7,8 @@ import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteCacheFromLocalRepository
-import com.findmeahometeam.reskiume.domain.usecases.fosterHome.DeleteFosterHomeFromLocalRepository
-import com.findmeahometeam.reskiume.domain.usecases.fosterHome.DeleteFosterHomeFromRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.fosterHome.DeleteMyFosterHomeFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.fosterHome.DeleteMyFosterHomeFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetFosterHomeFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetFosterHomeFromRemoteRepository
 import kotlinx.coroutines.CoroutineScope
@@ -21,8 +21,8 @@ class DeleteFosterHomeUtil(
     private val getFosterHomeFromLocalRepository: GetFosterHomeFromLocalRepository,
     private val deleteImageFromRemoteDataSource: DeleteImageFromRemoteDataSource,
     private val deleteImageFromLocalDataSource: DeleteImageFromLocalDataSource,
-    private val deleteFosterHomeFromRemoteRepository: DeleteFosterHomeFromRemoteRepository,
-    private val deleteFosterHomeFromLocalRepository: DeleteFosterHomeFromLocalRepository,
+    private val deleteMyFosterHomeFromRemoteRepository: DeleteMyFosterHomeFromRemoteRepository,
+    private val deleteMyFosterHomeFromLocalRepository: DeleteMyFosterHomeFromLocalRepository,
     private val deleteCacheFromLocalRepository: DeleteCacheFromLocalRepository,
     private val log: Log
 ) {
@@ -145,9 +145,10 @@ class DeleteFosterHomeUtil(
     ) {
         coroutineScope.launch {
 
-            deleteFosterHomeFromRemoteRepository(
+            deleteMyFosterHomeFromRemoteRepository(
                 id,
-                ownerId
+                ownerId,
+                coroutineScope,
             ) { databaseResult: DatabaseResult ->
 
                 if (databaseResult is DatabaseResult.Success) {
@@ -175,7 +176,10 @@ class DeleteFosterHomeUtil(
     ) {
         coroutineScope.launch {
 
-            deleteFosterHomeFromLocalRepository(id) { rowsDeleted: Int ->
+            deleteMyFosterHomeFromLocalRepository(
+                id,
+                coroutineScope
+            ) { rowsDeleted: Int ->
 
                 if (rowsDeleted > 0) {
                     log.d(

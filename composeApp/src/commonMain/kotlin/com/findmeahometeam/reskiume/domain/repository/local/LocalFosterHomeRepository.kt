@@ -46,7 +46,7 @@ interface LocalFosterHomeRepository {
     )
 
     suspend fun deleteResidentNonHumanAnimal(
-        residentNonHumanAnimalId: String,
+        nonHumanAnimalId: String,
         onDeleteResidentNonHumanAnimalId: (rowsDeleted: Int) -> Unit
     )
 

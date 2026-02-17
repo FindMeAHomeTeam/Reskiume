@@ -1,5 +1,6 @@
 package com.findmeahometeam.reskiume.domain.usecases.fosterHome
 
+import com.findmeahometeam.reskiume.data.database.entity.NonHumanAnimalEntity
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.AdoptionState
 import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
@@ -49,7 +50,16 @@ class InsertFosterHomeInLocalRepository(
                 localFosterHomeRepository.insertAcceptedNonHumanAnimalForFosterHome(
                     acceptedNonHumanAnimalForFosterHome.toEntity(),
                     onInsertAcceptedNonHumanAnimalType = { rowId ->
-                        if (rowId <= 0) {
+                        if (rowId > 0) {
+                            log.d(
+                                "InsertFosterHomeInLocalRepository",
+                                "insertAllAcceptedNonHumanAnimals: inserted the accepted non human animal ${acceptedNonHumanAnimalForFosterHome.acceptedNonHumanAnimalId} in the foster home ${acceptedNonHumanAnimalForFosterHome.fosterHomeId} in the local data source"
+                            )
+                        } else {
+                            log.e(
+                                "InsertFosterHomeInLocalRepository",
+                                "insertAllAcceptedNonHumanAnimals: failed to insert the accepted non human animal ${acceptedNonHumanAnimalForFosterHome.acceptedNonHumanAnimalId} in the foster home ${acceptedNonHumanAnimalForFosterHome.fosterHomeId} in the local data source"
+                            )
                             isSuccess = false
                         }
                     }
@@ -63,33 +73,59 @@ class InsertFosterHomeInLocalRepository(
         var isSuccess = true
         fosterHome.allResidentNonHumanAnimals.forEach { residentNonHumanAnimalForFosterHome ->
             if (isSuccess) {
-                localFosterHomeRepository.insertResidentNonHumanAnimalIdForFosterHome(
-                    residentNonHumanAnimalForFosterHome.toEntityForId(),
-                    onInsertResidentNonHumanAnimalId = { rowId ->
-                        if (rowId <= 0) {
-                            isSuccess = false
+
+                val nonHumanAnimalEntity: NonHumanAnimalEntity? =
+                    localNonHumanAnimalRepository.getNonHumanAnimal(
+                        residentNonHumanAnimalForFosterHome.nonHumanAnimalId,
+                    )
+
+                if (nonHumanAnimalEntity == null) {
+                    log.d(
+                        "InsertFosterHomeInLocalRepository",
+                        "insertAllResidentNonHumanAnimals: Can not insert the resident nor update the adoption state for the resident id ${residentNonHumanAnimalForFosterHome.nonHumanAnimalId} in the foster home ${residentNonHumanAnimalForFosterHome.fosterHomeId} in the local data source"
+                    )
+                } else {
+                    localFosterHomeRepository.insertResidentNonHumanAnimalIdForFosterHome(
+                        residentNonHumanAnimalForFosterHome.toEntity(),
+                        onInsertResidentNonHumanAnimalId = { rowId ->
+                            if (rowId > 0) {
+                                log.d(
+                                    "InsertFosterHomeInLocalRepository",
+                                    "insertAllResidentNonHumanAnimals: inserted the non human animal ${nonHumanAnimalEntity.id} in the foster home ${nonHumanAnimalEntity.fosterHomeId} in the local data source"
+                                )
+                            } else {
+                                log.e(
+                                    "InsertFosterHomeInLocalRepository",
+                                    "insertAllResidentNonHumanAnimals: failed to insert the non human animal ${nonHumanAnimalEntity.id} in the foster home ${nonHumanAnimalEntity.fosterHomeId} in the local data source"
+                                )
+                                isSuccess = false
+                            }
                         }
-                    }
-                )
-                val imageFileName = manageImagePath.getFileNameFromLocalImagePath(residentNonHumanAnimalForFosterHome.residentNonHumanAnimal!!.imageUrl)
-                localNonHumanAnimalRepository.modifyNonHumanAnimal(
-                    residentNonHumanAnimalForFosterHome.residentNonHumanAnimal.copy(
-                        adoptionState = AdoptionState.REHOMED,
-                        fosterHomeId = fosterHome.id,
-                        imageUrl = imageFileName
-                    ).toEntity()
-                ) { rowsUpdated ->
-                    if (rowsUpdated > 0) {
-                        log.d(
-                            "InsertFosterHomeInLocalRepository",
-                            "insertAllResidentNonHumanAnimals: updated adoption state for the non human animal ${residentNonHumanAnimalForFosterHome.residentNonHumanAnimal.id} in the local data source"
+                    )
+                    if (isSuccess) {
+                        val imageFileName = manageImagePath.getFileNameFromLocalImagePath(
+                            nonHumanAnimalEntity.imageUrl
                         )
-                    } else {
-                        log.e(
-                            "InsertFosterHomeInLocalRepository",
-                            "insertAllResidentNonHumanAnimals: failed to update the adoption state for the non human animal ${residentNonHumanAnimalForFosterHome.residentNonHumanAnimal.id} in the local data source"
-                        )
-                        isSuccess = false
+                        localNonHumanAnimalRepository.modifyNonHumanAnimal(
+                            nonHumanAnimalEntity.copy(
+                                adoptionState = AdoptionState.REHOMED,
+                                fosterHomeId = fosterHome.id,
+                                imageUrl = imageFileName
+                            )
+                        ) { rowsUpdated ->
+                            if (rowsUpdated > 0) {
+                                log.d(
+                                    "InsertFosterHomeInLocalRepository",
+                                    "insertAllResidentNonHumanAnimals: updated adoption state for the non human animal ${nonHumanAnimalEntity.id} in the local data source"
+                                )
+                            } else {
+                                log.e(
+                                    "InsertFosterHomeInLocalRepository",
+                                    "insertAllResidentNonHumanAnimals: failed to update the adoption state for the non human animal ${nonHumanAnimalEntity.id} in the local data source"
+                                )
+                                isSuccess = false
+                            }
+                        }
                     }
                 }
             }

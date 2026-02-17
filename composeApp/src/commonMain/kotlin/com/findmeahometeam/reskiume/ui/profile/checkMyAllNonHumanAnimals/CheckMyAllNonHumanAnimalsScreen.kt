@@ -1,4 +1,4 @@
-package com.findmeahometeam.reskiume.ui.profile.checkAllNonHumanAnimals
+package com.findmeahometeam.reskiume.ui.profile.checkMyAllNonHumanAnimals
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -41,15 +41,15 @@ import reskiume.composeapp.generated.resources.check_all_non_human_animals_scree
 import reskiume.composeapp.generated.resources.check_all_non_human_animals_screen_registered_non_human_animals_title
 
 @Composable
-fun CheckAllNonHumanAnimalsScreen(
+fun CheckAllMyNonHumanAnimalsScreen(
     onBackPressed: () -> Unit,
     onNonHumanAnimalClick: (nonHumanAnimalId: String, caregiverId: String) -> Unit,
     onCreateNonHumanAnimal: () -> Unit
 ) {
 
-    val checkAllNonHumanAnimalsViewmodel: CheckAllNonHumanAnimalsViewmodel =
-        koinViewModel<CheckAllNonHumanAnimalsViewmodel>()
-    val nonHumanAnimalListState: UiState<List<NonHumanAnimal>> by checkAllNonHumanAnimalsViewmodel.nonHumanAnimalListFlow.collectAsState(
+    val checkAllMyNonHumanAnimalsViewmodel: CheckAllMyNonHumanAnimalsViewmodel =
+        koinViewModel<CheckAllMyNonHumanAnimalsViewmodel>()
+    val nonHumanAnimalListState: UiState<List<NonHumanAnimal>> by checkAllMyNonHumanAnimalsViewmodel.nonHumanAnimalListFlow.collectAsState(
         initial = UiState.Loading()
     )
 
@@ -83,6 +83,7 @@ fun CheckAllNonHumanAnimalsScreen(
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Black
                     )
+                    Spacer(modifier = Modifier.weight(1f))
                 } else {
                     LazyColumn(modifier = Modifier.weight(1f)) {
                         items(

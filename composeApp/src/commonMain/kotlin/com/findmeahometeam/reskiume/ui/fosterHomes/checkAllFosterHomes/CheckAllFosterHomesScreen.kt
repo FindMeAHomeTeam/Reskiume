@@ -79,7 +79,7 @@ import reskiume.composeapp.generated.resources.location_turn_on_location_title
 
 @Composable
 fun CheckAllFosterHomesScreen(
-    onModifyFosterHome: (fosterHomeId: String, ownerId: String) -> Unit,
+    onModifyFosterHome: (fosterHomeId: String) -> Unit,
     onCheckFosterHome: (fosterHomeId: String) -> Unit
 ) {
     val checkAllFosterHomesViewmodel: CheckAllFosterHomesViewmodel =
@@ -355,10 +355,7 @@ fun CheckAllFosterHomesScreen(
                                 city = uiFosterHome.fosterHome.city,
                                 onClick = {
                                     if (authState?.uid == uiFosterHome.fosterHome.ownerId) {
-                                        onModifyFosterHome(
-                                            uiFosterHome.fosterHome.id,
-                                            uiFosterHome.fosterHome.ownerId
-                                        )
+                                        onModifyFosterHome(uiFosterHome.fosterHome.id)
                                     } else {
                                         onCheckFosterHome(uiFosterHome.fosterHome.id)
                                     }

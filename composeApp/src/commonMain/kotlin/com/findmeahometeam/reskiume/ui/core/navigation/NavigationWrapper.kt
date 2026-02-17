@@ -11,7 +11,7 @@ import com.findmeahometeam.reskiume.ui.home.HomeScreen
 import com.findmeahometeam.reskiume.ui.profile.checkAdvice.CheckAdviceScreen
 import com.findmeahometeam.reskiume.ui.profile.checkAllAdvice.CheckAllAdviceScreen
 import com.findmeahometeam.reskiume.ui.profile.checkAllMyFosterHomes.CheckAllMyFosterHomesScreen
-import com.findmeahometeam.reskiume.ui.profile.checkAllNonHumanAnimals.CheckAllNonHumanAnimalsScreen
+import com.findmeahometeam.reskiume.ui.profile.checkMyAllNonHumanAnimals.CheckAllMyNonHumanAnimalsScreen
 import com.findmeahometeam.reskiume.ui.profile.createAccount.CreateAccountScreen
 import com.findmeahometeam.reskiume.ui.profile.deleteAccount.DeleteAccountScreen
 import com.findmeahometeam.reskiume.ui.profile.loginAccount.LoginAccountScreen
@@ -38,8 +38,8 @@ fun NavigationWrapper() {
                 onCreateFosterHome = { ownerId: String ->
                     mainNavController.navigate(CreateFosterHome(ownerId))
                 },
-                onModifyFosterHome = { fosterHomeId: String, ownerId: String ->
-                    mainNavController.navigate(ModifyFosterHome(fosterHomeId, ownerId))
+                onModifyFosterHome = { fosterHomeId: String ->
+                    mainNavController.navigate(ModifyFosterHome(fosterHomeId))
                 }
             )
         }
@@ -87,8 +87,8 @@ fun NavigationWrapper() {
             )
         }
 
-        composable<CheckAllNonHumanAnimals> {
-            CheckAllNonHumanAnimalsScreen(
+        composable<CheckAllMyNonHumanAnimals> {
+            CheckAllMyNonHumanAnimalsScreen(
                 onBackPressed = {
                     mainNavController.navigateUp()
                 },

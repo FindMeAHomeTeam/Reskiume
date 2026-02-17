@@ -6,7 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.findmeahometeam.reskiume.ui.chats.ChatsScreen
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckAllMyFosterHomes
-import com.findmeahometeam.reskiume.ui.core.navigation.CheckAllNonHumanAnimals
+import com.findmeahometeam.reskiume.ui.core.navigation.CheckAllMyNonHumanAnimals
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckFosterHome
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckReviews
 import com.findmeahometeam.reskiume.ui.core.navigation.ModifyFosterHome
@@ -28,8 +28,8 @@ fun BottomNavigationWrapper(
 
         composable(route = Routes.CHECK_ALL_FOSTER_HOMES.route) {
             CheckAllFosterHomesScreen(
-                onModifyFosterHome = { fosterHomeId: String, ownerId: String ->
-                    mainNavHostController.navigate(ModifyFosterHome(fosterHomeId, ownerId))
+                onModifyFosterHome = { fosterHomeId: String ->
+                    mainNavHostController.navigate(ModifyFosterHome(fosterHomeId))
                 },
                 onCheckFosterHome = { fosterHomeId: String ->
                     mainNavHostController.navigate(CheckFosterHome(fosterHomeId))
@@ -57,7 +57,7 @@ fun BottomNavigationWrapper(
                     mainNavHostController.navigate(CheckReviews(uid))
                 },
                 navigateToCheckNonHumanAnimalsScreen = { myUid ->
-                    mainNavHostController.navigate(CheckAllNonHumanAnimals(myUid))
+                    mainNavHostController.navigate(CheckAllMyNonHumanAnimals(myUid))
                 },
                 navigateToCheckMyFosterHomesScreen = { myUid ->
                     mainNavHostController.navigate(CheckAllMyFosterHomes(myUid))

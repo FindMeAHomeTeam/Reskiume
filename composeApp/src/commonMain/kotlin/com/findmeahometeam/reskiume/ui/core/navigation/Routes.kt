@@ -24,10 +24,7 @@ class CheckFosterHome(val fosterHomeId: String)
 class CheckAllMyFosterHomes(val myUid: String)
 
 @Serializable
-class ModifyFosterHome(
-    val fosterHomeId: String,
-    val ownerId: String
-)
+class ModifyFosterHome(val fosterHomeId: String)
 
 @Serializable
 class CreateFosterHome(val ownerId: String)
@@ -36,7 +33,7 @@ class CreateFosterHome(val ownerId: String)
 class CheckReviews(val uid: String)
 
 @Serializable
-class CheckAllNonHumanAnimals(val caregiverId: String)
+class CheckAllMyNonHumanAnimals(val caregiverId: String)
 
 @Serializable
 class CheckNonHumanAnimal(

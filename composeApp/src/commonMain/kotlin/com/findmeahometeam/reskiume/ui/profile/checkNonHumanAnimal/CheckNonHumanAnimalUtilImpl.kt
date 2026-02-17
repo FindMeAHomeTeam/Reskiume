@@ -12,6 +12,8 @@ import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetNonHumanAn
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetNonHumanAnimalFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.InsertNonHumanAnimalInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.ModifyNonHumanAnimalInLocalRepository
+import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.DeleteNonHumanAnimalUtil
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapConcat
@@ -23,6 +25,7 @@ class CheckNonHumanAnimalUtilImpl(
     private val observeAuthStateInAuthDataSource: ObserveAuthStateInAuthDataSource,
     private val getDataByManagingObjectLocalCacheTimestamp: GetDataByManagingObjectLocalCacheTimestamp,
     private val getNonHumanAnimalFromRemoteRepository: GetNonHumanAnimalFromRemoteRepository,
+    private val deleteNonHumanAnimalUtil: DeleteNonHumanAnimalUtil,
     private val deleteCacheFromLocalRepository: DeleteCacheFromLocalRepository,
     private val downloadImageToLocalDataSource: DownloadImageToLocalDataSource,
     private val insertNonHumanAnimalInLocalRepository: InsertNonHumanAnimalInLocalRepository,
@@ -34,7 +37,8 @@ class CheckNonHumanAnimalUtilImpl(
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun getNonHumanAnimalFlow(
         nonHumanAnimalId: String,
-        caregiverId: String
+        caregiverId: String,
+        coroutineScope: CoroutineScope
     ): Flow<NonHumanAnimal> =
         observeAuthStateInAuthDataSource().flatMapConcat { authUser: AuthUser? ->
 
@@ -49,7 +53,12 @@ class CheckNonHumanAnimalUtilImpl(
                     ).downloadImageAndInsertNonHumanAnimalInLocalRepository()
                         .mapNotNull {
                             if (it == null) {
-                                deleteNonHumanAnimalCacheFromLocalDataSource(nonHumanAnimalId)
+                                deleteNonHumanAnimal(
+                                    nonHumanAnimalId,
+                                    caregiverId,
+                                    authUser?.uid ?: "",
+                                    coroutineScope
+                                )
                             }
                             it
                         }
@@ -61,7 +70,12 @@ class CheckNonHumanAnimalUtilImpl(
                     ).downloadImageAndModifyNonHumanAnimalInLocalRepository()
                         .mapNotNull {
                             if (it == null) {
-                                deleteNonHumanAnimalCacheFromLocalDataSource(nonHumanAnimalId)
+                                deleteNonHumanAnimal(
+                                    nonHumanAnimalId,
+                                    caregiverId,
+                                    authUser?.uid ?: "",
+                                    coroutineScope
+                                )
                             }
                             it
                         }
@@ -112,6 +126,32 @@ class CheckNonHumanAnimalUtilImpl(
             }
         }
 
+    private fun deleteNonHumanAnimal(
+        nonHumanAnimalId: String,
+        caregiverId: String,
+        myUid: String,
+        coroutineScope: CoroutineScope
+    ) {
+        deleteNonHumanAnimalUtil.deleteNonHumanAnimal(
+            id = nonHumanAnimalId,
+            caregiverId = caregiverId,
+            coroutineScope = coroutineScope,
+            onlyDeleteOnLocal = myUid != caregiverId,
+            onError = {
+                log.d(
+                    "CheckNonHumanAnimalUtilImpl",
+                    "deleteNonHumanAnimal: Failed to delete the Non human animal $nonHumanAnimalId"
+                )
+            },
+            onComplete = {
+                log.d(
+                    "CheckNonHumanAnimalUtilImpl",
+                    "deleteNonHumanAnimal: Non human animal $nonHumanAnimalId deleted successfully"
+                )
+            }
+        )
+    }
+
     private suspend fun deleteNonHumanAnimalCacheFromLocalDataSource(
         id: String
     ) {
@@ -120,12 +160,12 @@ class CheckNonHumanAnimalUtilImpl(
             if (rowsDeleted > 0) {
                 log.d(
                     "CheckNonHumanAnimalUtilImpl",
-                    "Non human animal $id deleted in the local cache in section ${Section.NON_HUMAN_ANIMALS}"
+                    "deleteNonHumanAnimalCacheFromLocalDataSource: Non human animal $id deleted in the local cache in section ${Section.NON_HUMAN_ANIMALS}"
                 )
             } else {
                 log.e(
                     "CheckNonHumanAnimalUtilImpl",
-                    "Error deleting the non human animal $id in the local cache in section ${Section.NON_HUMAN_ANIMALS}"
+                    "deleteNonHumanAnimalCacheFromLocalDataSource: Error deleting the non human animal $id in the local cache in section ${Section.NON_HUMAN_ANIMALS}"
                 )
             }
         }

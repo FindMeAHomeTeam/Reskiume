@@ -20,8 +20,8 @@ import com.findmeahometeam.reskiume.domain.usecases.authUser.SignInWithEmailAndP
 import com.findmeahometeam.reskiume.domain.usecases.authUser.SignOutFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.DeleteAllMyFosterHomesFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.DeleteAllMyFosterHomesFromRemoteRepository
-import com.findmeahometeam.reskiume.domain.usecases.fosterHome.DeleteFosterHomeFromLocalRepository
-import com.findmeahometeam.reskiume.domain.usecases.fosterHome.DeleteFosterHomeFromRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.fosterHome.DeleteMyFosterHomeFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.fosterHome.DeleteMyFosterHomeFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllFosterHomesByCountryAndCityFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllFosterHomesByCountryAndCityFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllFosterHomesByLocationFromLocalRepository
@@ -85,8 +85,8 @@ val domainModule = module {
     // fosterHome
     factoryOf(::DeleteAllMyFosterHomesFromLocalRepository)
     factoryOf(::DeleteAllMyFosterHomesFromRemoteRepository)
-    factoryOf(::DeleteFosterHomeFromLocalRepository)
-    factoryOf(::DeleteFosterHomeFromRemoteRepository)
+    factoryOf(::DeleteMyFosterHomeFromLocalRepository)
+    factoryOf(::DeleteMyFosterHomeFromRemoteRepository)
     factoryOf(::GetAllMyFosterHomesFromLocalRepository)
     factoryOf(::GetAllMyFosterHomesFromRemoteRepository)
     factoryOf(::GetAllFosterHomesByCountryAndCityFromLocalRepository)

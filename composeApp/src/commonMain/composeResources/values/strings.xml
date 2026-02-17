@@ -138,6 +138,9 @@
     <string name="modify_non_human_animal_screen_delete_non_human_animal_title">Do you want to delete %1$s's profile?</string>
     <string name="modify_non_human_animal_screen_delete_non_human_animal_message">This action can not be undone</string>
     <string name="modify_non_human_animal_screen_save_non_human_animal_changes_button">Save %1$s's changes</string>
+    <string name="modify_non_human_animal_screen_non_human_animal_in_foster_home_title">%1$s is in a foster home</string>
+    <string name="modify_non_human_animal_screen_non_human_animal_in_foster_home_message">Please finish the process with %1$s from the foster home first</string>
+    <string name="modify_non_human_animal_screen_non_human_animal_in_foster_home_ok_button">Ok</string>
 
     <!-- No human animal types -->
     <string name="non_human_animal_type_unselected">Unselected</string>
@@ -252,6 +255,11 @@
     <string name="modify_foster_home_screen_available_label">Available</string>
     <string name="modify_foster_home_screen_unavailable_label">Not available</string>
     <string name="modify_foster_home_availability_description">Update this foster home's availability to receive rehome requests</string>
+    <string name="modify_foster_home_screen_warning_foster_home_with_residents_title">This foster home has %1$d residents</string>
+    <string name="modify_foster_home_screen_warning_foster_home_with_residents_message">To delete this foster home you must first unregister all residents</string>
+    <string name="modify_foster_home_screen_warning_foster_home_with_residents_ok_button">Ok</string>
+
+
 
     <!-- Accepted non human animal list creator -->
     <string name="accepted_non_human_animal_list_creator_title">Add accepted non-human animals:</string>

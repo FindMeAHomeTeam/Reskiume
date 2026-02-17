@@ -216,7 +216,14 @@ fun ModifyFosterHomeScreen(
                         fosterHome.title
                     ),
                     textToLink = stringResource(Res.string.modify_foster_home_screen_delete_foster_home_button),
-                    onClick = { displayDeleteDialog = true }
+                    onClick = {
+                        if (uiFosterHome.uiAllResidentNonHumanAnimals.isEmpty()) {
+                            displayDeleteDialog = true
+                        } else {
+                            displayFosterHomeWithResidentsDialog = true
+                        }
+
+                    }
                 )
                 if (displayDeleteDialog) {
                     RmDialog(
@@ -236,6 +243,21 @@ fun ModifyFosterHomeScreen(
                             displayDeleteDialog = false
                         },
                         onClickDeny = { displayDeleteDialog = false }
+                    )
+                }
+                if (displayFosterHomeWithResidentsDialog) {
+                    RmDialog(
+                        emoji = "🐷🐱",
+                        title = stringResource(
+                            Res.string.modify_foster_home_screen_warning_foster_home_with_residents_title,
+                            uiFosterHome.uiAllResidentNonHumanAnimals.size
+                        ),
+                        message = stringResource(Res.string.modify_foster_home_screen_warning_foster_home_with_residents_message),
+                        allowMessage = stringResource(Res.string.modify_foster_home_screen_warning_foster_home_with_residents_ok_button),
+                        onClickAllow = {
+                            displayFosterHomeWithResidentsDialog = false
+                        },
+                        onClickDeny = { displayFosterHomeWithResidentsDialog = false }
                     )
                 }
 

@@ -12,7 +12,7 @@ import com.findmeahometeam.reskiume.ui.profile.checkAllAdvice.CheckAllAdviceView
 import com.findmeahometeam.reskiume.ui.profile.checkAllMyFosterHomes.CheckAllMyFosterHomesUtil
 import com.findmeahometeam.reskiume.ui.profile.checkAllMyFosterHomes.CheckAllMyFosterHomesUtilImpl
 import com.findmeahometeam.reskiume.ui.profile.checkAllMyFosterHomes.CheckAllMyFosterHomesViewmodel
-import com.findmeahometeam.reskiume.ui.profile.checkAllNonHumanAnimals.CheckAllNonHumanAnimalsViewmodel
+import com.findmeahometeam.reskiume.ui.profile.checkMyAllNonHumanAnimals.CheckAllMyNonHumanAnimalsViewmodel
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalViewmodel
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtilImpl
@@ -44,7 +44,7 @@ val uiModule = module {
     viewModelOf(::DeleteAccountViewmodel)
     viewModelOf(::CheckReviewsViewmodel)
     singleOf(::CheckActivistUtil)
-    viewModelOf(::CheckAllNonHumanAnimalsViewmodel)
+    viewModelOf(::CheckAllMyNonHumanAnimalsViewmodel)
     viewModelOf(::ModifyNonHumanAnimalViewmodel)
     viewModelOf(::CheckNonHumanAnimalViewmodel)
     singleOf(::CheckNonHumanAnimalUtilImpl) bind CheckNonHumanAnimalUtil::class

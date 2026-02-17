@@ -47,6 +47,9 @@ import reskiume.composeapp.generated.resources.modify_non_human_animal_screen_di
 import reskiume.composeapp.generated.resources.modify_non_human_animal_screen_non_human_animal_age_category
 import reskiume.composeapp.generated.resources.modify_non_human_animal_screen_non_human_animal_description
 import reskiume.composeapp.generated.resources.modify_non_human_animal_screen_non_human_animal_gender
+import reskiume.composeapp.generated.resources.modify_non_human_animal_screen_non_human_animal_in_foster_home_message
+import reskiume.composeapp.generated.resources.modify_non_human_animal_screen_non_human_animal_in_foster_home_ok_button
+import reskiume.composeapp.generated.resources.modify_non_human_animal_screen_non_human_animal_in_foster_home_title
 import reskiume.composeapp.generated.resources.modify_non_human_animal_screen_non_human_animal_name
 import reskiume.composeapp.generated.resources.modify_non_human_animal_screen_non_human_animal_profile_title
 import reskiume.composeapp.generated.resources.modify_non_human_animal_screen_non_human_animal_type
@@ -106,6 +109,7 @@ fun ModifyNonHumanAnimalScreen(
                 var ageCategory: AgeCategory by rememberSaveable { mutableStateOf(nonHumanAnimal.ageCategory) }
                 var description: String by rememberSaveable { mutableStateOf(nonHumanAnimal.description) }
                 var displayDeleteDialog: Boolean by rememberSaveable { mutableStateOf(false) }
+                var displayNonHumanAnimalInFosterHomeDialog: Boolean by rememberSaveable { mutableStateOf(false) }
 
                 val isUpdateUserButtonEnabled by remember(
                     imageUrl,
@@ -201,7 +205,13 @@ fun ModifyNonHumanAnimalScreen(
                         nonHumanAnimal.name
                     ),
                     textToLink = stringResource(Res.string.modify_non_human_animal_screen_delete_non_human_animal_button),
-                    onClick = { displayDeleteDialog = true }
+                    onClick = {
+                        if (nonHumanAnimal.fosterHomeId.isBlank()) {
+                            displayDeleteDialog = true
+                        } else {
+                            displayNonHumanAnimalInFosterHomeDialog = true
+                        }
+                    }
                 )
                 if (displayDeleteDialog) {
                     RmDialog(
@@ -221,6 +231,24 @@ fun ModifyNonHumanAnimalScreen(
                             displayDeleteDialog = false
                         },
                         onClickDeny = { displayDeleteDialog = false }
+                    )
+                }
+                if (displayNonHumanAnimalInFosterHomeDialog) {
+                    RmDialog(
+                        emoji = nonHumanAnimal.nonHumanAnimalType.toEmoji(),
+                        title = stringResource(
+                            Res.string.modify_non_human_animal_screen_non_human_animal_in_foster_home_title,
+                            nonHumanAnimal.name
+                        ),
+                        message = stringResource(
+                            Res.string.modify_non_human_animal_screen_non_human_animal_in_foster_home_message,
+                            nonHumanAnimal.name
+                        ),
+                        allowMessage = stringResource(Res.string.modify_non_human_animal_screen_non_human_animal_in_foster_home_ok_button),
+                        onClickAllow = {
+                            displayNonHumanAnimalInFosterHomeDialog = false
+                        },
+                        onClickDeny = { displayNonHumanAnimalInFosterHomeDialog = false }
                     )
                 }
 

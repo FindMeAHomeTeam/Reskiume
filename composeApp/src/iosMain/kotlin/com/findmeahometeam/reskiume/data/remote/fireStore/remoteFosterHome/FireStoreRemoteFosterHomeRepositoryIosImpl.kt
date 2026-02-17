@@ -91,16 +91,15 @@ class FireStoreRemoteFosterHomeRepositoryIosImpl(
         }
     }
 
-    override fun getRemoteFosterHome(
-        id: String,
-        ownerId: String
-    ): Flow<RemoteFosterHome?> {
+    override fun getRemoteFosterHome(id: String): Flow<RemoteFosterHome?> {
+
         fireStoreRemoteFosterHomeFlowsRepositoryForIosDelegate
-            .updateQueryFosterHome(QueryFosterHome(id = id, ownerId = ownerId))
+            .updateQueryFosterHome(QueryFosterHome(id = id))
         return fireStoreRemoteFosterHomeFlowsRepositoryForIosDelegate.remoteFosterHomeListFlow.map { it.firstOrNull() }
     }
 
     override fun getAllMyRemoteFosterHomes(ownerId: String): Flow<List<RemoteFosterHome>> {
+
         fireStoreRemoteFosterHomeFlowsRepositoryForIosDelegate
             .updateQueryFosterHome(QueryFosterHome(ownerId = ownerId))
         return fireStoreRemoteFosterHomeFlowsRepositoryForIosDelegate.remoteFosterHomeListFlow
@@ -110,6 +109,7 @@ class FireStoreRemoteFosterHomeRepositoryIosImpl(
         country: String,
         city: String
     ): Flow<List<RemoteFosterHome?>> {
+
         fireStoreRemoteFosterHomeFlowsRepositoryForIosDelegate
             .updateQueryFosterHome(QueryFosterHome(country = country, city = city))
         return fireStoreRemoteFosterHomeFlowsRepositoryForIosDelegate.remoteFosterHomeListFlow
@@ -121,6 +121,7 @@ class FireStoreRemoteFosterHomeRepositoryIosImpl(
         rangeLongitude: Double,
         rangeLatitude: Double
     ): Flow<List<RemoteFosterHome?>> {
+
         fireStoreRemoteFosterHomeFlowsRepositoryForIosDelegate
             .updateQueryFosterHome(
                 QueryFosterHome(

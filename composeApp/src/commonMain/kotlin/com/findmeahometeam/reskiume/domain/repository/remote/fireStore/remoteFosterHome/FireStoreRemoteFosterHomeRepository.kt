@@ -27,7 +27,7 @@ interface FireStoreRemoteFosterHomeRepository {
         onDeleteAllMyRemoteFosterHomes: (result: DatabaseResult) -> Unit
     )
 
-    fun getRemoteFosterHome(id: String, ownerId: String): Flow<RemoteFosterHome?>
+    fun getRemoteFosterHome(id: String): Flow<RemoteFosterHome?>
 
     fun getAllMyRemoteFosterHomes(ownerId: String): Flow<List<RemoteFosterHome?>>
 

@@ -48,7 +48,6 @@ class FireStoreRemoteFosterHomeRepositoryForIosDelegateImpl: FireStoreRemoteFost
                         
                         try await fetchFosterHome(
                             fosterHomeId: fosterHomeId,
-                            ownerId: ownerId,
                             fireStoreRemoteFosterHomeFlowsRepositoryForIosDelegate: fireStoreRemoteFosterHomeFlowsRepositoryForIosDelegate
                         )
                     } else if isFetchAllFosterHomesByCountryAndCity {
@@ -109,7 +108,6 @@ class FireStoreRemoteFosterHomeRepositoryForIosDelegateImpl: FireStoreRemoteFost
     
     private func fetchFosterHome(
         fosterHomeId: String,
-        ownerId: String,
         fireStoreRemoteFosterHomeFlowsRepositoryForIosDelegate: FireStoreRemoteFosterHomeFlowsRepositoryForIosDelegate
     ) async throws {
         
@@ -124,7 +122,7 @@ class FireStoreRemoteFosterHomeRepositoryForIosDelegateImpl: FireStoreRemoteFost
         } catch {
             log.e(
                 tag: "FireStoreRemoteFosterHomeRepositoryForIosDelegateImpl",
-                message: "Error retrieving the remote foster home \(fosterHomeId) for the owner id \(ownerId): \(String(describing: error))",
+                message: "Error retrieving the remote foster home \(fosterHomeId): \(String(describing: error))",
                 throwable: nil
             )
             fireStoreRemoteFosterHomeFlowsRepositoryForIosDelegate.updateRemoteFosterHomeListFlow(delegate: [])

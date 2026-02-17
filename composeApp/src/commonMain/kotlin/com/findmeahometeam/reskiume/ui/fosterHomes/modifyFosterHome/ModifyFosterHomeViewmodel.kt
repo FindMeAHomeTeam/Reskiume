@@ -116,8 +116,7 @@ class ModifyFosterHomeViewmodel(
                 }
             } else {
                 val collectedFosterHome = getFosterHomeFromRemoteRepository(
-                    modifiedFosterHome.id,
-                    modifiedFosterHome.ownerId,
+                    modifiedFosterHome.id
                 ).first()
 
                 modifyFosterHomeInRemoteDataSource(
@@ -132,7 +131,6 @@ class ModifyFosterHomeViewmodel(
         }
     }
 
-
     private fun deleteCurrentImageFromRemoteDataSource(
         ownerId: String,
         fosterHomeId: String,
@@ -141,8 +139,7 @@ class ModifyFosterHomeViewmodel(
         viewModelScope.launch {
 
             val remoteFosterHome = getFosterHomeFromRemoteRepository(
-                fosterHomeId,
-                ownerId
+                fosterHomeId
             ).first()
 
             deleteImageFromRemoteDataSource(

@@ -75,8 +75,7 @@ class DeleteFosterHomeUtil(
         coroutineScope.launch {
 
             val remoteFosterHome = getFosterHomeFromRemoteRepository(
-                fosterHomeId,
-                ownerId
+                fosterHomeId
             ).first()
 
             deleteImageFromRemoteDataSource(

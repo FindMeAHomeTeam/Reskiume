@@ -114,10 +114,8 @@ class FireStoreRemoteFosterHomeRepositoryAndroidImpl(
             }
     }
 
-    override fun getRemoteFosterHome(
-        id: String,
-        ownerId: String
-    ): Flow<RemoteFosterHome?> = flow {
+    override fun getRemoteFosterHome(id: String): Flow<RemoteFosterHome?> = flow {
+
         val querySnapshot = firebaseFirestore
             .collection(Section.FOSTER_HOMES.path)
             .document(id)
@@ -130,7 +128,7 @@ class FireStoreRemoteFosterHomeRepositoryAndroidImpl(
     }.catch { e ->
         log.e(
             "FireStoreRemoteFosterHomeRepositoryImpl",
-            "getRemoteFosterHome: Error retrieving the remote foster home $id from the owner $ownerId: ${e.message}"
+            "getRemoteFosterHome: Error retrieving the remote foster home $id: ${e.message}"
         )
         emit(null)
     }

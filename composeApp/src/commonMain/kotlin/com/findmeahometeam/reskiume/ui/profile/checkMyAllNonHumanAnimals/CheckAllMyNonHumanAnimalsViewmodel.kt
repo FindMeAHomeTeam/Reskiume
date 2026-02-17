@@ -1,4 +1,4 @@
-package com.findmeahometeam.reskiume.ui.profile.checkAllNonHumanAnimals
+package com.findmeahometeam.reskiume.ui.profile.checkMyAllNonHumanAnimals
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,7 +13,7 @@ import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNam
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
-import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllMyNonHumanAnimalsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.InsertNonHumanAnimalInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.ModifyNonHumanAnimalInLocalRepository
@@ -30,7 +30,7 @@ import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class CheckAllNonHumanAnimalsViewmodel(
+class CheckAllMyNonHumanAnimalsViewmodel(
     saveStateHandleProvider: SaveStateHandleProvider,
     observeAuthStateInAuthDataSource: ObserveAuthStateInAuthDataSource,
     private val getDataByManagingObjectLocalCacheTimestamp: GetDataByManagingObjectLocalCacheTimestamp,
@@ -40,7 +40,7 @@ class CheckAllNonHumanAnimalsViewmodel(
     private val insertCacheInLocalRepository: InsertCacheInLocalRepository,
     private val modifyNonHumanAnimalInLocalRepository: ModifyNonHumanAnimalInLocalRepository,
     private val modifyCacheInLocalRepository: ModifyCacheInLocalRepository,
-    private val getAllNonHumanAnimalsFromLocalRepository: GetAllNonHumanAnimalsFromLocalRepository,
+    private val getAllMyNonHumanAnimalsFromLocalRepository: GetAllMyNonHumanAnimalsFromLocalRepository,
     private val getImagePathForFileNameFromLocalDataSource: GetImagePathForFileNameFromLocalDataSource,
     private val log: Log
 ) : ViewModel() {
@@ -63,7 +63,7 @@ class CheckAllNonHumanAnimalsViewmodel(
                         getAllNonHumanAnimalsFromRemoteRepository(caregiverId).downloadImageAndModifyNonHumanAnimalsInLocalRepository()
                     },
                     onVerifyCacheIsRecent = {
-                        getAllNonHumanAnimalsFromLocalRepository(caregiverId)
+                        getAllMyNonHumanAnimalsFromLocalRepository(caregiverId)
                     }
                 ).map {
                     it.map { nonHumanAnimal ->

@@ -42,7 +42,6 @@ import reskiume.composeapp.generated.resources.resident_non_human_animal_list_cr
 
 @Composable
 fun RmResidentNonHumanAnimalListCreator(
-    fosterHomeId: String,
     allAvailableNonHumanAnimals: List<NonHumanAnimal>,
     allResidentNonHumanAnimals: List<NonHumanAnimal>,
     onAddResidentNonHumanAnimal: (List<NonHumanAnimal>) -> Unit

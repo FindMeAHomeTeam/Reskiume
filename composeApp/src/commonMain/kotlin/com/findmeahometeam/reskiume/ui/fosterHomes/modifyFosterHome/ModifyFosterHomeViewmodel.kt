@@ -79,8 +79,8 @@ class ModifyFosterHomeViewmodel(
             )
         }.toUiState()
 
-    val allAvailableNonHumanAnimalsFlow: Flow<List<NonHumanAnimal>> =
-        getAllNonHumanAnimalsFromLocalRepository(ownerId).map {
+    val allAvailableNonHumanAnimalsLookingForAdoptionFlow: Flow<List<NonHumanAnimal>> =
+        getAllNonHumanAnimalsFromLocalRepository().map {
             it.mapNotNull { nonHumanAnimal ->
                 if (nonHumanAnimal.adoptionState == AdoptionState.LOOKING_FOR_ADOPTION) {
                     nonHumanAnimal
@@ -255,7 +255,8 @@ class ModifyFosterHomeViewmodel(
 
             modifyFosterHomeInRemoteRepository(
                 updatedFosterHome,
-                previousFosterHome
+                previousFosterHome,
+                viewModelScope
             ) { result ->
 
                 if (result is DatabaseResult.Success) {

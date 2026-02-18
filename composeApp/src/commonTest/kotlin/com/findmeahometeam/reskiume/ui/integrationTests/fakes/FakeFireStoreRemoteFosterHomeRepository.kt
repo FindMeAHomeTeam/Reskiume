@@ -66,11 +66,8 @@ class FakeFireStoreRemoteFosterHomeRepository(
         }
     }
 
-    override fun getRemoteFosterHome(
-        id: String,
-        ownerId: String
-    ): Flow<RemoteFosterHome?> =
-        flowOf(remoteFosterHomeList.firstOrNull { it.id == id && it.ownerId == ownerId })
+    override fun getRemoteFosterHome(id: String): Flow<RemoteFosterHome?> =
+        flowOf(remoteFosterHomeList.firstOrNull { it.id == id })
 
     override fun getAllMyRemoteFosterHomes(ownerId: String): Flow<List<RemoteFosterHome>> =
         flowOf(remoteFosterHomeList.filter { it.ownerId == ownerId })

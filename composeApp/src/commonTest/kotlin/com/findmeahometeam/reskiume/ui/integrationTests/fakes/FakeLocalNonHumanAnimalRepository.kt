@@ -69,6 +69,9 @@ class FakeLocalNonHumanAnimalRepository(
         id: String,
     ): NonHumanAnimalEntity? = localNonHumanAnimalList.firstOrNull { it.id == id }
 
-    override fun getAllNonHumanAnimals(caregiverId: String): Flow<List<NonHumanAnimalEntity>> =
+    override fun getAllMyNonHumanAnimals(caregiverId: String): Flow<List<NonHumanAnimalEntity>> =
         flowOf(localNonHumanAnimalList.filter { it.caregiverId == caregiverId })
+
+    override fun getAllNonHumanAnimals(): Flow<List<NonHumanAnimalEntity>> =
+        flowOf(localNonHumanAnimalList)
 }

@@ -121,7 +121,8 @@ val fosterHome = FosterHome(
     ),
     allResidentNonHumanAnimals = listOf(
         ResidentNonHumanAnimalForFosterHome(
-            residentNonHumanAnimal = nonHumanAnimal,
+            nonHumanAnimalId = nonHumanAnimal.id,
+            caregiverId = nonHumanAnimal.caregiverId,
             fosterHomeId = "123" + user.uid
         )
     ),
@@ -139,5 +140,5 @@ const val activistLatitude = 37.891891891891895
 val fosterHomeWithAllNonHumanAnimalData = FosterHomeWithAllNonHumanAnimalData(
     fosterHomeEntity = fosterHome.toEntity(),
     allAcceptedNonHumanAnimals = fosterHome.allAcceptedNonHumanAnimals.map { it.toEntity() },
-    allResidentNonHumanAnimalIds = fosterHome.allResidentNonHumanAnimals.map { it.toEntityForId() }
+    allResidentNonHumanAnimalIds = fosterHome.allResidentNonHumanAnimals.map { it.toEntity() }
 )

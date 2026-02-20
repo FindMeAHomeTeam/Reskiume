@@ -10,6 +10,7 @@ import com.findmeahometeam.reskiume.domain.usecases.fosterHome.ModifyFosterHomeI
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
@@ -29,7 +30,8 @@ class CheckAllMyFosterHomesUtilImpl(
 
     override fun downloadImageAndManageFosterHomesInLocalRepositoryFromFlow(
         allFosterHomesFlow: Flow<List<FosterHome>>,
-        myUid: String
+        myUid: String,
+        coroutineScope: CoroutineScope
     ): Flow<List<FosterHome>> =
         allFosterHomesFlow.map { fosterHomeList ->
             fosterHomeList.map { fosterHome ->
@@ -51,11 +53,13 @@ class CheckAllMyFosterHomesUtilImpl(
                     if (localFosterHome == null) {
                         insertFosterHomeInLocalRepo(
                             fosterHomeWithLocalImage,
+                            coroutineScope,
                             myUid
                         )
                     } else {
                         modifyFosterHomeInLocalRepo(
                             fosterHomeWithLocalImage,
+                            coroutineScope,
                             myUid
                         )
                     }
@@ -72,11 +76,13 @@ class CheckAllMyFosterHomesUtilImpl(
                     if (localFosterHome == null) {
                         insertFosterHomeInLocalRepo(
                             fosterHome,
+                            coroutineScope,
                             myUid
                         )
                     } else {
                         modifyFosterHomeInLocalRepo(
                             fosterHome,
+                            coroutineScope,
                             myUid
                         )
                     }
@@ -88,9 +94,13 @@ class CheckAllMyFosterHomesUtilImpl(
     @OptIn(ExperimentalTime::class)
     private suspend fun insertFosterHomeInLocalRepo(
         fosterHome: FosterHome,
+        coroutineScope: CoroutineScope,
         myUid: String
     ) {
-        insertFosterHomeInLocalRepository(fosterHome) { isSuccess ->
+        insertFosterHomeInLocalRepository(
+            fosterHome,
+            coroutineScope
+        ) { isSuccess ->
             if (isSuccess) {
                 log.d(
                     "CheckAllMyFosterHomesUtilImpl",
@@ -130,13 +140,15 @@ class CheckAllMyFosterHomesUtilImpl(
     @OptIn(ExperimentalTime::class)
     private suspend fun modifyFosterHomeInLocalRepo(
         updatedFosterHome: FosterHome,
+        coroutineScope: CoroutineScope,
         myUid: String
     ) {
         val previousFosterHome = getFosterHomeFromLocalRepository(updatedFosterHome.id).first()!!
 
         modifyFosterHomeInLocalRepository(
             updatedFosterHome,
-            previousFosterHome
+            previousFosterHome,
+            coroutineScope
         ) { isSuccess ->
             if (isSuccess) {
                 log.d(
@@ -175,7 +187,8 @@ class CheckAllMyFosterHomesUtilImpl(
 
     override fun downloadImageAndModifyFosterHomesInLocalRepositoryFromFlow(
         allFosterHomesFlow: Flow<List<FosterHome>>,
-        myUid: String
+        myUid: String,
+        coroutineScope: CoroutineScope
     ): Flow<List<FosterHome>> =
         allFosterHomesFlow.map { fosterHomeList ->
             fosterHomeList.map { fosterHome ->
@@ -192,6 +205,7 @@ class CheckAllMyFosterHomesUtilImpl(
 
                     modifyFosterHomeInLocalRepo(
                         fosterHomeWithLocalImage,
+                        coroutineScope,
                         myUid
                     )
                     fosterHomeWithLocalImage
@@ -202,6 +216,7 @@ class CheckAllMyFosterHomesUtilImpl(
                     )
                     modifyFosterHomeInLocalRepo(
                         fosterHome,
+                        coroutineScope,
                         myUid
                     )
                     fosterHome

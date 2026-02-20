@@ -219,7 +219,8 @@ class CheckAllFosterHomesViewmodel(
                             )
                         checkAllMyFosterHomesUtil.downloadImageAndManageFosterHomesInLocalRepositoryFromFlow(
                             allFosterHomesFlow,
-                            myUid
+                            myUid,
+                            viewModelScope
                         )
                     },
                     onCompletionUpdateCache = {
@@ -230,7 +231,8 @@ class CheckAllFosterHomesViewmodel(
                             )
                         checkAllMyFosterHomesUtil.downloadImageAndModifyFosterHomesInLocalRepositoryFromFlow(
                             allFosterHomesFlow,
-                            myUid
+                            myUid,
+                            viewModelScope
                         )
                     },
                     onVerifyCacheIsRecent = {
@@ -294,7 +296,8 @@ class CheckAllFosterHomesViewmodel(
                             )
                         checkAllMyFosterHomesUtil.downloadImageAndManageFosterHomesInLocalRepositoryFromFlow(
                             allFosterHomesFlow,
-                            myUid
+                            myUid,
+                            viewModelScope
                         )
                     },
                     onCompletionUpdateCache = {
@@ -307,7 +310,8 @@ class CheckAllFosterHomesViewmodel(
                             )
                         checkAllMyFosterHomesUtil.downloadImageAndModifyFosterHomesInLocalRepositoryFromFlow(
                             allFosterHomesFlow,
-                            myUid
+                            myUid,
+                            viewModelScope
                         )
                     },
                     onVerifyCacheIsRecent = {

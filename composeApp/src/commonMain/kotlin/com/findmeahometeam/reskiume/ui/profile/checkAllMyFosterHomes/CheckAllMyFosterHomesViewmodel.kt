@@ -50,7 +50,8 @@ class CheckAllMyFosterHomesViewmodel(
                             )
                         checkAllMyFosterHomesUtil.downloadImageAndManageFosterHomesInLocalRepositoryFromFlow(
                             allFosterHomesFlow,
-                            myUid
+                            myUid,
+                            viewModelScope
                         )
                     },
                     onCompletionUpdateCache = {
@@ -60,7 +61,8 @@ class CheckAllMyFosterHomesViewmodel(
                             )
                         checkAllMyFosterHomesUtil.downloadImageAndModifyFosterHomesInLocalRepositoryFromFlow(
                             allFosterHomesFlow,
-                            myUid
+                            myUid,
+                            viewModelScope
                         )
                     },
                     onVerifyCacheIsRecent = {

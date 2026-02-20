@@ -5,16 +5,16 @@ import com.findmeahometeam.reskiume.data.remote.response.RemoteNonHumanAnimal
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.AdoptionState
 import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
+import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteFosterHome.FireStoreRemoteFosterHomeRepository
-import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.DeleteNonHumanAnimalUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 
 class InsertFosterHomeInRemoteRepository(
-    private val observeAuthStateInAuthDataSource: ObserveAuthStateInAuthDataSource,
+    private val authRepository: AuthRepository,
     private val deleteNonHumanAnimalUtil: DeleteNonHumanAnimalUtil,
     private val fireStoreRemoteFosterHomeRepository: FireStoreRemoteFosterHomeRepository,
     private val realtimeDatabaseRemoteNonHumanAnimalRepository: RealtimeDatabaseRemoteNonHumanAnimalRepository,
@@ -26,7 +26,7 @@ class InsertFosterHomeInRemoteRepository(
         coroutineScope: CoroutineScope,
         onInsertRemoteFosterHome: (result: DatabaseResult) -> Unit
     ) {
-        val myUid = observeAuthStateInAuthDataSource().first()!!.uid
+        val myUid = authRepository.authState.first()!!.uid
         val updatedFosterHome = getUpdatedFosterHomeWithUpdatedResidents(
             fosterHome,
             myUid,

@@ -287,7 +287,8 @@ class ModifyFosterHomeViewmodel(
 
             modifyFosterHomeInLocalRepository(
                 updatedFosterHome,
-                previousFosterHome
+                previousFosterHome,
+                viewModelScope
             ) { isUpdated: Boolean ->
 
                 if (isUpdated) {

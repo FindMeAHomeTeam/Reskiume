@@ -1,24 +1,28 @@
 package com.findmeahometeam.reskiume.domain.usecases.fosterHome
 
-import com.findmeahometeam.reskiume.data.database.entity.NonHumanAnimalEntity
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.AdoptionState
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
 import com.findmeahometeam.reskiume.domain.repository.local.LocalFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
+import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.firstOrNull
 
 class InsertFosterHomeInLocalRepository(
     private val localFosterHomeRepository: LocalFosterHomeRepository,
     private val manageImagePath: ManageImagePath,
     private val localNonHumanAnimalRepository: LocalNonHumanAnimalRepository,
+    private val checkNonHumanAnimalUtil: CheckNonHumanAnimalUtil,
     private val authRepository: AuthRepository,
     private val log: Log
 ) {
     suspend operator fun invoke(
         fosterHome: FosterHome,
+        coroutineScope: CoroutineScope,
         onInsertFosterHome: suspend (isSuccess: Boolean) -> Unit
     ) {
         val imageFileName = manageImagePath.getFileNameFromLocalImagePath(fosterHome.imageUrl)
@@ -33,7 +37,7 @@ class InsertFosterHomeInLocalRepository(
                     var isSuccess = insertAllAcceptedNonHumanAnimals(createdFosterHome)
 
                     if (isSuccess) {
-                        isSuccess = insertAllResidentNonHumanAnimals(createdFosterHome)
+                        isSuccess = insertAllResidentNonHumanAnimals(createdFosterHome, coroutineScope)
                     }
                     onInsertFosterHome(isSuccess)
                 } else {
@@ -69,17 +73,22 @@ class InsertFosterHomeInLocalRepository(
         return isSuccess
     }
 
-    private suspend fun insertAllResidentNonHumanAnimals(fosterHome: FosterHome): Boolean {
+    private suspend fun insertAllResidentNonHumanAnimals(
+        fosterHome: FosterHome,
+        coroutineScope: CoroutineScope
+    ): Boolean {
         var isSuccess = true
         fosterHome.allResidentNonHumanAnimals.forEach { residentNonHumanAnimalForFosterHome ->
             if (isSuccess) {
 
-                val nonHumanAnimalEntity: NonHumanAnimalEntity? =
-                    localNonHumanAnimalRepository.getNonHumanAnimal(
+                val residentNonHumanAnimal: NonHumanAnimal? =
+                    checkNonHumanAnimalUtil.getNonHumanAnimalFlow(
                         residentNonHumanAnimalForFosterHome.nonHumanAnimalId,
-                    )
+                        residentNonHumanAnimalForFosterHome.caregiverId,
+                        coroutineScope
+                    ).firstOrNull()
 
-                if (nonHumanAnimalEntity == null) {
+                if (residentNonHumanAnimal == null) {
                     log.d(
                         "InsertFosterHomeInLocalRepository",
                         "insertAllResidentNonHumanAnimals: Can not insert the resident nor update the adoption state for the resident id ${residentNonHumanAnimalForFosterHome.nonHumanAnimalId} in the foster home ${residentNonHumanAnimalForFosterHome.fosterHomeId} in the local data source"
@@ -91,12 +100,12 @@ class InsertFosterHomeInLocalRepository(
                             if (rowId > 0) {
                                 log.d(
                                     "InsertFosterHomeInLocalRepository",
-                                    "insertAllResidentNonHumanAnimals: inserted the non human animal ${nonHumanAnimalEntity.id} in the foster home ${nonHumanAnimalEntity.fosterHomeId} in the local data source"
+                                    "insertAllResidentNonHumanAnimals: inserted the non human animal ${residentNonHumanAnimal.id} in the foster home ${residentNonHumanAnimal.fosterHomeId} in the local data source"
                                 )
                             } else {
                                 log.e(
                                     "InsertFosterHomeInLocalRepository",
-                                    "insertAllResidentNonHumanAnimals: failed to insert the non human animal ${nonHumanAnimalEntity.id} in the foster home ${nonHumanAnimalEntity.fosterHomeId} in the local data source"
+                                    "insertAllResidentNonHumanAnimals: failed to insert the non human animal ${residentNonHumanAnimal.id} in the foster home ${residentNonHumanAnimal.fosterHomeId} in the local data source"
                                 )
                                 isSuccess = false
                             }
@@ -104,24 +113,24 @@ class InsertFosterHomeInLocalRepository(
                     )
                     if (isSuccess) {
                         val imageFileName = manageImagePath.getFileNameFromLocalImagePath(
-                            nonHumanAnimalEntity.imageUrl
+                            residentNonHumanAnimal.imageUrl
                         )
                         localNonHumanAnimalRepository.modifyNonHumanAnimal(
-                            nonHumanAnimalEntity.copy(
+                            residentNonHumanAnimal.copy(
                                 adoptionState = AdoptionState.REHOMED,
                                 fosterHomeId = fosterHome.id,
                                 imageUrl = imageFileName
-                            )
+                            ).toEntity()
                         ) { rowsUpdated ->
                             if (rowsUpdated > 0) {
                                 log.d(
                                     "InsertFosterHomeInLocalRepository",
-                                    "insertAllResidentNonHumanAnimals: updated adoption state for the non human animal ${nonHumanAnimalEntity.id} in the local data source"
+                                    "insertAllResidentNonHumanAnimals: updated adoption state for the non human animal ${residentNonHumanAnimal.id} in the local data source"
                                 )
                             } else {
                                 log.e(
                                     "InsertFosterHomeInLocalRepository",
-                                    "insertAllResidentNonHumanAnimals: failed to update the adoption state for the non human animal ${nonHumanAnimalEntity.id} in the local data source"
+                                    "insertAllResidentNonHumanAnimals: failed to update the adoption state for the non human animal ${residentNonHumanAnimal.id} in the local data source"
                                 )
                                 isSuccess = false
                             }

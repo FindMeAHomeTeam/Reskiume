@@ -4,8 +4,10 @@ import com.findmeahometeam.reskiume.authUser
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInLocalDataSource
+import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.findmeahometeam.reskiume.user
 import dev.mokkery.answering.returns
+import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
@@ -16,6 +18,12 @@ import kotlin.test.Test
 
 class ModifyUserInLocalDataSourceTest {
 
+    val manageImagePath: ManageImagePath = mock {
+        every { getImagePathForFileName(user.image) } returns user.image
+
+        every { getFileNameFromLocalImagePath(user.image) } returns user.image
+    }
+
     val localUserRepository: LocalUserRepository = mock {
         everySuspend { modifyUser(user, any()) } returns Unit
     }
@@ -25,13 +33,14 @@ class ModifyUserInLocalDataSourceTest {
     }
 
     private val modifyUserInLocalDataSource =
-        ModifyUserInLocalDataSource(localUserRepository, authRepository)
+        ModifyUserInLocalDataSource(manageImagePath, localUserRepository, authRepository)
 
     @Test
-    fun `given a user_when the app updates it in the local data source_then it calls to modifyUser`() =
+    fun `given a user_when the app updates it in the local data source_then it calls to getFileNameFromLocalImagePath and modifyUser`() =
         runTest {
             modifyUserInLocalDataSource(user, {})
             verifySuspend {
+                manageImagePath.getFileNameFromLocalImagePath(user.image)
                 localUserRepository.modifyUser(user, any())
             }
         }

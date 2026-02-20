@@ -7,9 +7,6 @@ import com.findmeahometeam.reskiume.activistLongitude
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteFosterHome.FireStoreRemoteFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllFosterHomesByLocationFromRemoteRepository
 import com.findmeahometeam.reskiume.fosterHome
-import com.findmeahometeam.reskiume.nonHumanAnimal
-import com.findmeahometeam.reskiume.ui.core.components.toUiState
-import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.mock
@@ -30,20 +27,9 @@ class GetAllFosterHomesByLocationFromRemoteRepositoryTest: CoroutineTestDispatch
             )
         } returns flowOf(listOf(fosterHome.toData()))
     }
-    private val checkNonHumanAnimalUtil: CheckNonHumanAnimalUtil = mock {
-        every {
-            getNonHumanAnimalFlow(
-                nonHumanAnimalId = nonHumanAnimal.id,
-                caregiverId = nonHumanAnimal.caregiverId
-            )
-        } returns flowOf(nonHumanAnimal).toUiState()
-    }
 
     private val getAllFosterHomesByLocationFromRemoteRepository =
-        GetAllFosterHomesByLocationFromRemoteRepository(
-            fireStoreRemoteFosterHomeRepository,
-            checkNonHumanAnimalUtil
-        )
+        GetAllFosterHomesByLocationFromRemoteRepository(fireStoreRemoteFosterHomeRepository)
 
     @Test
     fun `given remote foster homes_when the app retrieves them to list them by location_then app gets a flow of list of FosterHome`() =

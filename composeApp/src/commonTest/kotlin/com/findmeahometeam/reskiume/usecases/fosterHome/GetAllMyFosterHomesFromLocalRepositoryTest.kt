@@ -6,11 +6,7 @@ import com.findmeahometeam.reskiume.domain.repository.local.LocalFosterHomeRepos
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllMyFosterHomesFromLocalRepository
 import com.findmeahometeam.reskiume.fosterHome
 import com.findmeahometeam.reskiume.fosterHomeWithAllNonHumanAnimalData
-import com.findmeahometeam.reskiume.nonHumanAnimal
-import com.findmeahometeam.reskiume.ui.core.components.toUiState
-import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
 import dev.mokkery.answering.returns
-import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import kotlinx.coroutines.flow.flowOf
@@ -25,17 +21,9 @@ class GetAllMyFosterHomesFromLocalRepositoryTest: CoroutineTestDispatcher() {
             getAllMyFosterHomes(fosterHome.ownerId)
         } returns flowOf(listOf(fosterHomeWithAllNonHumanAnimalData))
     }
-    private val checkNonHumanAnimalUtil: CheckNonHumanAnimalUtil = mock {
-        every {
-            getNonHumanAnimalFlow(
-                nonHumanAnimalId = nonHumanAnimal.id,
-                caregiverId = nonHumanAnimal.caregiverId
-            )
-        } returns flowOf(nonHumanAnimal).toUiState()
-    }
 
     private val getAllMyFosterHomesFromLocalRepository =
-        GetAllMyFosterHomesFromLocalRepository(localFosterHomeRepository, checkNonHumanAnimalUtil)
+        GetAllMyFosterHomesFromLocalRepository(localFosterHomeRepository)
 
     @Test
     fun `given my own local foster homes_when the app retrieves them to list them_then app gets a flow of list of FosterHome`() =

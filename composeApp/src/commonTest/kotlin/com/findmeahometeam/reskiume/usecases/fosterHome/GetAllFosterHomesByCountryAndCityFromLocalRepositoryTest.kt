@@ -6,9 +6,6 @@ import com.findmeahometeam.reskiume.domain.repository.local.LocalFosterHomeRepos
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllFosterHomesByCountryAndCityFromLocalRepository
 import com.findmeahometeam.reskiume.fosterHome
 import com.findmeahometeam.reskiume.fosterHomeWithAllNonHumanAnimalData
-import com.findmeahometeam.reskiume.nonHumanAnimal
-import com.findmeahometeam.reskiume.ui.core.components.toUiState
-import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.mock
@@ -24,17 +21,9 @@ class GetAllFosterHomesByCountryAndCityFromLocalRepositoryTest: CoroutineTestDis
             getAllFosterHomesByCountryAndCity(fosterHome.country, fosterHome.city)
         } returns flowOf(listOf(fosterHomeWithAllNonHumanAnimalData))
     }
-    private val checkNonHumanAnimalUtil: CheckNonHumanAnimalUtil = mock {
-        every {
-            getNonHumanAnimalFlow(
-                nonHumanAnimalId = nonHumanAnimal.id,
-                caregiverId = nonHumanAnimal.caregiverId
-            )
-        } returns flowOf(nonHumanAnimal).toUiState()
-    }
 
     private val getAllFosterHomesByCountryAndCityFromLocalRepository =
-        GetAllFosterHomesByCountryAndCityFromLocalRepository(localFosterHomeRepository, checkNonHumanAnimalUtil)
+        GetAllFosterHomesByCountryAndCityFromLocalRepository(localFosterHomeRepository)
 
     @Test
     fun `given local foster homes_when the app retrieves them to list them by country and city_then app gets a flow of list of FosterHome`() =

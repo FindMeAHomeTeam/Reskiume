@@ -5,7 +5,9 @@ import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalR
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.InsertNonHumanAnimalInLocalRepository
 import com.findmeahometeam.reskiume.nonHumanAnimal
+import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import dev.mokkery.answering.returns
+import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
@@ -15,6 +17,12 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
 class InsertNonHumanAnimalInLocalRepositoryTest {
+
+    val manageImagePath: ManageImagePath = mock {
+        every { getImagePathForFileName(nonHumanAnimal.imageUrl) } returns nonHumanAnimal.imageUrl
+
+        every { getFileNameFromLocalImagePath(nonHumanAnimal.imageUrl) } returns nonHumanAnimal.imageUrl
+    }
 
     val localNonHumanAnimalRepository: LocalNonHumanAnimalRepository = mock {
         everySuspend {
@@ -27,13 +35,14 @@ class InsertNonHumanAnimalInLocalRepositoryTest {
     }
 
     private val insertNonHumanAnimalInLocalRepository =
-        InsertNonHumanAnimalInLocalRepository(localNonHumanAnimalRepository, authRepository)
+        InsertNonHumanAnimalInLocalRepository(manageImagePath, localNonHumanAnimalRepository, authRepository)
 
     @Test
-    fun `given a non human animal_when the user insert them in the local repository_then insertNonHumanAnimal is called`() =
+    fun `given a non human animal_when the user insert them in the local repository_then getFileNameFromLocalImagePath and insertNonHumanAnimal are called`() =
         runTest {
             insertNonHumanAnimalInLocalRepository(nonHumanAnimal, {})
             verifySuspend {
+                manageImagePath.getFileNameFromLocalImagePath(nonHumanAnimal.imageUrl)
                 localNonHumanAnimalRepository.insertNonHumanAnimal(nonHumanAnimal.toEntity(), any())
             }
         }

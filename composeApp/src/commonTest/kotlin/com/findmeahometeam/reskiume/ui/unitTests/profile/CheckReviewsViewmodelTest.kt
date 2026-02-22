@@ -24,7 +24,7 @@ import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInLocalDataSo
 import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.image.GetCompleteImagePathFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromRemoteRepository
@@ -218,8 +218,16 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
         }
 
         val manageImagePath: ManageImagePath = mock {
-            every { getCompleteImagePath(author.image) } returns author.image
-            every { getCompleteImagePath(user.image) } returns user.image
+
+            every { getImagePathForFileName(author.image) } returns author.image
+
+            every { getFileNameFromLocalImagePath(author.image) } returns author.image
+
+            every { getImagePathForFileName(user.image) } returns user.image
+
+            every { getFileNameFromLocalImagePath(user.image) } returns user.image
+
+            every { getFileNameFromLocalImagePath("") } returns ""
         }
 
         val observeAuthStateInAuthDataSource =
@@ -247,13 +255,13 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
             DownloadImageToLocalDataSource(storageRepository)
 
         val insertUserInLocalDataSource =
-            InsertUserInLocalDataSource(localUserRepository, authRepository)
+            InsertUserInLocalDataSource(manageImagePath, localUserRepository, authRepository)
 
         val modifyUserInLocalDataSource =
-            ModifyUserInLocalDataSource(localUserRepository, authRepository)
+            ModifyUserInLocalDataSource(manageImagePath, localUserRepository, authRepository)
 
-        val getCompleteImagePathFromLocalDataSource =
-            GetCompleteImagePathFromLocalDataSource(manageImagePath)
+        val getImagePathForFileNameFromLocalDataSource =
+            GetImagePathForFileNameFromLocalDataSource(manageImagePath)
 
         val checkActivistUtil = CheckActivistUtil(
             getDataByManagingObjectLocalCacheTimestamp,
@@ -262,7 +270,7 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
             downloadImageToLocalDataSource,
             insertUserInLocalDataSource,
             modifyUserInLocalDataSource,
-            getCompleteImagePathFromLocalDataSource,
+            getImagePathForFileNameFromLocalDataSource,
             log
         )
 

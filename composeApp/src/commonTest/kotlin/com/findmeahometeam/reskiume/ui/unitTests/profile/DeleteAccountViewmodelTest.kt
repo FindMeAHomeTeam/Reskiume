@@ -24,12 +24,9 @@ import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInA
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteAllCacheFromLocalRepository
-import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteCacheFromLocalRepository
-import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.DeleteNonHumanAnimalFromLocalRepository
-import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.DeleteNonHumanAnimalFromRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.DeleteAllNonHumanAnimalsFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.DeleteAllNonHumanAnimalsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromRemoteRepository
-import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetNonHumanAnimalFromLocalRepository
-import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetNonHumanAnimalFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.DeleteReviewsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.DeleteReviewsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromRemoteRepository
@@ -41,7 +38,6 @@ import com.findmeahometeam.reskiume.nonHumanAnimal
 import com.findmeahometeam.reskiume.review
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.profile.deleteAccount.DeleteAccountViewmodel
-import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.DeleteNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.user
 import com.findmeahometeam.reskiume.userPwd
 import dev.mokkery.answering.calls
@@ -68,17 +64,15 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
 
     private val onDeleteUserFromLocal = Capture.slot<(Int) -> Unit>()
 
-    private val onDeleteNonHumanAnimalFromRemote = Capture.slot<(DatabaseResult) -> Unit>()
+    private val onDeleteAllNonHumanAnimalFromRemote = Capture.slot<(DatabaseResult) -> Unit>()
 
-    private val onDeleteNonHumanAnimalFromLocal = Capture.slot<(rowsDeleted: Int) -> Unit>()
+    private val onDeleteAllNonHumanAnimalFromLocal = Capture.slot<(rowsDeleted: Int) -> Unit>()
 
     private val onDeleteRemoteReviews = Capture.slot<(DatabaseResult) -> Unit>()
 
     private val onDeleteLocalReviews = Capture.slot<(Int) -> Unit>()
 
     private val onDeleteAllLocalCacheEntity = Capture.slot<(Int) -> Unit>()
-
-    private val onDeleteLocalCacheEntity = Capture.slot<(Int) -> Unit>()
 
     private val onSuccessDeleteRemoteUser = Capture.slot<(DatabaseResult) -> Unit>()
 
@@ -101,13 +95,12 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
         getUserResult: User = user,
         deleteUserFromLocalArg: Int = 1,
         remoteUserResult: RemoteUser? = user.toData(),
-        databaseResultAfterDeletingRemoteNonHumanAnimalArg: DatabaseResult = DatabaseResult.Success,
-        rowsDeletedOfNonHumanAnimalsArg: Int = 1,
+        databaseResultAfterDeletingAllRemoteNonHumanAnimalArg: DatabaseResult = DatabaseResult.Success,
+        rowsDeletedOfAllNonHumanAnimalsArg: Int = 1,
         getRemoteReviewsResult: List<Review> = listOf(review),
         deleteRemoteReviewsArg: DatabaseResult = DatabaseResult.Success,
         deleteLocalReviewsArg: Int = 1,
         deleteLocalCacheEntityArg: Int = 1,
-        numberOfNonHumanAnimalsDeletedFromLocalCacheArg: Int = 1,
         successRemoteUserArg: DatabaseResult = DatabaseResult.Success,
         remoteImageDeletedArg: Boolean = true,
         remoteNonHumanAnimalImageDeletedArg: Boolean = true,
@@ -166,15 +159,6 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
                     capture(onDeleteAllLocalCacheEntity)
                 )
             } calls { onDeleteAllLocalCacheEntity.get().invoke(deleteLocalCacheEntityArg) }
-
-            everySuspend {
-                deleteLocalCacheEntity(
-                    nonHumanAnimal.id,
-                    capture(onDeleteLocalCacheEntity)
-                )
-            } calls {
-                onDeleteLocalCacheEntity.get().invoke(numberOfNonHumanAnimalsDeletedFromLocalCacheArg)
-            }
         }
 
         val realtimeDatabaseRemoteUserRepository: RealtimeDatabaseRemoteUserRepository = mock {
@@ -233,31 +217,22 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
             } returns flowOf(listOf(nonHumanAnimal.toData()))
 
             every {
-                getRemoteNonHumanAnimal(nonHumanAnimal.id, nonHumanAnimal.caregiverId)
-            } returns flowOf(nonHumanAnimal.toData())
-
-            every {
-                deleteRemoteNonHumanAnimal(
-                    nonHumanAnimal.id,
+                deleteAllRemoteNonHumanAnimals(
                     nonHumanAnimal.caregiverId,
-                    capture(onDeleteNonHumanAnimalFromRemote)
+                    capture(onDeleteAllNonHumanAnimalFromRemote)
                 )
-            } calls { onDeleteNonHumanAnimalFromRemote.get().invoke(databaseResultAfterDeletingRemoteNonHumanAnimalArg) }
+            } calls { onDeleteAllNonHumanAnimalFromRemote.get().invoke(databaseResultAfterDeletingAllRemoteNonHumanAnimalArg) }
         }
 
         val localNonHumanAnimalRepository: LocalNonHumanAnimalRepository = mock {
 
             everySuspend {
-                getNonHumanAnimal(nonHumanAnimal.id)
-            } returns nonHumanAnimal.toEntity()
-
-            everySuspend {
-                deleteNonHumanAnimal(
-                    nonHumanAnimal.id,
-                    capture(onDeleteNonHumanAnimalFromLocal)
+                deleteAllNonHumanAnimals(
+                    nonHumanAnimal.caregiverId,
+                    capture(onDeleteAllNonHumanAnimalFromLocal)
                 )
             } calls {
-                onDeleteNonHumanAnimalFromLocal.get().invoke(rowsDeletedOfNonHumanAnimalsArg)
+                onDeleteAllNonHumanAnimalFromLocal.get().invoke(rowsDeletedOfAllNonHumanAnimalsArg)
             }
         }
 
@@ -299,36 +274,17 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
         val deleteUsersFromLocalDataSource =
             DeleteUsersFromLocalDataSource(localUserRepository)
 
-        val getNonHumanAnimalFromRemoteRepository =
-            GetNonHumanAnimalFromRemoteRepository(realtimeDatabaseRemoteNonHumanAnimalRepository)
+        val deleteAllNonHumanAnimalsFromRemoteRepository =
+            DeleteAllNonHumanAnimalsFromRemoteRepository(realtimeDatabaseRemoteNonHumanAnimalRepository)
 
-        val getNonHumanAnimalFromLocalRepository =
-            GetNonHumanAnimalFromLocalRepository(localNonHumanAnimalRepository)
-
-        val deleteNonHumanAnimalFromRemoteRepository =
-            DeleteNonHumanAnimalFromRemoteRepository(realtimeDatabaseRemoteNonHumanAnimalRepository)
-
-        val deleteNonHumanAnimalFromLocalRepository =
-            DeleteNonHumanAnimalFromLocalRepository(localNonHumanAnimalRepository)
-
-        val deleteCacheFromLocalRepository =
-            DeleteCacheFromLocalRepository(localCacheRepository)
-
-        val deleteNonHumanAnimalUtil = DeleteNonHumanAnimalUtil(
-            getNonHumanAnimalFromRemoteRepository,
-            getNonHumanAnimalFromLocalRepository,
-            deleteImageFromRemoteDataSource,
-            deleteImageFromLocalDataSource,
-            deleteNonHumanAnimalFromRemoteRepository,
-            deleteNonHumanAnimalFromLocalRepository,
-            deleteCacheFromLocalRepository,
-            log
-        )
+        val deleteAllNonHumanAnimalsFromLocalRepository =
+            DeleteAllNonHumanAnimalsFromLocalRepository(localNonHumanAnimalRepository)
 
         return DeleteAccountViewmodel(
             observeAuthStateInAuthDataSource,
-            deleteNonHumanAnimalUtil,
             getAllNonHumanAnimalsFromRemoteRepository,
+            deleteAllNonHumanAnimalsFromRemoteRepository,
+            deleteAllNonHumanAnimalsFromLocalRepository,
             getReviewsFromRemoteRepository,
             deleteReviewsFromRemoteRepository,
             deleteReviewsFromLocalRepository,
@@ -367,7 +323,7 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
             deleteAccountViewmodel.state.test {
                 assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
-                assertTrue { awaitItem() is UiState.Error }
+                assertTrue { awaitItem() is UiState.Success }
                 ensureAllEventsConsumed()
             }
         }
@@ -382,7 +338,7 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
             deleteAccountViewmodel.state.test {
                 assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
-                assertTrue { awaitItem() is UiState.Error }
+                assertTrue { awaitItem() is UiState.Success }
                 ensureAllEventsConsumed()
             }
         }
@@ -391,7 +347,7 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
     fun `given a registered user_when that user deletes their account using their password but fails deleting non human animals in the remote repository_then the data is not deleted`() =
         runTest {
             val deleteAccountViewmodel = getDeleteAccountViewmodel(
-                databaseResultAfterDeletingRemoteNonHumanAnimalArg = DatabaseResult.Error()
+                databaseResultAfterDeletingAllRemoteNonHumanAnimalArg = DatabaseResult.Error()
             )
             deleteAccountViewmodel.deleteAccount(userPwd)
             deleteAccountViewmodel.state.test {
@@ -406,7 +362,7 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
     fun `given a registered user_when that user deletes their account using their password but fails deleting non human animals in the local repository_then the data is not deleted in the local repository`() =
         runTest {
             val deleteAccountViewmodel = getDeleteAccountViewmodel(
-                rowsDeletedOfNonHumanAnimalsArg = 0
+                rowsDeletedOfAllNonHumanAnimalsArg = 0
             )
             deleteAccountViewmodel.deleteAccount(userPwd)
             deleteAccountViewmodel.state.test {
@@ -414,31 +370,6 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Error }
                 ensureAllEventsConsumed()
-            }
-        }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun `given a non human animal_when the app deletes the non human animal but fails deleting its cache_then the data is deleted from the local and remote repositories and LogE is called`() =
-        runTest {
-            val deleteAccountViewmodel = getDeleteAccountViewmodel(
-                numberOfNonHumanAnimalsDeletedFromLocalCacheArg = 0
-            )
-            deleteAccountViewmodel.deleteAccount(userPwd)
-            deleteAccountViewmodel.state.test {
-                assertTrue { awaitItem() is UiState.Idle }
-                assertTrue { awaitItem() is UiState.Loading }
-                assertTrue { awaitItem() is UiState.Success }
-                ensureAllEventsConsumed()
-            }
-
-            runCurrent()
-
-            verify {
-                log.e(
-                    "DeleteNonHumanAnimalUtil",
-                    "Error deleting the non human animal ${nonHumanAnimal.id} in the local cache in section ${Section.NON_HUMAN_ANIMALS}"
-                )
             }
         }
 

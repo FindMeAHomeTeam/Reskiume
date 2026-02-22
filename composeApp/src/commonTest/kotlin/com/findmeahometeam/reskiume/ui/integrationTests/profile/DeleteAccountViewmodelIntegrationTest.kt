@@ -19,12 +19,9 @@ import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInA
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteAllCacheFromLocalRepository
-import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteCacheFromLocalRepository
-import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.DeleteNonHumanAnimalFromLocalRepository
-import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.DeleteNonHumanAnimalFromRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.DeleteAllNonHumanAnimalsFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.DeleteAllNonHumanAnimalsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromRemoteRepository
-import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetNonHumanAnimalFromLocalRepository
-import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetNonHumanAnimalFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.DeleteReviewsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.DeleteReviewsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromRemoteRepository
@@ -47,7 +44,6 @@ import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeRealtimeDataba
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeRealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeStorageRepository
 import com.findmeahometeam.reskiume.ui.profile.deleteAccount.DeleteAccountViewmodel
-import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.DeleteNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.user
 import com.findmeahometeam.reskiume.userPwd
 import kotlinx.coroutines.test.runTest
@@ -58,14 +54,14 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
 
     private fun getDeleteAccountViewmodel(
         authRepository: AuthRepository = FakeAuthRepository(),
+        realtimeDatabaseRemoteNonHumanAnimalRepository: RealtimeDatabaseRemoteNonHumanAnimalRepository = FakeRealtimeDatabaseRemoteNonHumanAnimalRepository(),
+        localNonHumanAnimalRepository: LocalNonHumanAnimalRepository = FakeLocalNonHumanAnimalRepository(),
         realtimeDatabaseRemoteReviewRepository: RealtimeDatabaseRemoteReviewRepository = FakeRealtimeDatabaseRemoteReviewRepository(),
         localReviewRepository: LocalReviewRepository = FakeLocalReviewRepository(),
         localCacheRepository: LocalCacheRepository = FakeLocalCacheRepository(),
         localUserRepository: LocalUserRepository = FakeLocalUserRepository(),
         realtimeDatabaseRemoteUserRepository: RealtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(),
-        storageRepository: StorageRepository = FakeStorageRepository(),
-        realtimeDatabaseRemoteNonHumanAnimalRepository: RealtimeDatabaseRemoteNonHumanAnimalRepository = FakeRealtimeDatabaseRemoteNonHumanAnimalRepository(),
-        localNonHumanAnimalRepository: LocalNonHumanAnimalRepository = FakeLocalNonHumanAnimalRepository()
+        storageRepository: StorageRepository = FakeStorageRepository()
     ): DeleteAccountViewmodel {
 
         val observeAuthStateInAuthDataSource =
@@ -73,6 +69,12 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
 
         val getAllNonHumanAnimalsFromRemoteRepository =
             GetAllNonHumanAnimalsFromRemoteRepository(realtimeDatabaseRemoteNonHumanAnimalRepository)
+
+        val deleteAllNonHumanAnimalsFromRemoteRepository =
+            DeleteAllNonHumanAnimalsFromRemoteRepository(realtimeDatabaseRemoteNonHumanAnimalRepository)
+
+        val deleteAllNonHumanAnimalsFromLocalRepository =
+            DeleteAllNonHumanAnimalsFromLocalRepository(localNonHumanAnimalRepository)
 
         val getReviewsFromRemoteRepository =
             GetReviewsFromRemoteRepository(realtimeDatabaseRemoteReviewRepository)
@@ -109,36 +111,11 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
 
         val log: Log = FakeLog()
 
-        val getNonHumanAnimalFromRemoteRepository =
-            GetNonHumanAnimalFromRemoteRepository(realtimeDatabaseRemoteNonHumanAnimalRepository)
-
-        val getNonHumanAnimalFromLocalRepository =
-            GetNonHumanAnimalFromLocalRepository(localNonHumanAnimalRepository)
-
-        val deleteNonHumanAnimalFromRemoteRepository =
-            DeleteNonHumanAnimalFromRemoteRepository(realtimeDatabaseRemoteNonHumanAnimalRepository)
-
-        val deleteNonHumanAnimalFromLocalRepository =
-            DeleteNonHumanAnimalFromLocalRepository(localNonHumanAnimalRepository)
-
-        val deleteCacheFromLocalRepository =
-            DeleteCacheFromLocalRepository(localCacheRepository)
-
-        val deleteNonHumanAnimalUtil = DeleteNonHumanAnimalUtil(
-            getNonHumanAnimalFromRemoteRepository,
-            getNonHumanAnimalFromLocalRepository,
-            deleteImageFromRemoteDataSource,
-            deleteImageFromLocalDataSource,
-            deleteNonHumanAnimalFromRemoteRepository,
-            deleteNonHumanAnimalFromLocalRepository,
-            deleteCacheFromLocalRepository,
-            log
-        )
-
         return DeleteAccountViewmodel(
             observeAuthStateInAuthDataSource,
-            deleteNonHumanAnimalUtil,
             getAllNonHumanAnimalsFromRemoteRepository,
+            deleteAllNonHumanAnimalsFromRemoteRepository,
+            deleteAllNonHumanAnimalsFromLocalRepository,
             getReviewsFromRemoteRepository,
             deleteReviewsFromRemoteRepository,
             deleteReviewsFromLocalRepository,
@@ -220,6 +197,19 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
     fun `given a registered user_when that user deletes their account using their password but fails deleting a non human animal image in the remote repository_then the NHA image is not deleted`() =
         runTest {
             val deleteAccountViewmodel = getDeleteAccountViewmodel(
+                realtimeDatabaseRemoteReviewRepository = FakeRealtimeDatabaseRemoteReviewRepository(
+                    mutableListOf(review.toData())
+                ),
+                localReviewRepository = FakeLocalReviewRepository(mutableListOf(review.toEntity())),
+                localCacheRepository = FakeLocalCacheRepository(
+                    mutableListOf(
+                        localCache.toEntity(),
+                        localCache.copy(
+                            cachedObjectId = nonHumanAnimal.id,
+                            section = Section.NON_HUMAN_ANIMALS
+                        ).toEntity()
+                    )
+                ),
                 authRepository = FakeAuthRepository(
                     authUser = authUser,
                     authEmail = user.email,
@@ -228,36 +218,19 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
                     mutableListOf(user.toData())
                 ),
-                realtimeDatabaseRemoteNonHumanAnimalRepository = FakeRealtimeDatabaseRemoteNonHumanAnimalRepository(
-                    mutableListOf(nonHumanAnimal.toData())
-                )
-            )
-            deleteAccountViewmodel.deleteAccount(userPwd)
-            deleteAccountViewmodel.state.test {
-                assertTrue { awaitItem() is UiState.Idle }
-                assertTrue { awaitItem() is UiState.Loading }
-                assertTrue { awaitItem() is UiState.Error }
-                ensureAllEventsConsumed()
-            }
-        }
-
-    @Test
-    fun `given a registered user_when that user deletes their account using their password but fails deleting a non human animal image in the local repository_then the NHA image is not deleted in local`() =
-        runTest {
-            val deleteAccountViewmodel = getDeleteAccountViewmodel(
-                authRepository = FakeAuthRepository(
-                    authUser = authUser,
-                    authEmail = user.email,
-                    authPassword = userPwd
-                ),
-                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
-                    mutableListOf(user.toData())
-                ),
+                localUserRepository = FakeLocalUserRepository(mutableListOf(user)),
                 storageRepository = FakeStorageRepository(
                     remoteDatasourceList = mutableListOf(
+                        Pair("${Section.USERS.path}/${user.uid}", user.image),
+                    ),
+                    localDatasourceList = mutableListOf(
                         Pair(
-                            "${Section.NON_HUMAN_ANIMALS.path}/${user.uid}",
-                            "${nonHumanAnimal.id}.webp"
+                            "local_path",
+                            user.image
+                        ),
+                        Pair(
+                            "local_path",
+                            nonHumanAnimal.imageUrl
                         )
                     )
                 ),
@@ -272,20 +245,28 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
             deleteAccountViewmodel.state.test {
                 assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
-                assertTrue { awaitItem() is UiState.Error }
+                assertTrue { awaitItem() is UiState.Success }
                 ensureAllEventsConsumed()
             }
         }
 
     @Test
-    fun `given a non human animal_when the app deletes the non human animal but fails deleting its cache_then the data is deleted from the local and remote repositories and LogE is called`() =
+    fun `given a registered user_when that user deletes their account using their password but fails deleting a non human animal image in the local repository_then the NHA image is not deleted in local`() =
         runTest {
             val deleteAccountViewmodel = getDeleteAccountViewmodel(
                 realtimeDatabaseRemoteReviewRepository = FakeRealtimeDatabaseRemoteReviewRepository(
                     mutableListOf(review.toData())
                 ),
                 localReviewRepository = FakeLocalReviewRepository(mutableListOf(review.toEntity())),
-                localCacheRepository = FakeLocalCacheRepository(mutableListOf(localCache.toEntity())),
+                localCacheRepository = FakeLocalCacheRepository(
+                    mutableListOf(
+                        localCache.toEntity(),
+                        localCache.copy(
+                            cachedObjectId = nonHumanAnimal.id,
+                            section = Section.NON_HUMAN_ANIMALS
+                        ).toEntity()
+                    )
+                ),
                 authRepository = FakeAuthRepository(
                     authUser = authUser,
                     authEmail = user.email,
@@ -307,10 +288,6 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                         Pair(
                             "local_path",
                             user.image
-                        ),
-                        Pair(
-                            "local_path",
-                            nonHumanAnimal.imageUrl
                         )
                     )
                 ),

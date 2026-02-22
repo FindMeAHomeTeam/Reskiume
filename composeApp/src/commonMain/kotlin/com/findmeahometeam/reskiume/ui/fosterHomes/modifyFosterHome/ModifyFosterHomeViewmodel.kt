@@ -190,7 +190,7 @@ class ModifyFosterHomeViewmodel(
             if (localFosterHome == null) {
                 log.e(
                     "ModifyFosterHomeViewModel",
-                    "deleteCurrentImageFromLocalDataSource: Failed to delete the image from the foster home $fosterHomeId in the local data source because the local foster home does not exist!"
+                    "deleteCurrentImageFromLocalDataSource: failed to delete the image from the foster home $fosterHomeId in the local data source because the local foster home does not exist!"
                 )
                 _manageChangesUiState.value = UiState.Error()
                 return@launch
@@ -207,7 +207,7 @@ class ModifyFosterHomeViewmodel(
                 } else {
                     log.e(
                         "ModifyFosterHomeViewModel",
-                        "deleteCurrentImageFromLocalDataSource: Failed to delete the image from the foster home $fosterHomeId in the local data source"
+                        "deleteCurrentImageFromLocalDataSource: failed to delete the image from the foster home $fosterHomeId in the local data source"
                     )
                     _manageChangesUiState.value = UiState.Error()
                 }

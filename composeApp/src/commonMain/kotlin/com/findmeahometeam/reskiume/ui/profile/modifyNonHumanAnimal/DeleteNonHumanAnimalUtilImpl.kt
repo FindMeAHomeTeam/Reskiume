@@ -137,7 +137,7 @@ class DeleteNonHumanAnimalUtilImpl(
                 } else {
                     log.e(
                         "DeleteNonHumanAnimalUtilImpl",
-                        "deleteCurrentImageFromLocalDataSource: Failed to delete the image from the non human animal $nonHumanAnimalId in the local data source"
+                        "deleteCurrentImageFromLocalDataSource: failed to delete the image from the non human animal $nonHumanAnimalId in the local data source"
                     )
                     onError()
                 }

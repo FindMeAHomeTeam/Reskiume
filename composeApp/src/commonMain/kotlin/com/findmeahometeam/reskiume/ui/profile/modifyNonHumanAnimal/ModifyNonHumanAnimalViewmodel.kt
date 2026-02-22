@@ -184,7 +184,7 @@ class ModifyNonHumanAnimalViewmodel(
                 } else {
                     log.e(
                         "ModifyNonHumanAnimalViewModel",
-                        "deleteCurrentImageFromLocalDataSource: Failed to delete the image from the non human animal $nonHumanAnimalId in the local data source"
+                        "deleteCurrentImageFromLocalDataSource: failed to delete the image from the non human animal $nonHumanAnimalId in the local data source"
                     )
                     _manageChangesUiState.value = UiState.Error()
                 }

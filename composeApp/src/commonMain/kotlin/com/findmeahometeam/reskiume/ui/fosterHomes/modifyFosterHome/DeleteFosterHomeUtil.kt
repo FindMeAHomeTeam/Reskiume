@@ -128,7 +128,7 @@ class DeleteFosterHomeUtil(
                 } else {
                     log.e(
                         "DeleteFosterHomeUtil",
-                        "deleteCurrentImageFromLocalDataSource: Failed to delete the image from the foster home $fosterHomeId in the local data source"
+                        "deleteCurrentImageFromLocalDataSource: failed to delete the image from the foster home $fosterHomeId in the local data source"
                     )
                     onError()
                 }

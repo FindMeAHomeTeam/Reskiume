@@ -14,7 +14,7 @@ import com.findmeahometeam.reskiume.domain.repository.local.LocalFosterHomeRepos
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteFosterHome.FireStoreRemoteFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllMyFosterHomesFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllMyFosterHomesFromRemoteRepository
-import com.findmeahometeam.reskiume.domain.usecases.image.GetCompleteImagePathFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.fosterHome
 import com.findmeahometeam.reskiume.fosterHomeWithAllNonHumanAnimalData
@@ -23,6 +23,7 @@ import com.findmeahometeam.reskiume.nonHumanAnimal
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckAllMyFosterHomes
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
+import com.findmeahometeam.reskiume.ui.fosterHomes.checkAllFosterHomes.UiFosterHome
 import com.findmeahometeam.reskiume.ui.profile.checkAllMyFosterHomes.CheckAllMyFosterHomesUtil
 import com.findmeahometeam.reskiume.ui.profile.checkAllMyFosterHomes.CheckAllMyFosterHomesViewmodel
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
@@ -173,11 +174,11 @@ class CheckAllMyFosterHomesViewmodelTest : CoroutineTestDispatcher() {
 
             every {
                 getNonHumanAnimalFlow(
-                    any(),
                     nonHumanAnimal.id,
-                    nonHumanAnimal.caregiverId
+                    nonHumanAnimal.caregiverId,
+                    any()
                 )
-            } returns flowOf(UiState.Success(nonHumanAnimal))
+            } returns flowOf((nonHumanAnimal))
         }
 
         val localFosterHomeRepository: LocalFosterHomeRepository = mock {
@@ -223,7 +224,7 @@ class CheckAllMyFosterHomesViewmodelTest : CoroutineTestDispatcher() {
 
             everySuspend {
                 insertResidentNonHumanAnimalIdForFosterHome(
-                    fosterHome.allResidentNonHumanAnimals[0].toEntityForId(),
+                    fosterHome.allResidentNonHumanAnimals[0].toEntity(),
                     capture(onInsertResidentNonHumanAnimalIdForFosterHome)
                 )
             } calls {
@@ -272,7 +273,7 @@ class CheckAllMyFosterHomesViewmodelTest : CoroutineTestDispatcher() {
 
             everySuspend {
                 modifyResidentNonHumanAnimalIdForFosterHome(
-                    fosterHome.allResidentNonHumanAnimals[0].toEntityForId(),
+                    fosterHome.allResidentNonHumanAnimals[0].toEntity(),
                     capture(onModifyResidentNonHumanAnimalIdForFosterHome)
                 )
             } calls {
@@ -294,44 +295,42 @@ class CheckAllMyFosterHomesViewmodelTest : CoroutineTestDispatcher() {
             every {
                 downloadImageAndManageFosterHomesInLocalRepositoryFromFlow(
                     any(),
-                    any(),
-                    user.uid
+                    user.uid,
+                    any()
                 )
             } returns allMyManagedFosterHomesFromLocalReturn
 
             every {
                 downloadImageAndModifyFosterHomesInLocalRepositoryFromFlow(
                     any(),
-                    any(),
-                    user.uid
+                    user.uid,
+                    any()
                 )
             } returns allMyModifiedFosterHomesFromLocalReturn
         }
 
         val manageImagePath: ManageImagePath = mock {
 
-            every { getCompleteImagePath(nonHumanAnimal.imageUrl) } returns nonHumanAnimal.imageUrl
+            every { getImagePathForFileName(nonHumanAnimal.imageUrl) } returns nonHumanAnimal.imageUrl
 
-            every { getCompleteImagePath(fosterHome.imageUrl) } returns fosterHome.imageUrl
+            every { getFileNameFromLocalImagePath(nonHumanAnimal.imageUrl) } returns nonHumanAnimal.imageUrl
+
+            every { getImagePathForFileName(fosterHome.imageUrl) } returns fosterHome.imageUrl
+
+            every { getFileNameFromLocalImagePath(fosterHome.imageUrl) } returns fosterHome.imageUrl
         }
 
         val getDataByManagingObjectLocalCacheTimestamp =
             GetDataByManagingObjectLocalCacheTimestamp(localCacheRepository, log, konnectivity)
 
         val getAllMyFosterHomesFromRemoteRepository =
-            GetAllMyFosterHomesFromRemoteRepository(
-                fireStoreRemoteFosterHomeRepository,
-                checkNonHumanAnimalUtil
-            )
+            GetAllMyFosterHomesFromRemoteRepository(fireStoreRemoteFosterHomeRepository)
 
-        val getCompleteImagePathFromLocalDataSource =
-            GetCompleteImagePathFromLocalDataSource(manageImagePath)
+        val getImagePathForFileNameFromLocalDataSource =
+            GetImagePathForFileNameFromLocalDataSource(manageImagePath)
 
         val getAllMyFosterHomesFromLocalRepository =
-            GetAllMyFosterHomesFromLocalRepository(
-                localFosterHomeRepository,
-                checkNonHumanAnimalUtil
-            )
+            GetAllMyFosterHomesFromLocalRepository(localFosterHomeRepository)
 
         return CheckAllMyFosterHomesViewmodel(
             saveStateHandleProvider,
@@ -339,7 +338,8 @@ class CheckAllMyFosterHomesViewmodelTest : CoroutineTestDispatcher() {
             getAllMyFosterHomesFromRemoteRepository,
             checkAllMyFosterHomesUtil,
             getAllMyFosterHomesFromLocalRepository,
-            getCompleteImagePathFromLocalDataSource
+            getImagePathForFileNameFromLocalDataSource,
+            checkNonHumanAnimalUtil
         )
     }
 
@@ -352,7 +352,7 @@ class CheckAllMyFosterHomesViewmodelTest : CoroutineTestDispatcher() {
             )
 
             checkAllMyFosterHomesViewmodel.fetchAllMyFosterHomes().test {
-                assertEquals(UiState.Success(listOf(fosterHome)), awaitItem())
+                assertEquals(UiState.Success(listOf(UiFosterHome(fosterHome, listOf(nonHumanAnimal)))), awaitItem())
                 awaitComplete()
             }
         }
@@ -377,7 +377,7 @@ class CheckAllMyFosterHomesViewmodelTest : CoroutineTestDispatcher() {
 
             checkAllMyFosterHomesViewmodel.fetchAllMyFosterHomes().test {
                 assertEquals(
-                    UiState.Success(listOf(fosterHome)),
+                    UiState.Success(listOf(UiFosterHome(fosterHome, listOf(nonHumanAnimal)))),
                     awaitItem()
                 )
                 awaitComplete()
@@ -391,7 +391,7 @@ class CheckAllMyFosterHomesViewmodelTest : CoroutineTestDispatcher() {
 
             checkAllMyFosterHomesViewmodel.fetchAllMyFosterHomes().test {
                 assertEquals(
-                    UiState.Success(listOf(fosterHome)),
+                    UiState.Success(listOf(UiFosterHome(fosterHome, listOf(nonHumanAnimal)))),
                     awaitItem()
                 )
                 awaitComplete()

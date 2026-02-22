@@ -14,9 +14,11 @@ import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManaging
 import com.findmeahometeam.reskiume.fosterHome
 import com.findmeahometeam.reskiume.fosterHomeWithAllNonHumanAnimalData
 import com.findmeahometeam.reskiume.localCache
+import com.findmeahometeam.reskiume.nonHumanAnimal
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckAllMyFosterHomes
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
+import com.findmeahometeam.reskiume.ui.fosterHomes.checkAllFosterHomes.UiFosterHome
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeCheckAllMyFosterHomesUtil
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeCheckNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeFireStoreRemoteFosterHomeRepository
@@ -39,7 +41,9 @@ import kotlin.test.assertEquals
 class CheckAllMyFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() {
 
     private fun getCheckAllMyFosterHomesViewmodel(
-        saveStateHandleProvider: SaveStateHandleProvider = FakeSaveStateHandleProvider(CheckAllMyFosterHomes(user.uid)),
+        saveStateHandleProvider: SaveStateHandleProvider = FakeSaveStateHandleProvider(
+            CheckAllMyFosterHomes(user.uid)
+        ),
         localCacheRepository: LocalCacheRepository = FakeLocalCacheRepository(),
         log: Log = FakeLog(),
         konnectivity: Konnectivity = FakeKonnectivity(),
@@ -54,19 +58,13 @@ class CheckAllMyFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() 
             GetDataByManagingObjectLocalCacheTimestamp(localCacheRepository, log, konnectivity)
 
         val getAllMyFosterHomesFromRemoteRepository =
-            GetAllMyFosterHomesFromRemoteRepository(
-                fireStoreRemoteFosterHomeRepository,
-                checkNonHumanAnimalUtil
-            )
+            GetAllMyFosterHomesFromRemoteRepository(fireStoreRemoteFosterHomeRepository)
 
         val getImagePathForFileNameFromLocalDataSource =
             GetImagePathForFileNameFromLocalDataSource(manageImagePath)
 
         val getAllMyFosterHomesFromLocalRepository =
-            GetAllMyFosterHomesFromLocalRepository(
-                localFosterHomeRepository,
-                checkNonHumanAnimalUtil
-            )
+            GetAllMyFosterHomesFromLocalRepository(localFosterHomeRepository)
 
         return CheckAllMyFosterHomesViewmodel(
             saveStateHandleProvider,
@@ -74,7 +72,8 @@ class CheckAllMyFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() 
             getAllMyFosterHomesFromRemoteRepository,
             checkAllMyFosterHomesUtil,
             getAllMyFosterHomesFromLocalRepository,
-            getImagePathForFileNameFromLocalDataSource
+            getImagePathForFileNameFromLocalDataSource,
+            checkNonHumanAnimalUtil
         )
     }
 
@@ -88,7 +87,10 @@ class CheckAllMyFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() 
             )
 
             checkAllMyFosterHomesViewmodel.fetchAllMyFosterHomes().test {
-                assertEquals(UiState.Success(listOf(fosterHome)), awaitItem())
+                assertEquals(
+                    UiState.Success(listOf(UiFosterHome(fosterHome, listOf(nonHumanAnimal)))),
+                    awaitItem()
+                )
                 awaitComplete()
             }
         }
@@ -123,7 +125,7 @@ class CheckAllMyFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() 
 
             checkAllMyFosterHomesViewmodel.fetchAllMyFosterHomes().test {
                 assertEquals(
-                    UiState.Success(listOf(fosterHome)),
+                    UiState.Success(listOf(UiFosterHome(fosterHome, listOf(nonHumanAnimal)))),
                     awaitItem()
                 )
                 awaitComplete()
@@ -155,7 +157,7 @@ class CheckAllMyFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() 
 
             checkAllMyFosterHomesViewmodel.fetchAllMyFosterHomes().test {
                 assertEquals(
-                    UiState.Success(listOf(fosterHome)),
+                    UiState.Success(listOf(UiFosterHome(fosterHome, listOf(nonHumanAnimal)))),
                     awaitItem()
                 )
                 awaitComplete()

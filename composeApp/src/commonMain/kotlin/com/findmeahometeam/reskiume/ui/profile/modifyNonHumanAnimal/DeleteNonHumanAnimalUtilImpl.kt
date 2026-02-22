@@ -99,13 +99,13 @@ class DeleteNonHumanAnimalUtilImpl(
 
                     if (isDeleted) {
                         log.d(
-                            "DeleteNonHumanAnimalUtil",
+                            "DeleteNonHumanAnimalUtilImpl",
                             "deleteCurrentImageFromRemoteDataSource: Image from the non human animal $nonHumanAnimalId was deleted successfully in the remote data source"
                         )
                         onSuccess()
                     } else {
                         log.e(
-                            "DeleteNonHumanAnimalUtil",
+                            "DeleteNonHumanAnimalUtilImpl",
                             "deleteCurrentImageFromRemoteDataSource: failed to delete the image from the non human animal $nonHumanAnimalId in the remote data source"
                         )
                         onError()
@@ -130,13 +130,13 @@ class DeleteNonHumanAnimalUtilImpl(
 
                 if (isDeleted) {
                     log.d(
-                        "DeleteNonHumanAnimalUtil",
+                        "DeleteNonHumanAnimalUtilImpl",
                         "deleteCurrentImageFromLocalDataSource: Image from the non human animal $nonHumanAnimalId was deleted successfully in the local data source"
                     )
                     onSuccess()
                 } else {
                     log.e(
-                        "DeleteNonHumanAnimalUtil",
+                        "DeleteNonHumanAnimalUtilImpl",
                         "deleteCurrentImageFromLocalDataSource: Failed to delete the image from the non human animal $nonHumanAnimalId in the local data source"
                     )
                     onError()
@@ -166,13 +166,13 @@ class DeleteNonHumanAnimalUtilImpl(
 
                 if (databaseResult is DatabaseResult.Success) {
                     log.d(
-                        "DeleteNonHumanAnimalUtil",
+                        "DeleteNonHumanAnimalUtilImpl",
                         "deleteNonHumanAnimalFromRemoteDataSource: Non human animal $id deleted in the remote data source"
                     )
                     onSuccess()
                 } else {
                     log.e(
-                        "DeleteNonHumanAnimalUtil",
+                        "DeleteNonHumanAnimalUtilImpl",
                         "deleteNonHumanAnimalFromRemoteDataSource: Error deleting the non human animal $id in the remote data source"
                     )
                     onError()
@@ -193,13 +193,13 @@ class DeleteNonHumanAnimalUtilImpl(
 
                 if (rowsDeleted > 0) {
                     log.d(
-                        "DeleteNonHumanAnimalUtil",
+                        "DeleteNonHumanAnimalUtilImpl",
                         "deleteNonHumanAnimalFromLocalDataSource: Non human animal $id deleted in the local data source"
                     )
                     onSuccess()
                 } else {
                     log.e(
-                        "DeleteNonHumanAnimalUtil",
+                        "DeleteNonHumanAnimalUtilImpl",
                         "deleteNonHumanAnimalFromLocalDataSource: Error deleting the non human animal $id in the local data source"
                     )
                     onError()
@@ -219,12 +219,12 @@ class DeleteNonHumanAnimalUtilImpl(
 
                 if (rowsDeleted > 0) {
                     log.d(
-                        "DeleteNonHumanAnimalUtil",
+                        "DeleteNonHumanAnimalUtilImpl",
                         "Non human animal $id deleted in the local cache in section ${Section.NON_HUMAN_ANIMALS}"
                     )
                 } else {
                     log.e(
-                        "DeleteNonHumanAnimalUtil",
+                        "DeleteNonHumanAnimalUtilImpl",
                         "Error deleting the non human animal $id in the local cache in section ${Section.NON_HUMAN_ANIMALS}"
                     )
                 }

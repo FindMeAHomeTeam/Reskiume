@@ -14,15 +14,16 @@ import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
+import com.findmeahometeam.reskiume.domain.usecases.authUser.SignInWithEmailAndPasswordFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.authUser.SignInWithEmailAndPasswordFromAuthDataSource
-import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.localCache
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.profile.loginAccount.LoginAccountViewmodel
+import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.findmeahometeam.reskiume.user
 import com.findmeahometeam.reskiume.userPwd
 import com.plusmobileapps.konnectivity.Konnectivity
@@ -113,6 +114,14 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
             }
         }
 
+        val manageImagePath: ManageImagePath = mock {
+            every { getImagePathForFileName(user.image) } returns user.image
+
+            every { getFileNameFromLocalImagePath(user.image) } returns user.image
+
+            every { getFileNameFromLocalImagePath("") } returns ""
+        }
+
         val realtimeDatabaseRemoteUserRepository: RealtimeDatabaseRemoteUserRepository = mock {
             every { getRemoteUser(user.uid) } returns flowOf(remoteUserResult)
         }
@@ -154,10 +163,10 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
             DownloadImageToLocalDataSource(storageRepository)
 
         val insertUserInLocalDataSource =
-            InsertUserInLocalDataSource(localUserRepository, authRepository)
+            InsertUserInLocalDataSource(manageImagePath, localUserRepository, authRepository)
 
         val modifyUserInLocalDataSource =
-            ModifyUserInLocalDataSource(localUserRepository, authRepository)
+            ModifyUserInLocalDataSource(manageImagePath, localUserRepository, authRepository)
 
 
         return LoginAccountViewmodel(

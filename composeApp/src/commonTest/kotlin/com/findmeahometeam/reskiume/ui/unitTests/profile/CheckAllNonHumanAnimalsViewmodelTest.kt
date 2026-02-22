@@ -15,19 +15,20 @@ import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonH
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.image.GetCompleteImagePathFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
-import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllMyNonHumanAnimalsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.InsertNonHumanAnimalInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.ModifyNonHumanAnimalInLocalRepository
 import com.findmeahometeam.reskiume.localCache
 import com.findmeahometeam.reskiume.nonHumanAnimal
-import com.findmeahometeam.reskiume.ui.core.navigation.CheckAllNonHumanAnimals
+import com.findmeahometeam.reskiume.ui.core.components.UiState
+import com.findmeahometeam.reskiume.ui.core.navigation.CheckAllMyNonHumanAnimals
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
-import com.findmeahometeam.reskiume.ui.profile.checkAllNonHumanAnimals.CheckAllNonHumanAnimalsViewmodel
+import com.findmeahometeam.reskiume.ui.profile.checkMyAllNonHumanAnimals.CheckAllMyNonHumanAnimalsViewmodel
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.findmeahometeam.reskiume.user
 import com.plusmobileapps.konnectivity.Konnectivity
@@ -87,12 +88,12 @@ class CheckAllNonHumanAnimalsViewmodelTest : CoroutineTestDispatcher() {
         absolutePathArg: String = nonHumanAnimal.imageUrl,
         nonHumanAnimalIdInsertedInLocalDatasourceArg: Long = 1L,
         rowsUpdatedNonHumanAnimalArg: Int = 1
-    ): CheckAllNonHumanAnimalsViewmodel {
+    ): CheckAllMyNonHumanAnimalsViewmodel {
 
         val saveStateHandleProvider: SaveStateHandleProvider = mock {
             every {
-                provideObjectRoute<CheckAllNonHumanAnimals>(any(), any())
-            } returns CheckAllNonHumanAnimals(user.uid)
+                provideObjectRoute<CheckAllMyNonHumanAnimals>(any(), any())
+            } returns CheckAllMyNonHumanAnimals(user.uid)
         }
 
         val authRepository: AuthRepository = mock {
@@ -180,12 +181,17 @@ class CheckAllNonHumanAnimalsViewmodelTest : CoroutineTestDispatcher() {
             } calls { onModifyNonHumanAnimalInLocal.get().invoke(rowsUpdatedNonHumanAnimalArg) }
 
             every {
-                getAllNonHumanAnimals(user.uid)
+                getAllMyNonHumanAnimals(user.uid)
             } returns flowOf(listOf(nonHumanAnimal.toEntity()))
         }
 
         val manageImagePath: ManageImagePath = mock {
-            every { getCompleteImagePath(nonHumanAnimal.imageUrl) } returns nonHumanAnimal.imageUrl
+
+            every { getImagePathForFileName(nonHumanAnimal.imageUrl) } returns nonHumanAnimal.imageUrl
+
+            every { getFileNameFromLocalImagePath(nonHumanAnimal.imageUrl) } returns nonHumanAnimal.imageUrl
+
+            every { getFileNameFromLocalImagePath("") } returns ""
         }
 
         val observeAuthStateInAuthDataSource =
@@ -201,22 +207,22 @@ class CheckAllNonHumanAnimalsViewmodelTest : CoroutineTestDispatcher() {
             DownloadImageToLocalDataSource(storageRepository)
 
         val insertNonHumanAnimalInLocalRepository =
-            InsertNonHumanAnimalInLocalRepository(localNonHumanAnimalRepository, authRepository)
+            InsertNonHumanAnimalInLocalRepository(manageImagePath, localNonHumanAnimalRepository, authRepository)
 
         val insertCacheInLocalRepository = InsertCacheInLocalRepository(localCacheRepository)
 
         val modifyNonHumanAnimalInLocalRepository =
-            ModifyNonHumanAnimalInLocalRepository(localNonHumanAnimalRepository, authRepository)
+            ModifyNonHumanAnimalInLocalRepository(manageImagePath, localNonHumanAnimalRepository, authRepository)
 
         val modifyCacheInLocalRepository = ModifyCacheInLocalRepository(localCacheRepository)
 
-        val getAllNonHumanAnimalsFromLocalRepository =
-            GetAllNonHumanAnimalsFromLocalRepository(localNonHumanAnimalRepository)
+        val getAllMyNonHumanAnimalsFromLocalRepository =
+            GetAllMyNonHumanAnimalsFromLocalRepository(localNonHumanAnimalRepository)
 
-        val getCompleteImagePathFromLocalDataSource =
-            GetCompleteImagePathFromLocalDataSource(manageImagePath)
+        val getImagePathForFileNameFromLocalDataSource =
+            GetImagePathForFileNameFromLocalDataSource(manageImagePath)
 
-        return CheckAllNonHumanAnimalsViewmodel(
+        return CheckAllMyNonHumanAnimalsViewmodel(
             saveStateHandleProvider,
             observeAuthStateInAuthDataSource,
             getDataByManagingObjectLocalCacheTimestamp,
@@ -226,8 +232,8 @@ class CheckAllNonHumanAnimalsViewmodelTest : CoroutineTestDispatcher() {
             insertCacheInLocalRepository,
             modifyNonHumanAnimalInLocalRepository,
             modifyCacheInLocalRepository,
-            getAllNonHumanAnimalsFromLocalRepository,
-            getCompleteImagePathFromLocalDataSource,
+            getAllMyNonHumanAnimalsFromLocalRepository,
+            getImagePathForFileNameFromLocalDataSource,
             log
         )
     }
@@ -239,7 +245,7 @@ class CheckAllNonHumanAnimalsViewmodelTest : CoroutineTestDispatcher() {
                 getLocalCacheEntityReturnForUser = null,
                 getLocalCacheEntityReturnForNonHumanAnimal = null
             ).nonHumanAnimalListFlow.test {
-                assertEquals(listOf(nonHumanAnimal.copy(savedBy = "")), awaitItem())
+                assertEquals(UiState.Success(listOf(nonHumanAnimal.copy(savedBy = ""))), awaitItem())
                 awaitComplete()
             }
         }
@@ -254,7 +260,7 @@ class CheckAllNonHumanAnimalsViewmodelTest : CoroutineTestDispatcher() {
                 getAllRemoteNonHumanAnimalsReturn = flowOf(listOf(nonHumanAnimal.copy(imageUrl = "").toData())),
                 nonHumanAnimalIdInsertedInLocalDatasourceArg = 0
             ).nonHumanAnimalListFlow.test {
-                assertEquals(listOf(nonHumanAnimal.copy(imageUrl = "", savedBy = "")), awaitItem())
+                assertEquals(UiState.Success(listOf(nonHumanAnimal.copy(imageUrl = "", savedBy = ""))), awaitItem())
                 awaitComplete()
             }
 
@@ -277,7 +283,7 @@ class CheckAllNonHumanAnimalsViewmodelTest : CoroutineTestDispatcher() {
                 getLocalCacheEntityReturnForNonHumanAnimal =
                     localCache.copy(cachedObjectId = nonHumanAnimal.id, section = Section.NON_HUMAN_ANIMALS, timestamp = 123L).toEntity()
             ).nonHumanAnimalListFlow.test {
-                assertEquals(listOf(nonHumanAnimal.copy(savedBy = "")), awaitItem())
+                assertEquals(UiState.Success(listOf(nonHumanAnimal.copy(savedBy = ""))), awaitItem())
                 awaitComplete()
             }
         }
@@ -294,7 +300,7 @@ class CheckAllNonHumanAnimalsViewmodelTest : CoroutineTestDispatcher() {
                 getAllRemoteNonHumanAnimalsReturn = flowOf(listOf(nonHumanAnimal.copy(imageUrl = "").toData())),
                 rowsUpdatedNonHumanAnimalArg = 0
             ).nonHumanAnimalListFlow.test {
-                assertEquals(listOf(nonHumanAnimal.copy(imageUrl = "", savedBy = "")), awaitItem())
+                assertEquals(UiState.Success(listOf(nonHumanAnimal.copy(imageUrl = "", savedBy = ""))), awaitItem())
                 awaitComplete()
             }
 
@@ -312,7 +318,7 @@ class CheckAllNonHumanAnimalsViewmodelTest : CoroutineTestDispatcher() {
     fun `given a registered non human animal with recent local cache_when the user clicks on check non human animals_then the non human animal is retrieved from local cache and displayed`() =
         runTest {
             getCheckAllNonHumanAnimalsViewmodel().nonHumanAnimalListFlow.test {
-                assertEquals(listOf(nonHumanAnimal), awaitItem())
+                assertEquals(UiState.Success(listOf(nonHumanAnimal)), awaitItem())
                 awaitComplete()
             }
         }

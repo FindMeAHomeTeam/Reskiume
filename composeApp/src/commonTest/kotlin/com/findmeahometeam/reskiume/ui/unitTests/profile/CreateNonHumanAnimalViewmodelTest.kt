@@ -19,6 +19,7 @@ import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.InsertNonHuma
 import com.findmeahometeam.reskiume.nonHumanAnimal
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.profile.createNonHumanAnimal.CreateNonHumanAnimalViewmodel
+import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -139,6 +140,15 @@ class CreateNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
             }
         }
 
+        val manageImagePath: ManageImagePath = mock {
+
+            every { getImagePathForFileName(nonHumanAnimal.imageUrl) } returns nonHumanAnimal.imageUrl
+
+            every { getFileNameFromLocalImagePath(nonHumanAnimal.imageUrl) } returns nonHumanAnimal.imageUrl
+
+            every { getFileNameFromLocalImagePath("") } returns ""
+        }
+
         val observeAuthStateInAuthDataSource =
             ObserveAuthStateInAuthDataSource(authRepository)
 
@@ -149,7 +159,7 @@ class CreateNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
             InsertNonHumanAnimalInRemoteRepository(realtimeDatabaseRemoteNonHumanAnimalRepository)
 
         val insertNonHumanAnimalInLocalRepository =
-            InsertNonHumanAnimalInLocalRepository(localNonHumanAnimalRepository, authRepository)
+            InsertNonHumanAnimalInLocalRepository(manageImagePath, localNonHumanAnimalRepository, authRepository)
 
         val insertCacheInLocalRepository =
             InsertCacheInLocalRepository(localCacheRepository)

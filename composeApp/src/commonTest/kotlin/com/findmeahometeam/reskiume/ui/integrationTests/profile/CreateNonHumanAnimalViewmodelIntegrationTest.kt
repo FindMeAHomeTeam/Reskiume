@@ -20,9 +20,11 @@ import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeAuthRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalCacheRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLog
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeManageImagePath
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeRealtimeDatabaseRemoteNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeStorageRepository
 import com.findmeahometeam.reskiume.ui.profile.createNonHumanAnimal.CreateNonHumanAnimalViewmodel
+import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertTrue
@@ -33,6 +35,7 @@ class CreateNonHumanAnimalViewmodelIntegrationTest : CoroutineTestDispatcher() {
         authRepository: AuthRepository = FakeAuthRepository(authUser = authUser),
         localCacheRepository: LocalCacheRepository = FakeLocalCacheRepository(),
         realtimeDatabaseRemoteNonHumanAnimalRepository: RealtimeDatabaseRemoteNonHumanAnimalRepository = FakeRealtimeDatabaseRemoteNonHumanAnimalRepository(),
+        manageImagePath: ManageImagePath = FakeManageImagePath(),
         storageRepository: StorageRepository = FakeStorageRepository(),
         localNonHumanAnimalRepository: LocalNonHumanAnimalRepository = FakeLocalNonHumanAnimalRepository(),
         log: Log = FakeLog()
@@ -48,7 +51,7 @@ class CreateNonHumanAnimalViewmodelIntegrationTest : CoroutineTestDispatcher() {
             InsertNonHumanAnimalInRemoteRepository(realtimeDatabaseRemoteNonHumanAnimalRepository)
 
         val insertNonHumanAnimalInLocalRepository =
-            InsertNonHumanAnimalInLocalRepository(localNonHumanAnimalRepository, authRepository)
+            InsertNonHumanAnimalInLocalRepository(manageImagePath, localNonHumanAnimalRepository, authRepository)
 
         val insertCacheInLocalRepository =
             InsertCacheInLocalRepository(localCacheRepository)

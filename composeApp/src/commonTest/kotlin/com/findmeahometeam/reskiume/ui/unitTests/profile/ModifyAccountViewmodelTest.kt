@@ -16,21 +16,22 @@ import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
-import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
-import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ModifyUserEmailInAuthDataSource
-import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ModifyUserPasswordInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.SignOutFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInRemoteDataSource
 import com.findmeahometeam.reskiume.localCache
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.profile.modifyAccount.ModifyAccountViewmodel
+import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.findmeahometeam.reskiume.user
 import com.findmeahometeam.reskiume.userPwd
 import dev.mokkery.answering.calls
@@ -121,6 +122,14 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
             } calls { onModifyUserInLocal.get().invoke(onModifyUserArg) }
         }
 
+        val manageImagePath: ManageImagePath = mock {
+            every { getImagePathForFileName(user.image) } returns user.image
+
+            every { getFileNameFromLocalImagePath(user.image) } returns user.image
+
+            every { getFileNameFromLocalImagePath("") } returns ""
+        }
+
         val realtimeDatabaseRemoteUserRepository: RealtimeDatabaseRemoteUserRepository = mock {
             every {
                 getRemoteUser(user.uid)
@@ -205,7 +214,7 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
             ModifyUserInRemoteDataSource(realtimeDatabaseRemoteUserRepository)
 
         val modifyUserInLocalDataSource =
-            ModifyUserInLocalDataSource(localUserRepository, authRepository)
+            ModifyUserInLocalDataSource(manageImagePath, localUserRepository, authRepository)
 
         val modifyCacheInLocalRepository =
             ModifyCacheInLocalRepository(localCacheRepository)

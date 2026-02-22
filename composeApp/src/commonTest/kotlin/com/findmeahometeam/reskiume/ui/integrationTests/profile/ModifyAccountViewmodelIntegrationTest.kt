@@ -28,9 +28,11 @@ import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeAuthRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalCacheRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalUserRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLog
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeManageImagePath
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeRealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeStorageRepository
 import com.findmeahometeam.reskiume.ui.profile.modifyAccount.ModifyAccountViewmodel
+import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.findmeahometeam.reskiume.user
 import com.findmeahometeam.reskiume.userPwd
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -49,6 +51,7 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
         localUserRepository: LocalUserRepository = FakeLocalUserRepository(),
         realtimeDatabaseRemoteUserRepository: RealtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(),
         storageRepository: StorageRepository = FakeStorageRepository(),
+        manageImagePath: ManageImagePath = FakeManageImagePath(),
         localCacheRepository: LocalCacheRepository = FakeLocalCacheRepository()
     ): ModifyAccountViewmodel {
 
@@ -80,7 +83,7 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
             ModifyUserInRemoteDataSource(realtimeDatabaseRemoteUserRepository)
 
         val modifyUserInLocalDataSource =
-            ModifyUserInLocalDataSource(localUserRepository, authRepository)
+            ModifyUserInLocalDataSource(manageImagePath, localUserRepository, authRepository)
 
         val modifyCacheInLocalRepository =
             ModifyCacheInLocalRepository(localCacheRepository)

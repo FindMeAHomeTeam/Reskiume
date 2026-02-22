@@ -95,19 +95,86 @@ class DeleteAccountViewmodel(
             if (allNonHumanAnimals.isEmpty()) {
                 onComplete()
             } else {
+                deleteAllNonHumanAnimalImagesFromRemoteDataSource(allNonHumanAnimals) {
 
-                deleteNonHumanAnimalsFromRemoteRepository(uid) {
+                    deleteAllNonHumanAnimalImagesFromLocalDataSource(allNonHumanAnimals) {
 
-                    deleteNonHumanAnimalsFromLocalRepository(uid) {
+                        deleteAllNonHumanAnimalsFromRemoteDataSource(uid) {
 
-                        onComplete()
+                            deleteAllNonHumanAnimalsFromLocalDataSource(uid) {
+
+                                onComplete()
+                            }
+                        }
                     }
                 }
             }
         }
     }
 
-    private fun deleteNonHumanAnimalsFromRemoteRepository(uid: String, onSuccess: () -> Unit) {
+    private fun deleteAllNonHumanAnimalImagesFromRemoteDataSource(
+        allNonHumanAnimals: List<NonHumanAnimal>,
+        onComplete: () -> Unit
+    ) {
+        viewModelScope.launch {
+
+            allNonHumanAnimals.forEach { remoteNonHumanAnimal ->
+
+                deleteImageFromRemoteDataSource(
+                    userUid = remoteNonHumanAnimal.caregiverId,
+                    extraId = remoteNonHumanAnimal.id,
+                    section = Section.NON_HUMAN_ANIMALS,
+                    currentImage = remoteNonHumanAnimal.imageUrl
+                ) { isDeleted ->
+
+                    if (isDeleted) {
+                        log.d(
+                            "DeleteAccountViewModel",
+                            "deleteAllNonHumanAnimalImagesFromRemoteDataSource: Image from the non human animal ${remoteNonHumanAnimal.id} was deleted successfully in the remote data source"
+                        )
+                    } else {
+                        log.e(
+                            "DeleteAccountViewModel",
+                            "deleteAllNonHumanAnimalImagesFromRemoteDataSource: failed to delete the image from the non human animal ${remoteNonHumanAnimal.id} in the remote data source"
+                        )
+                    }
+                }
+            }
+            onComplete()
+        }
+    }
+
+    private fun deleteAllNonHumanAnimalImagesFromLocalDataSource(
+        allNonHumanAnimals: List<NonHumanAnimal>,
+        onComplete: () -> Unit
+    ) {
+        viewModelScope.launch {
+
+            allNonHumanAnimals.forEach { localNonHumanAnimal ->
+
+                deleteImageFromLocalDataSource(currentImagePath = localNonHumanAnimal.imageUrl) { isDeleted ->
+
+                    if (isDeleted) {
+                        log.d(
+                            "DeleteAccountViewModel",
+                            "deleteAllNonHumanAnimalImagesFromLocalDataSource: Image from the non human animal ${localNonHumanAnimal.id} was deleted successfully in the local data source"
+                        )
+                    } else {
+                        log.e(
+                            "DeleteAccountViewModel",
+                            "deleteAllNonHumanAnimalImagesFromLocalDataSource: failed to delete the image from the non human animal ${localNonHumanAnimal.id} in the local data source"
+                        )
+                    }
+                }
+            }
+            onComplete()
+        }
+    }
+
+    private fun deleteAllNonHumanAnimalsFromRemoteDataSource(
+        uid: String,
+        onSuccess: () -> Unit
+    ) {
 
         viewModelScope.launch {
 
@@ -116,20 +183,24 @@ class DeleteAccountViewmodel(
                 if (databaseResult is DatabaseResult.Success) {
                     log.d(
                         "DeleteAccountViewmodel",
-                        "deleteNonHumanAnimalsFromRemoteRepository: deleted non human animals from caregiver $uid from remote repository"
+                        "deleteAllNonHumanAnimalsFromRemoteDataSource: deleted non human animals from caregiver $uid from remote repository"
                     )
                     onSuccess()
                 } else {
                     log.e(
                         "DeleteAccountViewmodel",
-                        "deleteNonHumanAnimalsFromRemoteRepository: failed to delete non human animals from caregiver $uid from remote repository: ${(databaseResult as DatabaseResult.Error).message}"
+                        "deleteAllNonHumanAnimalsFromRemoteDataSource: failed to delete non human animals from caregiver $uid from remote repository: ${(databaseResult as DatabaseResult.Error).message}"
                     )
+                    _state.value = UiState.Error()
                 }
             }
         }
     }
 
-    private fun deleteNonHumanAnimalsFromLocalRepository(uid: String, onSuccess: () -> Unit) {
+    private fun deleteAllNonHumanAnimalsFromLocalDataSource(
+        uid: String,
+        onSuccess: () -> Unit
+    ) {
 
         viewModelScope.launch {
 
@@ -146,6 +217,7 @@ class DeleteAccountViewmodel(
                         "DeleteAccountViewmodel",
                         "deleteNonHumanAnimalsFromLocalRepository: failed to delete non human animals from caregiver $uid from local repository"
                     )
+                    _state.value = UiState.Error()
                 }
             }
         }

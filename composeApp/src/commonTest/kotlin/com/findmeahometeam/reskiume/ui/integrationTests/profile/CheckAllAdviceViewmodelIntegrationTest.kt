@@ -12,7 +12,7 @@ import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.image.GetCompleteImagePathFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
@@ -81,13 +81,13 @@ class CheckAllAdviceViewmodelIntegrationTest : CoroutineTestDispatcher() {
             DownloadImageToLocalDataSource(storageRepository)
 
         val insertUserInLocalDataSource =
-            InsertUserInLocalDataSource(localUserRepository, authRepository)
+            InsertUserInLocalDataSource(manageImagePath, localUserRepository, authRepository)
 
         val modifyUserInLocalDataSource =
-            ModifyUserInLocalDataSource(localUserRepository, authRepository)
+            ModifyUserInLocalDataSource(manageImagePath, localUserRepository, authRepository)
 
-        val getCompleteImagePathFromLocalDataSource =
-            GetCompleteImagePathFromLocalDataSource(manageImagePath)
+        val getImagePathForFileNameFromLocalDataSource =
+            GetImagePathForFileNameFromLocalDataSource(manageImagePath)
 
         val checkActivistUtil = CheckActivistUtil(
             getDataByManagingObjectLocalCacheTimestamp,
@@ -96,7 +96,7 @@ class CheckAllAdviceViewmodelIntegrationTest : CoroutineTestDispatcher() {
             downloadImageToLocalDataSource,
             insertUserInLocalDataSource,
             modifyUserInLocalDataSource,
-            getCompleteImagePathFromLocalDataSource,
+            getImagePathForFileNameFromLocalDataSource,
             log
         )
 

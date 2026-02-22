@@ -3,6 +3,7 @@ package com.findmeahometeam.reskiume
 import com.findmeahometeam.reskiume.data.database.entity.fosterHome.FosterHomeWithAllNonHumanAnimalData
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.util.Section
+import com.findmeahometeam.reskiume.domain.model.AdoptionState
 import com.findmeahometeam.reskiume.domain.model.AgeCategory
 import com.findmeahometeam.reskiume.domain.model.Gender
 import com.findmeahometeam.reskiume.domain.model.LocalCache
@@ -92,7 +93,9 @@ val nonHumanAnimal = NonHumanAnimal(
     description = "Lucky is wonderfully peaceful and calm",
     imageUrl = "1.webp",
     nonHumanAnimalType = NonHumanAnimalType.DOG,
-    gender = Gender.MALE
+    gender = Gender.MALE,
+    adoptionState = AdoptionState.LOOKING_FOR_ADOPTION,
+    fosterHomeId = ""
 )
 
 // Mocked fosterHome data for testing

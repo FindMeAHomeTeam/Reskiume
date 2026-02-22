@@ -18,7 +18,7 @@ import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInA
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.image.GetCompleteImagePathFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteCacheFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
@@ -36,7 +36,7 @@ import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.navigation.ModifyNonHumanAnimal
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtilImpl
-import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.DeleteNonHumanAnimalUtil
+import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.DeleteNonHumanAnimalUtilImpl
 import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.ModifyNonHumanAnimalViewmodel
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.plusmobileapps.konnectivity.Konnectivity
@@ -290,7 +290,12 @@ class ModifyNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
         }
 
         val manageImagePath: ManageImagePath = mock {
-            every { getCompleteImagePath(nonHumanAnimal.imageUrl) } returns nonHumanAnimal.imageUrl
+
+            every { getImagePathForFileName(nonHumanAnimal.imageUrl) } returns nonHumanAnimal.imageUrl
+
+            every { getFileNameFromLocalImagePath(nonHumanAnimal.imageUrl) } returns nonHumanAnimal.imageUrl
+
+            every { getFileNameFromLocalImagePath("") } returns ""
         }
 
         val observeAuthStateInAuthDataSource =
@@ -309,10 +314,10 @@ class ModifyNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
             DownloadImageToLocalDataSource(storageRepository)
 
         val insertNonHumanAnimalInLocalRepository =
-            InsertNonHumanAnimalInLocalRepository(localNonHumanAnimalRepository, authRepository)
+            InsertNonHumanAnimalInLocalRepository(manageImagePath, localNonHumanAnimalRepository, authRepository)
 
         val modifyNonHumanAnimalInLocalRepository =
-            ModifyNonHumanAnimalInLocalRepository(localNonHumanAnimalRepository, authRepository)
+            ModifyNonHumanAnimalInLocalRepository(manageImagePath, localNonHumanAnimalRepository, authRepository)
 
         val getNonHumanAnimalFromLocalRepository =
             GetNonHumanAnimalFromLocalRepository(localNonHumanAnimalRepository)
@@ -338,23 +343,10 @@ class ModifyNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
         val deleteNonHumanAnimalFromLocalRepository =
             DeleteNonHumanAnimalFromLocalRepository(localNonHumanAnimalRepository)
 
-        val getCompleteImagePathFromLocalDataSource =
-            GetCompleteImagePathFromLocalDataSource(manageImagePath)
+        val getImagePathForFileNameFromLocalDataSource =
+            GetImagePathForFileNameFromLocalDataSource(manageImagePath)
 
-        val checkNonHumanAnimalUtil = CheckNonHumanAnimalUtilImpl(
-            observeAuthStateInAuthDataSource,
-            getDataByManagingObjectLocalCacheTimestamp,
-            getNonHumanAnimalFromRemoteRepository,
-            deleteCacheFromLocalRepository,
-            downloadImageToLocalDataSource,
-            insertNonHumanAnimalInLocalRepository,
-            modifyNonHumanAnimalInLocalRepository,
-            getNonHumanAnimalFromLocalRepository,
-            getCompleteImagePathFromLocalDataSource,
-            log
-        )
-
-        val deleteNonHumanAnimalUtil = DeleteNonHumanAnimalUtil(
+        val deleteNonHumanAnimalUtil = DeleteNonHumanAnimalUtilImpl(
             getNonHumanAnimalFromRemoteRepository,
             getNonHumanAnimalFromLocalRepository,
             deleteImageFromRemoteDataSource,
@@ -365,9 +357,23 @@ class ModifyNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
             log
         )
 
+        val checkNonHumanAnimalUtil = CheckNonHumanAnimalUtilImpl(
+            observeAuthStateInAuthDataSource,
+            getDataByManagingObjectLocalCacheTimestamp,
+            getNonHumanAnimalFromRemoteRepository,
+            deleteNonHumanAnimalUtil,
+            deleteCacheFromLocalRepository,
+            downloadImageToLocalDataSource,
+            insertNonHumanAnimalInLocalRepository,
+            modifyNonHumanAnimalInLocalRepository,
+            getNonHumanAnimalFromLocalRepository,
+            log
+        )
+
         return ModifyNonHumanAnimalViewmodel(
             saveStateHandleProvider,
             checkNonHumanAnimalUtil,
+            getImagePathForFileNameFromLocalDataSource,
             deleteNonHumanAnimalUtil,
             getNonHumanAnimalFromRemoteRepository,
             deleteImageFromRemoteDataSource,
@@ -394,13 +400,12 @@ class ModifyNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `given a user with empty cache and a wrong NHA id_when the app downloads the data to modify a NHA_then the app display an error and deletes the stored cache entity`() =
+    fun `given a user with empty cache and a wrong NHA id_when the app downloads the data to modify a NHA_then the app shows nothing`() =
         runTest {
             getModifyNonHumanAnimalViewmodel(
                 nonHumanAnimalIdArg = "wrongId",
                 getLocalCacheEntityForNonHumanAnimalReturn = null
             ).nonHumanAnimalFlow.test {
-                assertEquals(UiState.Error(), awaitItem())
                 awaitComplete()
             }
 
@@ -410,37 +415,6 @@ class ModifyNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
                 log.d(
                     "GetDataByManagingObjectLocalCacheTimestamp",
                     "wrongId added to local cache in section ${Section.NON_HUMAN_ANIMALS}"
-                )
-                log.d(
-                    "CheckNonHumanAnimalUtil",
-                    "Non human animal wrongId deleted in the local cache in section ${Section.NON_HUMAN_ANIMALS}"
-                )
-            }
-        }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun `given no cache and a wrong NHA id_when the app gets the data to modify a NHA but there is an error in the local db_then the app shows an error and do not delete the stored cache entity`() =
-        runTest {
-            getModifyNonHumanAnimalViewmodel(
-                nonHumanAnimalIdArg = "wrongId",
-                getLocalCacheEntityForNonHumanAnimalReturn = null,
-                numberOfNonHumanAnimalsDeletedFromLocalCacheWithWrongIdArg = 0
-            ).nonHumanAnimalFlow.test {
-                assertEquals(UiState.Error(), awaitItem())
-                awaitComplete()
-            }
-
-            runCurrent()
-
-            verify {
-                log.d(
-                    "GetDataByManagingObjectLocalCacheTimestamp",
-                    "wrongId added to local cache in section ${Section.NON_HUMAN_ANIMALS}"
-                )
-                log.e(
-                    "CheckNonHumanAnimalUtil",
-                    "Error deleting the non human animal wrongId in the local cache in section ${Section.NON_HUMAN_ANIMALS}"
                 )
             }
         }
@@ -462,7 +436,7 @@ class ModifyNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `given a user with an outdated cache and a wrong NHA id_when the app downloads the data to modify a NHA_then the app display an error and deletes the stored cache entity`() =
+    fun `given a user with an outdated cache and a wrong NHA id_when the app downloads the data to modify a NHA_then the app displays nothing`() =
         runTest {
             getModifyNonHumanAnimalViewmodel(
                 nonHumanAnimalIdArg = "wrongId",
@@ -472,7 +446,6 @@ class ModifyNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
                     timestamp = 123L
                 ).toEntity()
             ).nonHumanAnimalFlow.test {
-                assertEquals(UiState.Error(), awaitItem())
                 awaitComplete()
             }
 
@@ -482,10 +455,6 @@ class ModifyNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
                 log.d(
                     "GetDataByManagingObjectLocalCacheTimestamp",
                     "wrongId updated in local cache in section ${Section.NON_HUMAN_ANIMALS}"
-                )
-                log.d(
-                    "CheckNonHumanAnimalUtil",
-                    "Non human animal wrongId deleted in the local cache in section ${Section.NON_HUMAN_ANIMALS}"
                 )
             }
         }
@@ -511,7 +480,6 @@ class ModifyNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
                 ).toEntity(),
                 nonHumanAnimalEntityReturn = null
             ).nonHumanAnimalFlow.test {
-                assertEquals(UiState.Error(), awaitItem())
                 awaitComplete()
             }
 
@@ -523,8 +491,8 @@ class ModifyNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
                     "Cache for wrongId in section ${Section.NON_HUMAN_ANIMALS} is up-to-date."
                 )
                 log.d(
-                    "CheckNonHumanAnimalUtil",
-                    "Non human animal wrongId deleted in the local cache in section ${Section.NON_HUMAN_ANIMALS}"
+                    "CheckNonHumanAnimalUtilImpl",
+                    "deleteNonHumanAnimalCacheFromLocalDataSource: Non human animal wrongId deleted in the local cache in section ${Section.NON_HUMAN_ANIMALS}"
                 )
             }
         }
@@ -750,7 +718,7 @@ class ModifyNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
 
             verify {
                 log.e(
-                    "DeleteNonHumanAnimalUtil",
+                    "DeleteNonHumanAnimalUtilImpl",
                     "Error deleting the non human animal ${nonHumanAnimal.id} in the local cache in section ${Section.NON_HUMAN_ANIMALS}"
                 )
             }

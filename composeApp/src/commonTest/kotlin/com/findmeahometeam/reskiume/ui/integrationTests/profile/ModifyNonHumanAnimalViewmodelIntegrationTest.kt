@@ -13,7 +13,7 @@ import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInA
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.image.GetCompleteImagePathFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteCacheFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
@@ -40,7 +40,7 @@ import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeRealtimeDataba
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeSaveStateHandleProvider
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeStorageRepository
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtilImpl
-import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.DeleteNonHumanAnimalUtil
+import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.DeleteNonHumanAnimalUtilImpl
 import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.ModifyNonHumanAnimalViewmodel
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.findmeahometeam.reskiume.user
@@ -82,10 +82,10 @@ class ModifyNonHumanAnimalViewmodelIntegrationTest : CoroutineTestDispatcher() {
             DownloadImageToLocalDataSource(storageRepository)
 
         val insertNonHumanAnimalInLocalRepository =
-            InsertNonHumanAnimalInLocalRepository(localNonHumanAnimalRepository, authRepository)
+            InsertNonHumanAnimalInLocalRepository(manageImagePath, localNonHumanAnimalRepository, authRepository)
 
         val modifyNonHumanAnimalInLocalRepository =
-            ModifyNonHumanAnimalInLocalRepository(localNonHumanAnimalRepository, authRepository)
+            ModifyNonHumanAnimalInLocalRepository(manageImagePath, localNonHumanAnimalRepository, authRepository)
 
         val getNonHumanAnimalFromLocalRepository =
             GetNonHumanAnimalFromLocalRepository(localNonHumanAnimalRepository)
@@ -111,23 +111,10 @@ class ModifyNonHumanAnimalViewmodelIntegrationTest : CoroutineTestDispatcher() {
         val deleteNonHumanAnimalFromLocalRepository =
             DeleteNonHumanAnimalFromLocalRepository(localNonHumanAnimalRepository)
 
-        val getCompleteImagePathFromLocalDataSource =
-            GetCompleteImagePathFromLocalDataSource(manageImagePath)
+        val getImagePathForFileNameFromLocalDataSource =
+            GetImagePathForFileNameFromLocalDataSource(manageImagePath)
 
-        val checkNonHumanAnimalUtil = CheckNonHumanAnimalUtilImpl(
-            observeAuthStateInAuthDataSource,
-            getDataByManagingObjectLocalCacheTimestamp,
-            getNonHumanAnimalFromRemoteRepository,
-            deleteCacheFromLocalRepository,
-            downloadImageToLocalDataSource,
-            insertNonHumanAnimalInLocalRepository,
-            modifyNonHumanAnimalInLocalRepository,
-            getNonHumanAnimalFromLocalRepository,
-            getCompleteImagePathFromLocalDataSource,
-            log
-        )
-
-        val deleteNonHumanAnimalUtil = DeleteNonHumanAnimalUtil(
+        val deleteNonHumanAnimalUtil = DeleteNonHumanAnimalUtilImpl(
             getNonHumanAnimalFromRemoteRepository,
             getNonHumanAnimalFromLocalRepository,
             deleteImageFromRemoteDataSource,
@@ -138,9 +125,24 @@ class ModifyNonHumanAnimalViewmodelIntegrationTest : CoroutineTestDispatcher() {
             log
         )
 
+        val checkNonHumanAnimalUtil = CheckNonHumanAnimalUtilImpl(
+            observeAuthStateInAuthDataSource,
+            getDataByManagingObjectLocalCacheTimestamp,
+            getNonHumanAnimalFromRemoteRepository,
+            deleteNonHumanAnimalUtil,
+            deleteCacheFromLocalRepository,
+            downloadImageToLocalDataSource,
+            insertNonHumanAnimalInLocalRepository,
+            modifyNonHumanAnimalInLocalRepository,
+            getNonHumanAnimalFromLocalRepository,
+            log
+        )
+
+
         return ModifyNonHumanAnimalViewmodel(
             saveStateHandleProvider,
             checkNonHumanAnimalUtil,
+            getImagePathForFileNameFromLocalDataSource,
             deleteNonHumanAnimalUtil,
             getNonHumanAnimalFromRemoteRepository,
             deleteImageFromRemoteDataSource,
@@ -163,25 +165,6 @@ class ModifyNonHumanAnimalViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 )
             ).nonHumanAnimalFlow.test {
                 assertEquals(UiState.Success(nonHumanAnimal.copy(savedBy = "", imageUrl = "${nonHumanAnimal.caregiverId}${nonHumanAnimal.id}.webp")), awaitItem())
-                awaitComplete()
-            }
-        }
-
-    @Test
-    fun `given a user with empty cache and a wrong NHA id_when the app downloads the data to modify a NHA_then the app display an error and deletes the stored cache entity`() =
-        runTest {
-            getModifyNonHumanAnimalViewmodel(
-                realtimeDatabaseRemoteNonHumanAnimalRepository = FakeRealtimeDatabaseRemoteNonHumanAnimalRepository(
-                    remoteNonHumanAnimalList = mutableListOf(nonHumanAnimal.toData())
-                ),
-                saveStateHandleProvider = FakeSaveStateHandleProvider(
-                    ModifyNonHumanAnimal(
-                        "wrongId",
-                        nonHumanAnimal.caregiverId
-                    )
-                )
-            ).nonHumanAnimalFlow.test {
-                assertEquals(UiState.Error(), awaitItem())
                 awaitComplete()
             }
         }
@@ -212,7 +195,7 @@ class ModifyNonHumanAnimalViewmodelIntegrationTest : CoroutineTestDispatcher() {
         }
 
     @Test
-    fun `given a user with an outdated cache and a wrong NHA id_when the app downloads the data to modify a NHA_then the app display an error and deletes the stored cache entity`() =
+    fun `given a user with an outdated cache and a wrong NHA id_when the app downloads the data to modify a NHA_then the app displays nothing and deletes the stored cache entity`() =
         runTest {
             getModifyNonHumanAnimalViewmodel(
                 realtimeDatabaseRemoteNonHumanAnimalRepository = FakeRealtimeDatabaseRemoteNonHumanAnimalRepository(
@@ -227,6 +210,17 @@ class ModifyNonHumanAnimalViewmodelIntegrationTest : CoroutineTestDispatcher() {
                         ).toEntity()
                     )
                 ),
+                localNonHumanAnimalRepository = FakeLocalNonHumanAnimalRepository(
+                    localNonHumanAnimalList = mutableListOf(nonHumanAnimal.copy(id = "wrongId").toEntity())
+                ),
+                storageRepository = FakeStorageRepository(
+                    localDatasourceList = mutableListOf(
+                        Pair(
+                            "local_path",
+                            nonHumanAnimal.imageUrl
+                        )
+                    )
+                ),
                 saveStateHandleProvider = FakeSaveStateHandleProvider(
                     ModifyNonHumanAnimal(
                         "wrongId",
@@ -234,7 +228,6 @@ class ModifyNonHumanAnimalViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     )
                 )
             ).nonHumanAnimalFlow.test {
-                assertEquals(UiState.Error(), awaitItem())
                 awaitComplete()
             }
         }
@@ -282,7 +275,6 @@ class ModifyNonHumanAnimalViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     )
                 )
             ).nonHumanAnimalFlow.test {
-                assertEquals(UiState.Error(), awaitItem())
                 awaitComplete()
             }
         }

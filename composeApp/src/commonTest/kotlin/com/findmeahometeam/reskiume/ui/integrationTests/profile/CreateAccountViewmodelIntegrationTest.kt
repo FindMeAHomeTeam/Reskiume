@@ -22,9 +22,11 @@ import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeAuthRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalCacheRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalUserRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLog
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeManageImagePath
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeRealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeStorageRepository
 import com.findmeahometeam.reskiume.ui.profile.createAccount.CreateAccountViewmodel
+import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.findmeahometeam.reskiume.user
 import com.findmeahometeam.reskiume.userPwd
 import kotlinx.coroutines.test.runTest
@@ -38,8 +40,9 @@ class CreateAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
         storageRepository: StorageRepository = FakeStorageRepository(),
         localCacheRepository: LocalCacheRepository = FakeLocalCacheRepository(),
         realtimeDatabaseRemoteUserRepository: RealtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(),
-        localUserRepository: LocalUserRepository = FakeLocalUserRepository()
-    ): CreateAccountViewmodel {
+        localUserRepository: LocalUserRepository = FakeLocalUserRepository(),
+        manageImagePath: ManageImagePath = FakeManageImagePath()
+        ): CreateAccountViewmodel {
 
         val createUserWithEmailAndPasswordInAuthDataSource =
             CreateUserWithEmailAndPasswordInAuthDataSource(authRepository)
@@ -54,7 +57,7 @@ class CreateAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
             InsertCacheInLocalRepository(localCacheRepository)
 
         val insertUserInLocalDataSource =
-            InsertUserInLocalDataSource(localUserRepository, authRepository)
+            InsertUserInLocalDataSource(manageImagePath, localUserRepository, authRepository)
 
         val deleteUserFromAuthDataSource =
             DeleteUserFromAuthDataSource(authRepository)

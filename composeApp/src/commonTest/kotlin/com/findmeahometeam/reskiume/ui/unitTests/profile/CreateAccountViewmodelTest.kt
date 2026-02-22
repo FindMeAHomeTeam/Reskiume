@@ -22,6 +22,7 @@ import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDat
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.profile.createAccount.CreateAccountViewmodel
+import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.findmeahometeam.reskiume.user
 import com.findmeahometeam.reskiume.userPwd
 import dev.mokkery.answering.calls
@@ -140,6 +141,13 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
             }
         }
 
+        val manageImagePath: ManageImagePath = mock {
+
+            every { getImagePathForFileName(user.image) } returns user.image
+
+            every { getFileNameFromLocalImagePath(user.image) } returns user.image
+        }
+
         val createUserWithEmailAndPasswordInAuthDataSource =
             CreateUserWithEmailAndPasswordInAuthDataSource(authRepository)
 
@@ -153,7 +161,7 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
             InsertCacheInLocalRepository(localCacheRepository)
 
         val insertUserInLocalDataSource =
-            InsertUserInLocalDataSource(localUserRepository, authRepository)
+            InsertUserInLocalDataSource(manageImagePath, localUserRepository, authRepository)
 
         val deleteUserFromAuthDataSource =
             DeleteUserFromAuthDataSource(authRepository)

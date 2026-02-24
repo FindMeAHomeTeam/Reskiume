@@ -300,8 +300,8 @@ fun CheckAllFosterHomesScreen(
             ) {
                 if (searchOption == SearchOption.COUNTRY_CITY) {
                     checkAllFosterHomesViewmodel.fetchAllFosterHomesStateByPlace(
-                        country = selectedCountry.englishName,
-                        city = selectedCity.englishName,
+                        country = selectedCountry.countryName,
+                        city = selectedCity.cityName,
                         nonHumanAnimalType = nonHumanAnimalType
                     )
                 } else {

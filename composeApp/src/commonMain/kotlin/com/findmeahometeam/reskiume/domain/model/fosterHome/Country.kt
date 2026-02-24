@@ -8,7 +8,7 @@ import reskiume.composeapp.generated.resources.spain
 import reskiume.composeapp.generated.resources.united_kingdom
 import reskiume.composeapp.generated.resources.unselected_country
 
-enum class Country(val englishName: String) {
+enum class Country(val countryName: String) {
     UNSELECTED("unselected"),
     /*AFGHANISTAN("afghanistan"),
     ALBANIA("albania"),
@@ -204,9 +204,6 @@ enum class Country(val englishName: String) {
     ZAMBIA("zambia"),
     ZIMBABWE("zimbabwe")*/
 }
-
-fun String.toCountry(): Country =
-    Country.entries.firstOrNull { it.englishName == this } ?: Country.UNSELECTED
 
 fun Country.toStringResource(): StringResource {
     return when(this) {

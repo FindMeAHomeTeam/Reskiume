@@ -171,7 +171,7 @@ import reskiume.composeapp.generated.resources.york
 import reskiume.composeapp.generated.resources.zaragoza
 
 enum class City(
-    val englishName: String,
+    val cityName: String,
     val country: Country
 ) {
     UNSELECTED("unselected", Country.UNSELECTED),
@@ -350,9 +350,6 @@ enum class City(
     WORCESTER("worcester", Country.UNITED_KINGDOM),
     YORK("york", Country.UNITED_KINGDOM),
 }
-
-fun String.toCity(): City =
-    City.entries.firstOrNull { it.englishName == this } ?: City.UNSELECTED
 
 fun City.toStringResource(): StringResource {
     return when (this) {

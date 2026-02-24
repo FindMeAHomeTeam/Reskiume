@@ -15,16 +15,20 @@ import platform.Foundation.NSFileManager
 import platform.Foundation.NSSearchPathForDirectoriesInDomains
 import platform.Foundation.NSUserDomainMask
 
-class ManageImagePathImpl: ManageImagePath {
+class ManageImagePathImpl : ManageImagePath {
 
     override fun getImagePathForFileName(fileName: String): String {
-        val paths: List<*> = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true)
+        val paths: List<*> =
+            NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true)
         val documents: String = paths.first() as String
         return documents.toPath().resolve(fileName).toString()
     }
 
     @OptIn(ExperimentalForeignApi::class)
     override fun getFileNameFromLocalImagePath(localImagePath: String): String {
+
+        if (localImagePath.isBlank()) return localImagePath
+
         val fileName = localImagePath.split("/").last()
         val sourcePath = localImagePath.split("file:/").last()
         val destinationPath = getImagePathForFileName(fileName)
@@ -38,8 +42,8 @@ class ManageImagePathImpl: ManageImagePath {
     private fun copyItemAtPathIfExists(sourcePath: String, destinationPath: String) {
 
         if (NSFileManager.defaultManager.fileExistsAtPath(sourcePath)
-            && !NSFileManager.defaultManager.fileExistsAtPath(destinationPath)) {
-
+            && !NSFileManager.defaultManager.fileExistsAtPath(destinationPath)
+        ) {
             handleError {
                 NSFileManager.defaultManager.copyItemAtPath(
                     sourcePath,
@@ -47,6 +51,7 @@ class ManageImagePathImpl: ManageImagePath {
                     it
                 )
             }
+            removeItemAtPath(sourcePath)
         }
     }
 
@@ -61,6 +66,17 @@ class ManageImagePathImpl: ManageImagePath {
             } else {
                 result
             }
+        }
+    }
+
+    @OptIn(ExperimentalForeignApi::class)
+    private fun removeItemAtPath(sourcePath: String) {
+
+        handleError {
+            NSFileManager.defaultManager.removeItemAtPath(
+                sourcePath,
+                it
+            )
         }
     }
 }

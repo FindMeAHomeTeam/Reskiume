@@ -5,6 +5,7 @@ import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProviderIm
 import com.findmeahometeam.reskiume.ui.fosterHomes.checkAllFosterHomes.CheckAllFosterHomesViewmodel
 import com.findmeahometeam.reskiume.ui.fosterHomes.checkAllFosterHomes.PlaceUtil
 import com.findmeahometeam.reskiume.ui.fosterHomes.modifyFosterHome.DeleteFosterHomeUtil
+import com.findmeahometeam.reskiume.ui.fosterHomes.modifyFosterHome.DeleteFosterHomeUtilImpl
 import com.findmeahometeam.reskiume.ui.fosterHomes.modifyFosterHome.ModifyFosterHomeViewmodel
 import com.findmeahometeam.reskiume.ui.home.HomeViewmodel
 import com.findmeahometeam.reskiume.ui.profile.ProfileViewmodel
@@ -56,6 +57,6 @@ val uiModule = module {
     viewModelOf(::CheckAllMyFosterHomesViewmodel)
     singleOf(::CheckAllMyFosterHomesUtilImpl) bind CheckAllMyFosterHomesUtil::class
     viewModelOf(::ModifyFosterHomeViewmodel)
-    singleOf(::DeleteFosterHomeUtil)
+    singleOf(::DeleteFosterHomeUtilImpl) bind DeleteFosterHomeUtil::class
     singleOf(::PlaceUtil)
 }

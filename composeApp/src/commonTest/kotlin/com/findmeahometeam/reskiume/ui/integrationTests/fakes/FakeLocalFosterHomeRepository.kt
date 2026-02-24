@@ -37,24 +37,22 @@ class FakeLocalFosterHomeRepository(
         acceptedNonHumanAnimal: AcceptedNonHumanAnimalEntityForFosterHome,
         onInsertAcceptedNonHumanAnimalType: (rowId: Long) -> Unit
     ) {
-        val fosterHomeWithAllNonHumanAnimalData =
+        val allAcceptedNonHumanAnimals =
             localFosterHomeWithAllNonHumanAnimalDataList.flatMap { fosterHomeWithAllNonHumanAnimalData ->
 
-                fosterHomeWithAllNonHumanAnimalData.allAcceptedNonHumanAnimals.mapNotNull {
-                    if (it.fosterHomeId == acceptedNonHumanAnimal.fosterHomeId) {
-                        it
-                    } else {
-                        null
-                    }
+                fosterHomeWithAllNonHumanAnimalData.allAcceptedNonHumanAnimals.filter {
+                    it.acceptedNonHumanAnimalId == acceptedNonHumanAnimal.acceptedNonHumanAnimalId
                 }
             }
 
-        if (fosterHomeWithAllNonHumanAnimalData.isEmpty()) {
+        if (allAcceptedNonHumanAnimals.isEmpty()) {
 
             val result = localFosterHomeWithAllNonHumanAnimalDataList.map {
                 it.copy(allAcceptedNonHumanAnimals = it.allAcceptedNonHumanAnimals + acceptedNonHumanAnimal)
             }
-            localFosterHomeWithAllNonHumanAnimalDataList.removeAll(localFosterHomeWithAllNonHumanAnimalDataList)
+            localFosterHomeWithAllNonHumanAnimalDataList.removeAll(
+                localFosterHomeWithAllNonHumanAnimalDataList
+            )
             localFosterHomeWithAllNonHumanAnimalDataList.addAll(result)
             onInsertAcceptedNonHumanAnimalType(1L)
         } else {
@@ -66,24 +64,22 @@ class FakeLocalFosterHomeRepository(
         residentNonHumanAnimal: ResidentNonHumanAnimalIdEntityForFosterHome,
         onInsertResidentNonHumanAnimalId: (rowId: Long) -> Unit
     ) {
-        val fosterHomeWithAllNonHumanAnimalData =
+        val allResidentNonHumanAnimals =
             localFosterHomeWithAllNonHumanAnimalDataList.flatMap { fosterHomeWithAllNonHumanAnimalData ->
 
-                fosterHomeWithAllNonHumanAnimalData.allResidentNonHumanAnimalIds.mapNotNull {
-                    if (it.fosterHomeId == residentNonHumanAnimal.fosterHomeId) {
-                        it
-                    } else {
-                        null
-                    }
+                fosterHomeWithAllNonHumanAnimalData.allResidentNonHumanAnimalIds.filter {
+                    it.nonHumanAnimalId == residentNonHumanAnimal.nonHumanAnimalId
                 }
             }
 
-        if (fosterHomeWithAllNonHumanAnimalData.isEmpty()) {
+        if (allResidentNonHumanAnimals.isEmpty()) {
 
             val result = localFosterHomeWithAllNonHumanAnimalDataList.map {
                 it.copy(allResidentNonHumanAnimalIds = it.allResidentNonHumanAnimalIds + residentNonHumanAnimal)
             }
-            localFosterHomeWithAllNonHumanAnimalDataList.removeAll(localFosterHomeWithAllNonHumanAnimalDataList)
+            localFosterHomeWithAllNonHumanAnimalDataList.removeAll(
+                localFosterHomeWithAllNonHumanAnimalDataList
+            )
             localFosterHomeWithAllNonHumanAnimalDataList.addAll(result)
             onInsertResidentNonHumanAnimalId(1L)
         } else {
@@ -114,12 +110,8 @@ class FakeLocalFosterHomeRepository(
         val fosterHomeWithAllNonHumanAnimalData =
             localFosterHomeWithAllNonHumanAnimalDataList.flatMap { fosterHomeWithAllNonHumanAnimalData ->
 
-                fosterHomeWithAllNonHumanAnimalData.allAcceptedNonHumanAnimals.mapNotNull {
-                    if (it.fosterHomeId == acceptedNonHumanAnimal.fosterHomeId) {
-                        it
-                    } else {
-                        null
-                    }
+                fosterHomeWithAllNonHumanAnimalData.allAcceptedNonHumanAnimals.filter {
+                    it.acceptedNonHumanAnimalId == acceptedNonHumanAnimal.acceptedNonHumanAnimalId
                 }
             }
 
@@ -130,7 +122,9 @@ class FakeLocalFosterHomeRepository(
             val result = localFosterHomeWithAllNonHumanAnimalDataList.map {
                 it.copy(allAcceptedNonHumanAnimals = it.allAcceptedNonHumanAnimals + acceptedNonHumanAnimal)
             }
-            localFosterHomeWithAllNonHumanAnimalDataList.removeAll(localFosterHomeWithAllNonHumanAnimalDataList)
+            localFosterHomeWithAllNonHumanAnimalDataList.removeAll(
+                localFosterHomeWithAllNonHumanAnimalDataList
+            )
             localFosterHomeWithAllNonHumanAnimalDataList.addAll(result)
             onModifyAcceptedNonHumanAnimal(1)
         }
@@ -143,12 +137,8 @@ class FakeLocalFosterHomeRepository(
         val fosterHomeWithAllNonHumanAnimalData =
             localFosterHomeWithAllNonHumanAnimalDataList.flatMap { fosterHomeWithAllNonHumanAnimalData ->
 
-                fosterHomeWithAllNonHumanAnimalData.allResidentNonHumanAnimalIds.mapNotNull {
-                    if (it.fosterHomeId == residentNonHumanAnimalId.fosterHomeId) {
-                        it
-                    } else {
-                        null
-                    }
+                fosterHomeWithAllNonHumanAnimalData.allResidentNonHumanAnimalIds.filter {
+                    it.nonHumanAnimalId == residentNonHumanAnimalId.nonHumanAnimalId
                 }
             }
 
@@ -159,7 +149,9 @@ class FakeLocalFosterHomeRepository(
             val result = localFosterHomeWithAllNonHumanAnimalDataList.map {
                 it.copy(allResidentNonHumanAnimalIds = it.allResidentNonHumanAnimalIds + residentNonHumanAnimalId)
             }
-            localFosterHomeWithAllNonHumanAnimalDataList.removeAll(localFosterHomeWithAllNonHumanAnimalDataList)
+            localFosterHomeWithAllNonHumanAnimalDataList.removeAll(
+                localFosterHomeWithAllNonHumanAnimalDataList
+            )
             localFosterHomeWithAllNonHumanAnimalDataList.addAll(result)
             onModifyResidentNonHumanAnimalId(1)
         }
@@ -192,15 +184,25 @@ class FakeLocalFosterHomeRepository(
         if (acceptedNonHumanAnimal == null) {
             onDeleteAcceptedNonHumanAnimal(0)
         } else {
-            val result: List<FosterHomeWithAllNonHumanAnimalData> = localFosterHomeWithAllNonHumanAnimalDataList.map { fosterHomeWithAllNonHumanAnimalData: FosterHomeWithAllNonHumanAnimalData ->
+            val result: List<FosterHomeWithAllNonHumanAnimalData> =
+                localFosterHomeWithAllNonHumanAnimalDataList.map { fosterHomeWithAllNonHumanAnimalData: FosterHomeWithAllNonHumanAnimalData ->
 
-                if (fosterHomeWithAllNonHumanAnimalData.allAcceptedNonHumanAnimals.contains(acceptedNonHumanAnimal)) {
-                    fosterHomeWithAllNonHumanAnimalData.copy(allAcceptedNonHumanAnimals = fosterHomeWithAllNonHumanAnimalData.allAcceptedNonHumanAnimals.minus(acceptedNonHumanAnimal))
-                } else {
-                    fosterHomeWithAllNonHumanAnimalData
+                    if (fosterHomeWithAllNonHumanAnimalData
+                            .allAcceptedNonHumanAnimals.contains(acceptedNonHumanAnimal)
+                    ) {
+                        fosterHomeWithAllNonHumanAnimalData.copy(
+                            allAcceptedNonHumanAnimals =
+                                fosterHomeWithAllNonHumanAnimalData.allAcceptedNonHumanAnimals.minus(
+                                    acceptedNonHumanAnimal
+                                )
+                        )
+                    } else {
+                        fosterHomeWithAllNonHumanAnimalData
+                    }
                 }
-            }
-            localFosterHomeWithAllNonHumanAnimalDataList.removeAll(localFosterHomeWithAllNonHumanAnimalDataList)
+            localFosterHomeWithAllNonHumanAnimalDataList.removeAll(
+                localFosterHomeWithAllNonHumanAnimalDataList
+            )
             localFosterHomeWithAllNonHumanAnimalDataList.addAll(result)
             onDeleteAcceptedNonHumanAnimal(1)
         }
@@ -218,15 +220,24 @@ class FakeLocalFosterHomeRepository(
         if (residentNonHumanAnimalIdEntity == null) {
             onDeleteResidentNonHumanAnimalId(0)
         } else {
-            val result: List<FosterHomeWithAllNonHumanAnimalData> = localFosterHomeWithAllNonHumanAnimalDataList.map { fosterHomeWithAllNonHumanAnimalData: FosterHomeWithAllNonHumanAnimalData ->
+            val result: List<FosterHomeWithAllNonHumanAnimalData> =
+                localFosterHomeWithAllNonHumanAnimalDataList.map { fosterHomeWithAllNonHumanAnimalData: FosterHomeWithAllNonHumanAnimalData ->
 
-                if (fosterHomeWithAllNonHumanAnimalData.allResidentNonHumanAnimalIds.contains(residentNonHumanAnimalIdEntity)) {
-                    fosterHomeWithAllNonHumanAnimalData.copy(allResidentNonHumanAnimalIds = fosterHomeWithAllNonHumanAnimalData.allResidentNonHumanAnimalIds.minus(residentNonHumanAnimalIdEntity))
-                } else {
-                    fosterHomeWithAllNonHumanAnimalData
+                    if (fosterHomeWithAllNonHumanAnimalData
+                            .allResidentNonHumanAnimalIds.contains(residentNonHumanAnimalIdEntity)
+                    ) {
+                        fosterHomeWithAllNonHumanAnimalData.copy(
+                            allResidentNonHumanAnimalIds = fosterHomeWithAllNonHumanAnimalData.allResidentNonHumanAnimalIds.minus(
+                                residentNonHumanAnimalIdEntity
+                            )
+                        )
+                    } else {
+                        fosterHomeWithAllNonHumanAnimalData
+                    }
                 }
-            }
-            localFosterHomeWithAllNonHumanAnimalDataList.removeAll(localFosterHomeWithAllNonHumanAnimalDataList)
+            localFosterHomeWithAllNonHumanAnimalDataList.removeAll(
+                localFosterHomeWithAllNonHumanAnimalDataList
+            )
             localFosterHomeWithAllNonHumanAnimalDataList.addAll(result)
             onDeleteResidentNonHumanAnimalId(1)
         }

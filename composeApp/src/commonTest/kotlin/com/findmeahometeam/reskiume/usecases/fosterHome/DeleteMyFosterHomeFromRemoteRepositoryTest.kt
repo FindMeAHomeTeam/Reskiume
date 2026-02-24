@@ -21,7 +21,7 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
-class DeleteFosterHomeFromRemoteRepositoryTest {
+class DeleteMyFosterHomeFromRemoteRepositoryTest {
 
     val authRepository: AuthRepository = mock {
         everySuspend { authState } returns flowOf(authUser)
@@ -90,7 +90,7 @@ class DeleteFosterHomeFromRemoteRepositoryTest {
         )
 
     @Test
-    fun `given a remote foster home_when the app deletes it_then modifyRemoteNonHumanAnimal and deleteRemoteFosterHome are called`() =
+    fun `given my remote foster home_when the app deletes it_then modifyRemoteNonHumanAnimal and deleteRemoteFosterHome are called`() =
         runTest {
             deleteMyFosterHomeFromRemoteRepository(
                 fosterHome.id,
@@ -111,7 +111,7 @@ class DeleteFosterHomeFromRemoteRepositoryTest {
         }
 
     @Test
-    fun `given a remote FH_when the app deletes it on ac deletion but the residents were deleted_then deleteNonHumanAnimal and deleteRemoteFosterHome are called`() =
+    fun `given my remote FH_when the app deletes it on ac deletion but the residents were deleted_then deleteNonHumanAnimal and deleteRemoteFosterHome are called`() =
         runTest {
             deleteMyFosterHomeFromRemoteRepository(
                 "otherFosterHomeId",

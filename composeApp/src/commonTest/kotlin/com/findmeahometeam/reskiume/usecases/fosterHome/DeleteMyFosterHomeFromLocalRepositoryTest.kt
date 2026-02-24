@@ -21,7 +21,7 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
-class DeleteFosterHomeFromLocalRepositoryTest {
+class DeleteMyFosterHomeFromLocalRepositoryTest {
 
     val localNonHumanAnimalRepository: LocalNonHumanAnimalRepository = mock {
 
@@ -88,7 +88,7 @@ class DeleteFosterHomeFromLocalRepositoryTest {
         )
 
     @Test
-    fun `given a local foster home_when the app deletes it_then deleteFosterHome is called`() =
+    fun `given my local foster home_when the app deletes it_then deleteFosterHome is called`() =
         runTest {
             deleteMyFosterHomeFromLocalRepository(fosterHome.id, TestScope()) {}
             verifySuspend {
@@ -98,7 +98,7 @@ class DeleteFosterHomeFromLocalRepositoryTest {
         }
 
     @Test
-    fun `given a local foster home_when the app deletes it on account deletion but the residents were deleted_then only deleteFosterHome is called`() =
+    fun `given my local foster home_when the app deletes it on account deletion but the residents were deleted_then only deleteFosterHome is called`() =
         runTest {
             deleteMyFosterHomeFromLocalRepository("otherFosterHomeId", TestScope()) {}
             verifySuspend {

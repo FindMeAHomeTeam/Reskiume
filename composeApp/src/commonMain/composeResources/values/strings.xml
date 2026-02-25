@@ -209,7 +209,7 @@
     <string name="check_all_foster_homes_screen_non_human_animal_gender_both">Both</string>
     <string name="check_all_foster_homes_screen_register_foster_home">+  Register a foster home</string>
 
-    <!-- Location permission -->
+    <!-- Location permission to check all foster homes -->
     <string name="location_permission_title">Location permission</string>
     <string name="location_permission_message">You can grant the location permission to display foster homes near you. We will never track your location.</string>
     <string name="location_permission_grant_permission_button">Grant permission</string>
@@ -259,7 +259,33 @@
     <string name="modify_foster_home_screen_warning_foster_home_with_residents_message">To delete this foster home you must first unregister all residents</string>
     <string name="modify_foster_home_screen_warning_foster_home_with_residents_ok_button">Ok</string>
 
+    <!-- Create a foster home -->
+    <string name="create_foster_home_screen_title">Create a foster home</string>
+    <string name="create_foster_home_screen_foster_home_title">Title</string>
+    <string name="create_foster_home_screen_foster_home_description">Description</string>
+    <string name="create_foster_home_screen_foster_home_conditions">Conditions</string>
+    <string name="create_foster_home_screen_foster_home_accepted_non_human_animals">Accepted non-human animals</string>
+    <string name="create_foster_home_screen_foster_home_resident_non_human_animals">Resident non-human animals</string>
+    <string name="create_foster_home_screen_foster_home_longitude">Longitude</string>
+    <string name="create_foster_home_screen_foster_home_latitude">Latitude</string>
+    <string name="create_foster_home_screen_foster_home_country">Country</string>
+    <string name="create_foster_home_screen_foster_home_city">City</string>
+    <string name="create_foster_home_screen_create_a_foster_home_button">Create a foster home</string>
+    <string name="create_foster_home_screen_create_the_foster_home_button">Create the foster home %1$s</string>
+    <string name="create_foster_home_screen_turn_on_location">Please, turn on the location to get your position</string>
 
+    <!-- Location permission to create a foster home -->
+    <string name="create_foster_home_location_permission_title">Location permission</string>
+    <string name="create_foster_home_location_permission_message">You must grant location permission to access your foster home's coarse location. Users can see the distance between nearby foster homes using their current location. Furthermore, we will never track and reveal your location.</string>
+    <string name="create_foster_home_location_permission_grant_permission_button">Grant permission</string>
+    <string name="create_foster_home_location_permission_do_not_grant_permission_button">Later</string>
+    <string name="create_foster_home_location_go_to_settings_title">Go to settings</string>
+    <string name="create_foster_home_location_grant_in_settings_message">Location permissions can be enabled in settings. Remember, we will never track and reveal your location.</string>
+    <string name="create_foster_home_location_open_settings_button">Open settings</string>
+    <string name="create_foster_home_location_turn_on_location_title">Turn on location services manually</string>
+    <string name="create_foster_home_location_turn_on_location_message">Please activate location services manually so we can determine the coarse location of your foster home.</string>
+    <string name="create_foster_home_location_turn_on_location_open_settings_button">Open settings</string>
+    <string name="create_foster_home_location_turn_on_later_location_button">Later</string>
 
     <!-- Accepted non human animal list creator -->
     <string name="accepted_non_human_animal_list_creator_title">Add accepted non-human animals:</string>

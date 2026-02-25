@@ -122,7 +122,7 @@ fun ModifyFosterHomeScreen(
                 var displayDeleteDialog: Boolean by rememberSaveable { mutableStateOf(false) }
                 var displayFosterHomeWithResidentsDialog: Boolean by rememberSaveable { mutableStateOf(false) }
 
-                val isUpdateUserButtonEnabled by remember(
+                val isUpdateFosterHomeButtonEnabled by remember(
                     title,
                     description,
                     conditions,
@@ -274,7 +274,7 @@ fun ModifyFosterHomeScreen(
                         Res.string.modify_foster_home_screen_save_foster_home_changes_button,
                         title
                     ),
-                    enabled = isUpdateUserButtonEnabled,
+                    enabled = isUpdateFosterHomeButtonEnabled,
                     onClick = {
                         modifyFosterHomeViewmodel.saveFosterHomeChanges(
                             isDifferentImage = imageUrl != uiFosterHome.fosterHome.imageUrl,

@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.findmeahometeam.reskiume.ui.fosterHomes.createFosterHome.CreateFosterHomeScreen
 import com.findmeahometeam.reskiume.ui.fosterHomes.modifyFosterHome.ModifyFosterHomeScreen
 import com.findmeahometeam.reskiume.ui.home.HomeScreen
 import com.findmeahometeam.reskiume.ui.profile.checkAdvice.CheckAdviceScreen
@@ -45,7 +46,9 @@ fun NavigationWrapper() {
         }
 
         composable<CreateFosterHome> {
-            //
+            CreateFosterHomeScreen {
+                mainNavController.navigateUp()
+            }
         }
 
         composable<ModifyFosterHome> {

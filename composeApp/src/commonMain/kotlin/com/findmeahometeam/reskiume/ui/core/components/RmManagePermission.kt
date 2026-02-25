@@ -107,7 +107,7 @@ fun RmManagePermission(
             ) { permissionState: PermissionState ->
 
                 // If Android enabled the dialog, but the permission is NotGranted instead of DeniedAlways, display the dialog to open the settings
-                if (permissionState == PermissionState.NotGranted) {
+                if (permissionState == PermissionState.NotGranted || permissionState == PermissionState.DeniedAlways) {
                     updateManagePermissionState(ManagePermissionState.DISPLAY_DIALOG_OPEN_SETTINGS)
                 }
             }

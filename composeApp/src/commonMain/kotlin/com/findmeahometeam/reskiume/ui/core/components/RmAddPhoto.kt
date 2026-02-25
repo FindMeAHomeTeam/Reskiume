@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -75,14 +74,14 @@ fun RmAddPhoto(
     var uri by remember { mutableStateOf(currentImageUri) }
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.wrapContentSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
 
         if (showAddPhoto) {
             Column(
-                modifier = Modifier.fillMaxWidth().wrapContentHeight()
+                modifier = Modifier.wrapContentSize()
                     .background(color = tertiaryGreen, shape = RoundedCornerShape(15.dp))
                     .border(
                         BorderStroke(2.dp, gray.copy(alpha = 0.5f)),

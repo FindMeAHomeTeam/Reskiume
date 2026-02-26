@@ -117,7 +117,7 @@ class CreateFosterHomeViewmodel(
                 val errorMessage =
                     getStringProvider.getStringResource(Res.string.create_foster_home_screen_turn_on_location)
                 log.d(
-                    "CheckAllFosterHomesViewmodel",
+                    "CreateFosterHomeViewmodel",
                     errorMessage
                 )
                 _saveChangesUiState.value = UiState.Error(errorMessage)
@@ -154,13 +154,13 @@ class CreateFosterHomeViewmodel(
             val fosterHomeWithPossibleImageDownloadUri: FosterHome =
                 if (imageDownloadUri.isBlank()) {
                     log.d(
-                        "CreateFosterHomeViewModel",
+                        "CreateFosterHomeViewmodel",
                         "uploadNewImageToRemoteDataSource: the download URI from the foster home ${createdFosterHome.id} is blank"
                     )
                     createdFosterHome
                 } else {
                     log.d(
-                        "CreateFosterHomeViewModel",
+                        "CreateFosterHomeViewmodel",
                         "uploadNewImageToRemoteDataSource: the download URI from the foster home ${createdFosterHome.id} was saved successfully"
                     )
                     createdFosterHome.copy(imageUrl = imageDownloadUri)
@@ -182,14 +182,14 @@ class CreateFosterHomeViewmodel(
 
                 if (result is DatabaseResult.Success) {
                     log.d(
-                        "CreateFosterHomeViewModel",
+                        "CreateFosterHomeViewmodel",
                         "createFosterHomeInRemoteDataSource: foster home ${createdFosterHome.id} created successfully in the remote data source"
                     )
                     onSuccess()
                 } else {
                     log.e(
-                        "CreateFosterHomeViewModel",
-                        "createFosterHomeInRemoteDataSource: failed to update the foster home ${createdFosterHome.id} in the remote data source"
+                        "CreateFosterHomeViewmodel",
+                        "createFosterHomeInRemoteDataSource: failed to create the foster home ${createdFosterHome.id} in the remote data source"
                     )
                     _saveChangesUiState.value = UiState.Error()
                 }
@@ -210,13 +210,13 @@ class CreateFosterHomeViewmodel(
 
                 if (isUpdated) {
                     log.d(
-                        "CreateFosterHomeViewModel",
+                        "CreateFosterHomeViewmodel",
                         "createFosterHomeInLocalDataSource: foster home ${updatedFosterHome.id} created successfully in the local data source"
                     )
                     onSuccess()
                 } else {
                     log.e(
-                        "CreateFosterHomeViewModel",
+                        "CreateFosterHomeViewmodel",
                         "createFosterHomeInLocalDataSource: failed to create the foster home ${updatedFosterHome.id} in the local data source"
                     )
                     _saveChangesUiState.value = UiState.Error()
@@ -241,12 +241,12 @@ class CreateFosterHomeViewmodel(
 
                 if (rowId > 0) {
                     log.d(
-                        "CreateFosterHomeViewModel",
+                        "CreateFosterHomeViewmodel",
                         "createCacheForFosterHomeInLocalDataSource: ${fosterHome.id} created in the local cache in section ${Section.FOSTER_HOMES}"
                     )
                 } else {
                     log.e(
-                        "CreateFosterHomeViewModel",
+                        "CreateFosterHomeViewmodel",
                         "createCacheForFosterHomeInLocalDataSource: Error creating ${fosterHome.id} in the local cache in section ${Section.FOSTER_HOMES}"
                     )
                 }

@@ -423,7 +423,7 @@ class CreateFosterHomeViewmodelTest : CoroutineTestDispatcher() {
         }
 
     @Test
-    fun `given my foster home to create_when I add accepted and resident non human animals without my foster home location_then I click to create my foster home`() =
+    fun `given my foster home to create_when I add accepted and resident non human animals without my foster home location_then an error is displayed`() =
         runTest {
             val createFosterHomeViewmodel = getCreateFosterHomeViewmodel()
 
@@ -437,7 +437,7 @@ class CreateFosterHomeViewmodelTest : CoroutineTestDispatcher() {
         }
 
     @Test
-    fun `given my foster home to create_when I add my foster home data but there is no foster home image_then the foster home is updated`() =
+    fun `given my foster home to create_when I add my foster home data but there is no foster home image_then the foster home is created`() =
         runTest {
             val createFosterHomeViewmodel = getCreateFosterHomeViewmodel()
 
@@ -508,7 +508,7 @@ class CreateFosterHomeViewmodelTest : CoroutineTestDispatcher() {
         }
 
     @Test
-    fun `given my foster home to create_when I add my foster home data but fails inserting the foster home cache_then the foster home is updated`() =
+    fun `given my foster home to create_when I add my foster home data but fails inserting the foster home cache_then the foster home is created`() =
         runTest {
             val createFosterHomeViewmodel = getCreateFosterHomeViewmodel(
                 localCacheCreatedInLocalDatasourceArg = 0

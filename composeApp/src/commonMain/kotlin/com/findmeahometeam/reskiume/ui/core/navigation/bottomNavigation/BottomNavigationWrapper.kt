@@ -31,8 +31,8 @@ fun BottomNavigationWrapper(
                 onModifyFosterHome = { fosterHomeId: String ->
                     mainNavHostController.navigate(ModifyFosterHome(fosterHomeId))
                 },
-                onCheckFosterHome = { fosterHomeId: String ->
-                    mainNavHostController.navigate(CheckFosterHome(fosterHomeId))
+                onCheckFosterHome = { fosterHomeId: String, ownerId: String ->
+                    mainNavHostController.navigate(CheckFosterHome(fosterHomeId, ownerId))
                 }
             )
         }

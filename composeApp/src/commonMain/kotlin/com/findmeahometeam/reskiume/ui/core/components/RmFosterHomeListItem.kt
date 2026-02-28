@@ -176,28 +176,18 @@ private fun ListAcceptedNonHumanAnimals(allAcceptedNonHumanAnimals: List<Accepte
 
         if (counter <= 2) {
 
-            var genderText = ""
             val nonHumanAnimalText: String =
                 nonHumanAnimalType.toEmoji() + " " + stringResource(nonHumanAnimalType.toStringResource())
 
-            genders.forEach {
-
-                val gender = stringResource(it.toStringResource()).lowercase()
-
-                genderText = if (genderText.isBlank()) {
-                    gender
-                } else {
-                    stringResource(
-                        Res.string.foster_home_list_item_accepted_both_genders_non_human_animal,
-                        genderText,
-                        gender
-                    )
-                }
+            val genderText = if (genders.size == 1) {
+                stringResource(genders.first().toStringResource()).lowercase()
+            } else {
+                stringResource(Res.string.foster_home_list_item_accepted_both_genders_non_human_animal)
             }
             Spacer(modifier = Modifier.height(5.dp))
             RmTextBold(
                 modifier = Modifier.fillMaxWidth(),
-                text = "$nonHumanAnimalText: $genderText",
+                text = "$nonHumanAnimalText · $genderText",
                 textToBold = nonHumanAnimalText,
                 fontSize = 16.sp,
                 color = Color.Black,
@@ -225,7 +215,9 @@ private fun ListResidentNonHumanAnimals(allResidentNonHumanAnimalForFosterHome: 
             Spacer(modifier = Modifier.height(5.dp))
             RmText(
                 modifier = Modifier.fillMaxWidth(),
-                text = residentNonHumanAnimal.nonHumanAnimalType.toEmoji() + " " + residentNonHumanAnimal.name,
+                text = residentNonHumanAnimal.nonHumanAnimalType.toEmoji()
+                        + " " + residentNonHumanAnimal.name
+                        + " · " + stringResource(residentNonHumanAnimal.gender.toStringResource()).lowercase(),
                 fontSize = 16.sp,
                 color = Color.Black
             )

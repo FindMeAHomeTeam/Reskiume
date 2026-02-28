@@ -31,12 +31,14 @@ import com.findmeahometeam.reskiume.ui.core.components.RmImage
 import com.findmeahometeam.reskiume.ui.core.components.RmScaffold
 import com.findmeahometeam.reskiume.ui.core.components.RmText
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckAdvice
+import com.findmeahometeam.reskiume.ui.core.primaryGreen
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import reskiume.composeapp.generated.resources.Res
 import reskiume.composeapp.generated.resources.check_advice_screen_author
 import reskiume.composeapp.generated.resources.check_advice_screen_author_image_content_description
 import reskiume.composeapp.generated.resources.check_advice_screen_title
+import reskiume.composeapp.generated.resources.reskiume
 
 @Composable
 fun CheckAdviceScreen(
@@ -97,12 +99,28 @@ fun CheckAdviceScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        RmImage(
-                            modifier = Modifier.size(40.dp).clip(CircleShape),
-                            imagePath = checkAdvice.authorImage!!,
-                            contentDescription = stringResource(Res.string.check_advice_screen_author_image_content_description),
-                        )
-                        Spacer(modifier = Modifier.width(5.dp))
+                        if (checkAdvice.authorImage!!.isBlank()) {
+                            Icon(
+                                modifier = Modifier.size(40.dp),
+                                painter = painterResource(Res.drawable.reskiume),
+                                contentDescription =
+                                    stringResource(
+                                        Res.string.check_advice_screen_author_image_content_description,
+                                        checkAdvice.authorName
+                                    ),
+                                tint = primaryGreen
+                            )
+                        } else {
+                            RmImage(
+                                modifier = Modifier.size(40.dp).clip(CircleShape),
+                                imagePath = checkAdvice.authorImage,
+                                contentDescription = stringResource(
+                                    Res.string.check_advice_screen_author_image_content_description,
+                                    checkAdvice.authorName
+                                )
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
                         RmText(
                             text = stringResource(
                                 Res.string.check_advice_screen_author,

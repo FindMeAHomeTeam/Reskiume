@@ -2,6 +2,7 @@ package com.findmeahometeam.reskiume.ui.core.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -30,6 +31,7 @@ import reskiume.composeapp.generated.resources.ic_back
 fun RmScaffold(
     title: String = "",
     onBackPressed: (() -> Unit)? = null,
+    topAppBarActions: @Composable (RowScope.() -> Unit)? = null,
     floatingActionButton: @Composable () -> Unit = {},
     content: @Composable (PaddingValues) -> Unit
 ) {
@@ -39,7 +41,11 @@ fun RmScaffold(
             TopAppBar(
                 title = {
                     RmText(
-                        modifier = Modifier.fillMaxWidth().padding(end = 48.dp),
+                        modifier = if (topAppBarActions == null) {
+                            Modifier.fillMaxWidth().padding(end = 48.dp)
+                        } else {
+                            Modifier.fillMaxWidth()
+                        },
                         text = title,
                         textAlign = TextAlign.Center,
                         fontWeight = FontWeight.Bold,
@@ -60,6 +66,11 @@ fun RmScaffold(
                             )
                         }
                     }
+                },
+                actions = if (topAppBarActions == null ) {
+                    {}
+                } else {
+                    topAppBarActions
                 },
                 colors = TopAppBarDefaults.topAppBarColors().copy(containerColor = backgroundColor)
             )

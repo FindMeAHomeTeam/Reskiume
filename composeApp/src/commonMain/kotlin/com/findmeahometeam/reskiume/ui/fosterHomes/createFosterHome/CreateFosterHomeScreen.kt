@@ -170,8 +170,6 @@ fun CreateFosterHomeScreen(
                 createFosterHomeViewmodel,
                 onBackPressed,
                 onUpdatePermissionState = {
-                    println("----> $it")
-
                     if (it == ManagePermissionState.IDLE) {
                         onBackPressed()
                     } else {

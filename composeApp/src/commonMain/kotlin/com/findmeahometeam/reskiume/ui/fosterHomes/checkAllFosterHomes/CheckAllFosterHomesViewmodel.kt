@@ -7,6 +7,7 @@ import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
+import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllFosterHomesByCountryAndCityFromLocalRepository
@@ -400,7 +401,8 @@ class CheckAllFosterHomesViewmodel(
 data class UiFosterHome(
     val fosterHome: FosterHome,
     val uiAllResidentNonHumanAnimals: List<NonHumanAnimal>,
-    val distance: Double? = null
+    val distance: Double? = null,
+    val owner: User? = null
 )
 
 enum class SearchOption(val stringResource: StringResource) {

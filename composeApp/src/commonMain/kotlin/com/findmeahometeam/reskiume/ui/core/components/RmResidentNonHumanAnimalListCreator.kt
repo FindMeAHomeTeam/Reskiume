@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.toEmoji
+import com.findmeahometeam.reskiume.domain.model.toStringResource
 import com.findmeahometeam.reskiume.ui.core.backgroundColorForItems
 import com.findmeahometeam.reskiume.ui.core.primaryGreen
 import com.findmeahometeam.reskiume.ui.core.primaryRed
@@ -141,7 +142,9 @@ fun RmResidentNonHumanAnimalListCreator(
                 ) {
                     RmText(
                         text = residentNonHumanAnimalForFosterHome.nonHumanAnimalType.toEmoji()
-                                + " " + residentNonHumanAnimalForFosterHome.name,
+                                + " " + residentNonHumanAnimalForFosterHome.name
+                                + " · " + residentNonHumanAnimalForFosterHome.gender.toEmoji()
+                                + " " + stringResource(residentNonHumanAnimalForFosterHome.gender.toStringResource()),
                         fontSize = 16.sp
                     )
 

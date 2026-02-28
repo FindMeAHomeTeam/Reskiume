@@ -34,6 +34,7 @@ import com.findmeahometeam.reskiume.review
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckReviews
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckActivistUtil
+import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsUtilImpl
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsViewmodel
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.findmeahometeam.reskiume.uiReview
@@ -274,8 +275,7 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
             log
         )
 
-        return CheckReviewsViewmodel(
-            saveStateHandleProvider,
+        val checkReviewsUtilImpl = CheckReviewsUtilImpl(
             observeAuthStateInAuthDataSource,
             getDataByManagingObjectLocalCacheTimestamp,
             getReviewsFromRemoteRepository,
@@ -283,6 +283,13 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
             insertReviewInLocalRepository,
             checkActivistUtil,
             log
+        )
+
+        return CheckReviewsViewmodel(
+            saveStateHandleProvider,
+            checkReviewsUtilImpl,
+            observeAuthStateInAuthDataSource,
+            checkActivistUtil
         )
     }
 

@@ -13,10 +13,6 @@ import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteReview.RealtimeDatabaseRemoteReviewRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
-import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
-import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
@@ -24,6 +20,10 @@ import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManaging
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.InsertReviewInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInLocalDataSource
 import com.findmeahometeam.reskiume.localCache
 import com.findmeahometeam.reskiume.review
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckReviews
@@ -40,6 +40,7 @@ import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeRealtimeDataba
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeSaveStateHandleProvider
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeStorageRepository
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckActivistUtil
+import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsUtilImpl
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsViewmodel
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.findmeahometeam.reskiume.uiReview
@@ -110,8 +111,7 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
             log
         )
 
-        return CheckReviewsViewmodel(
-            saveStateHandleProvider,
+        val checkReviewsUtilImpl = CheckReviewsUtilImpl(
             observeAuthStateInAuthDataSource,
             getDataByManagingObjectLocalCacheTimestamp,
             getReviewsFromRemoteRepository,
@@ -119,6 +119,13 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
             insertReviewInLocalRepository,
             checkActivistUtil,
             log
+        )
+
+        return CheckReviewsViewmodel(
+            saveStateHandleProvider,
+            checkReviewsUtilImpl,
+            observeAuthStateInAuthDataSource,
+            checkActivistUtil
         )
     }
 

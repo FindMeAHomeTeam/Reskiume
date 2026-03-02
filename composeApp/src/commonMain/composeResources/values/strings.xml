@@ -188,9 +188,11 @@
     <!-- Give feedback -->
     <string name="give_feedback_subject">Feedback for Reskiume</string>
     <string name="give_feedback_body">My name: \n\nWhy this feedback is important: \n\nDescription: </string>
-    <string name="give_feedback_no_email_app_dialog_title">You have no email app installed</string>
-    <string name="give_feedback_no_email_app_dialog_message">Please, go to the store and install one</string>
-    <string name="give_feedback_no_email_app_dialog_ok_button">Ok</string>
+
+    <!-- No email dialog -->
+    <string name="dialog_no_email_app_dialog_title">You have no email app installed</string>
+    <string name="dialog_no_email_app_dialog_message">Please, go to the store and install one</string>
+    <string name="dialog_no_email_app_dialog_ok_button">Ok</string>
 
     <!-- Check all foster homes -->
     <string name="check_all_foster_homes_screen_title">Search foster homes by</string>

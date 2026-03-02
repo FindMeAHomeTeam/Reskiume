@@ -41,9 +41,9 @@ import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import reskiume.composeapp.generated.resources.Res
 import reskiume.composeapp.generated.resources.give_feedback_body
-import reskiume.composeapp.generated.resources.give_feedback_no_email_app_dialog_message
-import reskiume.composeapp.generated.resources.give_feedback_no_email_app_dialog_ok_button
-import reskiume.composeapp.generated.resources.give_feedback_no_email_app_dialog_title
+import reskiume.composeapp.generated.resources.dialog_no_email_app_dialog_message
+import reskiume.composeapp.generated.resources.dialog_no_email_app_dialog_ok_button
+import reskiume.composeapp.generated.resources.dialog_no_email_app_dialog_title
 import reskiume.composeapp.generated.resources.give_feedback_subject
 import reskiume.composeapp.generated.resources.ic_advice
 import reskiume.composeapp.generated.resources.ic_delete
@@ -293,9 +293,9 @@ fun ProfileScreen(
 
                 RmDialog(
                     emoji = "✉️",
-                    title = stringResource(Res.string.give_feedback_no_email_app_dialog_title),
-                    message = stringResource(Res.string.give_feedback_no_email_app_dialog_message),
-                    allowMessage = stringResource(Res.string.give_feedback_no_email_app_dialog_ok_button),
+                    title = stringResource(Res.string.dialog_no_email_app_dialog_title),
+                    message = stringResource(Res.string.dialog_no_email_app_dialog_message),
+                    allowMessage = stringResource(Res.string.dialog_no_email_app_dialog_ok_button),
                     onClickAllow = { displayNoEmailAppError = false },
                     onClickDeny = { displayNoEmailAppError = false }
                 )

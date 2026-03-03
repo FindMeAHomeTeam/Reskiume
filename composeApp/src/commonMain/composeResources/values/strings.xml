@@ -102,7 +102,7 @@
     <string name="delete_account_screen_are_you_sure_delete_account_message">Are you sure you want to delete your account?</string>
     <string name="delete_account_screen_explanation_delete_account_message">This action is irreversible. This means that your data, the non-human animals you manage, your foster homes, and your rescue events will be permanently deleted. To continue, add your password</string>
     <string name="delete_account_screen_delete_account_button">Delete account</string>
-    <string name="delete_account_screen_delete_message">"Error deleting user from local data source. Please, uninstall the app to delete it"</string>
+    <string name="delete_account_screen_delete_message">Error deleting user from local data source. Please, uninstall the app to delete it</string>
 
     <!-- General error messages -->
     <string name="general_error_network_message">Network error. Please check your internet connection and try again</string>
@@ -226,7 +226,7 @@
 
     <!-- Foster home list item -->
     <string name="foster_home_list_item_accepted_non_human_animal">Accept: </string>
-    <string name="foster_home_list_item_accepted_both_genders_non_human_animal">%1$s &amp; %2$s</string>
+    <string name="foster_home_list_item_accepted_both_genders_non_human_animal">female &amp; male</string>
     <string name="foster_home_list_item_more_non_human_animal">➕ And more</string>
     <string name="foster_home_list_item_residents_non_human_animal">Residents</string>
     <string name="foster_home_list_item_disabled_foster_home">Disabled</string>
@@ -302,6 +302,34 @@
     <string name="resident_non_human_animal_list_creator_unselected_non_human_animal_label">Unselected</string>
     <string name="resident_non_human_animal_list_creator_add_content_description">Add a non-human animal</string>
     <string name="resident_non_human_animal_list_creator_delete_content_description">Delete a non-human animal</string>
+
+    <!-- Check foster home -->
+    <string name="check_foster_home_screen_title">%1$s from %2$s (%3$s)</string>
+    <string name="check_foster_home_screen_share_content_description">Share this foster home</string>
+    <string name="check_foster_home_screen_accepted_both_genders_non_human_animal">female &amp; male</string>
+    <string name="check_foster_home_screen_accepted_non_human_animals">%1$s and %2$s</string>
+    <string name="check_foster_home_screen_share_title">You have no sharing app installed</string>
+    <string name="check_foster_home_screen_share_message">Please, go to the store and install one</string>
+    <string name="check_foster_home_screen_share_ok_button">Ok</string>
+    <string name="check_foster_home_screen_foster_home_avatar_content_description">%1$s's avatar</string>
+    <string name="check_foster_home_screen_owner_avatar_content_description">%1$s's avatar</string>
+    <string name="check_foster_home_screen_report_foster_home">Report this foster home</string>
+    <string name="check_foster_home_screen_report_foster_home_subject">Report the foster home %1$s (%2$s)</string>
+    <string name="check_foster_home_screen_report_foster_home_body">My name: \n\nI am reporting the foster home %1$s (%2$s) because: </string>
+    <string name="check_foster_home_screen_foster_home_description_label">Description</string>
+    <string name="check_foster_home_screen_foster_home_conditions_label">Conditions</string>
+    <string name="check_foster_home_screen_foster_home_accepted_non_human_animals_label">Accepted non-human animals</string>
+    <string name="check_foster_home_screen_foster_home_resident_non_human_animals_label">Resident non-human animals</string>
+    <string name="check_foster_home_screen_owner_reviews_label">Reviews</string>
+    <string name="check_foster_home_screen_no_account_label">Create an account to register a non-human animal to foster and talk to %1$s</string>
+    <string name="check_foster_home_screen_no_account_button">Create an account</string>
+    <string name="check_foster_home_screen_register_non_human_animal_to_talk_to_owner_label">Register first a non-human animal to foster and then talk to %1$s</string>
+    <string name="check_foster_home_screen_register_non_human_animal_button">Register first a non-human animal</string>
+    <string name="check_foster_home_screen_talk_to_owner_label">Talk to %1$s to foster a non-human animal</string>
+    <string name="check_foster_home_screen_non_human_animal_label">Non-human animal</string>
+    <string name="check_foster_home_screen_unselected_non_human_animal_label">Unselected</string>
+    <string name="check_foster_home_screen_start_chat_button">Start chat</string>
+    <string name="check_foster_home_screen_share_foster_home_title">Do you need me to foster a non-human animal? I can care for these non-human animal kinds: %1$s. Find me in the Reskiume app using the following link %2$s</string>
 
     <!-- Check all advice -->
     <string name="check_all_advice_screen_title">Check all advice</string>

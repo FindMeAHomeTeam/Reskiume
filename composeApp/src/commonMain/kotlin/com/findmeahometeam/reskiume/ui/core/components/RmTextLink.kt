@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
@@ -25,6 +26,7 @@ fun RmTextLink(
     textAlign: TextAlign = TextAlign.Start,
     fontWeight: FontWeight = FontWeight.Normal,
     fontSize: TextUnit = 14.sp,
+    linkColor: Color = primaryGreen,
     onClick: () -> Unit
 ) {
     val startIndex = text.indexOf(textToLink)
@@ -41,7 +43,7 @@ fun RmTextLink(
                 tag = textToLink,
                 styles = TextLinkStyles(
                     style = SpanStyle(
-                        color = primaryGreen,
+                        color = linkColor,
                         textDecoration = TextDecoration.Underline
                     )
                 ),

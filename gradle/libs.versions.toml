@@ -3,14 +3,16 @@ agp = "8.13.2"
 android-compileSdk = "36"
 android-minSdk = "24"
 android-targetSdk = "36"
-androidx-activity = "1.12.3"
+androidx-activity = "1.12.4"
 androidx-lifecycle = "2.9.6"
-coil = "3.3.0"
+coil = "3.3.0" #Needs a new kotlin version
+componentsResources = "1.10.1"
 composeHotReload = "1.0.0"
-composeMultiplatform = "1.9.3" #Deprecates compose libraries
+composeMultiplatform = "1.10.1"
 coroutines = "1.10.2"
 crashlyticsPlugin = "3.0.6"
-firebase-bom = "34.9.0"
+firebase-bom = "34.10.0"
+foundation = "1.10.1"
 googleServices = "4.4.4"
 imagepickerkmp = "1.0.28-beta3" #Camera bounds broken in new versions
 junit = "4.13.2"
@@ -18,16 +20,22 @@ koin-bom = "4.1.1"
 konnectivity = "0.1-alpha01"
 kotlin = "2.2.20"
 kotlinxDatetime = "0.7.1-0.6.x-compat"
+kotlinx-serialization = "1.9.0" #Needs a new kotlin version
 ksp = "2.2.20-2.0.2"
 ktor = "3.3.0" #Needs a new kotlin version
+material3 = "1.9.0"
 mokkery-plugin = "3.0.0" #Needs a new kotlin version
 moko-permissions = "0.20.1"
 nativecoroutines = "1.0.0-ALPHA-47" #Needs a new kotlin version
 navigation = "2.9.2"
 paging = "3.4.0-beta01" #Problems with iOS
 room = "2.8.2" #Needs a new kotlin version
+runtime = "1.10.1"
 sqlite = "2.6.1" #Needs a new kotlin version
 turbine = "1.2.1"
+ui = "1.10.1"
+uiTooling = "1.10.1"
+uiToolingPreview = "1.10.1"
 
 [libraries]
 #core
@@ -42,7 +50,15 @@ kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-c
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigation" }
+runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "runtime" }
+foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "foundation" }
+material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "material3" }
+ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "ui" }
+components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "componentsResources" }
+ui-tooling-preview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "uiToolingPreview" }
+ui-tooling = { module = "org.jetbrains.compose.ui:ui-tooling", version.ref = "uiTooling" }
 
 #tests
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }

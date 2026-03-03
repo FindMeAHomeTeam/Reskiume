@@ -39,7 +39,7 @@ kotlin {
             languageSettings.optIn("kotlin.experimental.ExperimentalObjCName")
         }
         androidMain.dependencies {
-            implementation(compose.preview)
+            implementation(libs.ui.tooling.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.koin.android)
             implementation(libs.kotlinx.coroutines.android)
@@ -59,12 +59,12 @@ kotlin {
             implementation(libs.koin.testJunit)
         }
         commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material3)
-            implementation(compose.ui)
-            implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
+            implementation(libs.runtime)
+            implementation(libs.foundation)
+            implementation(libs.material3)
+            implementation(libs.ui)
+            implementation(libs.components.resources)
+            implementation(libs.ui.tooling.preview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
@@ -75,6 +75,7 @@ kotlin {
             implementation(libs.androidx.room.runtime)
             implementation(libs.androidx.sqlite.bundled)
             implementation(libs.kotlinx.datetime)
+            implementation(libs.kotlinx.serialization.json)
 
             implementation(project.dependencies.platform(libs.koin.bom))
             implementation(libs.koin.core)
@@ -138,7 +139,7 @@ android {
 }
 
 dependencies {
-    debugImplementation(compose.uiTooling)
+    debugImplementation(libs.ui.tooling)
     add("kspCommonMainMetadata", libs.androidx.room.compiler)
     add("kspAndroid", libs.androidx.room.compiler)
     add("kspIosX64", libs.androidx.room.compiler)

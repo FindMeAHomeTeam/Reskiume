@@ -45,6 +45,8 @@ import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepo
 import com.findmeahometeam.reskiume.domain.repository.util.analytics.AnalyticsForIosWrapper
 import com.findmeahometeam.reskiume.domain.repository.util.location.LocationRepository
 import com.findmeahometeam.reskiume.domain.repository.util.log.CrashlyticsForIosWrapper
+import com.findmeahometeam.reskiume.ui.fosterHomes.shareService.ShareService
+import com.findmeahometeam.reskiume.ui.fosterHomes.shareService.ShareServiceIosImpl
 import com.findmeahometeam.reskiume.ui.location.LocationRepositoryIosImpl
 import com.findmeahometeam.reskiume.ui.profile.giveFeedback.GiveFeedback
 import com.findmeahometeam.reskiume.ui.profile.giveFeedback.GiveFeedbackImpl
@@ -84,4 +86,5 @@ actual val platformModule: Module = module {
     singleOf(::FireStoreRemoteFosterHomeFlowsRepositoryForIosDelegateImpl) bind FireStoreRemoteFosterHomeFlowsRepositoryForIosDelegate::class
     singleOf(::FireStoreRemoteFosterHomeRepositoryForIosDelegateWrapperImpl) bind FireStoreRemoteFosterHomeRepositoryForIosDelegateWrapper::class
     singleOf(::LocationRepositoryIosImpl) bind LocationRepository::class
+    singleOf(::ShareServiceIosImpl) bind ShareService::class
 }

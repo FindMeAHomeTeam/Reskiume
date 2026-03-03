@@ -20,6 +20,8 @@ import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteFosterHome.FireStoreRemoteFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.repository.util.location.LocationRepository
+import com.findmeahometeam.reskiume.ui.fosterHomes.shareService.ShareService
+import com.findmeahometeam.reskiume.ui.fosterHomes.shareService.ShareServiceAndroidImpl
 import com.findmeahometeam.reskiume.ui.location.LocationRepositoryAndroidImpl
 import com.findmeahometeam.reskiume.ui.profile.giveFeedback.GiveFeedback
 import com.findmeahometeam.reskiume.ui.profile.giveFeedback.GiveFeedbackImpl
@@ -55,4 +57,5 @@ actual val platformModule: Module = module {
     single<FirebaseFirestore> { Firebase.firestore }
     singleOf(::FireStoreRemoteFosterHomeRepositoryAndroidImpl) bind FireStoreRemoteFosterHomeRepository::class
     singleOf(::LocationRepositoryAndroidImpl) bind LocationRepository::class
+    singleOf(::ShareServiceAndroidImpl) bind ShareService::class
 }

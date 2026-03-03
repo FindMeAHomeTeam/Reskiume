@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.findmeahometeam.reskiume.ui.fosterHomes.checkFosterHome.CheckFosterHomeScreen
 import com.findmeahometeam.reskiume.ui.fosterHomes.createFosterHome.CreateFosterHomeScreen
 import com.findmeahometeam.reskiume.ui.fosterHomes.modifyFosterHome.ModifyFosterHomeScreen
 import com.findmeahometeam.reskiume.ui.home.HomeScreen
@@ -58,7 +59,23 @@ fun NavigationWrapper() {
         }
 
         composable<CheckFosterHome> {
-            //
+            CheckFosterHomeScreen(
+                onContactFosterHome = { fosterHomeId: String, nonHumanAnimalId: String ->
+                    // TODO
+                },
+                onReviewClick = { uid ->
+                    mainNavController.navigate(CheckReviews(uid))
+                },
+                onCreateAccount = {
+                    mainNavController.navigate(Routes.CREATE_ACCOUNT.route)
+                },
+                onCreateNonHumanAnimal = {
+                    mainNavController.navigate(Routes.CREATE_NON_HUMAN_ANIMAL.route)
+                },
+                onBackPressed = {
+                    mainNavController.navigateUp()
+                }
+            )
         }
 
         composable(route = Routes.CREATE_ACCOUNT.route) {

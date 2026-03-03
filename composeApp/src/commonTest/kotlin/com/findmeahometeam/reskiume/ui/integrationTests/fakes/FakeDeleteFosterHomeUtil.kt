@@ -13,6 +13,7 @@ class FakeDeleteFosterHomeUtil(
         id: String,
         ownerId: String,
         coroutineScope: CoroutineScope,
+        onlyDeleteOnLocal: Boolean,
         onError: () -> Unit,
         onComplete: () -> Unit
     ) {

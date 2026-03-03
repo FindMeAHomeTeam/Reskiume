@@ -25,18 +25,20 @@ class DeleteFosterHomeUtilImpl(
     private val deleteMyFosterHomeFromLocalRepository: DeleteMyFosterHomeFromLocalRepository,
     private val deleteCacheFromLocalRepository: DeleteCacheFromLocalRepository,
     private val log: Log
-): DeleteFosterHomeUtil {
+) : DeleteFosterHomeUtil {
 
     override fun deleteFosterHome(
         id: String,
         ownerId: String,
         coroutineScope: CoroutineScope,
+        onlyDeleteOnLocal: Boolean,
         onError: () -> Unit,
         onComplete: () -> Unit
     ) {
         deleteCurrentImageFromRemoteDataSource(
             ownerId,
             id,
+            onlyDeleteOnLocal,
             coroutineScope,
             onError
         ) {
@@ -48,6 +50,7 @@ class DeleteFosterHomeUtilImpl(
                 deleteFosterHomeFromRemoteDataSource(
                     id,
                     ownerId,
+                    onlyDeleteOnLocal,
                     coroutineScope,
                     onError
                 ) {
@@ -69,10 +72,15 @@ class DeleteFosterHomeUtilImpl(
     private fun deleteCurrentImageFromRemoteDataSource(
         ownerId: String,
         fosterHomeId: String,
+        onlyDeleteOnLocal: Boolean,
         coroutineScope: CoroutineScope,
         onError: () -> Unit,
         onSuccess: () -> Unit
     ) {
+        if (onlyDeleteOnLocal) {
+            onSuccess()
+            return
+        }
         coroutineScope.launch {
 
             val remoteFosterHome = getFosterHomeFromRemoteRepository(
@@ -144,10 +152,15 @@ class DeleteFosterHomeUtilImpl(
     private fun deleteFosterHomeFromRemoteDataSource(
         id: String,
         ownerId: String,
+        onlyDeleteOnLocal: Boolean,
         coroutineScope: CoroutineScope,
         onError: () -> Unit,
         onSuccess: () -> Unit
     ) {
+        if (onlyDeleteOnLocal) {
+            onSuccess()
+            return
+        }
         coroutineScope.launch {
 
             deleteMyFosterHomeFromRemoteRepository(

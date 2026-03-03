@@ -7,6 +7,7 @@ interface DeleteFosterHomeUtil {
         id: String,
         ownerId: String,
         coroutineScope: CoroutineScope,
+        onlyDeleteOnLocal: Boolean = false, // In case the user is not owner of the remote data
         onError: () -> Unit,
         onComplete: () -> Unit
     )

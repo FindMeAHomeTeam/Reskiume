@@ -7,7 +7,9 @@ struct iOSApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView().onOpenURL(perform: { url in
+                ExternalUriHandler.shared.onNewUri(uri: url.absoluteString)
+            })
         }
     }
 }

@@ -2,13 +2,24 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>reskiu.me</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>vegan-for-the-animals</string>
+			</array>
+		</dict>
+	</array>
 	<key>FirebaseAppDelegateProxyEnabled</key>
 	<false/>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>This app needs access to the camera to take photos</string>
-    <key>NSLocationWhenInUseUsageDescription</key>
-    <string>You can grant the location permission to display foster homes near you. We will never track your location.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>You can grant the location permission to display foster homes near you. We will never track your location.</string>
 </dict>
 </plist>

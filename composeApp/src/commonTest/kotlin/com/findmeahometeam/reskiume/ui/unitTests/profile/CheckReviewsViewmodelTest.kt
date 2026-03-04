@@ -335,7 +335,7 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
 
             verify {
                 log.e(
-                    "CheckUserUtil",
+                    "CheckActivistUtil",
                     "Error adding user ${author.uid} to local database"
                 )
             }
@@ -376,7 +376,7 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
 
             verify {
                 log.e(
-                    "CheckUserUtil",
+                    "CheckActivistUtil",
                     "Failed to modify user with uid ${author.uid} in local data source."
                 )
             }

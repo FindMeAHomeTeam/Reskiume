@@ -75,7 +75,7 @@ class CheckActivistUtil(
                     activistWithLocalImage
                 } else {
                     log.d(
-                        "CheckUserUtil",
+                        "CheckActivistUtil",
                         "User ${activist.uid} has no avatar image to save locally."
                     )
                     insertUserInLocalRepository(activist)
@@ -91,12 +91,12 @@ class CheckActivistUtil(
 
             if (rowId > 0) {
                 log.d(
-                    "CheckUserUtil",
+                    "CheckActivistUtil",
                     "User ${user.uid} added to local database"
                 )
             } else {
                 log.e(
-                    "CheckUserUtil",
+                    "CheckActivistUtil",
                     "Error adding user ${user.uid} to local database"
                 )
             }
@@ -122,7 +122,7 @@ class CheckActivistUtil(
                     activistWithLocalImage
                 } else {
                     log.d(
-                        "CheckUserUtil",
+                        "CheckActivistUtil",
                         "User ${activist.uid} has no avatar image to save locally."
                     )
                     modifyUserInLocalRepository(activist)
@@ -137,12 +137,12 @@ class CheckActivistUtil(
 
             if (rowsUpdated > 0) {
                 log.d(
-                    "CheckUserUtil",
+                    "CheckActivistUtil",
                     "Modified user with uid ${user.uid} into local data source."
                 )
             } else {
                 log.e(
-                    "CheckUserUtil",
+                    "CheckActivistUtil",
                     "Failed to modify user with uid ${user.uid} in local data source."
                 )
             }

@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.findmeahometeam.reskiume.ui.fosterHomes.checkFosterHome.CheckFosterHomeScreen
 import com.findmeahometeam.reskiume.ui.fosterHomes.createFosterHome.CreateFosterHomeScreen
@@ -26,6 +27,7 @@ import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.ModifyNonHum
 fun NavigationWrapper() {
 
     val mainNavController: NavHostController = rememberNavController()
+    DeepLinkListener(mainNavController)
 
     NavHost(navController = mainNavController, startDestination = Routes.HOME_SCREEN.route) {
 
@@ -58,7 +60,13 @@ fun NavigationWrapper() {
             }
         }
 
-        composable<CheckFosterHome> {
+        composable<CheckFosterHome>(
+            deepLinks = listOf(
+                navDeepLink {
+                    this.uriPattern = "vegan-for-the-animals://reskiu.me/fosterHome/{ownerId}/{fosterHomeId}"
+                }
+            )
+        ) {
             CheckFosterHomeScreen(
                 onContactFosterHome = { fosterHomeId: String, nonHumanAnimalId: String ->
                     // TODO

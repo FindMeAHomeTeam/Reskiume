@@ -15,6 +15,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresPermission
+import com.findmeahometeam.reskiume.ActivityHolder
 import com.findmeahometeam.reskiume.domain.repository.util.location.LocationRepository
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -27,17 +28,28 @@ import kotlin.time.ExperimentalTime
 
 private const val WAITING_TIME: Int = 2 * 60 * 1000 // 2 min
 
-class LocationRepositoryAndroidImpl(
-    private val componentActivity: ComponentActivity
-) : LocationRepository {
+class LocationRepositoryAndroidImpl : LocationRepository {
+
+    /**
+     * Resolves the current ComponentActivity lazily via ActivityHolder so that this singleton
+     * never holds a stale reference after the activity is destroyed (e.g. on back-press).
+     */
+    private val componentActivity: ComponentActivity?
+        get() = ActivityHolder.activityOrNull
 
     override fun observeIfLocationEnabledFlow(): Flow<Boolean> = callbackFlow {
 
-        trySend(isLocationEnabled())
+        val componentActivity = componentActivity ?: run {
+            close()
+            return@callbackFlow
+        }
+
+        trySend(isLocationEnabled(componentActivity))
 
         val receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
-                trySend(isLocationEnabled())
+                val current = this@LocationRepositoryAndroidImpl.componentActivity ?: return
+                trySend(isLocationEnabled(current))
             }
         }
         componentActivity.registerReceiver(
@@ -50,7 +62,7 @@ class LocationRepositoryAndroidImpl(
         }
     }
 
-    private fun isLocationEnabled(): Boolean {
+    private fun isLocationEnabled(componentActivity: ComponentActivity): Boolean {
         val locationManager =
             componentActivity.getSystemService(Context.LOCATION_SERVICE) as? LocationManager
                 ?: return false
@@ -59,7 +71,12 @@ class LocationRepositoryAndroidImpl(
     }
 
     override fun requestEnableLocation(onResult: (isEnabled: Boolean) -> Unit) {
-        if (isLocationEnabled()) {
+        val componentActivity = componentActivity ?: run {
+            onResult(false)
+            return
+        }
+
+        if (isLocationEnabled(componentActivity)) {
             onResult(true)
             return
         }
@@ -69,8 +86,8 @@ class LocationRepositoryAndroidImpl(
         launcher = componentActivity.registerActivityResultLauncher(
             contract = ActivityResultContracts.StartActivityForResult(),
             callback = {
-
-                onResult(isLocationEnabled())
+                val current = this@LocationRepositoryAndroidImpl.componentActivity ?: return@registerActivityResultLauncher
+                onResult(isLocationEnabled(current))
                 launcher?.unregister()
             }
         )
@@ -89,6 +106,8 @@ class LocationRepositoryAndroidImpl(
     @OptIn(ExperimentalTime::class)
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_COARSE_LOCATION])
     override suspend fun getLocation(): Pair<Double, Double> {
+
+        val componentActivity = componentActivity ?: return Pair(0.0, 0.0)
 
         val locationManager: LocationManager =
             componentActivity.getSystemService(Context.LOCATION_SERVICE) as? LocationManager

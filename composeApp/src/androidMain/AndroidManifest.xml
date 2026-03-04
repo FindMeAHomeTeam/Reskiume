@@ -3,11 +3,11 @@
 
     <queries>
         <intent>
-            <action android:name="android.intent.action.SENDTO"/>
+            <action android:name="android.intent.action.SENDTO" />
             <data android:scheme="mailto" />
         </intent>
         <intent>
-            <action android:name="android.intent.action.SEND"/>
+            <action android:name="android.intent.action.SEND" />
             <data android:mimeType="text/plain" />
             <category android:name="android.intent.category.DEFAULT" />
         </intent>
@@ -15,7 +15,10 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-feature android:name="android.hardware.camera" android:required="true" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
@@ -27,12 +30,24 @@
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Material.Light.NoActionBar">
         <activity
-            android:exported="true"
-            android:name=".MainActivity">
+            android:name=".MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <!-- Accepts URIs that begin with "vegan-for-the-animals://reskiu.me” -->
+                <data android:scheme="vegan-for-the-animals" />
+                <data android:host="reskiu.me" />
+                <data android:pathPrefix="/fosterHome/" />
+                <data android:pathPrefix="/rescueEvent/" />
             </intent-filter>
         </activity>
     </application>

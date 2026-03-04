@@ -5,7 +5,7 @@ import android.content.Intent
 
 class ShareServiceAndroidImpl(
     private val context: Context
-): ShareService {
+) : ShareService {
 
     override fun shareContent(
         text: String,
@@ -17,7 +17,9 @@ class ShareServiceAndroidImpl(
             putExtra(Intent.EXTRA_TEXT, text)
         }
         if (shareIntent.resolveActivity(context.packageManager) != null) {
-            context.startActivity(Intent.createChooser(shareIntent, null))
+            context.startActivity(Intent.createChooser(shareIntent, null).also { intent ->
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            })
         } else {
             onError()
         }

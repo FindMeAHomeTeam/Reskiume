@@ -56,6 +56,7 @@ import com.findmeahometeam.reskiume.ui.core.components.RmScaffold
 import com.findmeahometeam.reskiume.ui.core.components.RmText
 import com.findmeahometeam.reskiume.ui.core.components.RmTextLink
 import com.findmeahometeam.reskiume.ui.core.components.UiState
+import com.findmeahometeam.reskiume.ui.core.navigation.FOSTER_HOME_DEEP_LINK
 import com.findmeahometeam.reskiume.ui.core.primaryGreen
 import com.findmeahometeam.reskiume.ui.core.primaryRed
 import com.findmeahometeam.reskiume.ui.core.textColor
@@ -364,7 +365,7 @@ fun DisplayShareService(
             .joinToString(", "),
         allAcceptedNonHumanAnimalTextList.last()
     )
-    val fosterHomeDeepLink = "https://reskiu.me/fosterHome/$fosterHomeOwnerId/$fosterHomeId"
+    val fosterHomeDeepLink = "$FOSTER_HOME_DEEP_LINK/$fosterHomeOwnerId/$fosterHomeId"
 
     shareService.shareContent(
         text = stringResource(

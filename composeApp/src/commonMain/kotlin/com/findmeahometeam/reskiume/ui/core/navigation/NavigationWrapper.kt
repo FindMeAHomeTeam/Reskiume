@@ -63,7 +63,7 @@ fun NavigationWrapper() {
         composable<CheckFosterHome>(
             deepLinks = listOf(
                 navDeepLink {
-                    this.uriPattern = "vegan-for-the-animals://reskiu.me/fosterHome/{ownerId}/{fosterHomeId}"
+                    this.uriPattern = "$FOSTER_HOME_DEEP_LINK/{ownerId}/{fosterHomeId}"
                 }
             )
         ) {

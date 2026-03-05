@@ -201,8 +201,10 @@
     <string name="check_all_foster_homes_screen_country_label">🌍 Country</string>
     <string name="check_all_foster_homes_screen_city_label">🌇 City</string>
     <string name="check_all_foster_homes_screen_non_human_animal_type_label">🐷🐱 Non-human animal type</string>
-    <string name="check_all_foster_homes_screen_search_foster_homes_button">🔎 Search foster homes</string>
-    <string name="check_all_foster_homes_screen_search_available_foster_homes">Available foster homes</string>
+    <string name="check_all_foster_homes_screen_search_foster_homes_button">🔎 Search foster homes %1$s</string>
+    <string name="check_all_foster_homes_screen_search_by_place">by place</string>
+    <string name="check_all_foster_homes_screen_search_by_location">by location</string>
+    <string name="check_all_foster_homes_screen_search_available_foster_homes">%1$d foster homes available</string>
     <string name="check_all_foster_homes_screen_no_foster_home_found">⚠️ No foster home found, but consider creating a rescue event or searching social media networks.</string>
     <string name="check_all_foster_homes_screen_turn_on_location">Please, turn on the location to get your position</string>
     <string name="check_all_foster_homes_screen_km">%1$d Km · %2$s</string>

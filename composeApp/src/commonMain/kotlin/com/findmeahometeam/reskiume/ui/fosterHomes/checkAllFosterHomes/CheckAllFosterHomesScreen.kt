@@ -63,6 +63,8 @@ import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_cou
 import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_no_foster_home_found
 import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_non_human_animal_type_label
 import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_search_available_foster_homes
+import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_search_by_location
+import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_search_by_place
 import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_search_foster_homes_button
 import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_title
 import reskiume.composeapp.generated.resources.location_go_to_settings_title
@@ -294,7 +296,14 @@ fun CheckAllFosterHomesScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             RmButton(
-                text = stringResource(Res.string.check_all_foster_homes_screen_search_foster_homes_button),
+                text = stringResource(
+                    Res.string.check_all_foster_homes_screen_search_foster_homes_button,
+                    if (searchOption == SearchOption.COUNTRY_CITY) {
+                        stringResource(Res.string.check_all_foster_homes_screen_search_by_place)
+                    } else {
+                        stringResource(Res.string.check_all_foster_homes_screen_search_by_location)
+                    }
+                ),
                 enabled = isSearchButtonEnabled,
                 displayPleaseWait = uiFosterHomeListState is UiState.Loading
             ) {
@@ -335,7 +344,10 @@ fun CheckAllFosterHomesScreen(
                     Spacer(modifier = Modifier.height(8.dp))
                     RmSecondaryText(
                         modifier = Modifier.fillMaxWidth(),
-                        text = stringResource(Res.string.check_all_foster_homes_screen_search_available_foster_homes),
+                        text = stringResource(
+                            Res.string.check_all_foster_homes_screen_search_available_foster_homes,
+                            fosterHomeList.size
+                        ),
                         fontSize = 16.sp,
                     )
                     Spacer(modifier = Modifier.height(20.dp))

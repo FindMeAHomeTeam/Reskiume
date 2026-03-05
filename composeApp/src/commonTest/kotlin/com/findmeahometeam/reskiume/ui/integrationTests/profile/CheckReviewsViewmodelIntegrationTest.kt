@@ -39,7 +39,7 @@ import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeRealtimeDataba
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeRealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeSaveStateHandleProvider
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeStorageRepository
-import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckActivistUtil
+import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckActivistUtilImpl
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsUtilImpl
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsViewmodel
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
@@ -100,7 +100,7 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
         val getImagePathForFileNameFromLocalDataSource =
             GetImagePathForFileNameFromLocalDataSource(manageImagePath)
 
-        val checkActivistUtil = CheckActivistUtil(
+        val checkActivistUtil = CheckActivistUtilImpl(
             getDataByManagingObjectLocalCacheTimestamp,
             getUserFromRemoteDataSource,
             getUserFromLocalDataSource,

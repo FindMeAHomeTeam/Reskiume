@@ -29,7 +29,7 @@ import com.findmeahometeam.reskiume.ui.profile.checkAllAdvice.CheckAllAdviceView
 import com.findmeahometeam.reskiume.ui.profile.checkAllAdvice.careAdviceList
 import com.findmeahometeam.reskiume.ui.profile.checkAllAdvice.rehomeAdviceList
 import com.findmeahometeam.reskiume.ui.profile.checkAllAdvice.rescueAdviceList
-import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckActivistUtil
+import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckActivistUtilImpl
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.findmeahometeam.reskiume.ui.util.StringProvider
 import com.findmeahometeam.reskiume.user
@@ -195,7 +195,7 @@ class CheckAllAdviceViewmodelTest : CoroutineTestDispatcher() {
         val getImagePathForFileNameFromLocalDataSource =
             GetImagePathForFileNameFromLocalDataSource(manageImagePath)
 
-        val checkActivistUtil = CheckActivistUtil(
+        val checkActivistUtil = CheckActivistUtilImpl(
             getDataByManagingObjectLocalCacheTimestamp,
             getUserFromRemoteDataSource,
             getUserFromLocalDataSource,

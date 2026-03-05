@@ -33,7 +33,7 @@ import com.findmeahometeam.reskiume.localCache
 import com.findmeahometeam.reskiume.review
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckReviews
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
-import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckActivistUtil
+import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckActivistUtilImpl
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsUtilImpl
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsViewmodel
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
@@ -264,7 +264,7 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
         val getImagePathForFileNameFromLocalDataSource =
             GetImagePathForFileNameFromLocalDataSource(manageImagePath)
 
-        val checkActivistUtil = CheckActivistUtil(
+        val checkActivistUtil = CheckActivistUtilImpl(
             getDataByManagingObjectLocalCacheTimestamp,
             getUserFromRemoteDataSource,
             getUserFromLocalDataSource,

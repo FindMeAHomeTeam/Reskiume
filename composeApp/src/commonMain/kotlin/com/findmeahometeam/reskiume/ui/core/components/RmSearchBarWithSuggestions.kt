@@ -2,6 +2,7 @@ package com.findmeahometeam.reskiume.ui.core.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -70,6 +71,7 @@ fun <T : Enum<T>> RmSearchBarWithSuggestions(
                 .onFocusChanged(onFocusChanged)
                 .align(Alignment.TopCenter)
                 .semantics { traversalIndex = 0f },
+            windowInsets = WindowInsets(0.dp),
             inputField = {
                 SearchBarDefaults.InputField(
                     query = textFieldState.text.toString(),

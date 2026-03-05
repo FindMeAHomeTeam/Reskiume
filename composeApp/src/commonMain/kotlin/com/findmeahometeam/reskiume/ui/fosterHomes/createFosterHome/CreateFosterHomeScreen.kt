@@ -153,6 +153,7 @@ fun CreateFosterHomeScreen(
                 imageUrl = it
             }
 
+            Spacer(modifier = Modifier.height(8.dp))
             DisplayCountryAndCitySelectors(
                 placeUtil,
                 selectedCountry,
@@ -281,7 +282,7 @@ fun DisplayCountryAndCitySelectors(
     ).collectAsState(initial = emptyList())
 
     Column(
-        modifier = Modifier.heightIn(min = 100.dp, max = 300.dp),
+        modifier = Modifier.heightIn(max = 300.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(

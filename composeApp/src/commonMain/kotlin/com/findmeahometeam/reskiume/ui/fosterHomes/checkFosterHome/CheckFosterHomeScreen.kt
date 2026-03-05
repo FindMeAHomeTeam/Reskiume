@@ -117,8 +117,8 @@ fun CheckFosterHomeScreen(
         initial = UiState.Loading()
     )
 
-    val allUserUiReviews: List<UiReview> by checkFosterHomeViewmodel.reviewListFlow.collectAsState(
-        initial = emptyList()
+    val allUserUiReviewsState: UiState<List<UiReview>> by checkFosterHomeViewmodel.reviewListFlowState.collectAsState(
+        initial = UiState.Loading()
     )
 
     val allAvailableNonHumanAnimals: List<NonHumanAnimal> by checkFosterHomeViewmodel.allAvailableNonHumanAnimalsLookingForAdoptionFlow.collectAsState(
@@ -259,7 +259,7 @@ fun CheckFosterHomeScreen(
                     )
                 }
 
-                if (allUserUiReviews.isNotEmpty()) {
+                if (allUserUiReviewsState is UiState.Success && (allUserUiReviewsState as UiState.Success<List<UiReview>>).data.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(8.dp))
                     RmText(
                         modifier = Modifier.fillMaxWidth().padding(10.dp),
@@ -268,7 +268,7 @@ fun CheckFosterHomeScreen(
                         fontSize = 18.sp,
                         fontWeight = FontWeight.ExtraBold
                     )
-                    DisplayReviews(allUserUiReviews, onReviewClick)
+                    DisplayReviews(allUserUiReviewsState, onReviewClick)
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -544,23 +544,26 @@ private fun ResidentNonHumanAnimalList(allResidentNonHumanAnimals: List<NonHuman
 
 @Composable
 fun DisplayReviews(
-    allUserUiReviews: List<UiReview>,
+    allUserUiReviewsState: UiState<List<UiReview>>,
     onReviewClick: (uid: String) -> Unit
 ) {
-    allUserUiReviews.forEach { uiReview ->
-        RmListReviewItem(
-            author = uiReview.authorName.ifBlank { stringResource(Res.string.check_reviews_screen_user_deleted) },
-            description = uiReview.description,
-            listAvatarType = RmListAvatarType.Image(resource = uiReview.authorUri),
-            rating = uiReview.rating,
-            date = uiReview.date,
-            onClick = {
-                if (uiReview.authorUid.isNotBlank()) {
-                    onReviewClick(uiReview.authorUid)
+    RmResultState(allUserUiReviewsState) { allUserUiReviews ->
+
+        allUserUiReviews.forEach { uiReview ->
+            RmListReviewItem(
+                author = uiReview.authorName.ifBlank { stringResource(Res.string.check_reviews_screen_user_deleted) },
+                description = uiReview.description,
+                listAvatarType = RmListAvatarType.Image(resource = uiReview.authorUri),
+                rating = uiReview.rating,
+                date = uiReview.date,
+                onClick = {
+                    if (uiReview.authorUid.isNotBlank()) {
+                        onReviewClick(uiReview.authorUid)
+                    }
                 }
-            }
-        )
-        Spacer(modifier = Modifier.height(8.dp))
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
     }
 }
 

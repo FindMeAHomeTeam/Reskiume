@@ -27,6 +27,7 @@ import com.findmeahometeam.reskiume.ui.profile.loginAccount.LoginAccountViewmode
 import com.findmeahometeam.reskiume.ui.profile.modifyAccount.ModifyAccountViewmodel
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsViewmodel
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckActivistUtil
+import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckActivistUtilImpl
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsUtil
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsUtilImpl
 import com.findmeahometeam.reskiume.ui.profile.createNonHumanAnimal.CreateNonHumanAnimalViewmodel
@@ -52,7 +53,7 @@ val uiModule = module {
     viewModelOf(::DeleteAccountViewmodel)
     viewModelOf(::CheckReviewsViewmodel)
     singleOf(::CheckReviewsUtilImpl) bind CheckReviewsUtil::class
-    singleOf(::CheckActivistUtil)
+    singleOf(::CheckActivistUtilImpl) bind CheckActivistUtil::class
     viewModelOf(::CheckAllMyNonHumanAnimalsViewmodel)
     viewModelOf(::ModifyNonHumanAnimalViewmodel)
     viewModelOf(::CheckNonHumanAnimalViewmodel)

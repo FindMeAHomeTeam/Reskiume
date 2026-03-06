@@ -12,7 +12,6 @@ import com.findmeahometeam.reskiume.domain.usecases.fosterHome.ModifyFosterHomeI
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteCacheFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
-import com.findmeahometeam.reskiume.ui.fosterHomes.modifyFosterHome.DeleteFosterHomeUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -25,7 +24,6 @@ class CheckFosterHomeUtilImpl(
     private val observeAuthStateInAuthDataSource: ObserveAuthStateInAuthDataSource,
     private val getDataByManagingObjectLocalCacheTimestamp: GetDataByManagingObjectLocalCacheTimestamp,
     private val getFosterHomeFromRemoteRepository: GetFosterHomeFromRemoteRepository,
-    private val deleteFosterHomeUtil: DeleteFosterHomeUtil,
     private val deleteCacheFromLocalRepository: DeleteCacheFromLocalRepository,
     private val downloadImageToLocalDataSource: DownloadImageToLocalDataSource,
     private val insertFosterHomeInLocalRepository: InsertFosterHomeInLocalRepository,
@@ -52,33 +50,11 @@ class CheckFosterHomeUtilImpl(
                     getFosterHomeFromRemoteRepository(
                         fosterHomeId
                     ).downloadImageAndInsertFosterHomeInLocalRepository(coroutineScope)
-                        .mapNotNull {
-                            if (it == null) {
-                                deleteFosterHome(
-                                    fosterHomeId,
-                                    ownerId,
-                                    myUid,
-                                    coroutineScope
-                                )
-                            }
-                            it
-                        }
                 },
                 onCompletionUpdateCache = {
                     getFosterHomeFromRemoteRepository(
                         fosterHomeId
                     ).downloadImageAndModifyFosterHomeInLocalRepository(coroutineScope)
-                        .mapNotNull {
-                            if (it == null) {
-                                deleteFosterHome(
-                                    fosterHomeId,
-                                    ownerId,
-                                    myUid,
-                                    coroutineScope
-                                )
-                            }
-                            it
-                        }
                 },
                 onVerifyCacheIsRecent = {
                     getFosterHomeFromLocalRepository(fosterHomeId).mapNotNull {
@@ -91,12 +67,10 @@ class CheckFosterHomeUtilImpl(
             )
         }
 
-    private fun Flow<FosterHome?>.downloadImageAndInsertFosterHomeInLocalRepository(coroutineScope: CoroutineScope): Flow<FosterHome?> =
-        this.map { fosterHome: FosterHome? ->
+    private fun Flow<FosterHome>.downloadImageAndInsertFosterHomeInLocalRepository(coroutineScope: CoroutineScope): Flow<FosterHome> =
+        this.map { fosterHome: FosterHome ->
 
             when {
-                fosterHome == null -> fosterHome
-
                 fosterHome.imageUrl.isBlank() -> {
                     log.d(
                         "CheckFosterHomeUtilImpl",
@@ -122,32 +96,6 @@ class CheckFosterHomeUtilImpl(
                 }
             }
         }
-
-    private fun deleteFosterHome(
-        fosterHomeId: String,
-        ownerId: String,
-        myUid: String,
-        coroutineScope: CoroutineScope
-    ) {
-        deleteFosterHomeUtil.deleteFosterHome(
-            id = fosterHomeId,
-            ownerId = ownerId,
-            coroutineScope = coroutineScope,
-            onlyDeleteOnLocal = myUid != ownerId,
-            onError = {
-                log.d(
-                    "CheckFosterHomeUtilImpl",
-                    "deleteFosterHome: Failed to delete the foster home $fosterHomeId"
-                )
-            },
-            onComplete = {
-                log.d(
-                    "CheckFosterHomeUtilImpl",
-                    "deleteFosterHome: Foster home $fosterHomeId deleted successfully"
-                )
-            }
-        )
-    }
 
     private suspend fun deleteFosterHomeCacheFromLocalDataSource(
         id: String
@@ -190,14 +138,10 @@ class CheckFosterHomeUtilImpl(
         }
     }
 
-    private fun Flow<FosterHome?>.downloadImageAndModifyFosterHomeInLocalRepository(coroutineScope: CoroutineScope): Flow<FosterHome?> =
-        this.map { fosterHome: FosterHome? ->
+    private fun Flow<FosterHome>.downloadImageAndModifyFosterHomeInLocalRepository(coroutineScope: CoroutineScope): Flow<FosterHome> =
+        this.map { fosterHome: FosterHome ->
 
             when {
-                fosterHome == null -> { /* do nothing */
-                    fosterHome
-                }
-
                 fosterHome.imageUrl.isBlank() -> {
                     log.d(
                         "CheckFosterHomeUtilImpl",

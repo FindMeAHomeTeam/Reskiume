@@ -17,6 +17,7 @@ import com.findmeahometeam.reskiume.ui.core.components.UiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
 class LoginAccountViewmodel(
@@ -119,28 +120,27 @@ class LoginAccountViewmodel(
     ) {
         viewModelScope.launch {
 
-            getUserFromRemoteDataSource(userUid).collect { collectedUser: User? ->
+            val collectedUser: User? = getUserFromRemoteDataSource(userUid).firstOrNull()
 
-                if (collectedUser == null) {
-                    log.d(
-                        "LoginViewmodel",
-                        "Unless it is the default collectedUser value, it seems that the user $userUid was not found in the remote data source despite successful authentication."
-                    )
-                } else if (collectedUser.image.isNotBlank()) {
+            if (collectedUser == null) {
+                log.d(
+                    "LoginViewmodel",
+                    "Unless it is the default collectedUser value, it seems that the user $userUid was not found in the remote data source despite successful authentication."
+                )
+            } else if (collectedUser.image.isNotBlank()) {
 
-                    val localImagePath: String = downloadImageToLocalDataSource(
-                        userUid = collectedUser.uid,
-                        extraId = "",
-                        section = Section.USERS
-                    )
-                    onSavedAvatar(collectedUser.copy(image = localImagePath.ifBlank { collectedUser.image }))
-                } else {
-                    log.d(
-                        "LoginViewmodel",
-                        "User ${collectedUser.uid} has no avatar image to save locally."
-                    )
-                    onSavedAvatar(collectedUser)
-                }
+                val localImagePath: String = downloadImageToLocalDataSource(
+                    userUid = collectedUser.uid,
+                    extraId = "",
+                    section = Section.USERS
+                )
+                onSavedAvatar(collectedUser.copy(image = localImagePath.ifBlank { collectedUser.image }))
+            } else {
+                log.d(
+                    "LoginViewmodel",
+                    "User ${collectedUser.uid} has no avatar image to save locally."
+                )
+                onSavedAvatar(collectedUser)
             }
         }
     }

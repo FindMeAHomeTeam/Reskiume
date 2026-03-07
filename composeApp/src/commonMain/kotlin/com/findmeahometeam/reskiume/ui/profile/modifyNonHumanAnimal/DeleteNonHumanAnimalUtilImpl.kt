@@ -12,6 +12,7 @@ import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.DeleteNonHuma
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetNonHumanAnimalFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetNonHumanAnimalFromRemoteRepository
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
 class DeleteNonHumanAnimalUtilImpl(
@@ -23,7 +24,7 @@ class DeleteNonHumanAnimalUtilImpl(
     private val deleteNonHumanAnimalFromLocalRepository: DeleteNonHumanAnimalFromLocalRepository,
     private val deleteCacheFromLocalRepository: DeleteCacheFromLocalRepository,
     private val log: Log
-): DeleteNonHumanAnimalUtil {
+) : DeleteNonHumanAnimalUtil {
 
     override fun deleteNonHumanAnimal(
         id: String,
@@ -82,34 +83,30 @@ class DeleteNonHumanAnimalUtilImpl(
         }
         coroutineScope.launch {
 
-            getNonHumanAnimalFromRemoteRepository(
+            val remoteNonHumanAnimal: NonHumanAnimal = getNonHumanAnimalFromRemoteRepository(
                 nonHumanAnimalId,
                 caregiverId
-            ).collect { remoteNonHumanAnimal ->
+            ).firstOrNull() ?: return@launch
 
-                if (remoteNonHumanAnimal == null) {
-                    return@collect
-                }
-                deleteImageFromRemoteDataSource(
-                    userUid = caregiverId,
-                    extraId = nonHumanAnimalId,
-                    section = Section.NON_HUMAN_ANIMALS,
-                    currentImage = remoteNonHumanAnimal.imageUrl
-                ) { isDeleted ->
+            deleteImageFromRemoteDataSource(
+                userUid = caregiverId,
+                extraId = nonHumanAnimalId,
+                section = Section.NON_HUMAN_ANIMALS,
+                currentImage = remoteNonHumanAnimal.imageUrl
+            ) { isDeleted ->
 
-                    if (isDeleted) {
-                        log.d(
-                            "DeleteNonHumanAnimalUtilImpl",
-                            "deleteCurrentImageFromRemoteDataSource: Image from the non human animal $nonHumanAnimalId was deleted successfully in the remote data source"
-                        )
-                        onSuccess()
-                    } else {
-                        log.e(
-                            "DeleteNonHumanAnimalUtilImpl",
-                            "deleteCurrentImageFromRemoteDataSource: failed to delete the image from the non human animal $nonHumanAnimalId in the remote data source"
-                        )
-                        onError()
-                    }
+                if (isDeleted) {
+                    log.d(
+                        "DeleteNonHumanAnimalUtilImpl",
+                        "deleteCurrentImageFromRemoteDataSource: Image from the non human animal $nonHumanAnimalId was deleted successfully in the remote data source"
+                    )
+                    onSuccess()
+                } else {
+                    log.e(
+                        "DeleteNonHumanAnimalUtilImpl",
+                        "deleteCurrentImageFromRemoteDataSource: failed to delete the image from the non human animal $nonHumanAnimalId in the remote data source"
+                    )
+                    onError()
                 }
             }
         }

@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlin.time.Clock
@@ -102,21 +103,18 @@ class ModifyNonHumanAnimalViewmodel(
                     }
                 }
             } else {
-                getNonHumanAnimalFromRemoteRepository(
-                    modifiedNonHumanAnimal.id,
-                    modifiedNonHumanAnimal.caregiverId
-                ).collect { collectedNonHumanAnimal: NonHumanAnimal? ->
+                val nonHumanAnimal: NonHumanAnimal =
+                    getNonHumanAnimalFromRemoteRepository(
+                        modifiedNonHumanAnimal.id,
+                        modifiedNonHumanAnimal.caregiverId
+                    ).firstOrNull() ?: return@launch
 
-                    if (collectedNonHumanAnimal == null) {
-                        return@collect
-                    }
-                    modifyNonHumanAnimalInRemoteDataSource(
-                        modifiedNonHumanAnimal.copy(imageUrl = collectedNonHumanAnimal.imageUrl)
-                    ) {
-                        modifyNonHumanAnimalInLocalDataSource(modifiedNonHumanAnimal) {
+                modifyNonHumanAnimalInRemoteDataSource(
+                    modifiedNonHumanAnimal.copy(imageUrl = nonHumanAnimal.imageUrl)
+                ) {
+                    modifyNonHumanAnimalInLocalDataSource(modifiedNonHumanAnimal) {
 
-                            modifyCacheForNonHumanAnimalInLocalDataSource(modifiedNonHumanAnimal)
-                        }
+                        modifyCacheForNonHumanAnimalInLocalDataSource(modifiedNonHumanAnimal)
                     }
                 }
             }
@@ -131,34 +129,30 @@ class ModifyNonHumanAnimalViewmodel(
     ) {
         viewModelScope.launch {
 
-            getNonHumanAnimalFromRemoteRepository(
+            val remoteNonHumanAnimal: NonHumanAnimal = getNonHumanAnimalFromRemoteRepository(
                 nonHumanAnimalId,
                 caregiverId
-            ).collect { remoteNonHumanAnimal ->
+            ).firstOrNull() ?: return@launch
 
-                if (remoteNonHumanAnimal == null) {
-                    return@collect
-                }
-                deleteImageFromRemoteDataSource(
-                    userUid = caregiverId,
-                    extraId = nonHumanAnimalId,
-                    section = Section.NON_HUMAN_ANIMALS,
-                    currentImage = remoteNonHumanAnimal.imageUrl
-                ) { isDeleted ->
+            deleteImageFromRemoteDataSource(
+                userUid = caregiverId,
+                extraId = nonHumanAnimalId,
+                section = Section.NON_HUMAN_ANIMALS,
+                currentImage = remoteNonHumanAnimal.imageUrl
+            ) { isDeleted ->
 
-                    if (isDeleted) {
-                        log.d(
-                            "ModifyNonHumanAnimalViewModel",
-                            "deleteCurrentImageFromRemoteDataSource: Image from the non human animal $nonHumanAnimalId was deleted successfully in remote data source"
-                        )
-                        onSuccess()
-                    } else {
-                        log.e(
-                            "ModifyNonHumanAnimalViewModel",
-                            "deleteCurrentImageFromRemoteDataSource: failed to delete the image from the non human animal $nonHumanAnimalId in remote data source"
-                        )
-                        _manageChangesUiState.value = UiState.Error()
-                    }
+                if (isDeleted) {
+                    log.d(
+                        "ModifyNonHumanAnimalViewModel",
+                        "deleteCurrentImageFromRemoteDataSource: Image from the non human animal $nonHumanAnimalId was deleted successfully in remote data source"
+                    )
+                    onSuccess()
+                } else {
+                    log.e(
+                        "ModifyNonHumanAnimalViewModel",
+                        "deleteCurrentImageFromRemoteDataSource: failed to delete the image from the non human animal $nonHumanAnimalId in remote data source"
+                    )
+                    _manageChangesUiState.value = UiState.Error()
                 }
             }
         }

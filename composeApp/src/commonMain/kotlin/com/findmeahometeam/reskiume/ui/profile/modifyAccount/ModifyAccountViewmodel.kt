@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -79,15 +80,13 @@ class ModifyAccountViewmodel(
                             }
                         }
                     } else {
-                        getUserFromRemoteDataSource(user.uid).collect { collectedUser: User? ->
+                        val collectedUser: User =
+                            getUserFromRemoteDataSource(user.uid).firstOrNull()
+                                ?: return@updateUserPasswordInAuthDataSource
 
-                            if (collectedUser == null) {
-                                return@collect
-                            }
-                            updateUserInRemoteDataSource(user.copy(image = collectedUser.image)) {
+                        updateUserInRemoteDataSource(user.copy(image = collectedUser.image)) {
 
-                                saveUserChangesInLocalDataSource(user)
-                            }
+                            saveUserChangesInLocalDataSource(user)
                         }
                     }
                 }
@@ -154,31 +153,28 @@ class ModifyAccountViewmodel(
     }
 
     private suspend fun deleteCurrentImageFromRemoteDataSource(user: User, onSuccess: () -> Unit) {
-        getUserFromRemoteDataSource(user.uid).collect { previousUserData: User? ->
 
-            if (previousUserData == null) {
-                return@collect
-            }
-            deleteImageFromRemoteDataSource(
-                userUid = user.uid,
-                extraId = "",
-                section = Section.USERS,
-                currentImage = previousUserData.image
-            ) { isDeleted ->
+        val previousUserData: User = getUserFromRemoteDataSource(user.uid).firstOrNull() ?: return
 
-                if (isDeleted) {
-                    log.d(
-                        "ModifyAccountViewmodel",
-                        "deleteCurrentImageFromRemoteDataSource: Image deleted successfully in remote data source"
-                    )
-                    onSuccess()
-                } else {
-                    log.e(
-                        "ModifyAccountViewmodel",
-                        "deleteCurrentImageFromRemoteDataSource: failed to delete image in remote data source"
-                    )
-                    _uiState.value = UiState.Error()
-                }
+        deleteImageFromRemoteDataSource(
+            userUid = user.uid,
+            extraId = "",
+            section = Section.USERS,
+            currentImage = previousUserData.image
+        ) { isDeleted ->
+
+            if (isDeleted) {
+                log.d(
+                    "ModifyAccountViewmodel",
+                    "deleteCurrentImageFromRemoteDataSource: Image deleted successfully in remote data source"
+                )
+                onSuccess()
+            } else {
+                log.e(
+                    "ModifyAccountViewmodel",
+                    "deleteCurrentImageFromRemoteDataSource: failed to delete image in remote data source"
+                )
+                _uiState.value = UiState.Error()
             }
         }
     }
@@ -276,31 +272,29 @@ class ModifyAccountViewmodel(
     @OptIn(ExperimentalTime::class)
     fun logOut() {
         viewModelScope.launch {
-            authUserState.collect { authUser: AuthUser? ->
-                if (authUser == null) return@collect
+            val authUser: AuthUser = authUserState.firstOrNull() ?: return@launch
 
-                modifyCacheInLocalRepository(
-                    LocalCache(
-                        cachedObjectId = authUser.uid,
-                        savedBy = authUser.uid,
-                        section = Section.USERS,
-                        timestamp = Clock.System.now().epochSeconds
+            modifyCacheInLocalRepository(
+                LocalCache(
+                    cachedObjectId = authUser.uid,
+                    savedBy = authUser.uid,
+                    section = Section.USERS,
+                    timestamp = Clock.System.now().epochSeconds
+                )
+            ) { rowsUpdated: Int ->
+
+                if (rowsUpdated > 0) {
+                    log.d(
+                        "ModifyAccountViewmodel",
+                        "${authUser.uid} updated in local cache in section ${Section.USERS}"
                     )
-                ) { rowsUpdated: Int ->
-
-                    if (rowsUpdated > 0) {
-                        log.d(
-                            "ModifyAccountViewmodel",
-                            "${authUser.uid} updated in local cache in section ${Section.USERS}"
-                        )
-                    } else {
-                        log.e(
-                            "ModifyAccountViewmodel",
-                            "Error updating ${authUser.uid} in local cache in section ${Section.USERS}"
-                        )
-                    }
-                    signOutFromAuthDataSource()
+                } else {
+                    log.e(
+                        "ModifyAccountViewmodel",
+                        "Error updating ${authUser.uid} in local cache in section ${Section.USERS}"
+                    )
                 }
+                signOutFromAuthDataSource()
             }
         }
     }

@@ -26,6 +26,7 @@ import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllFosterHomes
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllFosterHomesByCountryAndCityFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllFosterHomesByLocationFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllFosterHomesByLocationFromRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllFosterHomesFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllMyFosterHomesFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllMyFosterHomesFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetFosterHomeFromLocalRepository
@@ -60,6 +61,7 @@ import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromLocalRe
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.InsertReviewInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.InsertReviewInRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.user.GetAllUsersFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.util.location.ObserveIfLocationEnabledFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.GetLocationFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.RequestEnableLocationFromLocationRepository
@@ -88,6 +90,7 @@ val domainModule = module {
     factoryOf(::DeleteMyFosterHomeFromLocalRepository)
     factoryOf(::DeleteMyFosterHomeFromRemoteRepository)
     factoryOf(::GetAllMyFosterHomesFromLocalRepository)
+    factoryOf(::GetAllFosterHomesFromLocalRepository)
     factoryOf(::GetAllMyFosterHomesFromRemoteRepository)
     factoryOf(::GetAllFosterHomesByCountryAndCityFromLocalRepository)
     factoryOf(::GetAllFosterHomesByCountryAndCityFromRemoteRepository)
@@ -141,6 +144,7 @@ val domainModule = module {
     factoryOf(::DeleteUserFromRemoteDataSource)
     factoryOf(::DeleteUsersFromLocalDataSource)
     factoryOf(::GetUserFromLocalDataSource)
+    factoryOf(::GetAllUsersFromLocalDataSource)
     factoryOf(::GetUserFromRemoteDataSource)
     factoryOf(::InsertUserInLocalDataSource)
     factoryOf(::InsertUserInRemoteDataSource)

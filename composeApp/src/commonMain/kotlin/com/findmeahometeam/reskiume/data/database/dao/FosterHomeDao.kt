@@ -54,6 +54,10 @@ interface FosterHomeDao {
     fun getAllMyFosterHomes(ownerId: String): Flow<List<FosterHomeWithAllNonHumanAnimalData>>
 
     @Transaction
+    @Query("SELECT * FROM FosterHomeEntity")
+    fun getAllFosterHomes(): Flow<List<FosterHomeWithAllNonHumanAnimalData>>
+
+    @Transaction
     @Query("SELECT * FROM FosterHomeEntity WHERE country = :country AND city = :city")
     fun getAllFosterHomesByCountryAndCity(country: String, city: String): Flow<List<FosterHomeWithAllNonHumanAnimalData>>
 

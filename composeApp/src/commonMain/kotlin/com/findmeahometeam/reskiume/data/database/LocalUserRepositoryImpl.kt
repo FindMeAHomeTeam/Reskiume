@@ -1,5 +1,6 @@
 package com.findmeahometeam.reskiume.data.database
 
+import com.findmeahometeam.reskiume.data.database.entity.UserEntity
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 
@@ -20,4 +21,7 @@ class LocalUserRepositoryImpl(
 
     override suspend fun getUser(uid: String): User? =
         reskiumeDatabase.getUserDao().getUser(uid)?.toDomain()
+
+    override suspend fun getAllUsers(): List<UserEntity> =
+        reskiumeDatabase.getUserDao().getAllUsers()
 }

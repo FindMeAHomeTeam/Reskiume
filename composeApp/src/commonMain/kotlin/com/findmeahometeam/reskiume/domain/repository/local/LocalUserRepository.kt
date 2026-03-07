@@ -1,5 +1,6 @@
 package com.findmeahometeam.reskiume.domain.repository.local
 
+import com.findmeahometeam.reskiume.data.database.entity.UserEntity
 import com.findmeahometeam.reskiume.domain.model.User
 
 interface LocalUserRepository {
@@ -7,4 +8,5 @@ interface LocalUserRepository {
     suspend fun modifyUser(user: User, onModifyUser: (rowsUpdated: Int) -> Unit)
     suspend fun deleteUsers(userUid: String, onDeletedUser: (rowsDeleted: Int) -> Unit)
     suspend fun getUser(uid: String): User?
+    suspend fun getAllUsers(): List<UserEntity>
 }

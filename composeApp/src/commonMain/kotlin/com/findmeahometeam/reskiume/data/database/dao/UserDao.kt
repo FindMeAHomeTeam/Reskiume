@@ -21,4 +21,7 @@ interface UserDao {
 
     @Query("SELECT * FROM UserEntity WHERE uid = :uid")
     suspend fun getUser(uid: String): UserEntity?
+
+    @Query("SELECT * FROM UserEntity")
+    suspend fun getAllUsers(): List<UserEntity>
 }

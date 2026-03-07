@@ -20,7 +20,7 @@ interface NonHumanAnimalDao {
     @Query("DELETE FROM NonHumanAnimalEntity WHERE id = :id")
     suspend fun deleteNonHumanAnimal(id: String): Int
 
-    @Query("DELETE FROM NonHumanAnimalEntity WHERE caregiverId = :caregiverId OR savedBy = :caregiverId OR savedBy = '' ")
+    @Query("DELETE FROM NonHumanAnimalEntity WHERE caregiverId = :caregiverId OR savedBy = :caregiverId OR savedBy = ' ' OR savedBy = '' ")
     suspend fun deleteAllNonHumanAnimals(caregiverId: String): Int
 
     @Query("SELECT * FROM NonHumanAnimalEntity WHERE id = :id")

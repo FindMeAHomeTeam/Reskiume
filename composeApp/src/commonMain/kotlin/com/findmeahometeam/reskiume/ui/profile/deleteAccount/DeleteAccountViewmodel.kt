@@ -105,7 +105,7 @@ class DeleteAccountViewmodel(
                 _state.value = UiState.Error()
                 log.e(
                     "DeleteAccountViewmodel",
-                    "getUserFromRemoteRepo: User not found in remote data source"
+                    "getUserFromRemoteRepo: User ${authUser.uid} not found in remote data source"
                 )
             } else {
                 onSuccess(remoteUser)
@@ -416,7 +416,7 @@ class DeleteAccountViewmodel(
             } else {
                 log.e(
                     "DeleteAccountViewmodel",
-                    "deleteUserReviewsFromRemoteRepository: ${(result as DatabaseResult.Error).message}"
+                    "deleteUserReviewsFromRemoteRepository: Error deleting reviews for the user $uid from the remote repository: ${(result as DatabaseResult.Error).message}"
                 )
             }
             onCompletion()
@@ -430,12 +430,12 @@ class DeleteAccountViewmodel(
                 if (rowsDeleted > 0) {
                     log.d(
                         "DeleteAccountViewmodel",
-                        "deleteUserReviewsFromLocalRepository: Deleted $rowsDeleted reviews from local repository"
+                        "deleteUserReviewsFromLocalRepository: Deleted $rowsDeleted reviews for the user $uid from the local repository"
                     )
                 } else {
                     log.e(
                         "DeleteAccountViewmodel",
-                        "deleteUserReviewsFromLocalRepository: No reviews to delete from local repository"
+                        "deleteUserReviewsFromLocalRepository: No reviews to delete for the user $uid from the local repository"
                     )
                 }
                 onCompletion()
@@ -589,13 +589,13 @@ class DeleteAccountViewmodel(
                     _state.value = UiState.Error()
                     log.e(
                         "DeleteAccountViewmodel",
-                        "deleteMyUserFromLocalDataSource: Error deleting user from the local data source"
+                        "deleteMyUserFromLocalDataSource: Error deleting the user $deletedUid from the local data source"
                     )
                 } else {
                     _state.value = UiState.Success(Unit)
                     log.d(
                         "DeleteAccountViewmodel",
-                        "deleteMyUserFromLocalDataSource: User deleted successfully from the local data source"
+                        "deleteMyUserFromLocalDataSource: User $deletedUid deleted successfully from the local data source"
                     )
                 }
             }

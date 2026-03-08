@@ -1,5 +1,6 @@
 package com.findmeahometeam.reskiume.ui.integrationTests.fakes
 
+import com.findmeahometeam.reskiume.data.database.entity.UserEntity
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 
@@ -49,5 +50,9 @@ class FakeLocalUserRepository(
 
     override suspend fun getUser(uid: String): User? {
         return localUserList.firstOrNull { it.uid == uid }
+    }
+
+    override suspend fun getAllUsers(): List<UserEntity> {
+        return localUserList.map { it.toEntity() }
     }
 }

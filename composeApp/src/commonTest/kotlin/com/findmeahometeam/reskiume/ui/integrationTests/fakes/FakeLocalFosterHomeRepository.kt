@@ -266,6 +266,9 @@ class FakeLocalFosterHomeRepository(
     override fun getAllMyFosterHomes(ownerId: String): Flow<List<FosterHomeWithAllNonHumanAnimalData>> =
         flowOf(localFosterHomeWithAllNonHumanAnimalDataList.filter { it.fosterHomeEntity.ownerId == ownerId })
 
+    override fun getAllFosterHomes(): Flow<List<FosterHomeWithAllNonHumanAnimalData>> =
+        flowOf(localFosterHomeWithAllNonHumanAnimalDataList)
+
     override fun getAllFosterHomesByCountryAndCity(
         country: String,
         city: String

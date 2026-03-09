@@ -1,7 +1,7 @@
 package com.findmeahometeam.reskiume.domain.model.rescueEvent
 
 import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.NeedToCoverEntityForRecueEvent
-import com.findmeahometeam.reskiume.data.remote.response.rescueEvent.RemoteNeedToCover
+import com.findmeahometeam.reskiume.data.remote.response.rescueEvent.RemoteNeedToCoverForRescueEvent
 
 data class NeedToCover(
     val needToCoverId: Long,
@@ -16,8 +16,8 @@ data class NeedToCover(
         )
     }
 
-    fun toData(): RemoteNeedToCover {
-        return RemoteNeedToCover(
+    fun toData(): RemoteNeedToCoverForRescueEvent {
+        return RemoteNeedToCoverForRescueEvent(
             needToCoverId = needToCoverId,
             rescueNeed = rescueNeed,
             rescueEventId = rescueEventId

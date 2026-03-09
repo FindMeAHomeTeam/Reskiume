@@ -1,8 +1,10 @@
 package com.findmeahometeam.reskiume.data.remote.response.rescueEvent
 
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.NonHumanAnimalToRescue
+import kotlinx.serialization.Serializable
 
-data class RemoteNonHumanAnimalToRescue(
+@Serializable
+data class RemoteNonHumanAnimalToRescueForRescueEvent(
     val nonHumanAnimalId: String? = "",
     val caregiverId: String? = "",
     val rescueEventId: String? = ""

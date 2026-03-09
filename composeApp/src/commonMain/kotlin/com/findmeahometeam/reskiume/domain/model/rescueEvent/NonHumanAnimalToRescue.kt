@@ -1,7 +1,7 @@
 package com.findmeahometeam.reskiume.domain.model.rescueEvent
 
 import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.NonHumanAnimalToRescueEntityForRescueEvent
-import com.findmeahometeam.reskiume.data.remote.response.rescueEvent.RemoteNonHumanAnimalToRescue
+import com.findmeahometeam.reskiume.data.remote.response.rescueEvent.RemoteNonHumanAnimalToRescueForRescueEvent
 
 data class NonHumanAnimalToRescue(
     val nonHumanAnimalId: String,
@@ -16,8 +16,8 @@ data class NonHumanAnimalToRescue(
         )
     }
 
-    fun toData(): RemoteNonHumanAnimalToRescue {
-        return RemoteNonHumanAnimalToRescue(
+    fun toData(): RemoteNonHumanAnimalToRescueForRescueEvent {
+        return RemoteNonHumanAnimalToRescueForRescueEvent(
             nonHumanAnimalId = nonHumanAnimalId,
             caregiverId = caregiverId,
             rescueEventId = rescueEventId

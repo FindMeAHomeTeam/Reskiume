@@ -1,15 +1,17 @@
 package com.findmeahometeam.reskiume.data.remote.response.rescueEvent
 
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueEvent
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class RemoteRescueEvent(
     val id: String? = "",
     val creatorId: String? = "",
     val title: String? = "",
     val description: String? = "",
     val imageUrl: String? = "",
-    val allNonHumanAnimalsToRescue: List<RemoteNonHumanAnimalToRescue>? = emptyList(),
-    val allNeedsToCover: List<RemoteNeedToCover>? = emptyList(),
+    val allNonHumanAnimalsToRescue: List<RemoteNonHumanAnimalToRescueForRescueEvent>? = emptyList(),
+    val allNeedsToCover: List<RemoteNeedToCoverForRescueEvent>? = emptyList(),
     val longitude: Double? = 0.0,
     val latitude: Double? = 0.0,
     val country: String? = "",

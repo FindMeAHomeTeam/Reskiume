@@ -2,8 +2,10 @@ package com.findmeahometeam.reskiume.data.remote.response.rescueEvent
 
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.NeedToCover
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueNeed
+import kotlinx.serialization.Serializable
 
-data class RemoteNeedToCover(
+@Serializable
+data class RemoteNeedToCoverForRescueEvent(
     val needToCoverId: Long? = 0,
     val rescueNeed: RescueNeed? = RescueNeed.UNSELECTED,
     val rescueEventId: String? = "",

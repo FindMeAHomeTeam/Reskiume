@@ -7,6 +7,7 @@ import com.findmeahometeam.reskiume.data.remote.database.nonHumanAnimal.Realtime
 import com.findmeahometeam.reskiume.data.remote.database.remoteReview.RealtimeDatabaseRemoteReviewRepositoryAndroidImpl
 import com.findmeahometeam.reskiume.data.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepositoryAndroidImpl
 import com.findmeahometeam.reskiume.data.remote.fireStore.fosterHome.FireStoreRemoteFosterHomeRepositoryAndroidImpl
+import com.findmeahometeam.reskiume.data.remote.fireStore.rescueEvent.FireStoreRemoteRescueEventRepositoryAndroidImpl
 import com.findmeahometeam.reskiume.data.remote.storage.StorageRepositoryAndroidImpl
 import com.findmeahometeam.reskiume.data.util.analytics.Analytics
 import com.findmeahometeam.reskiume.data.util.analytics.AnalyticsAndroidImpl
@@ -17,6 +18,7 @@ import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonH
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteReview.RealtimeDatabaseRemoteReviewRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteFosterHome.FireStoreRemoteFosterHomeRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteRescueEvent.FireStoreRemoteRescueEventRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.repository.util.location.LocationRepository
 import com.findmeahometeam.reskiume.ui.fosterHomes.shareService.ShareService
@@ -55,4 +57,5 @@ actual val platformModule: Module = module {
     singleOf(::FireStoreRemoteFosterHomeRepositoryAndroidImpl) bind FireStoreRemoteFosterHomeRepository::class
     singleOf(::LocationRepositoryAndroidImpl) bind LocationRepository::class
     singleOf(::ShareServiceAndroidImpl) bind ShareService::class
+    singleOf(::FireStoreRemoteRescueEventRepositoryAndroidImpl) bind FireStoreRemoteRescueEventRepository::class
 }

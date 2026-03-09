@@ -41,6 +41,7 @@ class KMPViewControllerWrapper: UIViewController {
             
             // FireStore
             FirebaseRemoteFosterHomeFireStoreManager.shared.startIfNeeded()
+            FirebaseRemoteRescueEventFireStoreManager.shared.startIfNeeded()
             
             didInitialize = true
         }

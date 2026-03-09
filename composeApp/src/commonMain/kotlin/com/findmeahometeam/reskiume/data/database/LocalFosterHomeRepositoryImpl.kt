@@ -45,26 +45,6 @@ class LocalFosterHomeRepositoryImpl(
         onModifyFosterHome(reskiumeDatabase.getFosterHomeDao().modifyFosterHome(fosterHomeEntity))
     }
 
-    override suspend fun modifyAcceptedNonHumanAnimalForFosterHome(
-        acceptedNonHumanAnimal: AcceptedNonHumanAnimalEntityForFosterHome,
-        onModifyAcceptedNonHumanAnimal: (rowsUpdated: Int) -> Unit
-    ) {
-        onModifyAcceptedNonHumanAnimal(
-            reskiumeDatabase.getFosterHomeDao()
-                .modifyAcceptedNonHumanAnimalForFosterHome(acceptedNonHumanAnimal)
-        )
-    }
-
-    override suspend fun modifyResidentNonHumanAnimalIdForFosterHome(
-        residentNonHumanAnimalId: ResidentNonHumanAnimalIdEntityForFosterHome,
-        onModifyResidentNonHumanAnimalId: (rowsUpdated: Int) -> Unit
-    ) {
-        onModifyResidentNonHumanAnimalId(
-            reskiumeDatabase.getFosterHomeDao()
-                .modifyResidentNonHumanAnimalIdForFosterHome(residentNonHumanAnimalId)
-        )
-    }
-
     override suspend fun deleteFosterHome(
         id: String,
         onDeleteFosterHome: suspend (rowsDeleted: Int) -> Unit

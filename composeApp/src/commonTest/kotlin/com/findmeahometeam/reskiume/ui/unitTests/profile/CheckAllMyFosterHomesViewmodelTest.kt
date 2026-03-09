@@ -69,15 +69,6 @@ class CheckAllMyFosterHomesViewmodelTest : CoroutineTestDispatcher() {
 
     private val onModifyFosterHomeWithoutImage = Capture.slot<suspend (rowsUpdated: Int) -> Unit>()
 
-    private val onModifyAcceptedNonHumanAnimalForFosterHome =
-        Capture.slot<(rowsUpdated: Int) -> Unit>()
-
-    private val onModifyAcceptedSecondNonHumanAnimalForFosterHome =
-        Capture.slot<(rowsUpdated: Int) -> Unit>()
-
-    private val onModifyResidentNonHumanAnimalIdForFosterHome =
-        Capture.slot<(rowsUpdated: Int) -> Unit>()
-
     private val log: Log = mock {
         every { d(any(), any()) } calls { println(it) }
         every { e(any(), any()) } calls { println(it) }
@@ -111,9 +102,6 @@ class CheckAllMyFosterHomesViewmodelTest : CoroutineTestDispatcher() {
         insertedResidentNonHumanAnimalIdForFosterHomeInLocalRowIdArg: Long = 1L,
         modifiedFosterHomeInLocalRowsUpdatedArg: Int = 1,
         modifiedFosterHomeWithoutImageInLocalRowsUpdatedArg: Int = 1,
-        modifiedAcceptedNonHumanAnimalForFosterHomeInLocalRowsUpdatedArg: Int = 1,
-        modifiedAcceptedSecondNonHumanAnimalForFosterHomeInLocalRowsUpdatedArg: Int = 1,
-        modifiedResidentNonHumanAnimalIdForFosterHomeInLocalRowsUpdatedArg: Int = 1,
         myFosterHomeWithAllNonHumanAnimalLocalDataReturn: FosterHomeWithAllNonHumanAnimalData? = fosterHomeWithAllNonHumanAnimalData,
         allMyFosterHomeWithAllNonHumanAnimalLocalDataReturn: Flow<List<FosterHomeWithAllNonHumanAnimalData>> = flowOf(
             listOf(fosterHomeWithAllNonHumanAnimalData)
@@ -249,36 +237,6 @@ class CheckAllMyFosterHomesViewmodelTest : CoroutineTestDispatcher() {
             } calls {
                 onModifyFosterHomeWithoutImage.get()
                     .invoke(modifiedFosterHomeWithoutImageInLocalRowsUpdatedArg)
-            }
-
-            everySuspend {
-                modifyAcceptedNonHumanAnimalForFosterHome(
-                    fosterHome.allAcceptedNonHumanAnimals[0].toEntity(),
-                    capture(onModifyAcceptedNonHumanAnimalForFosterHome)
-                )
-            } calls {
-                onModifyAcceptedNonHumanAnimalForFosterHome.get()
-                    .invoke(modifiedAcceptedNonHumanAnimalForFosterHomeInLocalRowsUpdatedArg)
-            }
-
-            everySuspend {
-                modifyAcceptedNonHumanAnimalForFosterHome(
-                    fosterHome.allAcceptedNonHumanAnimals[1].toEntity(),
-                    capture(onModifyAcceptedSecondNonHumanAnimalForFosterHome)
-                )
-            } calls {
-                onModifyAcceptedSecondNonHumanAnimalForFosterHome.get()
-                    .invoke(modifiedAcceptedSecondNonHumanAnimalForFosterHomeInLocalRowsUpdatedArg)
-            }
-
-            everySuspend {
-                modifyResidentNonHumanAnimalIdForFosterHome(
-                    fosterHome.allResidentNonHumanAnimals[0].toEntity(),
-                    capture(onModifyResidentNonHumanAnimalIdForFosterHome)
-                )
-            } calls {
-                onModifyResidentNonHumanAnimalIdForFosterHome.get()
-                    .invoke(modifiedResidentNonHumanAnimalIdForFosterHomeInLocalRowsUpdatedArg)
             }
 
             everySuspend {

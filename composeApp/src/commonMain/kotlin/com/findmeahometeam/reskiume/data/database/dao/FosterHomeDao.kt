@@ -27,12 +27,6 @@ interface FosterHomeDao {
     @Update
     suspend fun modifyFosterHome(fosterHomeEntity: FosterHomeEntity): Int
 
-    @Update
-    suspend fun modifyAcceptedNonHumanAnimalForFosterHome(acceptedNonHumanAnimal: AcceptedNonHumanAnimalEntityForFosterHome): Int
-
-    @Update
-    suspend fun modifyResidentNonHumanAnimalIdForFosterHome(residentNonHumanAnimalId: ResidentNonHumanAnimalIdEntityForFosterHome): Int
-
     @Query("DELETE FROM FosterHomeEntity WHERE id = :id")
     suspend fun deleteFosterHome(id: String): Int
 

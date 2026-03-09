@@ -80,15 +80,6 @@ class CheckFosterHomeUtilTest : CoroutineTestDispatcher() {
 
     private val onModifyFosterHomeWithoutImage = Capture.slot<suspend (rowsUpdated: Int) -> Unit>()
 
-    private val onModifyAcceptedNonHumanAnimalForFosterHome =
-        Capture.slot<(rowsUpdated: Int) -> Unit>()
-
-    private val onModifyAcceptedSecondNonHumanAnimalForFosterHome =
-        Capture.slot<(rowsUpdated: Int) -> Unit>()
-
-    private val onModifyResidentNonHumanAnimalIdForFosterHome =
-        Capture.slot<(rowsUpdated: Int) -> Unit>()
-
     private val modifyNonHumanAnimalInLocalRepository = Capture.slot<(rowsUpdated: Int) -> Unit>()
 
     private val log: Log = mock {
@@ -277,36 +268,6 @@ class CheckFosterHomeUtilTest : CoroutineTestDispatcher() {
                 )
             } calls {
                 onModifyFosterHomeWithoutImage.get()
-                    .invoke(1)
-            }
-
-            everySuspend {
-                modifyAcceptedNonHumanAnimalForFosterHome(
-                    fosterHome.allAcceptedNonHumanAnimals[0].toEntity(),
-                    capture(onModifyAcceptedNonHumanAnimalForFosterHome)
-                )
-            } calls {
-                onModifyAcceptedNonHumanAnimalForFosterHome.get()
-                    .invoke(1)
-            }
-
-            everySuspend {
-                modifyAcceptedNonHumanAnimalForFosterHome(
-                    fosterHome.allAcceptedNonHumanAnimals[1].toEntity(),
-                    capture(onModifyAcceptedSecondNonHumanAnimalForFosterHome)
-                )
-            } calls {
-                onModifyAcceptedSecondNonHumanAnimalForFosterHome.get()
-                    .invoke(1)
-            }
-
-            everySuspend {
-                modifyResidentNonHumanAnimalIdForFosterHome(
-                    fosterHome.allResidentNonHumanAnimals[0].toEntity(),
-                    capture(onModifyResidentNonHumanAnimalIdForFosterHome)
-                )
-            } calls {
-                onModifyResidentNonHumanAnimalIdForFosterHome.get()
                     .invoke(1)
             }
 

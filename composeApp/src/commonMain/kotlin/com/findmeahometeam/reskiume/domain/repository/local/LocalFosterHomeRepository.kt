@@ -28,16 +28,6 @@ interface LocalFosterHomeRepository {
         onModifyFosterHome: suspend (rowsUpdated: Int) -> Unit
     )
 
-    suspend fun modifyAcceptedNonHumanAnimalForFosterHome(
-        acceptedNonHumanAnimal: AcceptedNonHumanAnimalEntityForFosterHome,
-        onModifyAcceptedNonHumanAnimal: (rowsUpdated: Int) -> Unit
-    )
-
-    suspend fun modifyResidentNonHumanAnimalIdForFosterHome(
-        residentNonHumanAnimalId: ResidentNonHumanAnimalIdEntityForFosterHome,
-        onModifyResidentNonHumanAnimalId: (rowsUpdated: Int) -> Unit
-    )
-
     suspend fun deleteFosterHome(id: String, onDeleteFosterHome: suspend (rowsDeleted: Int) -> Unit)
 
     suspend fun deleteAcceptedNonHumanAnimal(

@@ -7,6 +7,7 @@ import androidx.room.RoomDatabaseConstructor
 import com.findmeahometeam.reskiume.data.database.dao.FosterHomeDao
 import com.findmeahometeam.reskiume.data.database.dao.LocalCacheDao
 import com.findmeahometeam.reskiume.data.database.dao.NonHumanAnimalDao
+import com.findmeahometeam.reskiume.data.database.dao.RescueEventDao
 import com.findmeahometeam.reskiume.data.database.dao.ReviewDao
 import com.findmeahometeam.reskiume.data.database.dao.UserDao
 import com.findmeahometeam.reskiume.data.database.entity.fosterHome.AcceptedNonHumanAnimalEntityForFosterHome
@@ -16,8 +17,9 @@ import com.findmeahometeam.reskiume.data.database.entity.NonHumanAnimalEntity
 import com.findmeahometeam.reskiume.data.database.entity.fosterHome.ResidentNonHumanAnimalIdEntityForFosterHome
 import com.findmeahometeam.reskiume.data.database.entity.ReviewEntity
 import com.findmeahometeam.reskiume.data.database.entity.UserEntity
-
-const val DATABASE_NAME = "reskiume_database.db"
+import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.NeedToCoverEntityForRecueEvent
+import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.NonHumanAnimalToRescueEntityForRescueEvent
+import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.RescueEventEntity
 
 @Database(
     entities = [
@@ -27,7 +29,10 @@ const val DATABASE_NAME = "reskiume_database.db"
         NonHumanAnimalEntity::class,
         FosterHomeEntity::class,
         AcceptedNonHumanAnimalEntityForFosterHome::class,
-        ResidentNonHumanAnimalIdEntityForFosterHome::class
+        ResidentNonHumanAnimalIdEntityForFosterHome::class,
+        RescueEventEntity::class,
+        NonHumanAnimalToRescueEntityForRescueEvent::class,
+        NeedToCoverEntityForRecueEvent::class
     ], version = 1
 )
 @ConstructedBy(ReskiumeConstructor::class)
@@ -37,7 +42,10 @@ abstract class ReskiumeDatabase : RoomDatabase() {
     abstract fun getReviewDao(): ReviewDao
     abstract fun getNonHumanAnimalDao(): NonHumanAnimalDao
     abstract fun getFosterHomeDao(): FosterHomeDao
+    abstract fun getRescueEventDao(): RescueEventDao
 }
+
+const val DATABASE_NAME = "reskiume_database.db"
 
 // The Room compiler generates the `actual` implementations.
 @Suppress("NO_ACTUAL_FOR_EXPECT")

@@ -6,7 +6,7 @@ import com.findmeahometeam.reskiume.data.remote.auth.AuthRepositoryAndroidImpl
 import com.findmeahometeam.reskiume.data.remote.database.nonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepositoryAndroidImpl
 import com.findmeahometeam.reskiume.data.remote.database.remoteReview.RealtimeDatabaseRemoteReviewRepositoryAndroidImpl
 import com.findmeahometeam.reskiume.data.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepositoryAndroidImpl
-import com.findmeahometeam.reskiume.data.remote.fireStore.FireStoreRemoteFosterHomeRepositoryAndroidImpl
+import com.findmeahometeam.reskiume.data.remote.fireStore.fosterHome.FireStoreRemoteFosterHomeRepositoryAndroidImpl
 import com.findmeahometeam.reskiume.data.remote.storage.StorageRepositoryAndroidImpl
 import com.findmeahometeam.reskiume.data.util.analytics.Analytics
 import com.findmeahometeam.reskiume.data.util.analytics.AnalyticsAndroidImpl

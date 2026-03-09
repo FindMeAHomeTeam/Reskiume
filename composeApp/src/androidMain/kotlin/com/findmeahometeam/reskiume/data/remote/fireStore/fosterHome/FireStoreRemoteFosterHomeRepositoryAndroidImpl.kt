@@ -1,4 +1,4 @@
-package com.findmeahometeam.reskiume.data.remote.fireStore
+package com.findmeahometeam.reskiume.data.remote.fireStore.fosterHome
 
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.remote.response.fosterHome.RemoteFosterHome
@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
+import kotlin.collections.forEach
 
 class FireStoreRemoteFosterHomeRepositoryAndroidImpl(
     private val firebaseFirestore: FirebaseFirestore,
@@ -34,7 +35,7 @@ class FireStoreRemoteFosterHomeRepositoryAndroidImpl(
                     onInsertRemoteFosterHome(DatabaseResult.Success)
                 }.addOnFailureListener { e ->
                     log.e(
-                        "FireStoreRemoteFosterHomeRepositoryImpl",
+                        "FireStoreRemoteFosterHomeRepositoryAndroidImpl",
                         "insertRemoteFosterHome: Error inserting the remote foster home ${remoteFosterHome.id}: ${e.message}"
                     )
                     onInsertRemoteFosterHome(DatabaseResult.Error(e.message ?: ""))
@@ -42,7 +43,7 @@ class FireStoreRemoteFosterHomeRepositoryAndroidImpl(
         } else {
             onInsertRemoteFosterHome(DatabaseResult.Error()).also {
                 log.e(
-                    "FireStoreRemoteFosterHomeRepositoryImpl",
+                    "FireStoreRemoteFosterHomeRepositoryAndroidImpl",
                     "insertRemoteFosterHome: Error inserting a remote foster home with empty id or owner id"
                 )
             }
@@ -63,7 +64,7 @@ class FireStoreRemoteFosterHomeRepositoryAndroidImpl(
                 onModifyRemoteFosterHome(DatabaseResult.Success)
             }.addOnFailureListener { e ->
                 log.e(
-                    "FireStoreRemoteFosterHomeRepositoryImpl",
+                    "FireStoreRemoteFosterHomeRepositoryAndroidImpl",
                     "modifyRemoteFosterHome: Error updating the remote foster home ${remoteFosterHome.id}: ${e.message}"
                 )
                 onModifyRemoteFosterHome(DatabaseResult.Error(e.message ?: ""))
@@ -84,7 +85,7 @@ class FireStoreRemoteFosterHomeRepositoryAndroidImpl(
                 onDeleteRemoteFosterHome(DatabaseResult.Success)
             }.addOnFailureListener { e ->
                 log.e(
-                    "FireStoreRemoteFosterHomeRepositoryImpl",
+                    "FireStoreRemoteFosterHomeRepositoryAndroidImpl",
                     "deleteRemoteFosterHome: Error deleting the remote foster home $id from the owner $ownerId: ${e.message}"
                 )
                 onDeleteRemoteFosterHome(DatabaseResult.Error())
@@ -107,7 +108,7 @@ class FireStoreRemoteFosterHomeRepositoryAndroidImpl(
                 onDeleteAllMyRemoteFosterHomes(DatabaseResult.Success)
             }.addOnFailureListener { e ->
                 log.e(
-                    "FireStoreRemoteFosterHomeRepositoryImpl",
+                    "FireStoreRemoteFosterHomeRepositoryAndroidImpl",
                     "deleteAllMyRemoteFosterHomes: Error deleting all remote foster homes from the owner $ownerId: ${e.message}"
                 )
                 onDeleteAllMyRemoteFosterHomes(DatabaseResult.Error())
@@ -127,7 +128,7 @@ class FireStoreRemoteFosterHomeRepositoryAndroidImpl(
 
     }.catch { e ->
         log.e(
-            "FireStoreRemoteFosterHomeRepositoryImpl",
+            "FireStoreRemoteFosterHomeRepositoryAndroidImpl",
             "getRemoteFosterHome: Error retrieving the remote foster home $id: ${e.message}"
         )
         emit(null)
@@ -148,7 +149,7 @@ class FireStoreRemoteFosterHomeRepositoryAndroidImpl(
 
     }.catch { e ->
         log.e(
-            "FireStoreRemoteFosterHomeRepositoryImpl",
+            "FireStoreRemoteFosterHomeRepositoryAndroidImpl",
             "getAllMyRemoteFosterHomes: Error retrieving all remote foster homes from the owner $ownerId: ${e.message}"
         )
         emit(emptyList())
@@ -174,7 +175,7 @@ class FireStoreRemoteFosterHomeRepositoryAndroidImpl(
 
     }.catch { e ->
         log.e(
-            "FireStoreRemoteFosterHomeRepositoryImpl",
+            "FireStoreRemoteFosterHomeRepositoryAndroidImpl",
             "getAllRemoteFosterHomesByCountryAndCity: Error retrieving all remote foster homes by country and city ($country, $city): ${e.message}"
         )
         emit(emptyList())
@@ -204,8 +205,8 @@ class FireStoreRemoteFosterHomeRepositoryAndroidImpl(
 
     }.catch { e ->
         log.e(
-            "FireStoreRemoteFosterHomeRepositoryImpl",
-            "getAllRemoteFosterHomesByCountryAndCity: Error retrieving all remote foster homes by location: ${e.message}"
+            "FireStoreRemoteFosterHomeRepositoryAndroidImpl",
+            "getAllRemoteFosterHomesByLocation: Error retrieving all remote foster homes by location: ${e.message}"
         )
         emit(emptyList())
     }

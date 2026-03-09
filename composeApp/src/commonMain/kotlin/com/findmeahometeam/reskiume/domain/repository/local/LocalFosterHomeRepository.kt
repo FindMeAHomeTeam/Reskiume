@@ -14,12 +14,12 @@ interface LocalFosterHomeRepository {
     )
 
     suspend fun insertAcceptedNonHumanAnimalForFosterHome(
-        acceptedNonHumanAnimal: AcceptedNonHumanAnimalEntityForFosterHome,
+        acceptedNonHumanAnimalEntityForFosterHome: AcceptedNonHumanAnimalEntityForFosterHome,
         onInsertAcceptedNonHumanAnimalType: (rowId: Long) -> Unit
     )
 
     suspend fun insertResidentNonHumanAnimalIdForFosterHome(
-        residentNonHumanAnimal: ResidentNonHumanAnimalIdEntityForFosterHome,
+        residentNonHumanAnimalIdEntityForFosterHome: ResidentNonHumanAnimalIdEntityForFosterHome,
         onInsertResidentNonHumanAnimalId: (rowId: Long) -> Unit
     )
 

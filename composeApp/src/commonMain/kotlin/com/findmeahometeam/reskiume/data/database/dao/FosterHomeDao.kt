@@ -19,10 +19,10 @@ interface FosterHomeDao {
     suspend fun insertFosterHome(fosterHomeEntity: FosterHomeEntity): Long
 
     @Insert(onConflict = REPLACE)
-    suspend fun insertAcceptedNonHumanAnimalForFosterHome(acceptedNonHumanAnimal: AcceptedNonHumanAnimalEntityForFosterHome): Long
+    suspend fun insertAcceptedNonHumanAnimalForFosterHome(acceptedNonHumanAnimalEntityForFosterHome: AcceptedNonHumanAnimalEntityForFosterHome): Long
 
     @Insert(onConflict = REPLACE)
-    suspend fun insertResidentNonHumanAnimalIdForFosterHome(residentNonHumanAnimalId: ResidentNonHumanAnimalIdEntityForFosterHome): Long
+    suspend fun insertResidentNonHumanAnimalIdForFosterHome(residentNonHumanAnimalIdEntityForFosterHome: ResidentNonHumanAnimalIdEntityForFosterHome): Long
 
     @Update
     suspend fun modifyFosterHome(fosterHomeEntity: FosterHomeEntity): Int

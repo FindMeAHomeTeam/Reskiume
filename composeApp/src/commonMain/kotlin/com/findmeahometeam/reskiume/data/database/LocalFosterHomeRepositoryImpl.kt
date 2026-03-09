@@ -19,22 +19,22 @@ class LocalFosterHomeRepositoryImpl(
     }
 
     override suspend fun insertAcceptedNonHumanAnimalForFosterHome(
-        acceptedNonHumanAnimal: AcceptedNonHumanAnimalEntityForFosterHome,
+        acceptedNonHumanAnimalEntityForFosterHome: AcceptedNonHumanAnimalEntityForFosterHome,
         onInsertAcceptedNonHumanAnimalType: (rowId: Long) -> Unit
     ) {
         onInsertAcceptedNonHumanAnimalType(
             reskiumeDatabase.getFosterHomeDao()
-                .insertAcceptedNonHumanAnimalForFosterHome(acceptedNonHumanAnimal)
+                .insertAcceptedNonHumanAnimalForFosterHome(acceptedNonHumanAnimalEntityForFosterHome)
         )
     }
 
     override suspend fun insertResidentNonHumanAnimalIdForFosterHome(
-        residentNonHumanAnimal: ResidentNonHumanAnimalIdEntityForFosterHome,
+        residentNonHumanAnimalIdEntityForFosterHome: ResidentNonHumanAnimalIdEntityForFosterHome,
         onInsertResidentNonHumanAnimalId: (rowId: Long) -> Unit
     ) {
         onInsertResidentNonHumanAnimalId(
             reskiumeDatabase.getFosterHomeDao()
-                .insertResidentNonHumanAnimalIdForFosterHome(residentNonHumanAnimal)
+                .insertResidentNonHumanAnimalIdForFosterHome(residentNonHumanAnimalIdEntityForFosterHome)
         )
     }
 

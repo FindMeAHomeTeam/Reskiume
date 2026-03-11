@@ -34,9 +34,9 @@ class LocalRescueEventRepositoryImpl(
 
     override suspend fun insertNeedToCoverEntityForRecueEvent(
         needToCoverEntityForRecueEvent: NeedToCoverEntityForRecueEvent,
-        onNeedToCoverEntityForRecueEvent: (rowId: Long) -> Unit
+        onInsertNeedToCoverEntityForRecueEvent: (rowId: Long) -> Unit
     ) {
-        onNeedToCoverEntityForRecueEvent(
+        onInsertNeedToCoverEntityForRecueEvent(
             reskiumeDatabase.getRescueEventDao()
                 .insertNeedToCoverEntityForRecueEvent(needToCoverEntityForRecueEvent)
         )

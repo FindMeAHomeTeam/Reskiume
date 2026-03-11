@@ -20,7 +20,7 @@ interface LocalRescueEventRepository {
 
     suspend fun insertNeedToCoverEntityForRecueEvent(
         needToCoverEntityForRecueEvent: NeedToCoverEntityForRecueEvent,
-        onNeedToCoverEntityForRecueEvent: (rowId: Long) -> Unit
+        onInsertNeedToCoverEntityForRecueEvent: (rowId: Long) -> Unit
     )
 
     suspend fun modifyRescueEvent(

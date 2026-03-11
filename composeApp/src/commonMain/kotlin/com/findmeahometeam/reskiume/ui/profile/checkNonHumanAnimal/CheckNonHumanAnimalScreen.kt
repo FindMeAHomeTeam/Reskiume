@@ -101,6 +101,7 @@ fun CheckNonHumanAnimalScreen(
                             .background(
                                 color = when(nonHumanAnimal.adoptionState) {
                                     AdoptionState.LOOKING_FOR_ADOPTION -> tertiaryGreen
+                                    AdoptionState.NEEDS_TO_BE_RESCUED -> secondaryGreen
                                     AdoptionState.REHOMED -> secondaryGreen
                                     AdoptionState.ADOPTED -> primaryGreen
                                 },

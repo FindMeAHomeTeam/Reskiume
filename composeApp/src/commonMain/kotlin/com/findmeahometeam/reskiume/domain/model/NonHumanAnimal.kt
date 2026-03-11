@@ -15,6 +15,7 @@ import reskiume.composeapp.generated.resources.non_human_animal_gender_female
 import reskiume.composeapp.generated.resources.non_human_animal_gender_male
 import reskiume.composeapp.generated.resources.non_human_animal_gender_unselected
 import reskiume.composeapp.generated.resources.non_human_animal_looking_for_adoption
+import reskiume.composeapp.generated.resources.non_human_animal_needs_to_be_rescued
 import reskiume.composeapp.generated.resources.non_human_animal_rehomed
 import reskiume.composeapp.generated.resources.non_human_animal_type_bird
 import reskiume.composeapp.generated.resources.non_human_animal_type_bobine
@@ -112,7 +113,7 @@ enum class Gender {
 }
 
 enum class AdoptionState {
-    LOOKING_FOR_ADOPTION, REHOMED, ADOPTED
+    LOOKING_FOR_ADOPTION, NEEDS_TO_BE_RESCUED, REHOMED, ADOPTED
 }
 
 fun AgeCategory.toStringResource(): StringResource {
@@ -155,6 +156,7 @@ fun Gender.toStringResource(): StringResource {
 fun AdoptionState.toStringResource(): StringResource {
     return when (this) {
         AdoptionState.LOOKING_FOR_ADOPTION -> Res.string.non_human_animal_looking_for_adoption
+        AdoptionState.NEEDS_TO_BE_RESCUED -> Res.string.non_human_animal_needs_to_be_rescued
         AdoptionState.REHOMED -> Res.string.non_human_animal_rehomed
         AdoptionState.ADOPTED -> Res.string.non_human_animal_adopted
     }

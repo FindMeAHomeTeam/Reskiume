@@ -193,7 +193,7 @@ class InsertFosterHomeInLocalRepositoryTest {
         }
 
     @Test
-    fun `given a local foster home_when the app inserts it but the residents were deleted_then inserts methods are called except insertResidentNonHumanAnimalIdForFosterHome`() =
+    fun `given a local foster home_when the app inserts it but the residents were deleted_then inserts methods are called except insertResidentNonHumanAnimalIdForFosterHome and modifyNonHumanAnimal`() =
         runTest {
             insertFosterHomeInLocalRepository(
                 fosterHome.copy(

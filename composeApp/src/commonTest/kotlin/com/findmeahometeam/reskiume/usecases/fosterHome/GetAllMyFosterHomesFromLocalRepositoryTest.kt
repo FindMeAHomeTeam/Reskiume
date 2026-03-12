@@ -26,7 +26,7 @@ class GetAllMyFosterHomesFromLocalRepositoryTest: CoroutineTestDispatcher() {
         GetAllMyFosterHomesFromLocalRepository(localFosterHomeRepository)
 
     @Test
-    fun `given my own local foster homes_when the app retrieves them to list them_then app gets a flow of list of FosterHome`() =
+    fun `given my own local foster homes_when the app retrieves them to list them_then the app gets a flow of list of FosterHome`() =
         runTest {
             getAllMyFosterHomesFromLocalRepository(
                 fosterHome.ownerId

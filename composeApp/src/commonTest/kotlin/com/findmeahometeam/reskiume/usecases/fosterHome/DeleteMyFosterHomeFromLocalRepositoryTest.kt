@@ -88,7 +88,7 @@ class DeleteMyFosterHomeFromLocalRepositoryTest {
         )
 
     @Test
-    fun `given my local foster home_when the app deletes it_then deleteFosterHome is called`() =
+    fun `given my local foster home_when the app deletes it_then modifyNonHumanAnimal and deleteFosterHome are called`() =
         runTest {
             deleteMyFosterHomeFromLocalRepository(fosterHome.id, TestScope()) {}
             verifySuspend {

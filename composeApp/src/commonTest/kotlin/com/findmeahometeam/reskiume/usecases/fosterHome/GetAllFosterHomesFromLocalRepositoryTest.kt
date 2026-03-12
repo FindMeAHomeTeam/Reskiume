@@ -26,7 +26,7 @@ class GetAllFosterHomesFromLocalRepositoryTest: CoroutineTestDispatcher() {
         GetAllFosterHomesFromLocalRepository(localFosterHomeRepository)
 
     @Test
-    fun `given local foster homes_when the app retrieves them to list them_then app gets a flow of list of FosterHome`() =
+    fun `given local foster homes_when the app retrieves them to list them_then the app gets a flow of list of FosterHome`() =
         runTest {
             getAllFosterHomesFromLocalRepository().test {
                 assertEquals(listOf(fosterHome), awaitItem())

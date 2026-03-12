@@ -33,7 +33,7 @@ class GetAllFosterHomesByLocationFromLocalRepositoryTest: CoroutineTestDispatche
         GetAllFosterHomesByLocationFromLocalRepository(localFosterHomeRepository)
 
     @Test
-    fun `given local foster homes_when the app retrieves them to list them by location_then app gets a flow of list of FosterHome`() =
+    fun `given local foster homes_when the app retrieves them to list them by location_then the app gets a flow of list of FosterHome`() =
         runTest {
             getAllFosterHomesByLocationFromLocalRepository(
                 activistLongitude,

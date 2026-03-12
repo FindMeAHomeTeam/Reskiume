@@ -26,7 +26,7 @@ class GetFosterHomeFromRemoteRepositoryTest: CoroutineTestDispatcher() {
     private val getFosterHomeFromRemoteRepository = GetFosterHomeFromRemoteRepository(fireStoreRemoteFosterHomeRepository)
 
     @Test
-    fun `given a remote foster home_when the app retrieves it to display it_then app gets a flow of FosterHome`() =
+    fun `given a remote foster home_when the app retrieves it to display it_then the app gets a flow of FosterHome`() =
         runTest {
             getFosterHomeFromRemoteRepository(fosterHome.id).test {
                 assertEquals(fosterHome, awaitItem())

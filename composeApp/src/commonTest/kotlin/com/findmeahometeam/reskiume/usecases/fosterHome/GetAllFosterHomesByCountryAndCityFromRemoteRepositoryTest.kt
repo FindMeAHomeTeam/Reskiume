@@ -27,7 +27,7 @@ class GetAllFosterHomesByCountryAndCityFromRemoteRepositoryTest: CoroutineTestDi
         )
 
     @Test
-    fun `given remote foster homes_when the app retrieves them to list them by country and city_then app gets a flow of list of FosterHome`() =
+    fun `given remote foster homes_when the app retrieves them to list them by country and city_then the app gets a flow of list of FosterHome`() =
         runTest {
             getAllFosterHomesByCountryAndCityFromRemoteRepository(
                 fosterHome.country,

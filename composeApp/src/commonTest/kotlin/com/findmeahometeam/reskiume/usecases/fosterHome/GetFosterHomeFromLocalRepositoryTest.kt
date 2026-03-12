@@ -25,7 +25,7 @@ class GetFosterHomeFromLocalRepositoryTest: CoroutineTestDispatcher() {
         GetFosterHomeFromLocalRepository(localFosterHomeRepository)
 
     @Test
-    fun `given a local foster home_when the app retrieves it to display it_then app gets a flow of FosterHome`() =
+    fun `given a local foster home_when the app retrieves it to display it_then the app gets a flow of FosterHome`() =
         runTest {
             getFosterHomeFromLocalRepository(
                 fosterHome.id

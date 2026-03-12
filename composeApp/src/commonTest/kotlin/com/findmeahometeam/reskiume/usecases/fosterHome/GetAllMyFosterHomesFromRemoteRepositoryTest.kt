@@ -25,7 +25,7 @@ class GetAllMyFosterHomesFromRemoteRepositoryTest : CoroutineTestDispatcher() {
         GetAllMyFosterHomesFromRemoteRepository(fireStoreRemoteFosterHomeRepository)
 
     @Test
-    fun `given my own remote foster homes_when the app retrieves them to list them_then app gets a flow of list of FosterHome`() =
+    fun `given my own remote foster homes_when the app retrieves them to list them_then the app gets a flow of list of FosterHome`() =
         runTest {
             getAllMyFosterHomesFromRemoteRepository(
                 fosterHome.ownerId

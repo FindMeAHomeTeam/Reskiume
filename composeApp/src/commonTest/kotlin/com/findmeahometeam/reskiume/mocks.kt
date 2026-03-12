@@ -1,6 +1,7 @@
 package com.findmeahometeam.reskiume
 
 import com.findmeahometeam.reskiume.data.database.entity.fosterHome.FosterHomeWithAllNonHumanAnimalData
+import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.RescueEventWithAllNeedsAndNonHumanAnimalData
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.domain.model.AdoptionState
@@ -14,6 +15,10 @@ import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.model.fosterHome.AcceptedNonHumanAnimalForFosterHome
 import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
 import com.findmeahometeam.reskiume.domain.model.fosterHome.ResidentNonHumanAnimalForFosterHome
+import com.findmeahometeam.reskiume.domain.model.rescueEvent.NeedToCover
+import com.findmeahometeam.reskiume.domain.model.rescueEvent.NonHumanAnimalToRescue
+import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueEvent
+import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueNeed
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.UiReview
 
 // Mocked user data for testing
@@ -144,4 +149,49 @@ val fosterHomeWithAllNonHumanAnimalData = FosterHomeWithAllNonHumanAnimalData(
     fosterHomeEntity = fosterHome.toEntity(),
     allAcceptedNonHumanAnimals = fosterHome.allAcceptedNonHumanAnimals.map { it.toEntity() },
     allResidentNonHumanAnimalIds = fosterHome.allResidentNonHumanAnimals.map { it.toEntity() }
+)
+
+// Mocked rescueEvent data for testing
+
+val rescueEvent = RescueEvent(
+    id = "456" + user.uid,
+    creatorId = user.uid,
+    savedBy = "",
+    title = "my rescue event",
+    description = "my description for rescue event",
+    imageUrl = "rescueEventImageUrl.webp",
+    allNonHumanAnimalsToRescue = listOf(
+        NonHumanAnimalToRescue(
+            nonHumanAnimalId = nonHumanAnimal.id,
+            caregiverId = nonHumanAnimal.caregiverId,
+            rescueEventId = "456" + user.uid
+        ),
+        NonHumanAnimalToRescue(
+            nonHumanAnimalId = nonHumanAnimal.id + "second",
+            caregiverId = nonHumanAnimal.caregiverId,
+            rescueEventId = "456" + user.uid
+        )
+    ),
+    allNeedsToCover = listOf(
+        NeedToCover(
+            needToCoverId = 1,
+            rescueNeed = RescueNeed.RESCUERS,
+            rescueEventId = "456" + user.uid
+        ),
+        NeedToCover(
+            needToCoverId = 2,
+            rescueNeed = RescueNeed.FOSTER_HOME,
+            rescueEventId = "456" + user.uid
+        )
+    ),
+    longitude = -5.0236,
+    latitude = 37.8925,
+    country = "spain",
+    city = "cordoba"
+)
+
+val rescueEventWithAllNeedsAndNonHumanAnimalData = RescueEventWithAllNeedsAndNonHumanAnimalData(
+    rescueEventEntity = rescueEvent.toEntity(),
+    allNonHumanAnimalsToRescue = rescueEvent.allNonHumanAnimalsToRescue.map { it.toEntity() },
+    allNeedsToCover = rescueEvent.allNeedsToCover.map { it.toEntity() }
 )

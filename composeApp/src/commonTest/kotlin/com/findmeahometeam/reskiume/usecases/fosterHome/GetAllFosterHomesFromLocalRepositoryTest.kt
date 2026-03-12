@@ -7,7 +7,7 @@ import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllFosterHomes
 import com.findmeahometeam.reskiume.fosterHome
 import com.findmeahometeam.reskiume.fosterHomeWithAllNonHumanAnimalData
 import dev.mokkery.answering.returns
-import dev.mokkery.everySuspend
+import dev.mokkery.every
 import dev.mokkery.mock
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -17,7 +17,7 @@ import kotlin.test.assertEquals
 class GetAllFosterHomesFromLocalRepositoryTest: CoroutineTestDispatcher() {
 
     private val localFosterHomeRepository: LocalFosterHomeRepository = mock {
-        everySuspend {
+        every {
             getAllFosterHomes()
         } returns flowOf(listOf(fosterHomeWithAllNonHumanAnimalData))
     }

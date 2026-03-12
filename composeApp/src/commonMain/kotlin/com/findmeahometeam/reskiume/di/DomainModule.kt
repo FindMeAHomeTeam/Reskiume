@@ -55,6 +55,23 @@ import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.InsertNonHuma
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.InsertNonHumanAnimalInRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.ModifyNonHumanAnimalInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.ModifyNonHumanAnimalInRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.DeleteAllMyRescueEventsFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.DeleteAllMyRescueEventsFromRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.DeleteMyRescueEventFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.DeleteMyRescueEventFromRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetAllMyRescueEventsFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetAllMyRescueEventsFromRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetAllRescueEventsByCountryAndCityFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetAllRescueEventsByCountryAndCityFromRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetAllRescueEventsByLocationFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetAllRescueEventsByLocationFromRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetAllRescueEventsFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetRescueEventFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetRescueEventFromRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.InsertRescueEventInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.InsertRescueEventInRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.ModifyRescueEventInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.ModifyRescueEventInRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.DeleteReviewsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.DeleteReviewsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromLocalRepository
@@ -131,6 +148,25 @@ val domainModule = module {
     factoryOf(::InsertNonHumanAnimalInRemoteRepository)
     factoryOf(::ModifyNonHumanAnimalInLocalRepository)
     factoryOf(::ModifyNonHumanAnimalInRemoteRepository)
+
+    // rescueEvent
+    factoryOf(::DeleteAllMyRescueEventsFromLocalRepository)
+    factoryOf(::DeleteAllMyRescueEventsFromRemoteRepository)
+    factoryOf(::DeleteMyRescueEventFromLocalRepository)
+    factoryOf(::DeleteMyRescueEventFromRemoteRepository)
+    factoryOf(::GetAllMyRescueEventsFromLocalRepository)
+    factoryOf(::GetAllRescueEventsFromLocalRepository)
+    factoryOf(::GetAllMyRescueEventsFromRemoteRepository)
+    factoryOf(::GetAllRescueEventsByCountryAndCityFromLocalRepository)
+    factoryOf(::GetAllRescueEventsByCountryAndCityFromRemoteRepository)
+    factoryOf(::GetAllRescueEventsByLocationFromLocalRepository)
+    factoryOf(::GetAllRescueEventsByLocationFromRemoteRepository)
+    factoryOf(::GetRescueEventFromLocalRepository)
+    factoryOf(::GetRescueEventFromRemoteRepository)
+    factoryOf(::InsertRescueEventInLocalRepository)
+    factoryOf(::InsertRescueEventInRemoteRepository)
+    factoryOf(::ModifyRescueEventInLocalRepository)
+    factoryOf(::ModifyRescueEventInRemoteRepository)
 
     // review
     factoryOf(::InsertReviewInLocalRepository)

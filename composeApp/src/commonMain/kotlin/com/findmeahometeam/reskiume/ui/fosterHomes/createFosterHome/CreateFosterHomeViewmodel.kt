@@ -29,6 +29,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import reskiume.composeapp.generated.resources.Res
 import reskiume.composeapp.generated.resources.create_foster_home_screen_turn_on_location
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -67,9 +69,13 @@ class CreateFosterHomeViewmodel(
 
     fun observeIfLocationEnabled(): Flow<Boolean> = observeIfLocationEnabledFromLocationRepository()
 
-    fun requestEnableLocation(onResul: (isEnabled: Boolean) -> Unit) {
+    suspend fun requestEnableLocation(): Boolean {
 
-        requestEnableLocationFromLocationRepository(onResul)
+        return suspendCoroutine { continuation ->
+            requestEnableLocationFromLocationRepository { isEnabled: Boolean ->
+                continuation.resume(isEnabled)
+            }
+        }
     }
 
     @OptIn(ExperimentalTime::class)

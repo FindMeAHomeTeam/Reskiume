@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 enum class Routes(val route: String) {
     HOME_SCREEN("homeScreen"),
     CHECK_ALL_FOSTER_HOMES("checkAllFosterHomes"),
-    RESCUE("rescue"),
+    CHECK_ALL_RESCUE_EVENTS("checkAllRescueEvents"),
     CHATS("chats"),
     PROFILE("profile"),
     CREATE_ACCOUNT("createAccount"),
@@ -31,6 +31,21 @@ class ModifyFosterHome(val fosterHomeId: String)
 
 @Serializable
 class CreateFosterHome(val ownerId: String)
+
+@Serializable
+class CheckRescueEvent(
+    val rescueEventId: String,
+    val creatorId: String,
+)
+
+@Serializable
+class CheckAllMyRescueEvents(val myUid: String)
+
+@Serializable
+class ModifyRescueEvent(val rescueEventId: String)
+
+@Serializable
+class CreateRescueEvent(val creatorId: String)
 
 @Serializable
 class CheckReviews(val uid: String)

@@ -37,7 +37,7 @@ fun BottomNavigationWrapper(
             )
         }
 
-        composable(route = Routes.RESCUE.route) {
+        composable(route = Routes.CHECK_ALL_RESCUE_EVENTS.route) {
             RescueScreen()
         }
 

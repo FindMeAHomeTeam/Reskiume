@@ -42,7 +42,7 @@ sealed class BottomBarItem {
     ) : BottomBarItem()
 
     data class RescueEvents(
-        override val route: String = Routes.RESCUE.route,
+        override val route: String = Routes.CHECK_ALL_RESCUE_EVENTS.route,
         override val title: @Composable () -> String = { stringResource(Res.string.bottom_bar_item_rescue) },
         override val icon: @Composable (() -> Unit) = {
             Icon(

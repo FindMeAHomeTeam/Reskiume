@@ -30,7 +30,7 @@ import com.findmeahometeam.reskiume.ui.core.components.RmButton
 import com.findmeahometeam.reskiume.ui.core.components.RmDialog
 import com.findmeahometeam.reskiume.ui.core.components.RmListAvatarType
 import com.findmeahometeam.reskiume.ui.core.components.RmListSwitchItem
-import com.findmeahometeam.reskiume.ui.core.components.RmResidentNonHumanAnimalListCreator
+import com.findmeahometeam.reskiume.ui.core.components.RmNonHumanAnimalListCreator
 import com.findmeahometeam.reskiume.ui.core.components.RmResultState
 import com.findmeahometeam.reskiume.ui.core.components.RmScaffold
 import com.findmeahometeam.reskiume.ui.core.components.RmTextField
@@ -205,7 +205,7 @@ fun ModifyFosterHomeScreen(
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
-                RmResidentNonHumanAnimalListCreator(
+                RmNonHumanAnimalListCreator(
                     allAvailableNonHumanAnimals,
                     uiFosterHome.uiAllResidentNonHumanAnimals
                 ) {

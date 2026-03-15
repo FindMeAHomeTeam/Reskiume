@@ -42,6 +42,8 @@ import reskiume.composeapp.generated.resources.Res
 import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_location_search_option
 import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_place_search_option
 import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_turn_on_location
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -151,9 +153,13 @@ class CheckAllFosterHomesViewmodel(
 
     fun observeIfLocationEnabled(): Flow<Boolean> = observeIfLocationEnabledFromLocationRepository()
 
-    fun requestEnableLocation(onResul: (isEnabled: Boolean) -> Unit) {
+    suspend fun requestEnableLocation(): Boolean {
 
-        requestEnableLocationFromLocationRepository(onResul)
+        return suspendCoroutine { continuation ->
+            requestEnableLocationFromLocationRepository { isEnabled: Boolean ->
+                continuation.resume(isEnabled)
+            }
+        }
     }
 
     @OptIn(ExperimentalTime::class)

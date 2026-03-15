@@ -42,7 +42,7 @@ import reskiume.composeapp.generated.resources.resident_non_human_animal_list_cr
 import reskiume.composeapp.generated.resources.resident_non_human_animal_list_creator_unselected_non_human_animal_label
 
 @Composable
-fun RmResidentNonHumanAnimalListCreator(
+fun RmNonHumanAnimalListCreator(
     allAvailableNonHumanAnimals: List<NonHumanAnimal>,
     allResidentNonHumanAnimals: List<NonHumanAnimal>,
     onAddResidentNonHumanAnimal: (List<NonHumanAnimal>) -> Unit

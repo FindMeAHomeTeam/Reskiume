@@ -33,7 +33,7 @@ import com.findmeahometeam.reskiume.ui.core.primaryGreen
 import com.findmeahometeam.reskiume.ui.core.tertiaryGreen
 import org.jetbrains.compose.resources.stringResource
 import reskiume.composeapp.generated.resources.Res
-import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_km
+import reskiume.composeapp.generated.resources.foster_home_list_item_km
 import reskiume.composeapp.generated.resources.foster_home_list_item_accepted_both_genders_non_human_animal
 import reskiume.composeapp.generated.resources.foster_home_list_item_accepted_non_human_animal
 import reskiume.composeapp.generated.resources.foster_home_list_item_disabled_foster_home
@@ -108,7 +108,7 @@ fun RmFosterHomeListItem(
                             city
                         } else {
                             stringResource(
-                                Res.string.check_all_foster_homes_screen_km,
+                                Res.string.foster_home_list_item_km,
                                 distance,
                                 city
                             )

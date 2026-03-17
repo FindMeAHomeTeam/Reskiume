@@ -1,8 +1,23 @@
 package com.findmeahometeam.reskiume.domain.model
 
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
 import com.findmeahometeam.reskiume.data.database.entity.NonHumanAnimalEntity
 import com.findmeahometeam.reskiume.data.remote.response.RemoteNonHumanAnimal
-import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType.*
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType.BIRD
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType.BOBINE
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType.CAT
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType.DOG
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType.EQUID
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType.FERRET
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType.FISH
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType.HOG
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType.OTHER
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType.OVINE
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType.RABBIT
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType.REPTILE
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType.RODENT
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType.UNSELECTED
 import org.jetbrains.compose.resources.StringResource
 import reskiume.composeapp.generated.resources.Res
 import reskiume.composeapp.generated.resources.non_human_animal_adopted
@@ -82,6 +97,44 @@ data class NonHumanAnimal(
         )
     }
 }
+
+private fun NonHumanAnimal.toSaveableList(): List<Any?> = listOf(
+    id,
+    caregiverId,
+    savedBy,
+    name,
+    ageCategory,
+    description,
+    imageUrl,
+    nonHumanAnimalType,
+    gender,
+    adoptionState,
+    fosterHomeId
+)
+
+private fun List<Any?>.fromSaveableList(): NonHumanAnimal = NonHumanAnimal(
+    id = this[0] as String,
+    caregiverId = this[1] as String,
+    savedBy = this[2] as String,
+    name = this[3] as String,
+    ageCategory = this[4] as AgeCategory,
+    description = this[5] as String,
+    imageUrl = this[6] as String,
+    nonHumanAnimalType = this[7] as NonHumanAnimalType,
+    gender = this[8] as Gender,
+    adoptionState = this[9] as AdoptionState,
+    fosterHomeId = this[10] as String
+)
+
+val NonHumanAnimalSaver: Saver<NonHumanAnimal?, Any> = listSaver(
+    save = { it?.toSaveableList() ?: listOf(null) },
+    restore = { if(it[0] == null) null else it.fromSaveableList() }
+)
+
+val NonHumanAnimalListSaver: Saver<List<NonHumanAnimal>, Any> = listSaver(
+    save = { nonHumanAnimals -> nonHumanAnimals.map { it.toSaveableList() } },
+    restore = { savedList -> savedList.map { it.fromSaveableList() } }
+)
 
 enum class AgeCategory {
     UNSELECTED,

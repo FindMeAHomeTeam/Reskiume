@@ -171,7 +171,7 @@
     <string name="non_human_animal_age_category_senior">Senior</string>
 
     <!-- No human animal adoption state -->
-    <string name="non_human_animal_looking_for_adoption">💟 Looking for adoption</string>
+    <string name="non_human_animal_looking_for_adoption">🩷 Looking for adoption</string>
     <string name="non_human_animal_needs_to_be_rescued">🦸 Needs to be rescued</string>
     <string name="non_human_animal_rehomed">🏠 Rehomed</string>
     <string name="non_human_animal_adopted">🎉 Adopted</string>
@@ -293,12 +293,13 @@
     <string name="accepted_non_human_animal_list_creator_add_content_description">Add a non-human animal type and gender</string>
     <string name="accepted_non_human_animal_list_creator_delete_content_description">Delete a non-human animal type and gender</string>
 
-    <!-- Resident non human animal list creator -->
-    <string name="resident_non_human_animal_list_creator_title">Add resident non-human animals:</string>
-    <string name="resident_non_human_animal_list_creator_non_human_animal_label">Non-human animal</string>
-    <string name="resident_non_human_animal_list_creator_unselected_non_human_animal_label">Unselected</string>
-    <string name="resident_non_human_animal_list_creator_add_content_description">Add a non-human animal</string>
-    <string name="resident_non_human_animal_list_creator_delete_content_description">Delete a non-human animal</string>
+    <!-- Non human animal list creator -->
+    <string name="non_human_animal_list_creator_resident_title">Add resident non-human animals:</string>
+    <string name="non_human_animal_list_creator_save_title">Add non-human animals to save:</string>
+    <string name="non_human_animal_list_creator_non_human_animal_label">Non-human animal</string>
+    <string name="non_human_animal_list_creator_unselected_non_human_animal_label">Unselected</string>
+    <string name="non_human_animal_list_creator_add_content_description">Add a non-human animal</string>
+    <string name="non_human_animal_list_creator_delete_content_description">Delete a non-human animal</string>
 
     <!-- Check foster home -->
     <string name="check_foster_home_screen_title">%1$s from %2$s (%3$s)</string>

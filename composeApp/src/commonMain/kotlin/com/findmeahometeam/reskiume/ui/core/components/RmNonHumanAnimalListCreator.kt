@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalSaver
 import com.findmeahometeam.reskiume.domain.model.toEmoji
 import com.findmeahometeam.reskiume.domain.model.toStringResource
 import com.findmeahometeam.reskiume.ui.core.backgroundColorForItems
@@ -35,29 +37,33 @@ import org.jetbrains.compose.resources.stringResource
 import reskiume.composeapp.generated.resources.Res
 import reskiume.composeapp.generated.resources.ic_add
 import reskiume.composeapp.generated.resources.ic_delete
-import reskiume.composeapp.generated.resources.resident_non_human_animal_list_creator_add_content_description
-import reskiume.composeapp.generated.resources.resident_non_human_animal_list_creator_delete_content_description
-import reskiume.composeapp.generated.resources.resident_non_human_animal_list_creator_non_human_animal_label
-import reskiume.composeapp.generated.resources.resident_non_human_animal_list_creator_title
-import reskiume.composeapp.generated.resources.resident_non_human_animal_list_creator_unselected_non_human_animal_label
+import reskiume.composeapp.generated.resources.non_human_animal_list_creator_add_content_description
+import reskiume.composeapp.generated.resources.non_human_animal_list_creator_delete_content_description
+import reskiume.composeapp.generated.resources.non_human_animal_list_creator_non_human_animal_label
+import reskiume.composeapp.generated.resources.non_human_animal_list_creator_unselected_non_human_animal_label
 
 @Composable
 fun RmNonHumanAnimalListCreator(
+    title: String,
     allAvailableNonHumanAnimals: List<NonHumanAnimal>,
-    allResidentNonHumanAnimals: List<NonHumanAnimal>,
-    onAddResidentNonHumanAnimal: (List<NonHumanAnimal>) -> Unit
+    allExistentNonHumanAnimals: List<NonHumanAnimal>,
+    onAddNonHumanAnimal: (List<NonHumanAnimal>) -> Unit
 ) {
     var availableNonHumanAnimals: List<NonHumanAnimal> by remember(allAvailableNonHumanAnimals) {
         mutableStateOf(
             allAvailableNonHumanAnimals
         )
     }
-    var residentNonHumanAnimals: List<NonHumanAnimal> by remember {
+    var existentNonHumanAnimals: List<NonHumanAnimal> by remember {
         mutableStateOf(
-            allResidentNonHumanAnimals
+            allExistentNonHumanAnimals
         )
     }
-    var selectedResidentNonHumanAnimal: NonHumanAnimal? by remember { mutableStateOf(null) }
+    var selectedNonHumanAnimal: NonHumanAnimal? by rememberSaveable(stateSaver = NonHumanAnimalSaver) {
+        mutableStateOf(
+            null
+        )
+    }
 
     Column(
         modifier = Modifier
@@ -69,7 +75,7 @@ fun RmNonHumanAnimalListCreator(
         verticalArrangement = Arrangement.Center
     ) {
         RmText(
-            text = stringResource(Res.string.resident_non_human_animal_list_creator_title),
+            text = title,
             fontSize = 16.sp
         )
 
@@ -81,16 +87,16 @@ fun RmNonHumanAnimalListCreator(
         ) {
             RmDropDownMenu(
                 modifier = Modifier.weight(1f),
-                dropDownLabel = stringResource(Res.string.resident_non_human_animal_list_creator_non_human_animal_label),
-                defaultElementText = if (selectedResidentNonHumanAnimal == null) {
-                    stringResource(Res.string.resident_non_human_animal_list_creator_unselected_non_human_animal_label)
+                dropDownLabel = stringResource(Res.string.non_human_animal_list_creator_non_human_animal_label),
+                defaultElementText = if (selectedNonHumanAnimal == null) {
+                    stringResource(Res.string.non_human_animal_list_creator_unselected_non_human_animal_label)
                 } else {
-                    selectedResidentNonHumanAnimal?.nonHumanAnimalType?.toEmoji() + " " + selectedResidentNonHumanAnimal?.name
+                    selectedNonHumanAnimal?.nonHumanAnimalType?.toEmoji() + " " + selectedNonHumanAnimal?.name
                 },
                 items = availableNonHumanAnimals.map {
                     Pair(it, it.nonHumanAnimalType.toEmoji() + " " + it.name)
                 },
-                onClick = { selectedResidentNonHumanAnimal = it },
+                onClick = { selectedNonHumanAnimal = it },
             )
 
             IconButton(
@@ -98,23 +104,23 @@ fun RmNonHumanAnimalListCreator(
                     .padding(start = 16.dp, top = 8.dp)
                     .size(32.dp),
                 onClick = {
-                    if (selectedResidentNonHumanAnimal != null) {
+                    if (selectedNonHumanAnimal != null) {
 
-                        val existingItems = residentNonHumanAnimals.filter {
-                            it.id == selectedResidentNonHumanAnimal!!.id
+                        val existingItems = existentNonHumanAnimals.filter {
+                            it.id == selectedNonHumanAnimal!!.id
                         }
                         if (existingItems.isEmpty()) {
-                            availableNonHumanAnimals -= selectedResidentNonHumanAnimal!!
-                            residentNonHumanAnimals += selectedResidentNonHumanAnimal!!
-                            onAddResidentNonHumanAnimal(residentNonHumanAnimals)
-                            selectedResidentNonHumanAnimal = null
+                            availableNonHumanAnimals -= selectedNonHumanAnimal!!
+                            existentNonHumanAnimals += selectedNonHumanAnimal!!
+                            onAddNonHumanAnimal(existentNonHumanAnimals)
+                            selectedNonHumanAnimal = null
                         }
                     }
                 }
             ) {
                 Icon(
                     painter = painterResource(Res.drawable.ic_add),
-                    contentDescription = stringResource(Res.string.resident_non_human_animal_list_creator_add_content_description),
+                    contentDescription = stringResource(Res.string.non_human_animal_list_creator_add_content_description),
                     tint = primaryGreen,
                     modifier = Modifier.size(24.dp),
                 )
@@ -122,7 +128,7 @@ fun RmNonHumanAnimalListCreator(
         }
     }
 
-    if (residentNonHumanAnimals.isNotEmpty()) {
+    if (existentNonHumanAnimals.isNotEmpty()) {
         Spacer(modifier = Modifier.height(8.dp))
 
         Column(
@@ -134,41 +140,41 @@ fun RmNonHumanAnimalListCreator(
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.Center
         ) {
-            residentNonHumanAnimals.forEachIndexed { index, residentNonHumanAnimalForFosterHome ->
+            existentNonHumanAnimals.forEachIndexed { index, existentNonHumanAnimal ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     RmText(
-                        text = residentNonHumanAnimalForFosterHome.nonHumanAnimalType.toEmoji()
-                                + " " + residentNonHumanAnimalForFosterHome.name
-                                + " · " + residentNonHumanAnimalForFosterHome.gender.toEmoji()
-                                + " " + stringResource(residentNonHumanAnimalForFosterHome.gender.toStringResource()),
+                        text = existentNonHumanAnimal.nonHumanAnimalType.toEmoji()
+                                + " " + existentNonHumanAnimal.name
+                                + " · " + existentNonHumanAnimal.gender.toEmoji()
+                                + " " + stringResource(existentNonHumanAnimal.gender.toStringResource()),
                         fontSize = 16.sp
                     )
 
                     IconButton(
                         modifier = Modifier.size(32.dp),
                         onClick = {
-                            residentNonHumanAnimals.first {
-                                it == residentNonHumanAnimalForFosterHome
+                            existentNonHumanAnimals.first {
+                                it == existentNonHumanAnimal
                             }.also {
                                 availableNonHumanAnimals += it
-                                residentNonHumanAnimals -= it
-                                onAddResidentNonHumanAnimal(residentNonHumanAnimals)
+                                existentNonHumanAnimals -= it
+                                onAddNonHumanAnimal(existentNonHumanAnimals)
                             }
                         }
                     ) {
                         Icon(
                             painter = painterResource(Res.drawable.ic_delete),
-                            contentDescription = stringResource(Res.string.resident_non_human_animal_list_creator_delete_content_description),
+                            contentDescription = stringResource(Res.string.non_human_animal_list_creator_delete_content_description),
                             tint = primaryRed,
                             modifier = Modifier.size(24.dp),
                         )
                     }
                 }
-                if (index < residentNonHumanAnimals.size - 1) {
+                if (index < existentNonHumanAnimals.size - 1) {
                     Spacer(modifier = Modifier.height(8.dp))
                 }
             }

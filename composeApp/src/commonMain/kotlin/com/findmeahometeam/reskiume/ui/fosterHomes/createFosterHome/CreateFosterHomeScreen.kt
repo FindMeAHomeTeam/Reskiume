@@ -21,8 +21,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalListSaver
 import com.findmeahometeam.reskiume.domain.model.fosterHome.AcceptedNonHumanAnimalForFosterHome
+import com.findmeahometeam.reskiume.domain.model.fosterHome.AcceptedNonHumanAnimalForFosterHomeListSaver
 import com.findmeahometeam.reskiume.domain.model.fosterHome.City
 import com.findmeahometeam.reskiume.domain.model.fosterHome.Country
 import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
@@ -53,6 +56,7 @@ import reskiume.composeapp.generated.resources.create_foster_home_screen_title
 import reskiume.composeapp.generated.resources.manage_location_permission_foster_home
 import reskiume.composeapp.generated.resources.manage_location_permission_message
 import reskiume.composeapp.generated.resources.manage_location_permission_turn_on_location_message
+import reskiume.composeapp.generated.resources.non_human_animal_list_creator_resident_title
 
 @Composable
 fun CreateFosterHomeScreen(
@@ -63,8 +67,8 @@ fun CreateFosterHomeScreen(
 
     val placeUtil: PlaceUtil = koinInject<PlaceUtil>()
 
-    val allAvailableNonHumanAnimals: List<NonHumanAnimal> by createFosterHomeViewmodel.allAvailableNonHumanAnimalsLookingForAdoptionFlow.collectAsState(
-        initial = emptyList()
+    val allAvailableUiNonHumanAnimals: List<NonHumanAnimal> by createFosterHomeViewmodel.allAvailableNonHumanAnimalsLookingForAdoptionFlow.collectAsStateWithLifecycle(
+        initialValue = emptyList()
     )
     val manageChangesUiState: UiState<Unit> by createFosterHomeViewmodel.saveChangesUiState.collectAsState()
 
@@ -72,10 +76,12 @@ fun CreateFosterHomeScreen(
     var description: String by rememberSaveable { mutableStateOf("") }
     var conditions: String by rememberSaveable { mutableStateOf("") }
     var imageUrl: String by rememberSaveable { mutableStateOf("") }
-    var allAcceptedNonHumanAnimals: List<AcceptedNonHumanAnimalForFosterHome> by rememberSaveable {
+    var allAcceptedNonHumanAnimals: List<AcceptedNonHumanAnimalForFosterHome> by rememberSaveable(
+        stateSaver = AcceptedNonHumanAnimalForFosterHomeListSaver
+    ) {
         mutableStateOf(emptyList())
     }
-    var uiAllResidentNonHumanAnimals: List<NonHumanAnimal> by rememberSaveable {
+    var allResidentUiNonHumanAnimals: List<NonHumanAnimal> by rememberSaveable(stateSaver = NonHumanAnimalListSaver) {
         mutableStateOf(emptyList())
     }
     var selectedCountry: Country by rememberSaveable { mutableStateOf(Country.UNSELECTED) }
@@ -128,7 +134,7 @@ fun CreateFosterHomeScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(8.dp))
-            RmAddPhoto {
+            RmAddPhoto(currentImageUri = imageUrl) {
                 imageUrl = it
             }
 
@@ -197,18 +203,21 @@ fun CreateFosterHomeScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
             RmAcceptedNonHumanAnimalListCreator(
-                "",
-                emptyList()
+                fosterHomeId = "",
+                acceptedNonHumanAnimals = allAcceptedNonHumanAnimals
             ) {
                 allAcceptedNonHumanAnimals = it
             }
 
             Spacer(modifier = Modifier.height(8.dp))
             RmNonHumanAnimalListCreator(
-                allAvailableNonHumanAnimals,
-                emptyList()
+                title = stringResource(Res.string.non_human_animal_list_creator_resident_title),
+                allAvailableNonHumanAnimals = allAvailableUiNonHumanAnimals.minus(
+                    allResidentUiNonHumanAnimals.toSet()
+                ),
+                allExistentNonHumanAnimals = allResidentUiNonHumanAnimals
             ) {
-                uiAllResidentNonHumanAnimals = it
+                allResidentUiNonHumanAnimals = it
             }
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -236,7 +245,7 @@ fun CreateFosterHomeScreen(
                             conditions = conditions,
                             imageUrl = imageUrl,
                             allAcceptedNonHumanAnimals = allAcceptedNonHumanAnimals,
-                            allResidentNonHumanAnimals = uiAllResidentNonHumanAnimals.map {
+                            allResidentNonHumanAnimals = allResidentUiNonHumanAnimals.map {
                                 ResidentNonHumanAnimalForFosterHome(
                                     nonHumanAnimalId = it.id,
                                     caregiverId = it.caregiverId,

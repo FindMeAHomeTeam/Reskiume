@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,8 +60,12 @@ fun RmAcceptedNonHumanAnimalListCreator(
             acceptedNonHumanAnimals
         )
     }
-    var nonHumanAnimalType: NonHumanAnimalType by remember { mutableStateOf(NonHumanAnimalType.UNSELECTED) }
-    var gender: Gender by remember { mutableStateOf(Gender.UNSELECTED) }
+    var nonHumanAnimalTypeString: String by rememberSaveable { mutableStateOf(NonHumanAnimalType.UNSELECTED.name) }
+    var nonHumanAnimalType: NonHumanAnimalType by remember(nonHumanAnimalTypeString) {
+        mutableStateOf(NonHumanAnimalType.valueOf(nonHumanAnimalTypeString))
+    }
+    var genderString: String by rememberSaveable { mutableStateOf(Gender.UNSELECTED.name) }
+    var gender: Gender by remember(genderString) { mutableStateOf(Gender.valueOf(genderString)) }
 
     Column(
         modifier = Modifier
@@ -96,7 +101,9 @@ fun RmAcceptedNonHumanAnimalListCreator(
                     }
                 },
                 textStyleForTextField = LocalTextStyle.current.copy(fontSize = 12.sp),
-                onClick = { nonHumanAnimalType = it },
+                onClick = {
+                    nonHumanAnimalTypeString = it.name
+                }
             )
 
             Spacer(modifier = Modifier.width(16.dp))
@@ -112,7 +119,9 @@ fun RmAcceptedNonHumanAnimalListCreator(
                     }
                 },
                 textStyleForTextField = LocalTextStyle.current.copy(fontSize = 12.sp),
-                onClick = { gender = it },
+                onClick = {
+                    genderString = it.name
+                }
             )
 
             IconButton(
@@ -135,8 +144,8 @@ fun RmAcceptedNonHumanAnimalListCreator(
                             )
                             itemsAdded += acceptedNonHumanAnimal
                             onAddAcceptedNonHumanAnimal(itemsAdded)
-                            nonHumanAnimalType = NonHumanAnimalType.UNSELECTED
-                            gender = Gender.UNSELECTED
+                            nonHumanAnimalTypeString = NonHumanAnimalType.UNSELECTED.name
+                            genderString = Gender.UNSELECTED.name
                         }
                     }
                 }

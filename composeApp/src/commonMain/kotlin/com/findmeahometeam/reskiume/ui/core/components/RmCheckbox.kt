@@ -19,9 +19,10 @@ import com.findmeahometeam.reskiume.ui.core.primaryGreen
 @Composable
 fun RmCheckbox(
     label: String,
+    isChecked: Boolean = false,
     onChecked: (isChecked: Boolean) -> Unit
 ) {
-    var checked by remember { mutableStateOf(false) }
+    var checked by remember { mutableStateOf(isChecked) }
 
     Row(verticalAlignment = Alignment.CenterVertically) {
         Checkbox(

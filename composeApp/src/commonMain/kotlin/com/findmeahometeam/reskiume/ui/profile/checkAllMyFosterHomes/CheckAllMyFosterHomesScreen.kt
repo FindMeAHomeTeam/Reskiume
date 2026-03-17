@@ -86,7 +86,7 @@ fun CheckAllMyFosterHomesScreen(
                                 title = uiFosterHome.fosterHome.title,
                                 imageUrl = uiFosterHome.fosterHome.imageUrl,
                                 allAcceptedNonHumanAnimals = uiFosterHome.fosterHome.allAcceptedNonHumanAnimals,
-                                allResidentNonHumanAnimals = uiFosterHome.uiAllResidentNonHumanAnimals,
+                                allResidentNonHumanAnimals = uiFosterHome.allResidentUiNonHumanAnimals,
                                 distance = null,
                                 city = uiFosterHome.fosterHome.city,
                                 onClick = {

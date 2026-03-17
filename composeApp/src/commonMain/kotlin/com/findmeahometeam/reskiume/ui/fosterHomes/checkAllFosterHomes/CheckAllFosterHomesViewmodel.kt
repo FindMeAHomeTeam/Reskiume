@@ -265,7 +265,7 @@ class CheckAllFosterHomesViewmodel(
                                         getImagePathForFileNameFromLocalDataSource(fosterHome.imageUrl)
                                     }
                                 ),
-                                uiAllResidentNonHumanAnimals = fosterHome.allResidentNonHumanAnimals.mapNotNull { residentNonHumanAnimal ->
+                                allResidentUiNonHumanAnimals = fosterHome.allResidentNonHumanAnimals.mapNotNull { residentNonHumanAnimal ->
 
                                     checkNonHumanAnimalUtil.getNonHumanAnimalFlow(
                                         residentNonHumanAnimal.nonHumanAnimalId,
@@ -346,7 +346,7 @@ class CheckAllFosterHomesViewmodel(
                                         getImagePathForFileNameFromLocalDataSource(fosterHome.imageUrl)
                                     }
                                 ),
-                                uiAllResidentNonHumanAnimals = fosterHome.allResidentNonHumanAnimals.mapNotNull { residentNonHumanAnimal ->
+                                allResidentUiNonHumanAnimals = fosterHome.allResidentNonHumanAnimals.mapNotNull { residentNonHumanAnimal ->
 
                                     checkNonHumanAnimalUtil.getNonHumanAnimalFlow(
                                         residentNonHumanAnimal.nonHumanAnimalId,
@@ -406,7 +406,7 @@ class CheckAllFosterHomesViewmodel(
 
 data class UiFosterHome(
     val fosterHome: FosterHome,
-    val uiAllResidentNonHumanAnimals: List<NonHumanAnimal>,
+    val allResidentUiNonHumanAnimals: List<NonHumanAnimal>,
     val distance: Double? = null,
     val owner: User? = null
 )

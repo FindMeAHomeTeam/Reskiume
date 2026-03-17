@@ -85,7 +85,7 @@ class CheckFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     UiState.Success(
                         UiFosterHome(
                             fosterHome = fosterHome,
-                            uiAllResidentNonHumanAnimals = listOf(nonHumanAnimal),
+                            allResidentUiNonHumanAnimals = listOf(nonHumanAnimal),
                             owner = user
                         )
                     ),
@@ -154,7 +154,7 @@ class CheckFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     UiState.Success(
                         UiFosterHome(
                             fosterHome = fosterHome,
-                            uiAllResidentNonHumanAnimals = listOf(nonHumanAnimal),
+                            allResidentUiNonHumanAnimals = listOf(nonHumanAnimal),
                             owner = user
                         )
                     ),

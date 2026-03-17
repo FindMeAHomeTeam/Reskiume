@@ -245,7 +245,7 @@ fun CheckFosterHomeScreen(
                     uiFosterHome.fosterHome.allAcceptedNonHumanAnimals
                 )
 
-                if (uiFosterHome.uiAllResidentNonHumanAnimals.isNotEmpty()) {
+                if (uiFosterHome.allResidentUiNonHumanAnimals.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(8.dp))
                     RmText(
                         modifier = Modifier.fillMaxWidth().padding(10.dp),
@@ -255,7 +255,7 @@ fun CheckFosterHomeScreen(
                         fontWeight = FontWeight.ExtraBold
                     )
                     ResidentNonHumanAnimalList(
-                        uiFosterHome.uiAllResidentNonHumanAnimals
+                        uiFosterHome.allResidentUiNonHumanAnimals
                     )
                 }
 

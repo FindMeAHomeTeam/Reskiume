@@ -78,7 +78,7 @@ class CheckAllMyFosterHomesViewmodel(
                                     getImagePathForFileNameFromLocalDataSource(fosterHome.imageUrl)
                                 }
                             ),
-                            uiAllResidentNonHumanAnimals = fosterHome.allResidentNonHumanAnimals.mapNotNull { residentNonHumanAnimal ->
+                            allResidentUiNonHumanAnimals = fosterHome.allResidentNonHumanAnimals.mapNotNull { residentNonHumanAnimal ->
 
                                 checkNonHumanAnimalUtil.getNonHumanAnimalFlow(
                                     residentNonHumanAnimal.nonHumanAnimalId,

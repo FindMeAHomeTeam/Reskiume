@@ -204,7 +204,7 @@ fun CreateFosterHomeScreen(
             Spacer(modifier = Modifier.height(8.dp))
             RmAcceptedNonHumanAnimalListCreator(
                 fosterHomeId = "",
-                acceptedNonHumanAnimals = allAcceptedNonHumanAnimals
+                allAcceptedNonHumanAnimals = allAcceptedNonHumanAnimals
             ) {
                 allAcceptedNonHumanAnimals = it
             }

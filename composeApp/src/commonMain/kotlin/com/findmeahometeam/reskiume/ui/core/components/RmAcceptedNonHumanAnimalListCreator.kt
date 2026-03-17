@@ -52,12 +52,12 @@ import kotlin.time.ExperimentalTime
 @Composable
 fun RmAcceptedNonHumanAnimalListCreator(
     fosterHomeId: String,
-    acceptedNonHumanAnimals: List<AcceptedNonHumanAnimalForFosterHome>,
+    allAcceptedNonHumanAnimals: List<AcceptedNonHumanAnimalForFosterHome>,
     onAddAcceptedNonHumanAnimal: (List<AcceptedNonHumanAnimalForFosterHome>) -> Unit
 ) {
     var itemsAdded: List<AcceptedNonHumanAnimalForFosterHome> by remember {
         mutableStateOf(
-            acceptedNonHumanAnimals
+            allAcceptedNonHumanAnimals
         )
     }
     var nonHumanAnimalTypeString: String by rememberSaveable { mutableStateOf(NonHumanAnimalType.UNSELECTED.name) }

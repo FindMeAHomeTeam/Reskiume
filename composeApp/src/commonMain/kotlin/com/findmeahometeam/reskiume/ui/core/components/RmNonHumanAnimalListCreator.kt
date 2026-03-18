@@ -55,7 +55,7 @@ fun RmNonHumanAnimalListCreator(
             allAvailableNonHumanAnimals
         )
     }
-    var existentNonHumanAnimals: List<NonHumanAnimal> by remember {
+    var existentNonHumanAnimals: List<NonHumanAnimal> by rememberSaveable(stateSaver = NonHumanAnimalListSaver) {
         mutableStateOf(
             allExistentNonHumanAnimals
         )

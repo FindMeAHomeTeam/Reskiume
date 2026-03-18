@@ -103,12 +103,12 @@ private fun NonHumanAnimal.toSaveableList(): List<Any?> = listOf(
     caregiverId,
     savedBy,
     name,
-    ageCategory,
+    ageCategory.name,
     description,
     imageUrl,
-    nonHumanAnimalType,
-    gender,
-    adoptionState,
+    nonHumanAnimalType.name,
+    gender.name,
+    adoptionState.name,
     fosterHomeId
 )
 
@@ -117,23 +117,28 @@ private fun List<Any?>.fromSaveableList(): NonHumanAnimal = NonHumanAnimal(
     caregiverId = this[1] as String,
     savedBy = this[2] as String,
     name = this[3] as String,
-    ageCategory = this[4] as AgeCategory,
+    ageCategory = AgeCategory.valueOf(this[4] as String),
     description = this[5] as String,
     imageUrl = this[6] as String,
-    nonHumanAnimalType = this[7] as NonHumanAnimalType,
-    gender = this[8] as Gender,
-    adoptionState = this[9] as AdoptionState,
+    nonHumanAnimalType = NonHumanAnimalType.valueOf(this[7] as String),
+    gender = Gender.valueOf(this[8] as String),
+    adoptionState = AdoptionState.valueOf(this[9] as String),
     fosterHomeId = this[10] as String
 )
 
 val NonHumanAnimalSaver: Saver<NonHumanAnimal?, Any> = listSaver(
     save = { it?.toSaveableList() ?: listOf(null) },
-    restore = { if(it[0] == null) null else it.fromSaveableList() }
+    restore = { if (it[0] == null) null else it.fromSaveableList() }
 )
 
 val NonHumanAnimalListSaver: Saver<List<NonHumanAnimal>, Any> = listSaver(
-    save = { nonHumanAnimals -> nonHumanAnimals.map { it.toSaveableList() } },
-    restore = { savedList -> savedList.map { it.fromSaveableList() } }
+    save = { nonHumanAnimals ->
+        listOf(nonHumanAnimals.map { it.toSaveableList() })
+    },
+    restore = { savedList ->
+        val innerList = savedList[0] as List<Any>
+        innerList.map { (it as List<Any?>).fromSaveableList() }
+    }
 )
 
 enum class AgeCategory {

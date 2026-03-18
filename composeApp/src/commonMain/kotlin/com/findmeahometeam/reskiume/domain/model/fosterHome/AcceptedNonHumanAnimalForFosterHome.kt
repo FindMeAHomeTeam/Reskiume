@@ -35,18 +35,24 @@ data class AcceptedNonHumanAnimalForFosterHome(
 private fun AcceptedNonHumanAnimalForFosterHome.toSaveableList(): List<Any?> = listOf(
     acceptedNonHumanAnimalId,
     fosterHomeId,
-    acceptedNonHumanAnimalType,
-    acceptedNonHumanAnimalGender
+    acceptedNonHumanAnimalType.name,
+    acceptedNonHumanAnimalGender.name
 )
 
 private fun List<Any?>.fromSaveableList(): AcceptedNonHumanAnimalForFosterHome = AcceptedNonHumanAnimalForFosterHome(
     acceptedNonHumanAnimalId = this[0] as Long,
     fosterHomeId = this[1] as String,
-    acceptedNonHumanAnimalType = this[2] as NonHumanAnimalType,
-    acceptedNonHumanAnimalGender = this[3] as Gender
+    acceptedNonHumanAnimalType = NonHumanAnimalType.valueOf(this[2] as String),
+    acceptedNonHumanAnimalGender = Gender.valueOf(this[3] as String)
 )
 
-val AcceptedNonHumanAnimalForFosterHomeListSaver: Saver<List<AcceptedNonHumanAnimalForFosterHome>, Any> = listSaver(
-    save = { acceptedNonHumanAnimals -> acceptedNonHumanAnimals.map { it.toSaveableList() } },
-    restore = { savedList -> savedList.map { it.fromSaveableList() } }
-)
+val AcceptedNonHumanAnimalForFosterHomeListSaver: Saver<List<AcceptedNonHumanAnimalForFosterHome>, Any> =
+    listSaver(
+        save = { acceptedNonHumanAnimals ->
+            listOf(acceptedNonHumanAnimals.map { it.toSaveableList() })
+        },
+        restore = { savedList ->
+            val innerList = savedList[0] as List<Any>
+            innerList.map { (it as List<Any?>).fromSaveableList() }
+        }
+    )

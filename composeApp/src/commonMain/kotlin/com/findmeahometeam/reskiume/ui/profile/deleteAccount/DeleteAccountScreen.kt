@@ -47,7 +47,7 @@ import reskiume.composeapp.generated.resources.ic_warning
 fun DeleteAccountScreen(onBackPressed: () -> Unit) {
 
     val deleteAccountViewmodel: DeleteAccountViewmodel = koinViewModel<DeleteAccountViewmodel>()
-    val uiState: UiState<Unit> by deleteAccountViewmodel.state.collectAsState()
+    val deletionState: UiState<Unit> by deleteAccountViewmodel.deletionState.collectAsStateWithLifecycle()
 
     var password by remember { mutableStateOf("") }
     val buttonEnabled by remember(password) {
@@ -104,8 +104,8 @@ fun DeleteAccountScreen(onBackPressed: () -> Unit) {
                 )
                 Spacer(Modifier.height(10.dp))
                 RmResultState(
-                    uiState,
-                    customErrorMessage = stringResource(Res.string.delete_account_screen_delete_message),
+                    uiState = deletionState,
+                    customErrorMessage = stringResource(Res.string.delete_account_screen_delete_error_message),
                     onSuccess = { onBackPressed() }
                 )
             }

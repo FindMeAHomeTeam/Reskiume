@@ -249,7 +249,7 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 )
             )
             deleteAccountViewmodel.deleteAccount(userPwd)
-            deleteAccountViewmodel.state.test {
+            deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Success }
@@ -320,7 +320,7 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 )
             )
             deleteAccountViewmodel.deleteAccount(userPwd)
-            deleteAccountViewmodel.state.test {
+            deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Success }
@@ -391,7 +391,7 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 )
             )
             deleteAccountViewmodel.deleteAccount(userPwd)
-            deleteAccountViewmodel.state.test {
+            deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Success }
@@ -463,7 +463,7 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 )
             )
             deleteAccountViewmodel.deleteAccount(userPwd)
-            deleteAccountViewmodel.state.test {
+            deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Error }
@@ -520,7 +520,7 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 )
             )
             deleteAccountViewmodel.deleteAccount(userPwd)
-            deleteAccountViewmodel.state.test {
+            deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Success }
@@ -577,7 +577,7 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 )
             )
             deleteAccountViewmodel.deleteAccount(userPwd)
-            deleteAccountViewmodel.state.test {
+            deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Success }
@@ -626,7 +626,7 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 )
             )
             deleteAccountViewmodel.deleteAccount(userPwd)
-            deleteAccountViewmodel.state.test {
+            deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Error }
@@ -661,7 +661,7 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 )
             )
             deleteAccountViewmodel.deleteAccount(userPwd)
-            deleteAccountViewmodel.state.test {
+            deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Success }
@@ -674,7 +674,7 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
         runTest {
             val deleteAccountViewmodel = getDeleteAccountViewmodel()
             deleteAccountViewmodel.deleteAccount(userPwd)
-            deleteAccountViewmodel.state.test {
+            deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Error }
                 ensureAllEventsConsumed()
@@ -692,7 +692,7 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 )
             )
             deleteAccountViewmodel.deleteAccount(userPwd)
-            deleteAccountViewmodel.state.test {
+            deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Error }
@@ -714,7 +714,7 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 )
             )
             deleteAccountViewmodel.deleteAccount(userPwd)
-            deleteAccountViewmodel.state.test {
+            deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Error }

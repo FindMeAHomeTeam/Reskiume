@@ -62,8 +62,8 @@ class DeleteAccountViewmodel(
     private val deleteUsersFromLocalDataSource: DeleteUsersFromLocalDataSource,
     private val log: Log
 ) : ViewModel() {
-    private var _state: MutableStateFlow<UiState<Unit>> = MutableStateFlow(UiState.Idle())
-    val state: StateFlow<UiState<Unit>> = _state.asStateFlow()
+    private var _deletionState: MutableStateFlow<UiState<Unit>> = MutableStateFlow(UiState.Idle())
+    val deletionState: StateFlow<UiState<Unit>> = _deletionState.asStateFlow()
 
     private val authUserState: Flow<AuthUser?> = observeAuthStateInAuthDataSource()
 
@@ -90,19 +90,19 @@ class DeleteAccountViewmodel(
             val authUser: AuthUser? = authUserState.firstOrNull()
 
             if (authUser == null) {
-                _state.value = UiState.Error()
+                _deletionState.value = UiState.Error()
                 log.e(
                     "DeleteAccountViewmodel",
                     "getUserFromRemoteRepo: User UID is blank"
                 )
                 return@launch
             }
-            _state.value = UiState.Loading()
+            _deletionState.value = UiState.Loading()
 
             val remoteUser: User? = getUserFromRemoteDataSource(authUser.uid).firstOrNull()
             if (remoteUser == null) {
 
-                _state.value = UiState.Error()
+                _deletionState.value = UiState.Error()
                 log.e(
                     "DeleteAccountViewmodel",
                     "getUserFromRemoteRepo: User ${authUser.uid} not found in remote data source"
@@ -221,7 +221,7 @@ class DeleteAccountViewmodel(
                         "DeleteAccountViewmodel",
                         "deleteAllMyFosterHomesFromRemoteDataSource: failed to delete foster homes from the owner id $uid from the remote repository: ${(databaseResult as DatabaseResult.Error).message}"
                     )
-                    _state.value = UiState.Error()
+                    _deletionState.value = UiState.Error()
                 }
             }
         }
@@ -246,7 +246,7 @@ class DeleteAccountViewmodel(
                         "DeleteAccountViewmodel",
                         "deleteAllMyFosterHomesFromLocalDataSource: failed to delete foster homes from the caregiver $uid from the local repository"
                     )
-                    _state.value = UiState.Error()
+                    _deletionState.value = UiState.Error()
                 }
             }
         }
@@ -355,7 +355,7 @@ class DeleteAccountViewmodel(
                     "DeleteAccountViewmodel",
                     "deleteAllNonHumanAnimalsFromRemoteDataSource: failed to delete non human animals from caregiver $uid from remote repository: ${(databaseResult as DatabaseResult.Error).message}"
                 )
-                _state.value = UiState.Error()
+                _deletionState.value = UiState.Error()
             }
         }
     }
@@ -379,7 +379,7 @@ class DeleteAccountViewmodel(
                         "DeleteAccountViewmodel",
                         "deleteAllNonHumanAnimalsFromLocalDataSource: failed to delete non human animals from caregiver $uid from local repository"
                     )
-                    _state.value = UiState.Error()
+                    _deletionState.value = UiState.Error()
                 }
             }
         }
@@ -544,7 +544,7 @@ class DeleteAccountViewmodel(
 
         deleteUserFromRemoteDataSource(uid) { result: DatabaseResult ->
             if (result is DatabaseResult.Error) {
-                _state.value = UiState.Error(result.message)
+                _deletionState.value = UiState.Error(result.message)
                 log.e(
                     "DeleteAccountViewmodel",
                     "deleteUserFromRemoteRepository: Error deleting the user $uid from the remote repository: ${result.message}"
@@ -586,13 +586,13 @@ class DeleteAccountViewmodel(
             deleteUsersFromLocalDataSource(deletedUid) { rowsDeleted: Int ->
 
                 if (rowsDeleted == 0) {
-                    _state.value = UiState.Error()
+                    _deletionState.value = UiState.Error()
                     log.e(
                         "DeleteAccountViewmodel",
                         "deleteMyUserFromLocalDataSource: Error deleting the user $deletedUid from the local data source"
                     )
                 } else {
-                    _state.value = UiState.Success(Unit)
+                    _deletionState.value = UiState.Success(Unit)
                     log.d(
                         "DeleteAccountViewmodel",
                         "deleteMyUserFromLocalDataSource: User $deletedUid deleted successfully from the local data source"

@@ -502,7 +502,7 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
         runTest {
             val deleteAccountViewmodel = getDeleteAccountViewmodel()
             deleteAccountViewmodel.deleteAccount(userPwd)
-            deleteAccountViewmodel.state.test {
+            deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Success }
@@ -523,7 +523,7 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
                 remoteFosterHomeImageDeletedArg = false
             )
             deleteAccountViewmodel.deleteAccount(userPwd)
-            deleteAccountViewmodel.state.test {
+            deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Success }
@@ -544,7 +544,7 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
                 localFosterHomeImageDeletedArg = false
             )
             deleteAccountViewmodel.deleteAccount(userPwd)
-            deleteAccountViewmodel.state.test {
+            deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Success }
@@ -565,7 +565,7 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
                 databaseResultOfDeletingAllRemoteFosterHomesArg = DatabaseResult.Error()
             )
             deleteAccountViewmodel.deleteAccount(userPwd)
-            deleteAccountViewmodel.state.test {
+            deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Error }
@@ -586,7 +586,7 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
                 rowsDeletedOfAllMyFosterHomesArg = 0
             )
             deleteAccountViewmodel.deleteAccount(userPwd)
-            deleteAccountViewmodel.state.test {
+            deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Error }
@@ -607,7 +607,7 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
                 remoteNonHumanAnimalImageDeletedArg = false
             )
             deleteAccountViewmodel.deleteAccount(userPwd)
-            deleteAccountViewmodel.state.test {
+            deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Success }
@@ -628,7 +628,7 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
                 localNonHumanAnimalImageDeletedArg = false
             )
             deleteAccountViewmodel.deleteAccount(userPwd)
-            deleteAccountViewmodel.state.test {
+            deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Success }
@@ -649,7 +649,7 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
                 databaseResultAfterDeletingAllRemoteNonHumanAnimalArg = DatabaseResult.Error()
             )
             deleteAccountViewmodel.deleteAccount(userPwd)
-            deleteAccountViewmodel.state.test {
+            deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Error }
@@ -670,7 +670,7 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
                 rowsDeletedOfAllNonHumanAnimalsArg = 0
             )
             deleteAccountViewmodel.deleteAccount(userPwd)
-            deleteAccountViewmodel.state.test {
+            deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Error }
@@ -691,7 +691,7 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
                 getRemoteReviewsResult = emptyList()
             )
             deleteAccountViewmodel.deleteAccount(userPwd)
-            deleteAccountViewmodel.state.test {
+            deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Success }
@@ -756,7 +756,7 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
                 authStateResult = null
             )
             deleteAccountViewmodel.deleteAccount(userPwd)
-            deleteAccountViewmodel.state.test {
+            deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Error }
                 ensureAllEventsConsumed()
@@ -777,7 +777,7 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
                 localImageDeletedArg = false
             )
             deleteAccountViewmodel.deleteAccount(userPwd)
-            deleteAccountViewmodel.state.test {
+            deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Success }
@@ -802,7 +802,7 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
                 remoteUserResult = null
             )
             deleteAccountViewmodel.deleteAccount(userPwd)
-            deleteAccountViewmodel.state.test {
+            deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Error }
@@ -823,7 +823,7 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
                 successRemoteUserArg = DatabaseResult.Error("error")
             )
             deleteAccountViewmodel.deleteAccount(userPwd)
-            deleteAccountViewmodel.state.test {
+            deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Error }
@@ -846,7 +846,7 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
                 deleteUserFromLocalArg = 0
             )
             deleteAccountViewmodel.deleteAccount(userPwd)
-            deleteAccountViewmodel.state.test {
+            deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Error }

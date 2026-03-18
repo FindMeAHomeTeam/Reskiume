@@ -1,5 +1,7 @@
 package com.findmeahometeam.reskiume.domain.model.rescueEvent
 
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
 import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.NeedToCoverEntityForRecueEvent
 import com.findmeahometeam.reskiume.data.remote.response.rescueEvent.RemoteNeedToCoverForRescueEvent
 import org.jetbrains.compose.resources.StringResource
@@ -41,3 +43,25 @@ fun RescueNeed.toStringResource(): StringResource {
         RescueNeed.FOSTER_HOME -> Res.string.need_to_cover_foster_home
     }
 }
+
+private fun NeedToCover.toSaveableList(): List<Any?> = listOf(
+    needToCoverId,
+    rescueNeed.name,
+    rescueEventId
+)
+
+private fun List<Any?>.fromSaveableList(): NeedToCover = NeedToCover(
+    needToCoverId = this[0] as Long,
+    rescueNeed = RescueNeed.valueOf(this[1] as String),
+    rescueEventId = this[2] as String
+)
+
+val NeedToCoverListSaver: Saver<List<NeedToCover>, Any> = listSaver(
+    save = { allNeedsToCover ->
+        listOf(allNeedsToCover.map { it.toSaveableList() })
+    },
+    restore = { savedList ->
+        val innerList = savedList[0] as List<Any>
+        innerList.map { (it as List<Any?>).fromSaveableList() }
+    }
+)

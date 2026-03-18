@@ -21,7 +21,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalListSaver
 import com.findmeahometeam.reskiume.domain.model.fosterHome.AcceptedNonHumanAnimalForFosterHome
+import com.findmeahometeam.reskiume.domain.model.fosterHome.AcceptedNonHumanAnimalForFosterHomeListSaver
 import com.findmeahometeam.reskiume.domain.model.fosterHome.ResidentNonHumanAnimalForFosterHome
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.components.RmAcceptedNonHumanAnimalListCreator
@@ -108,19 +110,29 @@ fun ModifyFosterHomeScreen(
                 var description: String by rememberSaveable { mutableStateOf(uiFosterHome.fosterHome.description) }
                 var conditions: String by rememberSaveable { mutableStateOf(uiFosterHome.fosterHome.conditions) }
                 var imageUrl: String by rememberSaveable { mutableStateOf(uiFosterHome.fosterHome.imageUrl) }
-                var allAcceptedNonHumanAnimals: List<AcceptedNonHumanAnimalForFosterHome> by rememberSaveable {
+                var allAcceptedNonHumanAnimals: List<AcceptedNonHumanAnimalForFosterHome> by rememberSaveable(
+                    uiFosterHome.fosterHome.id,
+                    stateSaver = AcceptedNonHumanAnimalForFosterHomeListSaver
+                ) {
                     mutableStateOf(
                         uiFosterHome.fosterHome.allAcceptedNonHumanAnimals
                     )
                 }
-                var uiAllResidentNonHumanAnimals: List<NonHumanAnimal> by rememberSaveable {
+                var allResidentUiNonHumanAnimals: List<NonHumanAnimal> by rememberSaveable(
+                    uiFosterHome.fosterHome.id,
+                    stateSaver = NonHumanAnimalListSaver
+                ) {
                     mutableStateOf(
-                        uiFosterHome.uiAllResidentNonHumanAnimals
+                        uiFosterHome.allResidentUiNonHumanAnimals
                     )
                 }
                 var isAvailable: Boolean by rememberSaveable { mutableStateOf(uiFosterHome.fosterHome.available) }
                 var displayDeleteDialog: Boolean by rememberSaveable { mutableStateOf(false) }
-                var displayFosterHomeWithResidentsDialog: Boolean by rememberSaveable { mutableStateOf(false) }
+                var displayFosterHomeWithResidentsDialog: Boolean by rememberSaveable {
+                    mutableStateOf(
+                        false
+                    )
+                }
 
                 val isUpdateFosterHomeButtonEnabled by remember(
                     title,
@@ -128,7 +140,7 @@ fun ModifyFosterHomeScreen(
                     conditions,
                     imageUrl,
                     allAcceptedNonHumanAnimals,
-                    uiAllResidentNonHumanAnimals,
+                    allResidentUiNonHumanAnimals,
                     isAvailable,
                 ) {
                     derivedStateOf {
@@ -142,13 +154,13 @@ fun ModifyFosterHomeScreen(
                                 || description != uiFosterHome.fosterHome.description
                                 || conditions != uiFosterHome.fosterHome.conditions
                                 || allAcceptedNonHumanAnimals != uiFosterHome.fosterHome.allAcceptedNonHumanAnimals
-                                || uiAllResidentNonHumanAnimals != uiFosterHome.uiAllResidentNonHumanAnimals
+                                || allResidentUiNonHumanAnimals != uiFosterHome.allResidentUiNonHumanAnimals
                                 || isAvailable != uiFosterHome.fosterHome.available)
                     }
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
-                RmAddPhoto(currentImageUri = uiFosterHome.fosterHome.imageUrl) {
+                RmAddPhoto(currentImageUri = imageUrl) {
                     imageUrl = it
                 }
 

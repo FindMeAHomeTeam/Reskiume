@@ -111,7 +111,7 @@ fun CheckAllFosterHomesScreen(
     RmScaffold(
         title = stringResource(Res.string.check_all_foster_homes_screen_title)
     ) { padding ->
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .background(backgroundColor)
@@ -119,160 +119,166 @@ fun CheckAllFosterHomesScreen(
                 .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            RmDisplaySingleChoiceSegmentedButtonRow(
-                items = SearchOption.entries.map {
-                    Pair(
-                        it,
-                        stringResource(it.stringResource)
-                    )
+            item {
+                RmDisplaySingleChoiceSegmentedButtonRow(
+                    items = SearchOption.entries.map {
+                        Pair(
+                            it,
+                            stringResource(it.stringResource)
+                        )
+                    }
+                ) { searchOp ->
+                    searchOption = searchOp
+
+                    if (searchOption == SearchOption.LOCATION) {
+
+                        permissionState = ManagePermissionState.CHECK_PERMISSION
+                        displayDialogToRequestLocationActivation = !isLocationEnabledState.value
+                    }
                 }
-            ) { searchOp ->
-                searchOption = searchOp
 
                 if (searchOption == SearchOption.LOCATION) {
 
-                    permissionState = ManagePermissionState.CHECK_PERMISSION
-                    displayDialogToRequestLocationActivation = !isLocationEnabledState.value
+                    RmManageLocationPermission(
+                        explainingLocationPermissionMessage =
+                            stringResource(Res.string.manage_location_permission_turn_on_location_message_check_all_foster_homes),
+                        explainingLocationActivationMessage =
+                            stringResource(Res.string.manage_location_permission_message_check_all_foster_homes),
+                        permissionState = permissionState,
+                        isLocationEnabledState = isLocationEnabledState,
+                        onRequestEnableLocation = {
+                            checkAllFosterHomesViewmodel.requestEnableLocation()
+                        },
+                        onUpdateLocation = {
+                            checkAllFosterHomesViewmodel.updateLocation()
+                        },
+                        onBackPressed = {},
+                        onUpdatePermissionState = {
+                            permissionState = it
+                        }
+                    )
                 }
-            }
 
-            if (searchOption == SearchOption.LOCATION) {
+                AnimatedVisibility(visible = searchOption == SearchOption.COUNTRY_CITY) {
 
-                RmManageLocationPermission(
-                    explainingLocationPermissionMessage =
-                        stringResource(Res.string.manage_location_permission_turn_on_location_message_check_all_foster_homes),
-                    explainingLocationActivationMessage =
-                        stringResource(Res.string.manage_location_permission_message_check_all_foster_homes),
-                    permissionState = permissionState,
-                    isLocationEnabledState = isLocationEnabledState,
-                    onRequestEnableLocation = {
-                        checkAllFosterHomesViewmodel.requestEnableLocation()
+                    RmCountryAndCitySelectors(
+                        placeUtil,
+                        selectedCountry,
+                        onSelectedCountry = {
+                            selectedCountry = it
+                        },
+                        onSelectedCity = {
+                            selectedCity = it
+                        }
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+                RmDropDownMenu(
+                    dropDownLabel = stringResource(Res.string.check_all_foster_homes_screen_non_human_animal_type_label),
+                    defaultElementText = nonHumanAnimalType.toEmoji() + " " + stringResource(
+                        nonHumanAnimalType.toStringResource()
+                    ),
+                    items = NonHumanAnimalType.entries.mapNotNull {
+                        if (it != NonHumanAnimalType.UNSELECTED) {
+                            Pair(it, it.toEmoji() + " " + stringResource(it.toStringResource()))
+                        } else {
+                            null
+                        }
                     },
-                    onUpdateLocation = {
-                        checkAllFosterHomesViewmodel.updateLocation()
-                    },
-                    onBackPressed = {},
-                    onUpdatePermissionState = {
-                        permissionState = it
-                    }
+                    onClick = { nonHumanAnimalType = it },
                 )
-            }
 
-            AnimatedVisibility(visible = searchOption == SearchOption.COUNTRY_CITY) {
-
-                RmCountryAndCitySelectors(
-                    placeUtil,
-                    selectedCountry,
-                    onSelectedCountry = {
-                        selectedCountry = it
-                    },
-                    onSelectedCity = {
-                        selectedCity = it
-                    }
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-            RmDropDownMenu(
-                dropDownLabel = stringResource(Res.string.check_all_foster_homes_screen_non_human_animal_type_label),
-                defaultElementText = nonHumanAnimalType.toEmoji() + " " + stringResource(
-                    nonHumanAnimalType.toStringResource()
-                ),
-                items = NonHumanAnimalType.entries.mapNotNull {
-                    if (it != NonHumanAnimalType.UNSELECTED) {
-                        Pair(it, it.toEmoji() + " " + stringResource(it.toStringResource()))
-                    } else {
-                        null
-                    }
-                },
-                onClick = { nonHumanAnimalType = it },
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-            RmButton(
-                text = stringResource(
-                    Res.string.check_all_foster_homes_screen_search_foster_homes_button,
+                Spacer(modifier = Modifier.height(8.dp))
+                RmButton(
+                    text = stringResource(
+                        Res.string.check_all_foster_homes_screen_search_foster_homes_button,
+                        if (searchOption == SearchOption.COUNTRY_CITY) {
+                            stringResource(Res.string.check_all_foster_homes_screen_search_by_place)
+                        } else {
+                            stringResource(Res.string.check_all_foster_homes_screen_search_by_location)
+                        }
+                    ),
+                    enabled = isSearchButtonEnabled,
+                    displayPleaseWait = uiFosterHomeListState is UiState.Loading
+                ) {
                     if (searchOption == SearchOption.COUNTRY_CITY) {
-                        stringResource(Res.string.check_all_foster_homes_screen_search_by_place)
-                    } else {
-                        stringResource(Res.string.check_all_foster_homes_screen_search_by_location)
-                    }
-                ),
-                enabled = isSearchButtonEnabled,
-                displayPleaseWait = uiFosterHomeListState is UiState.Loading
-            ) {
-                if (searchOption == SearchOption.COUNTRY_CITY) {
-                    checkAllFosterHomesViewmodel.fetchAllFosterHomesStateByPlace(
-                        country = selectedCountry.countryName,
-                        city = selectedCity.cityName,
-                        nonHumanAnimalType = nonHumanAnimalType
-                    )
-                } else {
-                    checkAllFosterHomesViewmodel.fetchAllFosterHomesStateByLocation(
-                        nonHumanAnimalType
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-            RmResultState(uiFosterHomeListState) { fosterHomeList: List<UiFosterHome> ->
-
-                AnimatedVisibility(visible = fosterHomeList.isEmpty()) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Spacer(modifier = Modifier.weight(1f))
-                        RmText(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = stringResource(Res.string.check_all_foster_homes_screen_no_foster_home_found),
-                            textAlign = TextAlign.Center,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Black
+                        checkAllFosterHomesViewmodel.fetchAllFosterHomesStateByPlace(
+                            country = selectedCountry.countryName,
+                            city = selectedCity.cityName,
+                            nonHumanAnimalType = nonHumanAnimalType
                         )
-                        Spacer(modifier = Modifier.weight(1f))
+                    } else {
+                        checkAllFosterHomesViewmodel.fetchAllFosterHomesStateByLocation(
+                            nonHumanAnimalType
+                        )
                     }
                 }
-                if (fosterHomeList.isNotEmpty()) {
 
-                    Spacer(modifier = Modifier.height(8.dp))
-                    RmSecondaryText(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = stringResource(
-                            Res.string.check_all_foster_homes_screen_search_available_foster_homes,
-                            fosterHomeList.size
-                        ),
-                        fontSize = 16.sp,
-                    )
+                Spacer(modifier = Modifier.height(8.dp))
+                RmResultState(uiFosterHomeListState) { fosterHomeList: List<UiFosterHome> ->
 
-                    Spacer(modifier = Modifier.height(20.dp))
-                    LazyColumn {
-                        items(
-                            items = fosterHomeList,
-                            key = { uiFosterHome -> uiFosterHome.hashCode() }
-                        ) { uiFosterHome ->
-                            RmFosterHomeListItem(
-                                modifier = Modifier.animateItem(),
-                                title = uiFosterHome.fosterHome.title,
-                                imageUrl = uiFosterHome.fosterHome.imageUrl,
-                                allAcceptedNonHumanAnimals = uiFosterHome.fosterHome.allAcceptedNonHumanAnimals,
-                                allResidentNonHumanAnimals = uiFosterHome.allResidentUiNonHumanAnimals,
-                                distance = uiFosterHome.distance,
-                                city = uiFosterHome.fosterHome.city,
-                                onClick = {
-                                    if (authState?.uid == uiFosterHome.fosterHome.ownerId) {
-                                        onModifyFosterHome(uiFosterHome.fosterHome.id)
-                                    } else {
-                                        onCheckFosterHome(
-                                            uiFosterHome.fosterHome.id,
-                                            uiFosterHome.fosterHome.ownerId
-                                        )
-                                    }
-                                }
+                    AnimatedVisibility(visible = fosterHomeList.isEmpty()) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Spacer(modifier = Modifier.weight(1f))
+                            RmText(
+                                modifier = Modifier.fillMaxWidth(),
+                                text = stringResource(Res.string.check_all_foster_homes_screen_no_foster_home_found),
+                                textAlign = TextAlign.Center,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Black
                             )
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.weight(1f))
                         }
                     }
+
+                    if (fosterHomeList.isNotEmpty()) {
+
+                        Spacer(modifier = Modifier.height(8.dp))
+                        RmSecondaryText(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = stringResource(
+                                Res.string.check_all_foster_homes_screen_search_available_foster_homes,
+                                fosterHomeList.size
+                            ),
+                            fontSize = 16.sp,
+                        )
+
+                        Spacer(modifier = Modifier.height(20.dp))
+                    }
+                }
+            }
+            if (uiFosterHomeListState is UiState.Success && (uiFosterHomeListState as UiState.Success<List<UiFosterHome>>).data.isNotEmpty()) {
+                val fosterHomeList: List<UiFosterHome> =
+                    (uiFosterHomeListState as UiState.Success<List<UiFosterHome>>).data
+                items(
+                    items = fosterHomeList,
+                    key = { uiFosterHome -> uiFosterHome.hashCode() }
+                ) { uiFosterHome ->
+
+                    RmFosterHomeListItem(
+                        modifier = Modifier.animateItem(),
+                        title = uiFosterHome.fosterHome.title,
+                        imageUrl = uiFosterHome.fosterHome.imageUrl,
+                        allAcceptedNonHumanAnimals = uiFosterHome.fosterHome.allAcceptedNonHumanAnimals,
+                        allResidentNonHumanAnimals = uiFosterHome.allResidentUiNonHumanAnimals,
+                        distance = uiFosterHome.distance,
+                        city = uiFosterHome.fosterHome.city,
+                        onClick = {
+                            if (authState?.uid == uiFosterHome.fosterHome.ownerId) {
+                                onModifyFosterHome(uiFosterHome.fosterHome.id)
+                            } else {
+                                onCheckFosterHome(
+                                    uiFosterHome.fosterHome.id,
+                                    uiFosterHome.fosterHome.ownerId
+                                )
+                            }
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
             }
         }

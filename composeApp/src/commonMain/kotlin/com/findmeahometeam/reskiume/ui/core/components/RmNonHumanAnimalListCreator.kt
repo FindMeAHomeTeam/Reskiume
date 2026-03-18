@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalListSaver
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalSaver
 import com.findmeahometeam.reskiume.domain.model.toEmoji
 import com.findmeahometeam.reskiume.domain.model.toStringResource
@@ -49,7 +50,7 @@ fun RmNonHumanAnimalListCreator(
     allExistentNonHumanAnimals: List<NonHumanAnimal>,
     onAddNonHumanAnimal: (List<NonHumanAnimal>) -> Unit
 ) {
-    var availableNonHumanAnimals: List<NonHumanAnimal> by remember(allAvailableNonHumanAnimals) {
+    var availableNonHumanAnimals: List<NonHumanAnimal> by rememberSaveable(allAvailableNonHumanAnimals, stateSaver = NonHumanAnimalListSaver) {
         mutableStateOf(
             allAvailableNonHumanAnimals
         )

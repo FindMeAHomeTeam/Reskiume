@@ -9,7 +9,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -25,6 +24,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
+import com.findmeahometeam.reskiume.ui.core.components.RmScaffold
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.gray
 import com.findmeahometeam.reskiume.ui.core.navigation.bottomNavigation.BottomBarItem
@@ -48,7 +48,7 @@ fun HomeScreen(mainNavHostController: NavHostController) {
         BottomBarItem.Profile()
     )
 
-    Scaffold(bottomBar = {
+    RmScaffold(bottomBar = {
         BottomNavigationBar(bottomNavHostController, items, displayChats)
     }) { padding: PaddingValues ->
         Box(modifier = Modifier.padding(padding)) {

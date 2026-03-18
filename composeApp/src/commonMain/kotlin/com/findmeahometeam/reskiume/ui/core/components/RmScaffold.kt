@@ -33,6 +33,7 @@ fun RmScaffold(
     onBackPressed: (() -> Unit)? = null,
     topAppBarActions: @Composable (RowScope.() -> Unit)? = null,
     floatingActionButton: @Composable () -> Unit = {},
+    bottomBar: @Composable () -> Unit = {},
     content: @Composable (PaddingValues) -> Unit
 ) {
     Scaffold(
@@ -76,6 +77,7 @@ fun RmScaffold(
             )
         },
         floatingActionButton = floatingActionButton,
+        bottomBar = bottomBar,
         content = content
     )
 }

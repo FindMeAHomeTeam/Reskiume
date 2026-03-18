@@ -76,7 +76,7 @@ fun CreateAccountScreen(onBackPressed: () -> Unit, navigateToLoginScreen: () -> 
                 .padding(horizontal = 16.dp).verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            RmAddPhoto {
+            RmAddPhoto(currentImageUri = imageUri) {
                 imageUri = it
             }
             Spacer(modifier = Modifier.height(15.dp))

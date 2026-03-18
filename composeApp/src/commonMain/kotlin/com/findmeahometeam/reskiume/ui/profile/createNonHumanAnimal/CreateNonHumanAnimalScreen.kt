@@ -100,7 +100,7 @@ fun CreateNonHumanAnimalScreen(
         ) {
 
             Spacer(modifier = Modifier.height(8.dp))
-            RmAddPhoto {
+            RmAddPhoto(currentImageUri = imageUrl) {
                 imageUrl = it
             }
 

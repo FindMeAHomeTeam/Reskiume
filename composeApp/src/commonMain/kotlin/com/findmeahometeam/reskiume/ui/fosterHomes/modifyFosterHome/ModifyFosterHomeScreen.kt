@@ -61,6 +61,7 @@ import reskiume.composeapp.generated.resources.modify_foster_home_screen_unavail
 import reskiume.composeapp.generated.resources.modify_foster_home_screen_warning_foster_home_with_residents_message
 import reskiume.composeapp.generated.resources.modify_foster_home_screen_warning_foster_home_with_residents_ok_button
 import reskiume.composeapp.generated.resources.modify_foster_home_screen_warning_foster_home_with_residents_title
+import reskiume.composeapp.generated.resources.non_human_animal_list_creator_resident_title
 
 @Composable
 fun ModifyFosterHomeScreen(
@@ -210,29 +211,30 @@ fun ModifyFosterHomeScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
                 RmAcceptedNonHumanAnimalListCreator(
-                    uiFosterHome.fosterHome.id,
-                    uiFosterHome.fosterHome.allAcceptedNonHumanAnimals
+                    fosterHomeId = uiFosterHome.fosterHome.id,
+                    allAcceptedNonHumanAnimals = allAcceptedNonHumanAnimals
                 ) {
                     allAcceptedNonHumanAnimals = it
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
                 RmNonHumanAnimalListCreator(
-                    allAvailableNonHumanAnimals,
-                    uiFosterHome.uiAllResidentNonHumanAnimals
+                    title = stringResource(Res.string.non_human_animal_list_creator_resident_title),
+                    allAvailableNonHumanAnimals = allAvailableNonHumanAnimals,
+                    allExistentNonHumanAnimals = allResidentUiNonHumanAnimals
                 ) {
-                    uiAllResidentNonHumanAnimals = it
+                    allResidentUiNonHumanAnimals = it
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
                 RmTextLink(
                     text = stringResource(
                         Res.string.modify_foster_home_screen_delete_foster_home_text,
-                        uiFosterHome.fosterHome.title
+                        title
                     ),
                     textToLink = stringResource(Res.string.modify_foster_home_screen_delete_foster_home_button),
                     onClick = {
-                        if (uiFosterHome.uiAllResidentNonHumanAnimals.isEmpty()) {
+                        if (allResidentUiNonHumanAnimals.isEmpty()) {
                             displayDeleteDialog = true
                         } else {
                             displayFosterHomeWithResidentsDialog = true
@@ -245,7 +247,7 @@ fun ModifyFosterHomeScreen(
                         emoji = "🗑️",
                         title = stringResource(
                             Res.string.modify_foster_home_screen_delete_foster_home_title,
-                            uiFosterHome.fosterHome.title
+                            title
                         ),
                         message = stringResource(Res.string.modify_foster_home_screen_delete_foster_home_message),
                         allowMessage = stringResource(Res.string.modify_foster_home_screen_delete_foster_home_button),
@@ -265,7 +267,7 @@ fun ModifyFosterHomeScreen(
                         emoji = "🐷🐱",
                         title = stringResource(
                             Res.string.modify_foster_home_screen_warning_foster_home_with_residents_title,
-                            uiFosterHome.uiAllResidentNonHumanAnimals.size
+                            allResidentUiNonHumanAnimals.size
                         ),
                         message = stringResource(Res.string.modify_foster_home_screen_warning_foster_home_with_residents_message),
                         allowMessage = stringResource(Res.string.modify_foster_home_screen_warning_foster_home_with_residents_ok_button),
@@ -296,7 +298,7 @@ fun ModifyFosterHomeScreen(
                                 description = description,
                                 conditions = conditions,
                                 allAcceptedNonHumanAnimals = allAcceptedNonHumanAnimals,
-                                allResidentNonHumanAnimals = uiAllResidentNonHumanAnimals.map {
+                                allResidentNonHumanAnimals = allResidentUiNonHumanAnimals.map {
                                     ResidentNonHumanAnimalForFosterHome(
                                         nonHumanAnimalId = it.id,
                                         caregiverId = it.caregiverId,

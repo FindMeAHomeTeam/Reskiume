@@ -1,6 +1,7 @@
 package com.findmeahometeam.reskiume.ui.core.components
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
@@ -15,34 +16,41 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.findmeahometeam.reskiume.ui.core.primaryGreen
+import com.findmeahometeam.reskiume.ui.core.textColor
 
 @Composable
 fun RmCheckbox(
     label: String,
+    modifier: Modifier = Modifier,
     isChecked: Boolean = false,
     onChecked: (isChecked: Boolean) -> Unit
 ) {
     var checked by remember { mutableStateOf(isChecked) }
 
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    val onCheckedChange: (Boolean) -> Unit = {
+        checked = it
+        onChecked(it)
+    }
+
+    Row(
+        modifier = modifier.then(
+            Modifier.clickable {
+                onCheckedChange(!checked)
+            }
+        ),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start
+    ) {
         Checkbox(
             checked = checked,
             colors = CheckboxDefaults.colors().copy(
                 checkedBoxColor = primaryGreen,
-                checkedBorderColor = primaryGreen
+                checkedBorderColor = primaryGreen,
+                uncheckedBorderColor = textColor
             ),
-            onCheckedChange = {
-                checked = it
-                onChecked(it)
-            }
+            onCheckedChange = onCheckedChange
         )
         Spacer(modifier = Modifier.width(5.dp))
-        RmText(
-            modifier = Modifier.clickable {
-                checked = !checked
-                onChecked(checked)
-            },
-            text = label
-        )
+        RmText(label)
     }
 }

@@ -34,6 +34,10 @@ class StorageRepositoryAndroidImpl(
                 .child(Section.FOSTER_HOMES.path)
                 .child(uid)
                 .child("$extraId.webp")
+            Section.RESCUE_EVENTS -> storageRef
+                .child(Section.RESCUE_EVENTS.path)
+                .child(uid)
+                .child("$extraId.webp")
             else -> storageRef
                 .child(Section.USERS.path)
                 .child(uid)
@@ -77,6 +81,7 @@ class StorageRepositoryAndroidImpl(
             Section.USERS -> File(context.filesDir, "$userUid.webp")
             Section.NON_HUMAN_ANIMALS -> File(context.filesDir, "$extraId.webp")
             Section.FOSTER_HOMES -> File(context.filesDir, "$extraId.webp")
+            Section.RESCUE_EVENTS -> File(context.filesDir, "$extraId.webp")
             else -> File(context.filesDir, "$userUid.webp")
         }
 

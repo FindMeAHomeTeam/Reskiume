@@ -17,6 +17,9 @@ import com.findmeahometeam.reskiume.ui.profile.checkAllAdvice.CheckAllAdviceView
 import com.findmeahometeam.reskiume.ui.profile.checkAllMyFosterHomes.CheckAllMyFosterHomesUtil
 import com.findmeahometeam.reskiume.ui.profile.checkAllMyFosterHomes.CheckAllMyFosterHomesUtilImpl
 import com.findmeahometeam.reskiume.ui.profile.checkAllMyFosterHomes.CheckAllMyFosterHomesViewmodel
+import com.findmeahometeam.reskiume.ui.profile.checkAllMyRescueEvents.CheckAllMyRescueEventsUtil
+import com.findmeahometeam.reskiume.ui.profile.checkAllMyRescueEvents.CheckAllMyRescueEventsUtilImpl
+import com.findmeahometeam.reskiume.ui.profile.checkAllMyRescueEvents.CheckAllMyRescueEventsViewmodel
 import com.findmeahometeam.reskiume.ui.profile.checkMyAllNonHumanAnimals.CheckAllMyNonHumanAnimalsViewmodel
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalViewmodel
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
@@ -34,6 +37,7 @@ import com.findmeahometeam.reskiume.ui.profile.createNonHumanAnimal.CreateNonHum
 import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.DeleteNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.DeleteNonHumanAnimalUtilImpl
 import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.ModifyNonHumanAnimalViewmodel
+import com.findmeahometeam.reskiume.ui.rescueEvents.createRescueEvent.CreateRescueEventViewmodel
 import com.findmeahometeam.reskiume.ui.util.StringProvider
 import com.findmeahometeam.reskiume.ui.util.StringProviderImpl
 import org.koin.core.module.dsl.factoryOf
@@ -70,4 +74,7 @@ val uiModule = module {
     viewModelOf(::CreateFosterHomeViewmodel)
     viewModelOf(::CheckFosterHomeViewmodel)
     singleOf(::CheckFosterHomeUtilImpl) bind CheckFosterHomeUtil::class
+    viewModelOf(::CheckAllMyRescueEventsViewmodel)
+    singleOf(::CheckAllMyRescueEventsUtilImpl) bind CheckAllMyRescueEventsUtil::class
+    viewModelOf(::CreateRescueEventViewmodel)
 }

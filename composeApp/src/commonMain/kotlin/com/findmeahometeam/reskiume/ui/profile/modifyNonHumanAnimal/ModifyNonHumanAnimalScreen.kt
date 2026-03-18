@@ -109,7 +109,11 @@ fun ModifyNonHumanAnimalScreen(
                 var ageCategory: AgeCategory by rememberSaveable { mutableStateOf(nonHumanAnimal.ageCategory) }
                 var description: String by rememberSaveable { mutableStateOf(nonHumanAnimal.description) }
                 var displayDeleteDialog: Boolean by rememberSaveable { mutableStateOf(false) }
-                var displayNonHumanAnimalInFosterHomeDialog: Boolean by rememberSaveable { mutableStateOf(false) }
+                var displayNonHumanAnimalInFosterHomeDialog: Boolean by rememberSaveable {
+                    mutableStateOf(
+                        false
+                    )
+                }
 
                 val isUpdateUserButtonEnabled by remember(
                     imageUrl,
@@ -136,7 +140,7 @@ fun ModifyNonHumanAnimalScreen(
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
-                RmAddPhoto(currentImageUri = nonHumanAnimal.imageUrl) {
+                RmAddPhoto(currentImageUri = imageUrl) {
                     imageUrl = it
                 }
 
@@ -151,7 +155,9 @@ fun ModifyNonHumanAnimalScreen(
                 Spacer(modifier = Modifier.height(8.dp))
                 RmDropDownMenu(
                     dropDownLabel = stringResource(Res.string.modify_non_human_animal_screen_non_human_animal_type),
-                    defaultElementText = nonHumanAnimal.nonHumanAnimalType.toEmoji() + " " + stringResource(nonHumanAnimal.nonHumanAnimalType.toStringResource()),
+                    defaultElementText = nonHumanAnimalType.toEmoji() + " " + stringResource(
+                        nonHumanAnimalType.toStringResource()
+                    ),
                     items = NonHumanAnimalType.entries.mapNotNull {
                         if (it != NonHumanAnimalType.UNSELECTED) {
                             Pair(it, it.toEmoji() + " " + stringResource(it.toStringResource()))
@@ -165,7 +171,7 @@ fun ModifyNonHumanAnimalScreen(
                 Spacer(modifier = Modifier.height(8.dp))
                 RmDropDownMenu(
                     dropDownLabel = stringResource(Res.string.modify_non_human_animal_screen_non_human_animal_gender),
-                    defaultElementText = nonHumanAnimal.gender.toEmoji() + " " + stringResource(nonHumanAnimal.gender.toStringResource()),
+                    defaultElementText = gender.toEmoji() + " " + stringResource(gender.toStringResource()),
                     items = Gender.entries.mapNotNull {
                         if (it != Gender.UNSELECTED) {
                             Pair(it, it.toEmoji() + " " + stringResource(it.toStringResource()))
@@ -179,7 +185,7 @@ fun ModifyNonHumanAnimalScreen(
                 Spacer(modifier = Modifier.height(8.dp))
                 RmDropDownMenu(
                     dropDownLabel = stringResource(Res.string.modify_non_human_animal_screen_non_human_animal_age_category),
-                    defaultElementText = nonHumanAnimal.ageCategory.toEmoji() + " " + stringResource(nonHumanAnimal.ageCategory.toStringResource()),
+                    defaultElementText = ageCategory.toEmoji() + " " + stringResource(ageCategory.toStringResource()),
                     items = AgeCategory.entries.mapNotNull {
                         if (it != AgeCategory.UNSELECTED) {
                             Pair(it, it.toEmoji() + " " + stringResource(it.toStringResource()))
@@ -235,7 +241,7 @@ fun ModifyNonHumanAnimalScreen(
                 }
                 if (displayNonHumanAnimalInFosterHomeDialog) {
                     RmDialog(
-                        emoji = nonHumanAnimal.nonHumanAnimalType.toEmoji(),
+                        emoji = nonHumanAnimalType.toEmoji(),
                         title = stringResource(
                             Res.string.modify_non_human_animal_screen_non_human_animal_in_foster_home_title,
                             nonHumanAnimal.name

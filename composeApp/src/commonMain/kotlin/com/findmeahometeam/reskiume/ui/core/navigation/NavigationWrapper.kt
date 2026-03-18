@@ -14,6 +14,7 @@ import com.findmeahometeam.reskiume.ui.home.HomeScreen
 import com.findmeahometeam.reskiume.ui.profile.checkAdvice.CheckAdviceScreen
 import com.findmeahometeam.reskiume.ui.profile.checkAllAdvice.CheckAllAdviceScreen
 import com.findmeahometeam.reskiume.ui.profile.checkAllMyFosterHomes.CheckAllMyFosterHomesScreen
+import com.findmeahometeam.reskiume.ui.profile.checkAllMyRescueEvents.CheckAllMyRescueEventsScreen
 import com.findmeahometeam.reskiume.ui.profile.checkMyAllNonHumanAnimals.CheckAllMyNonHumanAnimalsScreen
 import com.findmeahometeam.reskiume.ui.profile.createAccount.CreateAccountScreen
 import com.findmeahometeam.reskiume.ui.profile.deleteAccount.DeleteAccountScreen
@@ -22,6 +23,7 @@ import com.findmeahometeam.reskiume.ui.profile.modifyAccount.ModifyAccountScreen
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsScreen
 import com.findmeahometeam.reskiume.ui.profile.createNonHumanAnimal.CreateNonHumanAnimalScreen
 import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.ModifyNonHumanAnimalScreen
+import com.findmeahometeam.reskiume.ui.rescueEvents.createRescueEvent.CreateRescueEventScreen
 
 @Composable
 fun NavigationWrapper() {
@@ -84,6 +86,39 @@ fun NavigationWrapper() {
                     mainNavController.navigateUp()
                 }
             )
+        }
+
+        composable<CheckAllMyRescueEvents> {
+            CheckAllMyRescueEventsScreen(
+                myUid = it.toRoute<CheckAllMyRescueEvents>().myUid,
+                onBackPressed = { mainNavController.navigateUp() },
+                onCreateRescueEvent = { creatorId: String ->
+                    mainNavController.navigate(CreateRescueEvent(creatorId))
+                },
+                onModifyRescueEvent = { rescueEventId: String ->
+                    mainNavController.navigate(ModifyRescueEvent(rescueEventId))
+                }
+            )
+        }
+
+        composable<CreateRescueEvent> {
+            CreateRescueEventScreen {
+                mainNavController.navigateUp()
+            }
+        }
+
+        composable<ModifyRescueEvent> {
+            //
+        }
+
+        composable<CheckRescueEvent>(
+            deepLinks = listOf(
+                navDeepLink {
+                    this.uriPattern = "$RESCUE_EVENT_DEEP_LINK/{creatorId}/{rescueEventId}"
+                }
+            )
+        ) {
+            //
         }
 
         composable(route = Routes.CREATE_ACCOUNT.route) {

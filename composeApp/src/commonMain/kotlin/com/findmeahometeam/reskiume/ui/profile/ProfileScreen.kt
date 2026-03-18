@@ -82,6 +82,7 @@ fun ProfileScreen(
     navigateToCheckReviewsScreen: (uid: String) -> Unit,
     navigateToCheckNonHumanAnimalsScreen: (uid: String) -> Unit,
     navigateToCheckMyFosterHomesScreen: (uid: String) -> Unit,
+    navigateToCheckMyRescueEventsScreen: (uid: String) -> Unit,
     navigateToCheckAllAdviceScreen: () -> Unit,
     navigateToDeleteAccountScreen: () -> Unit
 ) {
@@ -236,7 +237,7 @@ fun ProfileScreen(
                     iconColor = primaryGreen
                 ),
                 onClick = {
-                    // TODO
+                    navigateToCheckMyRescueEventsScreen(user!!.uid)
                 }
             )
         }

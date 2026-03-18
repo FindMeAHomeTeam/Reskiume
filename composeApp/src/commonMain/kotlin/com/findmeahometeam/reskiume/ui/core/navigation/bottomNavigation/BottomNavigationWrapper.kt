@@ -7,13 +7,14 @@ import androidx.navigation.compose.composable
 import com.findmeahometeam.reskiume.ui.chats.ChatsScreen
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckAllMyFosterHomes
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckAllMyNonHumanAnimals
+import com.findmeahometeam.reskiume.ui.core.navigation.CheckAllMyRescueEvents
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckFosterHome
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckReviews
 import com.findmeahometeam.reskiume.ui.core.navigation.ModifyFosterHome
 import com.findmeahometeam.reskiume.ui.core.navigation.Routes
 import com.findmeahometeam.reskiume.ui.fosterHomes.checkAllFosterHomes.CheckAllFosterHomesScreen
 import com.findmeahometeam.reskiume.ui.profile.ProfileScreen
-import com.findmeahometeam.reskiume.ui.rescue.RescueScreen
+import com.findmeahometeam.reskiume.ui.rescueEvents.RescueScreen
 
 @Composable
 fun BottomNavigationWrapper(
@@ -61,6 +62,9 @@ fun BottomNavigationWrapper(
                 },
                 navigateToCheckMyFosterHomesScreen = { myUid ->
                     mainNavHostController.navigate(CheckAllMyFosterHomes(myUid))
+                },
+                navigateToCheckMyRescueEventsScreen = { myUid ->
+                    mainNavHostController.navigate(CheckAllMyRescueEvents(myUid))
                 },
                 navigateToCheckAllAdviceScreen = {
                     mainNavHostController.navigate(Routes.CHECK_ALL_ADVICE.route)

@@ -36,6 +36,10 @@ class CheckAllMyRescueEventsUtilImpl(
         allRescueEventsFlow.map { rescueEventList ->
             rescueEventList.map { rescueEvent ->
 
+                val localRescueEvent: RescueEvent? = getRescueEventFromLocalRepository(
+                    rescueEvent.id
+                ).firstOrNull()
+
                 if (rescueEvent.imageUrl.isNotBlank()) {
 
                     val localImagePath: String = downloadImageToLocalDataSource(
@@ -46,21 +50,18 @@ class CheckAllMyRescueEventsUtilImpl(
                     val rescueEventWithLocalImage =
                         rescueEvent.copy(imageUrl = localImagePath.ifBlank { rescueEvent.imageUrl })
 
-                    val localRescueEvent: RescueEvent? = getRescueEventFromLocalRepository(
-                        rescueEvent.id
-                    ).firstOrNull()
-
                     if (localRescueEvent == null) {
                         insertRescueEventInLocalRepo(
-                            rescueEventWithLocalImage,
-                            coroutineScope,
-                            myUid
+                            rescueEvent = rescueEventWithLocalImage,
+                            coroutineScope = coroutineScope,
+                            myUid = myUid
                         )
                     } else {
                         modifyRescueEventInLocalRepo(
-                            rescueEventWithLocalImage,
-                            coroutineScope,
-                            myUid
+                            updatedRescueEvent = rescueEventWithLocalImage,
+                            previousRescueEvent = localRescueEvent,
+                            coroutineScope = coroutineScope,
+                            myUid = myUid
                         )
                     }
                     rescueEventWithLocalImage
@@ -69,21 +70,19 @@ class CheckAllMyRescueEventsUtilImpl(
                         "CheckAllMyRescueEventsUtilImpl",
                         "downloadImageAndManageRescueEventsInLocalRepositoryFromFlow: Rescue event ${rescueEvent.id} has no avatar image to save locally."
                     )
-                    val localRescueEvent: RescueEvent? = getRescueEventFromLocalRepository(
-                        rescueEvent.id
-                    ).firstOrNull()
 
                     if (localRescueEvent == null) {
                         insertRescueEventInLocalRepo(
-                            rescueEvent,
-                            coroutineScope,
-                            myUid
+                            rescueEvent = rescueEvent,
+                            coroutineScope = coroutineScope,
+                            myUid = myUid
                         )
                     } else {
                         modifyRescueEventInLocalRepo(
-                            rescueEvent,
-                            coroutineScope,
-                            myUid
+                            updatedRescueEvent = rescueEvent,
+                            previousRescueEvent = localRescueEvent,
+                            coroutineScope = coroutineScope,
+                            myUid = myUid
                         )
                     }
                     rescueEvent
@@ -140,11 +139,10 @@ class CheckAllMyRescueEventsUtilImpl(
     @OptIn(ExperimentalTime::class)
     private suspend fun modifyRescueEventInLocalRepo(
         updatedRescueEvent: RescueEvent,
+        previousRescueEvent: RescueEvent,
         coroutineScope: CoroutineScope,
         myUid: String
     ) {
-        val previousRescueEvent = getRescueEventFromLocalRepository(updatedRescueEvent.id).first()!!
-
         modifyRescueEventInLocalRepository(
             updatedRescueEvent,
             previousRescueEvent,
@@ -191,35 +189,41 @@ class CheckAllMyRescueEventsUtilImpl(
         coroutineScope: CoroutineScope
     ): Flow<List<RescueEvent>> =
         allRescueEventsFlow.map { rescueEventList ->
-            rescueEventList.map { rescueEvent ->
+            rescueEventList.map { updatedRescueEvent ->
 
-                if (rescueEvent.imageUrl.isNotBlank()) {
+                val previousRescueEvent: RescueEvent = getRescueEventFromLocalRepository(
+                    updatedRescueEvent.id
+                ).first()!!
+
+                if (updatedRescueEvent.imageUrl.isNotBlank()) {
 
                     val localImagePath: String = downloadImageToLocalDataSource(
-                        userUid = rescueEvent.creatorId,
-                        extraId = rescueEvent.id,
+                        userUid = updatedRescueEvent.creatorId,
+                        extraId = updatedRescueEvent.id,
                         section = Section.RESCUE_EVENTS
                     )
-                    val rescueEventWithLocalImage =
-                        rescueEvent.copy(imageUrl = localImagePath.ifBlank { rescueEvent.imageUrl })
+                    val updatedRescueEventWithLocalImage =
+                        updatedRescueEvent.copy(imageUrl = localImagePath.ifBlank { updatedRescueEvent.imageUrl })
 
                     modifyRescueEventInLocalRepo(
-                        rescueEventWithLocalImage,
-                        coroutineScope,
-                        myUid
+                        updatedRescueEvent = updatedRescueEventWithLocalImage,
+                        previousRescueEvent = previousRescueEvent,
+                        coroutineScope = coroutineScope,
+                        myUid = myUid
                     )
-                    rescueEventWithLocalImage
+                    updatedRescueEventWithLocalImage
                 } else {
                     log.d(
                         "CheckAllMyRescueEventsUtilImpl",
-                        "downloadImageAndModifyRescueEventsInLocalRepositoryFromFlow: Rescue event ${rescueEvent.id} has no avatar image to save locally."
+                        "downloadImageAndModifyRescueEventsInLocalRepositoryFromFlow: Rescue event ${updatedRescueEvent.id} has no avatar image to save locally."
                     )
                     modifyRescueEventInLocalRepo(
-                        rescueEvent,
-                        coroutineScope,
-                        myUid
+                        updatedRescueEvent = updatedRescueEvent,
+                        previousRescueEvent = previousRescueEvent,
+                        coroutineScope = coroutineScope,
+                        myUid = myUid
                     )
-                    rescueEvent
+                    updatedRescueEvent
                 }
             }
         }

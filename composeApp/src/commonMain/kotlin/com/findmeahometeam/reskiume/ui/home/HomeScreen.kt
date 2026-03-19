@@ -48,9 +48,12 @@ fun HomeScreen(mainNavHostController: NavHostController) {
         BottomBarItem.Profile()
     )
 
-    RmScaffold(bottomBar = {
-        BottomNavigationBar(bottomNavHostController, items, displayChats)
-    }) { padding: PaddingValues ->
+    RmScaffold(
+        displayTopBar = false,
+        bottomBar = {
+            BottomNavigationBar(bottomNavHostController, items, displayChats)
+        }
+    ) { padding: PaddingValues ->
         Box(modifier = Modifier.padding(padding)) {
             BottomNavigationWrapper(bottomNavHostController, mainNavHostController)
         }

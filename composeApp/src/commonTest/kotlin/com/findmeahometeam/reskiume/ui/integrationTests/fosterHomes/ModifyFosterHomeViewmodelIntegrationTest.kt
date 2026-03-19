@@ -204,7 +204,7 @@ class ModifyFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     )
                 ),
                 checkNonHumanAnimalUtil = FakeCheckNonHumanAnimalUtil(
-                    nonHumanAnimal.copy(id = nonHumanAnimal.id + "789")
+                    mutableListOf(nonHumanAnimal.copy(id = nonHumanAnimal.id + "789"))
                 ),
                 localNonHumanAnimalRepository = FakeLocalNonHumanAnimalRepository(
                     mutableListOf(
@@ -359,7 +359,7 @@ class ModifyFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     )
                 ),
                 checkNonHumanAnimalUtil = FakeCheckNonHumanAnimalUtil(
-                    nonHumanAnimal.copy(id = nonHumanAnimal.id + "789")
+                    mutableListOf(nonHumanAnimal.copy(id = nonHumanAnimal.id + "789"))
                 ),
                 localNonHumanAnimalRepository = FakeLocalNonHumanAnimalRepository(
                     mutableListOf(

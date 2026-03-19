@@ -1,6 +1,5 @@
 package com.findmeahometeam.reskiume.ui.core.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,50 +30,62 @@ import reskiume.composeapp.generated.resources.ic_back
 fun RmScaffold(
     title: String = "",
     onBackPressed: (() -> Unit)? = null,
+    displayTopBar: Boolean = true,
     topAppBarActions: @Composable (RowScope.() -> Unit)? = null,
     floatingActionButton: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
     content: @Composable (PaddingValues) -> Unit
 ) {
     Scaffold(
-        modifier = Modifier.background(backgroundColor),
+        containerColor = backgroundColor,
         topBar = {
-            TopAppBar(
-                title = {
-                    RmText(
-                        modifier = if (topAppBarActions == null) {
-                            Modifier.fillMaxWidth().padding(end = 48.dp)
-                        } else {
-                            Modifier.fillMaxWidth()
-                        },
-                        text = title,
-                        textAlign = TextAlign.Center,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp,
-                    )
-                },
-                navigationIcon = {
-                    if (onBackPressed != null) {
-                        IconButton(
-                            modifier = Modifier.padding(start = 16.dp).size(32.dp),
-                            onClick = onBackPressed
-                        ) {
-                            Icon(
-                                painter = painterResource(Res.drawable.ic_back),
-                                contentDescription = stringResource(Res.string.back_arrow_content_description),
-                                tint = textColor,
-                                modifier = Modifier.size(24.dp),
-                            )
+            if (displayTopBar) {
+                TopAppBar(
+                    title = {
+                        RmText(
+                            modifier = when {
+                                onBackPressed == null -> {
+                                    Modifier.fillMaxWidth().padding(end = 16.dp)
+                                }
+
+                                topAppBarActions == null -> {
+                                    Modifier.fillMaxWidth().padding(end = 48.dp)
+                                }
+
+                                else -> {
+                                    Modifier.fillMaxWidth()
+                                }
+                            },
+                            text = title,
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp,
+                        )
+                    },
+                    navigationIcon = {
+                        if (onBackPressed != null) {
+                            IconButton(
+                                modifier = Modifier.padding(start = 16.dp).size(32.dp),
+                                onClick = onBackPressed
+                            ) {
+                                Icon(
+                                    painter = painterResource(Res.drawable.ic_back),
+                                    contentDescription = stringResource(Res.string.back_arrow_content_description),
+                                    tint = textColor,
+                                    modifier = Modifier.size(24.dp),
+                                )
+                            }
                         }
-                    }
-                },
-                actions = if (topAppBarActions == null ) {
-                    {}
-                } else {
-                    topAppBarActions
-                },
-                colors = TopAppBarDefaults.topAppBarColors().copy(containerColor = backgroundColor)
-            )
+                    },
+                    actions = if (topAppBarActions == null) {
+                        {}
+                    } else {
+                        topAppBarActions
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors()
+                        .copy(containerColor = backgroundColor)
+                )
+            }
         },
         floatingActionButton = floatingActionButton,
         bottomBar = bottomBar,

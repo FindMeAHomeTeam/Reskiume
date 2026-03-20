@@ -100,12 +100,12 @@ class InsertRescueEventInLocalRepository(
                         ) { rowsUpdated ->
                             if (rowsUpdated > 0) {
                                 log.d(
-                                    "ModifyRescueEventInLocalRepository",
+                                    "InsertRescueEventInLocalRepository",
                                     "insertAllNonHumanAnimalsToRescue: updated adoption state ${AdoptionState.NEEDS_TO_BE_RESCUED} for the non human animal ${nonHumanAnimal.id} in the local data source"
                                 )
                             } else {
                                 log.e(
-                                    "ModifyRescueEventInLocalRepository",
+                                    "InsertRescueEventInLocalRepository",
                                     "insertAllNonHumanAnimalsToRescue: failed to update the adoption state ${AdoptionState.NEEDS_TO_BE_RESCUED} for the non human animal ${nonHumanAnimal.id} in the local data source"
                                 )
                                 isSuccess = false

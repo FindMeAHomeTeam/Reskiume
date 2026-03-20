@@ -102,12 +102,12 @@ class CreateRescueEventsViewmodelTest : CoroutineTestDispatcher() {
         databaseResultOfModifyingNonHumanAnimalInRemoteRepositoryArg: DatabaseResult = DatabaseResult.Success,
         databaseResultOfModifyingSecondNonHumanAnimalInRemoteRepositoryArg: DatabaseResult = DatabaseResult.Success,
         imagePathToUploadToRemoteForRescueEvent: String = rescueEvent.imageUrl,
-        insertedAcceptedNonHumanAnimalForRescueEventInLocalRowIdArg: Long = 1L,
-        insertedAcceptedSecondNonHumanAnimalForRescueEventInLocalRowIdArg: Long = 1L,
-        insertedResidentNonHumanAnimalIdForRescueEventInLocalRowIdArg: Long = 1L,
-        insertedSecondResidentNonHumanAnimalIdForRescueEventInLocalRowIdArg: Long = 1L,
-        createdRescueEventIdInLocalRepoArg: Long = 1L,
-        createdRescueEventIdWithoutImageInLocalRepoArg: Long = 1L,
+        insertedRowIdOfNeedToCoverForRescueEventInLocalArg: Long = 1L,
+        insertedRowIdOfSecondNeedToCoverForRescueEventInLocalArg: Long = 1L,
+        insertedRowIdOfNonHumanAnimalToRescueForRescueEventInLocalArg: Long = 1L,
+        insertedRowIdOfSecondNonHumanAnimalToRescueForRescueEventInLocalArg: Long = 1L,
+        insertedRowIdOfRescueEventInLocalArg: Long = 1L,
+        insertedRowIdOfRescueEventWithoutImageInLocalArg: Long = 1L,
         numberOfNonHumanAnimalsUpdatedInLocalRepositoryArg: Int = 1,
         numberOfSecondNonHumanAnimalsUpdatedInLocalRepositoryArg: Int = 1
     ): CreateRescueEventViewmodel {
@@ -301,7 +301,7 @@ class CreateRescueEventsViewmodelTest : CoroutineTestDispatcher() {
                 )
             } calls {
                 onInsertNeedToCoverForRescueEvent.get()
-                    .invoke(insertedAcceptedNonHumanAnimalForRescueEventInLocalRowIdArg)
+                    .invoke(insertedRowIdOfNeedToCoverForRescueEventInLocalArg)
             }
 
             everySuspend {
@@ -313,7 +313,7 @@ class CreateRescueEventsViewmodelTest : CoroutineTestDispatcher() {
                 )
             } calls {
                 onInsertSecondNeedToCoverForRescueEvent.get()
-                    .invoke(insertedAcceptedSecondNonHumanAnimalForRescueEventInLocalRowIdArg)
+                    .invoke(insertedRowIdOfSecondNeedToCoverForRescueEventInLocalArg)
             }
 
             everySuspend {
@@ -325,7 +325,7 @@ class CreateRescueEventsViewmodelTest : CoroutineTestDispatcher() {
                 )
             } calls {
                 onInsertNonHumanAnimalToRescueForRescueEvent.get()
-                    .invoke(insertedResidentNonHumanAnimalIdForRescueEventInLocalRowIdArg)
+                    .invoke(insertedRowIdOfNonHumanAnimalToRescueForRescueEventInLocalArg)
             }
 
             everySuspend {
@@ -337,7 +337,7 @@ class CreateRescueEventsViewmodelTest : CoroutineTestDispatcher() {
                 )
             } calls {
                 onInsertSecondNonHumanAnimalToRescueForRescueEvent.get()
-                    .invoke(insertedSecondResidentNonHumanAnimalIdForRescueEventInLocalRowIdArg)
+                    .invoke(insertedRowIdOfSecondNonHumanAnimalToRescueForRescueEventInLocalArg)
             }
 
             everySuspend {
@@ -349,7 +349,7 @@ class CreateRescueEventsViewmodelTest : CoroutineTestDispatcher() {
                     capture(onInsertRescueEvent)
                 )
             } calls {
-                onInsertRescueEvent.get().invoke(createdRescueEventIdInLocalRepoArg)
+                onInsertRescueEvent.get().invoke(insertedRowIdOfRescueEventInLocalArg)
             }
 
             everySuspend {
@@ -363,7 +363,7 @@ class CreateRescueEventsViewmodelTest : CoroutineTestDispatcher() {
                 )
             } calls {
                 onInsertRescueEventWithoutImage.get()
-                    .invoke(createdRescueEventIdWithoutImageInLocalRepoArg)
+                    .invoke(insertedRowIdOfRescueEventWithoutImageInLocalArg)
             }
         }
 
@@ -560,7 +560,7 @@ class CreateRescueEventsViewmodelTest : CoroutineTestDispatcher() {
     fun `given my rescue event to create_when I add my rescue event data but fails creating the rescue event in the local repo_then the app retrieves an error`() =
         runTest {
             val createRescueEventViewmodel = getCreateRescueEventViewmodel(
-                createdRescueEventIdInLocalRepoArg = 0
+                insertedRowIdOfRescueEventInLocalArg = 0
             )
 
             createRescueEventViewmodel.updateLocation()

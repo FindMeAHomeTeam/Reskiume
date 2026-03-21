@@ -84,7 +84,7 @@ fun CheckAllMyRescueEventsScreen(
                                 title = uiRescueEvent.rescueEvent.title,
                                 imageUrl = uiRescueEvent.rescueEvent.imageUrl,
                                 allNeedsToCover = uiRescueEvent.rescueEvent.allNeedsToCover,
-                                allNonHumanAnimalsToRescue = uiRescueEvent.uiAllNonHumanAnimalsToRescue,
+                                allNonHumanAnimalsToRescue = uiRescueEvent.allUiNonHumanAnimalsToRescue,
                                 distance = null,
                                 city = uiRescueEvent.rescueEvent.city,
                                 onClick = {

@@ -78,7 +78,7 @@ class CheckAllMyRescueEventsViewmodel(
                                     getImagePathForFileNameFromLocalDataSource(rescueEvent.imageUrl)
                                 }
                             ),
-                            uiAllNonHumanAnimalsToRescue = rescueEvent.allNonHumanAnimalsToRescue.mapNotNull { nonHumanAnimalToRescue ->
+                            allUiNonHumanAnimalsToRescue = rescueEvent.allNonHumanAnimalsToRescue.mapNotNull { nonHumanAnimalToRescue ->
 
                                 checkNonHumanAnimalUtil.getNonHumanAnimalFlow(
                                     nonHumanAnimalToRescue.nonHumanAnimalId,
@@ -94,7 +94,7 @@ class CheckAllMyRescueEventsViewmodel(
 
 data class UiRescueEvent(
     val rescueEvent: RescueEvent,
-    val uiAllNonHumanAnimalsToRescue: List<NonHumanAnimal>,
+    val allUiNonHumanAnimalsToRescue: List<NonHumanAnimal>,
     val distance: Double? = null,
     val owner: User? = null
 )

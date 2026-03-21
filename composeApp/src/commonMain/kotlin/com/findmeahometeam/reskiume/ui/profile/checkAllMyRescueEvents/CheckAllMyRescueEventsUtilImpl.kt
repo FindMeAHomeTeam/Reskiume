@@ -12,7 +12,6 @@ import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.InsertRescueEven
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.ModifyRescueEventInLocalRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlin.time.Clock
@@ -182,49 +181,4 @@ class CheckAllMyRescueEventsUtilImpl(
             }
         }
     }
-
-    override fun downloadImageAndModifyRescueEventsInLocalRepositoryFromFlow(
-        allRescueEventsFlow: Flow<List<RescueEvent>>,
-        myUid: String,
-        coroutineScope: CoroutineScope
-    ): Flow<List<RescueEvent>> =
-        allRescueEventsFlow.map { rescueEventList ->
-            rescueEventList.map { updatedRescueEvent ->
-
-                val previousRescueEvent: RescueEvent = getRescueEventFromLocalRepository(
-                    updatedRescueEvent.id
-                ).first()!!
-
-                if (updatedRescueEvent.imageUrl.isNotBlank()) {
-
-                    val localImagePath: String = downloadImageToLocalDataSource(
-                        userUid = updatedRescueEvent.creatorId,
-                        extraId = updatedRescueEvent.id,
-                        section = Section.RESCUE_EVENTS
-                    )
-                    val updatedRescueEventWithLocalImage =
-                        updatedRescueEvent.copy(imageUrl = localImagePath.ifBlank { updatedRescueEvent.imageUrl })
-
-                    modifyRescueEventInLocalRepo(
-                        updatedRescueEvent = updatedRescueEventWithLocalImage,
-                        previousRescueEvent = previousRescueEvent,
-                        coroutineScope = coroutineScope,
-                        myUid = myUid
-                    )
-                    updatedRescueEventWithLocalImage
-                } else {
-                    log.d(
-                        "CheckAllMyRescueEventsUtilImpl",
-                        "downloadImageAndModifyRescueEventsInLocalRepositoryFromFlow: Rescue event ${updatedRescueEvent.id} has no avatar image to save locally."
-                    )
-                    modifyRescueEventInLocalRepo(
-                        updatedRescueEvent = updatedRescueEvent,
-                        previousRescueEvent = previousRescueEvent,
-                        coroutineScope = coroutineScope,
-                        myUid = myUid
-                    )
-                    updatedRescueEvent
-                }
-            }
-        }
 }

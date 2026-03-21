@@ -506,7 +506,7 @@ class CheckAllMyRescueEventsUtilTest : CoroutineTestDispatcher() {
         }
 
     @Test
-    fun `given a rescue event list_when the app manage them but it does exist in cache_then it modifies it in the local repository`() =
+    fun `given an existent rescue event list_when the app manage them_then it modifies it in the local repository`() =
         runTest {
             getCheckAllMyRescueEventsUtil().downloadImageAndManageRescueEventsInLocalRepositoryFromFlow(
                 flowOf(listOf(rescueEvent)),
@@ -529,82 +529,11 @@ class CheckAllMyRescueEventsUtilTest : CoroutineTestDispatcher() {
         }
 
     @Test
-    fun `given a rescue event list_when the app manage them but it does exist in cache and fails the modification in the local repo_then it wont be modified`() =
-        runTest {
-            getCheckAllMyRescueEventsUtil(
-                modifiedRowIdsOfRescueEventInLocalArg = 0
-            ).downloadImageAndManageRescueEventsInLocalRepositoryFromFlow(
-                flowOf(listOf(rescueEvent)),
-                user.uid,
-                this
-            ).test {
-                assertEquals(listOf(rescueEvent), awaitItem())
-                awaitComplete()
-            }
-            verify {
-                log.e(
-                    "CheckAllMyRescueEventsUtilImpl",
-                    "modifyRescueEventInLocalRepo: Error modifying the rescue event ${rescueEvent.id} in local database"
-                )
-            }
-        }
-
-    @Test
-    fun `given a rescue event list without avatar_when the app manage them but it does exist in cache and fails the modification in the local cache_then it wont be inserted`() =
-        runTest {
-            getCheckAllMyRescueEventsUtil(
-                imagePathToUploadToRemoteForRescueEventArg = "",
-                modifiedRowIdsOfLocalCacheInLocalRepositoryArg = 0
-            ).downloadImageAndManageRescueEventsInLocalRepositoryFromFlow(
-                flowOf(listOf(rescueEvent.copy(imageUrl = ""))),
-                user.uid,
-                this
-            ).test {
-                assertEquals(listOf(rescueEvent.copy(imageUrl = "")), awaitItem())
-                awaitComplete()
-            }
-            verify {
-                log.d(
-                    "CheckAllMyRescueEventsUtilImpl",
-                    "modifyRescueEventInLocalRepo: Rescue event ${rescueEvent.id} modified in local database"
-                )
-                log.e(
-                    "CheckAllMyRescueEventsUtilImpl",
-                    "modifyRescueEventInLocalRepo: Error updating ${rescueEvent.id} in local cache in section ${Section.RESCUE_EVENTS}"
-                )
-            }
-        }
-
-    @Test
-    fun `given an existent rescue event list_when the app manage them_then it modifies it in the local repository`() =
-        runTest {
-            getCheckAllMyRescueEventsUtil().downloadImageAndModifyRescueEventsInLocalRepositoryFromFlow(
-                flowOf(listOf(rescueEvent)),
-                user.uid,
-                this
-            ).test {
-                assertEquals(listOf(rescueEvent), awaitItem())
-                awaitComplete()
-            }
-            verify {
-                log.d(
-                    "CheckAllMyRescueEventsUtilImpl",
-                    "modifyRescueEventInLocalRepo: Rescue event ${rescueEvent.id} modified in local database"
-                )
-                log.d(
-                    "CheckAllMyRescueEventsUtilImpl",
-                    "modifyRescueEventInLocalRepo: ${rescueEvent.id} updated in local cache in section ${Section.RESCUE_EVENTS}"
-                )
-            }
-        }
-
-
-    @Test
     fun `given an existent rescue event list_when the app manage them but fails the modification in the local repo_then it wont be modified`() =
         runTest {
             getCheckAllMyRescueEventsUtil(
                 modifiedRowIdsOfRescueEventInLocalArg = 0
-            ).downloadImageAndModifyRescueEventsInLocalRepositoryFromFlow(
+            ).downloadImageAndManageRescueEventsInLocalRepositoryFromFlow(
                 flowOf(listOf(rescueEvent)),
                 user.uid,
                 this
@@ -626,7 +555,7 @@ class CheckAllMyRescueEventsUtilTest : CoroutineTestDispatcher() {
             getCheckAllMyRescueEventsUtil(
                 imagePathToUploadToRemoteForRescueEventArg = "",
                 modifiedRowIdsOfLocalCacheInLocalRepositoryArg = 0
-            ).downloadImageAndModifyRescueEventsInLocalRepositoryFromFlow(
+            ).downloadImageAndManageRescueEventsInLocalRepositoryFromFlow(
                 flowOf(listOf(rescueEvent.copy(imageUrl = ""))),
                 user.uid,
                 this
@@ -635,10 +564,6 @@ class CheckAllMyRescueEventsUtilTest : CoroutineTestDispatcher() {
                 awaitComplete()
             }
             verify {
-                log.d(
-                    "CheckAllMyRescueEventsUtilImpl",
-                    "downloadImageAndModifyRescueEventsInLocalRepositoryFromFlow: Rescue event ${rescueEvent.id} has no avatar image to save locally."
-                )
                 log.d(
                     "CheckAllMyRescueEventsUtilImpl",
                     "modifyRescueEventInLocalRepo: Rescue event ${rescueEvent.id} modified in local database"

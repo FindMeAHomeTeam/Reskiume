@@ -111,12 +111,7 @@ class CheckAllMyRescueEventsViewmodelTest : CoroutineTestDispatcher() {
         allMyRescueEventWithAllNonHumanAnimalLocalDataReturn: Flow<List<RescueEventWithAllNeedsAndNonHumanAnimalData>> = flowOf(
             listOf(rescueEventWithAllNeedsAndNonHumanAnimalData)
         ),
-        allMyManagedRescueEventsFromLocalReturn: Flow<List<RescueEvent>> = flowOf(listOf(rescueEvent)),
-        allMyModifiedRescueEventsFromLocalReturn: Flow<List<RescueEvent>> = flowOf(
-            listOf(
-                rescueEvent
-            )
-        )
+        allMyManagedRescueEventsFromLocalReturn: Flow<List<RescueEvent>> = flowOf(listOf(rescueEvent))
     ): CheckAllMyRescueEventsViewmodel {
 
         val saveStateHandleProvider: SaveStateHandleProvider = mock {
@@ -284,14 +279,6 @@ class CheckAllMyRescueEventsViewmodelTest : CoroutineTestDispatcher() {
                     any()
                 )
             } returns allMyManagedRescueEventsFromLocalReturn
-
-            every {
-                downloadImageAndModifyRescueEventsInLocalRepositoryFromFlow(
-                    any(),
-                    user.uid,
-                    any()
-                )
-            } returns allMyModifiedRescueEventsFromLocalReturn
         }
 
         val manageImagePath: ManageImagePath = mock {

@@ -59,7 +59,7 @@ class CheckAllMyRescueEventsViewmodel(
                         val allRescueEventsFlow: Flow<List<RescueEvent>> =
                             getAllMyRescueEventsFromRemoteRepository(myUid)
 
-                        checkAllMyRescueEventsUtil.downloadImageAndModifyRescueEventsInLocalRepositoryFromFlow(
+                        checkAllMyRescueEventsUtil.downloadImageAndManageRescueEventsInLocalRepositoryFromFlow(
                             allRescueEventsFlow,
                             myUid,
                             viewModelScope

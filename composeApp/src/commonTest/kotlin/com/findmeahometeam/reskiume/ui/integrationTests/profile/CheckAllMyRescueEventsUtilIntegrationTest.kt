@@ -201,42 +201,4 @@ class CheckAllMyRescueEventsUtilIntegrationTest : CoroutineTestDispatcher() {
                 )
             }
         }
-
-    @Test
-    fun `given an existent rescue event list_when the app manage them_then it modifies it in the local repository`() =
-        runTest {
-            getCheckAllMyRescueEventsUtil(
-                localRescueEventRepository = FakeLocalRescueEventRepository(
-                    mutableListOf(rescueEventWithAllNeedsAndNonHumanAnimalData)
-                ),
-                localCacheRepository = FakeLocalCacheRepository(
-                    mutableListOf(
-                        localCache.copy(
-                            cachedObjectId = rescueEvent.id,
-                            section = Section.RESCUE_EVENTS
-                        ).toEntity()
-                    )
-                ),
-            ).downloadImageAndModifyRescueEventsInLocalRepositoryFromFlow(
-                flowOf(listOf(rescueEvent)),
-                user.uid,
-                this
-            ).test {
-                assertEquals(
-                    listOf(rescueEvent.copy(imageUrl = "${rescueEvent.creatorId}${rescueEvent.id}.webp")),
-                    awaitItem()
-                )
-                awaitComplete()
-            }
-            verify {
-                log.d(
-                    "CheckAllMyRescueEventsUtilImpl",
-                    "modifyRescueEventInLocalRepo: Rescue event ${rescueEvent.id} modified in local database"
-                )
-                log.d(
-                    "CheckAllMyRescueEventsUtilImpl",
-                    "modifyRescueEventInLocalRepo: ${rescueEvent.id} updated in local cache in section ${Section.RESCUE_EVENTS}"
-                )
-            }
-        }
 }

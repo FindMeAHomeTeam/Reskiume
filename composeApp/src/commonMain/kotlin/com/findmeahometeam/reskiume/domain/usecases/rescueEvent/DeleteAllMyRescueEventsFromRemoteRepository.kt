@@ -27,7 +27,7 @@ class DeleteAllMyRescueEventsFromRemoteRepository(
         onDeleteAllMyRemoteRescueEvents: (result: DatabaseResult) -> Unit
     ) {
         val myUid = authRepository.authState.first()!!.uid
-        val isSuccess = manageResidents(
+        val isSuccess = manageNonHumanAnimals(
             creatorId,
             myUid,
             coroutineScope
@@ -40,7 +40,7 @@ class DeleteAllMyRescueEventsFromRemoteRepository(
         }
     }
 
-    private suspend fun manageResidents(
+    private suspend fun manageNonHumanAnimals(
         creatorId: String,
         myUid: String,
         coroutineScope: CoroutineScope
@@ -54,13 +54,13 @@ class DeleteAllMyRescueEventsFromRemoteRepository(
             remoteRescueEvent!!.allNonHumanAnimalsToRescue!!.forEach { remoteNonHumanAnimalToRescue ->
 
                 if (isSuccess) {
-                    val remoteResidentNonHumanAnimal: RemoteNonHumanAnimal? =
+                    val remoteNonHumanAnimal: RemoteNonHumanAnimal? =
                         realtimeDatabaseRemoteNonHumanAnimalRepository.getRemoteNonHumanAnimal(
                             remoteNonHumanAnimalToRescue.nonHumanAnimalId!!,
                             remoteNonHumanAnimalToRescue.caregiverId!!,
                         ).firstOrNull()
 
-                    if (remoteResidentNonHumanAnimal == null) {
+                    if (remoteNonHumanAnimal == null) {
                         deleteNonHumanAnimalUtil.deleteNonHumanAnimal(
                             id = remoteNonHumanAnimalToRescue.nonHumanAnimalId,
                             caregiverId = remoteNonHumanAnimalToRescue.caregiverId,
@@ -69,19 +69,19 @@ class DeleteAllMyRescueEventsFromRemoteRepository(
                             onError = {
                                 log.e(
                                     "DeleteAllMyRescueEventsFromRemoteRepository",
-                                    "manageResidents: Can not delete the non human animal ${remoteNonHumanAnimalToRescue.nonHumanAnimalId} in the local data source"
+                                    "manageNonHumanAnimals: Can not delete the non human animal ${remoteNonHumanAnimalToRescue.nonHumanAnimalId} in the local data source"
                                 )
                             },
                             onComplete = {
                                 log.d(
                                     "DeleteAllMyRescueEventsFromRemoteRepository",
-                                    "manageResidents: Deleted the non human animal ${remoteNonHumanAnimalToRescue.nonHumanAnimalId} in the local data source"
+                                    "manageNonHumanAnimals: Deleted the non human animal ${remoteNonHumanAnimalToRescue.nonHumanAnimalId} in the local data source"
                                 )
                             }
                         )
                     } else {
                         realtimeDatabaseRemoteNonHumanAnimalRepository.modifyRemoteNonHumanAnimal(
-                            remoteResidentNonHumanAnimal.copy(
+                            remoteNonHumanAnimal.copy(
                                 adoptionState = AdoptionState.LOOKING_FOR_ADOPTION,
                                 fosterHomeId = ""
                             )
@@ -89,12 +89,12 @@ class DeleteAllMyRescueEventsFromRemoteRepository(
                             if (databaseResult is DatabaseResult.Success) {
                                 log.d(
                                     "DeleteAllMyRescueEventsFromRemoteRepository",
-                                    "manageResidents: updated adoption state ${AdoptionState.LOOKING_FOR_ADOPTION} for the non human animal ${remoteResidentNonHumanAnimal.id} in the remote data source"
+                                    "manageNonHumanAnimals: updated adoption state ${AdoptionState.LOOKING_FOR_ADOPTION} for the non human animal ${remoteNonHumanAnimal.id} in the remote data source"
                                 )
                             } else {
                                 log.e(
                                     "DeleteAllMyRescueEventsFromRemoteRepository",
-                                    "manageResidents: failed to update the adoption state ${AdoptionState.LOOKING_FOR_ADOPTION} for the non human animal ${remoteResidentNonHumanAnimal.id} in the remote data source"
+                                    "manageNonHumanAnimals: failed to update the adoption state ${AdoptionState.LOOKING_FOR_ADOPTION} for the non human animal ${remoteNonHumanAnimal.id} in the remote data source"
                                 )
                                 isSuccess = false
                             }

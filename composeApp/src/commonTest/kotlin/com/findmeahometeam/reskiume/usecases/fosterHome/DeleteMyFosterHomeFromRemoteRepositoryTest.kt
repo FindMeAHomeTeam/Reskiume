@@ -17,7 +17,6 @@ import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
@@ -95,7 +94,7 @@ class DeleteMyFosterHomeFromRemoteRepositoryTest {
             deleteMyFosterHomeFromRemoteRepository(
                 fosterHome.id,
                 fosterHome.ownerId,
-                TestScope()
+                this
             ) {}
             verifySuspend {
                 realtimeDatabaseRemoteNonHumanAnimalRepository.modifyRemoteNonHumanAnimal(
@@ -116,7 +115,7 @@ class DeleteMyFosterHomeFromRemoteRepositoryTest {
             deleteMyFosterHomeFromRemoteRepository(
                 "otherFosterHomeId",
                 "otherFosterHomeOwnerId",
-                TestScope()
+                this
             ) {}
             verifySuspend {
                 deleteNonHumanAnimalUtil.deleteNonHumanAnimal(

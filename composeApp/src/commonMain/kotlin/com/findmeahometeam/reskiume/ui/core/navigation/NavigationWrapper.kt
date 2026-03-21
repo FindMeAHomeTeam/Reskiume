@@ -24,6 +24,7 @@ import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsScreen
 import com.findmeahometeam.reskiume.ui.profile.createNonHumanAnimal.CreateNonHumanAnimalScreen
 import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.ModifyNonHumanAnimalScreen
 import com.findmeahometeam.reskiume.ui.rescueEvents.createRescueEvent.CreateRescueEventScreen
+import com.findmeahometeam.reskiume.ui.rescueEvents.modifyRescueEvent.ModifyRescueEventScreen
 
 @Composable
 fun NavigationWrapper() {
@@ -108,7 +109,9 @@ fun NavigationWrapper() {
         }
 
         composable<ModifyRescueEvent> {
-            //
+            ModifyRescueEventScreen {
+                mainNavController.navigateUp()
+            }
         }
 
         composable<CheckRescueEvent>(

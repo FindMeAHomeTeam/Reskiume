@@ -38,6 +38,9 @@ import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.DeleteNonHum
 import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.DeleteNonHumanAnimalUtilImpl
 import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.ModifyNonHumanAnimalViewmodel
 import com.findmeahometeam.reskiume.ui.rescueEvents.createRescueEvent.CreateRescueEventViewmodel
+import com.findmeahometeam.reskiume.ui.rescueEvents.modifyRescueEvent.DeleteRescueEventUtil
+import com.findmeahometeam.reskiume.ui.rescueEvents.modifyRescueEvent.DeleteRescueEventUtilImpl
+import com.findmeahometeam.reskiume.ui.rescueEvents.modifyRescueEvent.ModifyRescueEventViewmodel
 import com.findmeahometeam.reskiume.ui.util.StringProvider
 import com.findmeahometeam.reskiume.ui.util.StringProviderImpl
 import org.koin.core.module.dsl.factoryOf
@@ -77,4 +80,6 @@ val uiModule = module {
     viewModelOf(::CheckAllMyRescueEventsViewmodel)
     singleOf(::CheckAllMyRescueEventsUtilImpl) bind CheckAllMyRescueEventsUtil::class
     viewModelOf(::CreateRescueEventViewmodel)
+    viewModelOf(::ModifyRescueEventViewmodel)
+    singleOf(::DeleteRescueEventUtilImpl) bind DeleteRescueEventUtil::class
 }

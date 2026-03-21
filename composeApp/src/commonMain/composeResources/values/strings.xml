@@ -232,13 +232,6 @@
     <string name="modify_foster_home_screen_foster_home_title">Title</string>
     <string name="modify_foster_home_screen_foster_home_description">Description</string>
     <string name="modify_foster_home_screen_foster_home_conditions">Conditions</string>
-    <string name="modify_foster_home_screen_foster_home_accepted_non_human_animals">Accepted non-human animals</string>
-    <string name="modify_foster_home_screen_foster_home_resident_non_human_animals">Resident non-human animals</string>
-    <string name="modify_foster_home_screen_foster_home_longitude">Longitude</string>
-    <string name="modify_foster_home_screen_foster_home_latitude">Latitude</string>
-    <string name="modify_foster_home_screen_foster_home_country">Country</string>
-    <string name="modify_foster_home_screen_foster_home_city">City</string>
-    <string name="modify_foster_home_screen_foster_home_availability">Availability</string>
     <string name="modify_foster_home_screen_delete_foster_home_text">Delete %1$s</string>
     <string name="modify_foster_home_screen_delete_foster_home_button">Delete</string>
     <string name="modify_foster_home_screen_dismiss_delete_foster_home_button">Dismiss</string>
@@ -361,6 +354,17 @@
 
     <!-- Need to cover list creator -->
     <string name="need_to_cover_list_creator_title">Select needs to cover:</string>
+
+    <!-- Modify a rescue event -->
+    <string name="modify_rescue_event_screen_title">Modify %1$s - %2$s (%3$s)</string>
+    <string name="modify_rescue_event_screen_rescue_event_title">Title</string>
+    <string name="modify_rescue_event_screen_rescue_event_description">Description</string>
+    <string name="modify_rescue_event_screen_delete_rescue_event_text">Delete %1$s</string>
+    <string name="modify_rescue_event_screen_delete_rescue_event_button">Delete</string>
+    <string name="modify_rescue_event_screen_dismiss_delete_rescue_event_button">Dismiss</string>
+    <string name="modify_rescue_event_screen_delete_rescue_event_title">Do you want to delete %1$s?</string>
+    <string name="modify_rescue_event_screen_delete_rescue_event_message">This action can not be undone</string>
+    <string name="modify_rescue_event_screen_save_rescue_event_changes_button">Save %1$s's changes</string>
 
     <!-- Check all advice -->
     <string name="check_all_advice_screen_title">Check all advice</string>

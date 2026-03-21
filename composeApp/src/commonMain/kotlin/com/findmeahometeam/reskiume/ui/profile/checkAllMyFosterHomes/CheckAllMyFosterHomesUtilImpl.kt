@@ -184,43 +184,4 @@ class CheckAllMyFosterHomesUtilImpl(
             }
         }
     }
-
-    override fun downloadImageAndModifyFosterHomesInLocalRepositoryFromFlow(
-        allFosterHomesFlow: Flow<List<FosterHome>>,
-        myUid: String,
-        coroutineScope: CoroutineScope
-    ): Flow<List<FosterHome>> =
-        allFosterHomesFlow.map { fosterHomeList ->
-            fosterHomeList.map { fosterHome ->
-
-                if (fosterHome.imageUrl.isNotBlank()) {
-
-                    val localImagePath: String = downloadImageToLocalDataSource(
-                        userUid = fosterHome.ownerId,
-                        extraId = fosterHome.id,
-                        section = Section.FOSTER_HOMES
-                    )
-                    val fosterHomeWithLocalImage =
-                        fosterHome.copy(imageUrl = localImagePath.ifBlank { fosterHome.imageUrl })
-
-                    modifyFosterHomeInLocalRepo(
-                        fosterHomeWithLocalImage,
-                        coroutineScope,
-                        myUid
-                    )
-                    fosterHomeWithLocalImage
-                } else {
-                    log.d(
-                        "CheckAllMyFosterHomesUtilImpl",
-                        "Foster home ${fosterHome.id} has no avatar image to save locally."
-                    )
-                    modifyFosterHomeInLocalRepo(
-                        fosterHome,
-                        coroutineScope,
-                        myUid
-                    )
-                    fosterHome
-                }
-            }
-        }
 }

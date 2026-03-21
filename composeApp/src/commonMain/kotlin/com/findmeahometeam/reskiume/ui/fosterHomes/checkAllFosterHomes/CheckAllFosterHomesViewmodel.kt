@@ -236,7 +236,7 @@ class CheckAllFosterHomesViewmodel(
                                 country,
                                 city
                             )
-                        checkAllMyFosterHomesUtil.downloadImageAndModifyFosterHomesInLocalRepositoryFromFlow(
+                        checkAllMyFosterHomesUtil.downloadImageAndManageFosterHomesInLocalRepositoryFromFlow(
                             allFosterHomesFlow,
                             myUid,
                             viewModelScope
@@ -315,7 +315,7 @@ class CheckAllFosterHomesViewmodel(
                                 rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
                                 rangeLatitude = getRangeLat()
                             )
-                        checkAllMyFosterHomesUtil.downloadImageAndModifyFosterHomesInLocalRepositoryFromFlow(
+                        checkAllMyFosterHomesUtil.downloadImageAndManageFosterHomesInLocalRepositoryFromFlow(
                             allFosterHomesFlow,
                             myUid,
                             viewModelScope

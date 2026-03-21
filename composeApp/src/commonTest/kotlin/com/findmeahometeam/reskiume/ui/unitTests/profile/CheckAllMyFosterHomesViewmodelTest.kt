@@ -106,8 +106,7 @@ class CheckAllMyFosterHomesViewmodelTest : CoroutineTestDispatcher() {
         allMyFosterHomeWithAllNonHumanAnimalLocalDataReturn: Flow<List<FosterHomeWithAllNonHumanAnimalData>> = flowOf(
             listOf(fosterHomeWithAllNonHumanAnimalData)
         ),
-        allMyManagedFosterHomesFromLocalReturn: Flow<List<FosterHome>> = flowOf(listOf(fosterHome)),
-        allMyModifiedFosterHomesFromLocalReturn: Flow<List<FosterHome>> = flowOf(listOf(fosterHome))
+        allMyManagedFosterHomesFromLocalReturn: Flow<List<FosterHome>> = flowOf(listOf(fosterHome))
     ): CheckAllMyFosterHomesViewmodel {
 
         val saveStateHandleProvider: SaveStateHandleProvider = mock {
@@ -257,14 +256,6 @@ class CheckAllMyFosterHomesViewmodelTest : CoroutineTestDispatcher() {
                     any()
                 )
             } returns allMyManagedFosterHomesFromLocalReturn
-
-            every {
-                downloadImageAndModifyFosterHomesInLocalRepositoryFromFlow(
-                    any(),
-                    user.uid,
-                    any()
-                )
-            } returns allMyModifiedFosterHomesFromLocalReturn
         }
 
         val manageImagePath: ManageImagePath = mock {

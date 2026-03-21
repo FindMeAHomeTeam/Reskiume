@@ -59,7 +59,7 @@ class CheckAllMyFosterHomesViewmodel(
                             getAllMyFosterHomesFromRemoteRepository(
                                 myUid
                             )
-                        checkAllMyFosterHomesUtil.downloadImageAndModifyFosterHomesInLocalRepositoryFromFlow(
+                        checkAllMyFosterHomesUtil.downloadImageAndManageFosterHomesInLocalRepositoryFromFlow(
                             allFosterHomesFlow,
                             myUid,
                             viewModelScope

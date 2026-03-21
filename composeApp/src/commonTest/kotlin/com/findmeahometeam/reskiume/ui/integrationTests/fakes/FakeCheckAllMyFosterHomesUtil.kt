@@ -12,10 +12,4 @@ class FakeCheckAllMyFosterHomesUtil: CheckAllMyFosterHomesUtil {
         myUid: String,
         coroutineScope: CoroutineScope
     ): Flow<List<FosterHome>> = allFosterHomesFlow
-
-    override fun downloadImageAndModifyFosterHomesInLocalRepositoryFromFlow(
-        allFosterHomesFlow: Flow<List<FosterHome>>,
-        myUid: String,
-        coroutineScope: CoroutineScope
-    ): Flow<List<FosterHome>> = allFosterHomesFlow
 }

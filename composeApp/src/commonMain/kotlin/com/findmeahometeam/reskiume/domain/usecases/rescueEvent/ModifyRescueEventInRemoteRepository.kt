@@ -62,8 +62,6 @@ class ModifyRescueEventInRemoteRepository(
             (previousAllNonHumanAnimalsToRescue - updatedAllNonHumanAnimalsToRescue) +
                     (updatedAllNonHumanAnimalsToRescue - previousAllNonHumanAnimalsToRescue)
 
-        println("size: ${nonHumanAnimalsToRescueToManage.size}")
-
         nonHumanAnimalsToRescueToManage.forEach { nonHumanAnimalToRescue ->
 
             val remoteNonHumanAnimal: RemoteNonHumanAnimal =

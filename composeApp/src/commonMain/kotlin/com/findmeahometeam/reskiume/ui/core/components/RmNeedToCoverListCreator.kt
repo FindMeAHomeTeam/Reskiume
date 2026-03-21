@@ -36,12 +36,12 @@ import kotlin.time.ExperimentalTime
 @Composable
 fun RmNeedToCoverListCreator(
     rescueEventId: String,
-    needsToCover: List<NeedToCover>,
+    allNeedsToCover: List<NeedToCover>,
     onAddNeedToCover: (List<NeedToCover>) -> Unit
 ) {
     var itemsAdded: List<NeedToCover> by rememberSaveable(stateSaver = NeedToCoverListSaver) {
         mutableStateOf(
-            needsToCover
+            allNeedsToCover
         )
     }
 

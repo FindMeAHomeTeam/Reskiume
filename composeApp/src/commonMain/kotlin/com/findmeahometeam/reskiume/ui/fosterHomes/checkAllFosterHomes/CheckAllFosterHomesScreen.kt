@@ -30,6 +30,7 @@ import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
 import com.findmeahometeam.reskiume.domain.model.fosterHome.City
 import com.findmeahometeam.reskiume.domain.model.fosterHome.Country
+import com.findmeahometeam.reskiume.domain.model.fosterHome.toStringResource
 import com.findmeahometeam.reskiume.domain.model.toEmoji
 import com.findmeahometeam.reskiume.domain.model.toStringResource
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
@@ -266,7 +267,11 @@ fun CheckAllFosterHomesScreen(
                         allAcceptedNonHumanAnimals = uiFosterHome.fosterHome.allAcceptedNonHumanAnimals,
                         allResidentNonHumanAnimals = uiFosterHome.allResidentUiNonHumanAnimals,
                         distance = uiFosterHome.distance,
-                        city = uiFosterHome.fosterHome.city,
+                        city = stringResource(
+                            City
+                                .valueOf(uiFosterHome.fosterHome.city)
+                                .toStringResource()
+                        ).substring(5),
                         onClick = {
                             if (authState?.uid == uiFosterHome.fosterHome.ownerId) {
                                 onModifyFosterHome(uiFosterHome.fosterHome.id)

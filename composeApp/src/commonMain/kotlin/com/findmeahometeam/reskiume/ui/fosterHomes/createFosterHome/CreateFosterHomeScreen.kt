@@ -255,8 +255,8 @@ fun CreateFosterHomeScreen(
                             available = true,
                             longitude = 0.0,
                             latitude = 0.0,
-                            country = selectedCountry.countryName,
-                            city = selectedCity.cityName
+                            country = selectedCountry.name,
+                            city = selectedCity.name
                         )
                     )
                 }

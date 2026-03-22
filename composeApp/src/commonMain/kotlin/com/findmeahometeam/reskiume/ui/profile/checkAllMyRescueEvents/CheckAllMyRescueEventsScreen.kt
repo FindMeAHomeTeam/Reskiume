@@ -19,6 +19,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.findmeahometeam.reskiume.domain.model.fosterHome.City
+import com.findmeahometeam.reskiume.domain.model.fosterHome.toStringResource
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.components.RmButton
 import com.findmeahometeam.reskiume.ui.core.components.RmRescueEventListItem
@@ -86,7 +88,11 @@ fun CheckAllMyRescueEventsScreen(
                                 allNeedsToCover = uiRescueEvent.rescueEvent.allNeedsToCover,
                                 allNonHumanAnimalsToRescue = uiRescueEvent.allUiNonHumanAnimalsToRescue,
                                 distance = null,
-                                city = uiRescueEvent.rescueEvent.city,
+                                city = stringResource(
+                                    City
+                                        .valueOf(uiRescueEvent.rescueEvent.city)
+                                        .toStringResource()
+                                ).substring(5),
                                 onClick = {
                                     onModifyRescueEvent(uiRescueEvent.rescueEvent.id)
                                 }

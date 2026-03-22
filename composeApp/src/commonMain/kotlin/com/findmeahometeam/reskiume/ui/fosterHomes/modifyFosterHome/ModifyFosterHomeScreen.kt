@@ -24,7 +24,10 @@ import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalListSaver
 import com.findmeahometeam.reskiume.domain.model.fosterHome.AcceptedNonHumanAnimalForFosterHome
 import com.findmeahometeam.reskiume.domain.model.fosterHome.AcceptedNonHumanAnimalForFosterHomeListSaver
+import com.findmeahometeam.reskiume.domain.model.fosterHome.City
+import com.findmeahometeam.reskiume.domain.model.fosterHome.Country
 import com.findmeahometeam.reskiume.domain.model.fosterHome.ResidentNonHumanAnimalForFosterHome
+import com.findmeahometeam.reskiume.domain.model.fosterHome.toStringResource
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.components.RmAcceptedNonHumanAnimalListCreator
 import com.findmeahometeam.reskiume.ui.core.components.RmAddPhoto
@@ -86,8 +89,16 @@ fun ModifyFosterHomeScreen(
                 stringResource(
                     Res.string.modify_foster_home_screen_title,
                     (uiFosterHomeState as UiState.Success<UiFosterHome>).data.fosterHome.title,
-                    (uiFosterHomeState as UiState.Success<UiFosterHome>).data.fosterHome.city,
-                    (uiFosterHomeState as UiState.Success<UiFosterHome>).data.fosterHome.country
+                    stringResource(
+                        City
+                            .valueOf((uiFosterHomeState as UiState.Success<UiFosterHome>).data.fosterHome.city)
+                            .toStringResource()
+                    ).substring(5),
+                    stringResource(
+                        Country
+                            .valueOf((uiFosterHomeState as UiState.Success<UiFosterHome>).data.fosterHome.country)
+                            .toStringResource()
+                    ).substring(5)
                 )
             } else {
                 ""

@@ -19,6 +19,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.findmeahometeam.reskiume.domain.model.fosterHome.City
+import com.findmeahometeam.reskiume.domain.model.fosterHome.toStringResource
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.components.RmButton
 import com.findmeahometeam.reskiume.ui.core.components.RmFosterHomeListItem
@@ -88,7 +90,11 @@ fun CheckAllMyFosterHomesScreen(
                                 allAcceptedNonHumanAnimals = uiFosterHome.fosterHome.allAcceptedNonHumanAnimals,
                                 allResidentNonHumanAnimals = uiFosterHome.allResidentUiNonHumanAnimals,
                                 distance = null,
-                                city = uiFosterHome.fosterHome.city,
+                                city = stringResource(
+                                    City
+                                        .valueOf(uiFosterHome.fosterHome.city)
+                                        .toStringResource()
+                                ).substring(5),
                                 onClick = {
                                     onModifyFosterHome(uiFosterHome.fosterHome.id)
                                 },

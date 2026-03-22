@@ -22,6 +22,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalListSaver
+import com.findmeahometeam.reskiume.domain.model.fosterHome.City
+import com.findmeahometeam.reskiume.domain.model.fosterHome.Country
+import com.findmeahometeam.reskiume.domain.model.fosterHome.toStringResource
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.NeedToCover
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.NeedToCoverListSaver
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.NonHumanAnimalToRescue
@@ -74,8 +77,16 @@ fun ModifyRescueEventScreen(
                 stringResource(
                     Res.string.modify_rescue_event_screen_title,
                     (uiRescueEventState as UiState.Success<UiRescueEvent>).data.rescueEvent.title,
-                    (uiRescueEventState as UiState.Success<UiRescueEvent>).data.rescueEvent.city,
-                    (uiRescueEventState as UiState.Success<UiRescueEvent>).data.rescueEvent.country
+                    stringResource(
+                        City
+                            .valueOf((uiRescueEventState as UiState.Success<UiRescueEvent>).data.rescueEvent.city)
+                            .toStringResource()
+                    ).substring(5),
+                    stringResource(
+                        Country
+                            .valueOf((uiRescueEventState as UiState.Success<UiRescueEvent>).data.rescueEvent.country)
+                            .toStringResource()
+                    ).substring(5)
                 )
             } else {
                 ""

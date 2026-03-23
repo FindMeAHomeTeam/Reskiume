@@ -6,7 +6,7 @@ import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.DeleteNonHum
 import kotlinx.coroutines.CoroutineScope
 
 class FakeDeleteNonHumanAnimalUtil(
-    private val nonHumanAnimalToDelete: NonHumanAnimal = nonHumanAnimal
+    private val allNonHumanAnimalsToDelete: MutableList<NonHumanAnimal> = mutableListOf(nonHumanAnimal)
 ): DeleteNonHumanAnimalUtil {
 
     override fun deleteNonHumanAnimal(
@@ -17,7 +17,7 @@ class FakeDeleteNonHumanAnimalUtil(
         onError: () -> Unit,
         onComplete: () -> Unit
     ) {
-        if (nonHumanAnimalToDelete.id == id && nonHumanAnimalToDelete.caregiverId == caregiverId) {
+        if (allNonHumanAnimalsToDelete.any { it.id == id && it.caregiverId == caregiverId }) {
             onComplete()
         } else {
             onError()

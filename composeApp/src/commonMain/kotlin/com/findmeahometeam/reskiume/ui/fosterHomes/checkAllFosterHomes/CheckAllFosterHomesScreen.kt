@@ -57,8 +57,9 @@ import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_sea
 import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_search_by_place
 import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_search_foster_homes_button
 import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_title
-import reskiume.composeapp.generated.resources.manage_location_permission_message_check_all_foster_homes
-import reskiume.composeapp.generated.resources.manage_location_permission_turn_on_location_message_check_all_foster_homes
+import reskiume.composeapp.generated.resources.manage_location_permission_foster_home
+import reskiume.composeapp.generated.resources.manage_location_permission_message_check_all
+import reskiume.composeapp.generated.resources.manage_location_permission_turn_on_location_message_check_all
 
 @Composable
 fun CheckAllFosterHomesScreen(
@@ -142,9 +143,15 @@ fun CheckAllFosterHomesScreen(
 
                     RmManageLocationPermission(
                         explainingLocationPermissionMessage =
-                            stringResource(Res.string.manage_location_permission_turn_on_location_message_check_all_foster_homes),
+                            stringResource(
+                                Res.string.manage_location_permission_turn_on_location_message_check_all,
+                                stringResource(Res.string.manage_location_permission_foster_home)
+                            ),
                         explainingLocationActivationMessage =
-                            stringResource(Res.string.manage_location_permission_message_check_all_foster_homes),
+                            stringResource(
+                                Res.string.manage_location_permission_message_check_all,
+                                stringResource(Res.string.manage_location_permission_foster_home)
+                            ),
                         permissionState = permissionState,
                         isLocationEnabledState = isLocationEnabledState,
                         onRequestEnableLocation = {

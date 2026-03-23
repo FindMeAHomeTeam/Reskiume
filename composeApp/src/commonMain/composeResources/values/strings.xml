@@ -199,8 +199,6 @@
     <string name="check_all_foster_homes_screen_title">Search foster homes by</string>
     <string name="check_all_foster_homes_screen_place_search_option">🌐 place</string>
     <string name="check_all_foster_homes_screen_location_search_option">📍 location</string>
-    <string name="check_all_foster_homes_screen_country_label">🌍 Country</string>
-    <string name="check_all_foster_homes_screen_city_label">🌇 City</string>
     <string name="check_all_foster_homes_screen_non_human_animal_type_label">🐷🐱 Non-human animal type</string>
     <string name="check_all_foster_homes_screen_search_foster_homes_button">🔎 Search foster homes %1$s</string>
     <string name="check_all_foster_homes_screen_search_by_place">by place</string>
@@ -208,10 +206,6 @@
     <string name="check_all_foster_homes_screen_search_available_foster_homes">%1$d foster homes available</string>
     <string name="check_all_foster_homes_screen_no_foster_home_found">⚠️ No foster home found, but consider creating a rescue event or searching social media networks.</string>
     <string name="check_all_foster_homes_screen_turn_on_location">Please, turn on the location to get your position</string>
-    <string name="check_all_foster_homes_screen_km">%1$d Km · %2$s</string>
-    <string name="check_all_foster_homes_screen_non_human_animal_gender_female">Female</string>
-    <string name="check_all_foster_homes_screen_non_human_animal_gender_male">Male</string>
-    <string name="check_all_foster_homes_screen_non_human_animal_gender_both">Both</string>
     <string name="check_all_foster_homes_screen_register_foster_home">+  Register a foster home</string>
 
     <!-- Foster home list item -->
@@ -266,7 +260,7 @@
     <string name="manage_location_permission_foster_home">foster home</string>
     <string name="manage_location_permission_rescue_event">rescue event</string>
     <string name="manage_location_permission_title">Location permission</string>
-    <string name="manage_location_permission_message_check_all_foster_homes">You can grant the location permission to display foster homes near you. We will never track your location.</string>
+    <string name="manage_location_permission_message_check_all">You can grant the location permission to display %1$ss near you. We will never track your location.</string>
     <string name="manage_location_permission_message">You must grant location permission to access your %1$s's coarse location. Users can see the distance between nearby %1$ss using their current location. Furthermore, we will never track and reveal your location.</string>
     <string name="manage_location_permission_grant_permission_button">Grant permission</string>
     <string name="manage_location_permission_do_not_grant_permission_button">Later</string>
@@ -274,7 +268,7 @@
     <string name="manage_location_permission_grant_in_settings_message">Location permissions can be enabled in settings. Remember, we will never track and reveal your location.</string>
     <string name="manage_location_permission_open_settings_button">Open settings</string>
     <string name="manage_location_permission_turn_on_location_title">Turn on location services manually</string>
-    <string name="manage_location_permission_turn_on_location_message_check_all_foster_homes">Please activate location services manually so we can determine where you are and show nearby shelters after clicking search.</string>
+    <string name="manage_location_permission_turn_on_location_message_check_all">Please activate location services manually so we can determine where you are and show nearby %1$ss after clicking search.</string>
     <string name="manage_location_permission_turn_on_location_message">Please activate location services manually so we can determine the coarse location of your %1$s.</string>
     <string name="manage_location_permission_turn_on_location_open_settings_button">Open settings</string>
     <string name="manage_location_permission_turn_on_later_location_button">Later</string>

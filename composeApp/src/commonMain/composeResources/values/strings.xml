@@ -206,7 +206,7 @@
     <string name="check_all_foster_homes_screen_search_available_foster_homes">%1$d foster homes available</string>
     <string name="check_all_foster_homes_screen_no_foster_home_found">⚠️ No foster home found, but consider creating a rescue event or searching social media networks.</string>
     <string name="check_all_foster_homes_screen_turn_on_location">Please, turn on the location to get your position</string>
-    <string name="check_all_foster_homes_screen_register_foster_home">+  Register a foster home</string>
+    <string name="check_all_foster_homes_screen_register_foster_home">Add foster home</string>
 
     <!-- Foster home list item -->
     <string name="foster_home_list_item_accepted_non_human_animal">Accept: </string>
@@ -359,6 +359,16 @@
     <string name="modify_rescue_event_screen_delete_rescue_event_title">Do you want to delete %1$s?</string>
     <string name="modify_rescue_event_screen_delete_rescue_event_message">This action can not be undone</string>
     <string name="modify_rescue_event_screen_save_rescue_event_changes_button">Save %1$s's changes</string>
+
+    <!-- Check all foster homes -->
+    <string name="check_all_rescue_events_screen_title">Search rescue events by</string>
+    <string name="check_all_rescue_events_screen_search_rescue_events_button">🔎 Search rescue events %1$s</string>
+    <string name="check_all_rescue_events_screen_search_by_place">by place</string>
+    <string name="check_all_rescue_events_screen_search_by_location">by location</string>
+    <string name="check_all_rescue_events_screen_search_available_rescue_events">%1$d rescue events available</string>
+    <string name="check_all_rescue_events_screen_no_rescue_event_found">⚠️ No rescue event found.</string>
+    <string name="check_all_rescue_events_screen_turn_on_location">Please, turn on the location to get your position</string>
+    <string name="check_all_rescue_events_screen_register_rescue_event">Add rescue event</string>
 
     <!-- Check all advice -->
     <string name="check_all_advice_screen_title">Check all advice</string>

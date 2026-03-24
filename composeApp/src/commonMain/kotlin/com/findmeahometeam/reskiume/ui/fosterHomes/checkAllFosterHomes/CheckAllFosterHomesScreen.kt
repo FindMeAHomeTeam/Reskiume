@@ -4,18 +4,21 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -39,6 +42,7 @@ import com.findmeahometeam.reskiume.ui.core.components.RmButton
 import com.findmeahometeam.reskiume.ui.core.components.RmCountryAndCitySelectors
 import com.findmeahometeam.reskiume.ui.core.components.RmDisplaySingleChoiceSegmentedButtonRow
 import com.findmeahometeam.reskiume.ui.core.components.RmDropDownMenu
+import com.findmeahometeam.reskiume.ui.core.components.RmExtendedFloatingActionButton
 import com.findmeahometeam.reskiume.ui.core.components.RmFosterHomeListItem
 import com.findmeahometeam.reskiume.ui.core.components.RmManageLocationPermission
 import com.findmeahometeam.reskiume.ui.core.components.RmResultState
@@ -52,17 +56,20 @@ import org.koin.compose.viewmodel.koinViewModel
 import reskiume.composeapp.generated.resources.Res
 import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_no_foster_home_found
 import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_non_human_animal_type_label
+import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_register_foster_home
 import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_search_available_foster_homes
 import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_search_by_location
 import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_search_by_place
 import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_search_foster_homes_button
 import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_title
+import reskiume.composeapp.generated.resources.ic_add
 import reskiume.composeapp.generated.resources.manage_location_permission_foster_home
 import reskiume.composeapp.generated.resources.manage_location_permission_message_check_all
 import reskiume.composeapp.generated.resources.manage_location_permission_turn_on_location_message_check_all
 
 @Composable
 fun CheckAllFosterHomesScreen(
+    onCreateFosterHome: (ownerId: String) -> Unit,
     onModifyFosterHome: (fosterHomeId: String) -> Unit,
     onCheckFosterHome: (fosterHomeId: String, ownerId: String) -> Unit
 ) {
@@ -110,8 +117,17 @@ fun CheckAllFosterHomesScreen(
         }
     }
 
+    val lazyListState = remember { LazyListState() }
+
     RmScaffold(
-        title = stringResource(Res.string.check_all_foster_homes_screen_title)
+        title = stringResource(Res.string.check_all_foster_homes_screen_title),
+        floatingActionButton = {
+            DisplayExtendedFloatingActionButtonToCreateFosterHomeIfLoggedIn(
+                authState,
+                lazyListState.isScrollingUp(),
+                onCreateFosterHome
+            )
+        }
     ) { padding ->
         LazyColumn(
             modifier = Modifier
@@ -119,7 +135,9 @@ fun CheckAllFosterHomesScreen(
                 .background(backgroundColor)
                 .padding(padding)
                 .padding(horizontal = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            state = lazyListState,
+            contentPadding = PaddingValues(bottom = if (authState?.uid == null) 0.dp else 72.dp) // Add space to the FAB
         ) {
             item {
                 RmDisplaySingleChoiceSegmentedButtonRow(
@@ -295,4 +313,46 @@ fun CheckAllFosterHomesScreen(
             }
         }
     }
+}
+
+@Composable
+private fun DisplayExtendedFloatingActionButtonToCreateFosterHomeIfLoggedIn(
+    authState: AuthUser?,
+    expanded: Boolean,
+    onCreateFosterHome: (ownerId: String) -> Unit
+) {
+    if (authState != null) {
+
+        RmExtendedFloatingActionButton(
+            drawableResource = Res.drawable.ic_add,
+            text = stringResource(Res.string.check_all_foster_homes_screen_register_foster_home),
+            expanded = expanded,
+            onClick = {
+                onCreateFosterHome(authState.uid)
+            }
+        )
+    }
+}
+
+/**
+ * Returns whether the lazy list is currently scrolling up.
+ * author: Google
+ * link: https://github.com/android/codelab-android-compose/blob/main/AnimationCodelab/finished/src/main/java/com/example/android/codelab/animation/ui/home/Home.kt#L355
+ */
+@Composable
+fun LazyListState.isScrollingUp(): Boolean {
+    var previousIndex by remember(this) { mutableIntStateOf(firstVisibleItemIndex) }
+    var previousScrollOffset by remember(this) { mutableIntStateOf(firstVisibleItemScrollOffset) }
+    return remember(this) {
+        derivedStateOf {
+            if (previousIndex != firstVisibleItemIndex) {
+                previousIndex > firstVisibleItemIndex
+            } else {
+                previousScrollOffset >= firstVisibleItemScrollOffset
+            }.also {
+                previousIndex = firstVisibleItemIndex
+                previousScrollOffset = firstVisibleItemScrollOffset
+            }
+        }
+    }.value
 }

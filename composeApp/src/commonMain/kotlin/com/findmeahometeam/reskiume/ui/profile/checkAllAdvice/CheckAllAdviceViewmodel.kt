@@ -2,6 +2,7 @@ package com.findmeahometeam.reskiume.ui.profile.checkAllAdvice
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.domain.model.Advice
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
@@ -9,10 +10,11 @@ import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.components.UiState.Success
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckActivistUtil
 import com.findmeahometeam.reskiume.ui.util.StringProvider
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
 import reskiume.composeapp.generated.resources.Res
@@ -22,19 +24,24 @@ import reskiume.composeapp.generated.resources.check_all_advice_screen_option_re
 import reskiume.composeapp.generated.resources.check_all_advice_screen_option_rescue
 
 class CheckAllAdviceViewmodel(
-    private val observeAuthStateInAuthDataSource: ObserveAuthStateInAuthDataSource,
+    observeAuthStateInAuthDataSource: ObserveAuthStateInAuthDataSource,
     private val checkActivistUtil: CheckActivistUtil,
     private val stringProvider: StringProvider
 ) : ViewModel() {
 
     private var selectedAdviceType: AdviceType = AdviceType.ALL
 
-    private var myUid: String? = null
+    private var myUid: String = ""
 
     private val _adviceListState: MutableStateFlow<UiState<List<Advice>>> =
         MutableStateFlow(Success(getAdviceList(AdviceType.ALL)))
 
     val adviceListState: StateFlow<UiState<List<Advice>>> = _adviceListState.asStateFlow()
+
+    val authState: Flow<AuthUser?> = observeAuthStateInAuthDataSource().map { authUser ->
+        myUid = authUser?.uid ?: " "
+        authUser
+    }
 
     private fun getAdviceList(adviceType: AdviceType): List<Advice> {
         return when (adviceType) {
@@ -80,14 +87,6 @@ class CheckAllAdviceViewmodel(
         }
     }
 
-    fun checkAuthState(onLoggedIn: (Boolean) -> Unit) {
-        viewModelScope.launch {
-
-            myUid = observeAuthStateInAuthDataSource().firstOrNull()?.uid
-            onLoggedIn(myUid != null)
-        }
-    }
-
     fun retrieveAdviceAuthor(userId: String?, onAuthorFetched: (User?) -> Unit) {
 
         if (userId == null) {
@@ -98,7 +97,7 @@ class CheckAllAdviceViewmodel(
             val author =
                 checkActivistUtil.getUser(
                     activistUid = userId,
-                    myUserUid = myUid ?: ""
+                    myUserUid = myUid
                 )
             onAuthorFetched(author)
         }

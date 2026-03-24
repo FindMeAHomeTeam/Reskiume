@@ -96,7 +96,9 @@ class CheckAllFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() {
             GetDataByManagingObjectLocalCacheTimestamp(localCacheRepository, log, konnectivity)
 
         val getAllFosterHomesByCountryAndCityFromRemoteRepository =
-            GetAllFosterHomesByCountryAndCityFromRemoteRepository(fireStoreRemoteFosterHomeRepository)
+            GetAllFosterHomesByCountryAndCityFromRemoteRepository(
+                fireStoreRemoteFosterHomeRepository
+            )
 
         val downloadImageToLocalDataSource =
             DownloadImageToLocalDataSource(storageRepository)
@@ -105,13 +107,27 @@ class CheckAllFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() {
             GetFosterHomeFromLocalRepository(localFosterHomeRepository)
 
         val insertFosterHomeInLocalRepository =
-            InsertFosterHomeInLocalRepository(localFosterHomeRepository, manageImagePath, localNonHumanAnimalRepository, checkNonHumanAnimalUtil, authRepository, log)
+            InsertFosterHomeInLocalRepository(
+                localFosterHomeRepository,
+                manageImagePath,
+                localNonHumanAnimalRepository,
+                checkNonHumanAnimalUtil,
+                authRepository,
+                log
+            )
 
         val insertCacheInLocalRepository =
             InsertCacheInLocalRepository(localCacheRepository)
 
         val modifyFosterHomeInLocalRepository =
-            ModifyFosterHomeInLocalRepository(manageImagePath, localFosterHomeRepository, localNonHumanAnimalRepository, checkNonHumanAnimalUtil, authRepository, log)
+            ModifyFosterHomeInLocalRepository(
+                manageImagePath,
+                localFosterHomeRepository,
+                localNonHumanAnimalRepository,
+                checkNonHumanAnimalUtil,
+                authRepository,
+                log
+            )
 
         val modifyCacheInLocalRepository = ModifyCacheInLocalRepository(localCacheRepository)
 
@@ -181,7 +197,14 @@ class CheckAllFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() {
             checkAllFosterHomesViewmodel.allFosterHomesState.test {
                 assertTrue { awaitItem() is UiState.Loading }
                 assertEquals(
-                    UiState.Success(listOf(UiFosterHome(fosterHome.copy(imageUrl = "${fosterHome.ownerId}${fosterHome.id}.webp"), listOf(nonHumanAnimal)))),
+                    UiState.Success(
+                        listOf(
+                            UiFosterHome(
+                                fosterHome.copy(imageUrl = "${fosterHome.ownerId}${fosterHome.id}.webp"),
+                                listOf(nonHumanAnimal)
+                            )
+                        )
+                    ),
                     awaitItem()
                 )
                 ensureAllEventsConsumed()
@@ -205,7 +228,14 @@ class CheckAllFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() {
             checkAllFosterHomesViewmodel.allFosterHomesState.test {
                 assertTrue { awaitItem() is UiState.Loading }
                 assertEquals(
-                    UiState.Success(listOf(UiFosterHome(fosterHome.copy(imageUrl = ""), listOf(nonHumanAnimal)))),
+                    UiState.Success(
+                        listOf(
+                            UiFosterHome(
+                                fosterHome.copy(imageUrl = ""),
+                                listOf(nonHumanAnimal)
+                            )
+                        )
+                    ),
                     awaitItem()
                 )
                 ensureAllEventsConsumed()
@@ -238,7 +268,14 @@ class CheckAllFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() {
             checkAllFosterHomesViewmodel.allFosterHomesState.test {
                 assertTrue { awaitItem() is UiState.Loading }
                 assertEquals(
-                    UiState.Success(listOf(UiFosterHome(fosterHome.copy(imageUrl = "${fosterHome.ownerId}${fosterHome.id}.webp"), listOf(nonHumanAnimal)))),
+                    UiState.Success(
+                        listOf(
+                            UiFosterHome(
+                                fosterHome.copy(imageUrl = "${fosterHome.ownerId}${fosterHome.id}.webp"),
+                                listOf(nonHumanAnimal)
+                            )
+                        )
+                    ),
                     awaitItem()
                 )
                 ensureAllEventsConsumed()
@@ -281,7 +318,7 @@ class CheckAllFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() {
             checkAllFosterHomesViewmodel.allFosterHomesState.test {
                 assertTrue { awaitItem() is UiState.Loading }
                 assertEquals(
-                    UiState.Success(listOf(UiFosterHome(fosterHome.copy(imageUrl = "${fosterHome.ownerId}${fosterHome.id}.webp"), listOf(nonHumanAnimal)))),
+                    UiState.Success(listOf(UiFosterHome(fosterHome, listOf(nonHumanAnimal)))),
                     awaitItem()
                 )
                 ensureAllEventsConsumed()
@@ -297,7 +334,11 @@ class CheckAllFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 ),
                 localFosterHomeRepository = FakeLocalFosterHomeRepository(
                     localFosterHomeWithAllNonHumanAnimalDataList = mutableListOf(
-                        fosterHomeWithAllNonHumanAnimalData
+                        fosterHomeWithAllNonHumanAnimalData.copy(
+                            fosterHomeEntity = fosterHome.copy(
+                                imageUrl = ""
+                            ).toEntity()
+                        )
                     )
                 ),
                 localCacheRepository = FakeLocalCacheRepository(
@@ -324,7 +365,14 @@ class CheckAllFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() {
             checkAllFosterHomesViewmodel.allFosterHomesState.test {
                 assertTrue { awaitItem() is UiState.Loading }
                 assertEquals(
-                    UiState.Success(listOf(UiFosterHome(fosterHome.copy(imageUrl = ""), listOf(nonHumanAnimal)))),
+                    UiState.Success(
+                        listOf(
+                            UiFosterHome(
+                                fosterHome.copy(imageUrl = ""),
+                                listOf(nonHumanAnimal)
+                            )
+                        )
+                    ),
                     awaitItem()
                 )
                 ensureAllEventsConsumed()
@@ -370,7 +418,7 @@ class CheckAllFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() {
         }
 
     @Test
-    fun `given a user requesting all FHs by location_when the user clicks on the search button_then FHs are saved in the local repository but displayed`() =
+    fun `given a user requesting all FHs by location_when the user clicks on the search button_then FHs are saved in the local repository and displayed`() =
         runTest {
             val checkAllFosterHomesViewmodel = getCheckAllFosterHomesViewmodel(
                 fireStoreRemoteFosterHomeRepository = FakeFireStoreRemoteFosterHomeRepository(
@@ -454,7 +502,7 @@ class CheckAllFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     UiState.Success(
                         listOf(
                             UiFosterHome(
-                                fosterHome.copy(imageUrl = "${fosterHome.ownerId}${fosterHome.id}.webp"),
+                                fosterHome,
                                 listOf(nonHumanAnimal),
                                 22.1
                             )

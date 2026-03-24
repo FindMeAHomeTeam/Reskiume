@@ -4,19 +4,19 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,6 +24,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.domain.model.Advice
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
@@ -38,6 +40,7 @@ import com.findmeahometeam.reskiume.ui.core.components.RmSearchBar
 import com.findmeahometeam.reskiume.ui.core.components.RmText
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckAdvice
+import com.findmeahometeam.reskiume.ui.fosterHomes.checkAllFosterHomes.isScrollingUp
 import com.findmeahometeam.reskiume.ui.profile.giveFeedback.GiveFeedback
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -61,13 +64,20 @@ fun CheckAllAdviceScreen(
 ) {
     val checkAllAdviceViewmodel: CheckAllAdviceViewmodel = koinViewModel<CheckAllAdviceViewmodel>()
 
-    val adviceListState: UiState<List<Advice>> by checkAllAdviceViewmodel.adviceListState.collectAsState()
+    val adviceListState: UiState<List<Advice>> by checkAllAdviceViewmodel.adviceListState.collectAsStateWithLifecycle()
+
+    val authState: AuthUser? by checkAllAdviceViewmodel.authState.collectAsStateWithLifecycle(initialValue = null)
+
+    val lazyListState = remember { LazyListState() }
 
     RmScaffold(
         title = stringResource(Res.string.check_all_advice_screen_title),
         onBackPressed = onBackPressed,
         floatingActionButton = {
-            DisplayExtendedFloatingActionButton(checkAllAdviceViewmodel)
+            DisplayExtendedFloatingActionButton(
+                authState?.uid != null,
+                lazyListState.isScrollingUp()
+            )
         }
     ) { padding ->
 
@@ -117,7 +127,10 @@ fun CheckAllAdviceScreen(
                     }
                 }
                 if (adviceList.isNotEmpty()) {
-                    LazyColumn {
+                    LazyColumn(
+                        state = lazyListState,
+                        contentPadding = PaddingValues(bottom = if (authState?.uid == null) 0.dp else 72.dp) // Add space to the FAB
+                    ) {
                         items(adviceList, key = { advice -> advice.hashCode() }) { advice ->
 
                             val title = stringResource(advice.title)
@@ -157,17 +170,15 @@ fun CheckAllAdviceScreen(
 }
 
 @Composable
-private fun DisplayExtendedFloatingActionButton(checkAllAdviceViewmodel: CheckAllAdviceViewmodel) {
-
+private fun DisplayExtendedFloatingActionButton(
+    isLoggedIn: Boolean,
+    extended: Boolean
+) {
     val giveFeedback: GiveFeedback = koinInject<GiveFeedback>()
 
-    var displaySendAdviceButton by rememberSaveable { mutableStateOf(false) }
     var displayNoEmailAppError: Boolean by remember { mutableStateOf(false) }
 
-    checkAllAdviceViewmodel.checkAuthState { isLoggedIn ->
-        displaySendAdviceButton = isLoggedIn
-    }
-    if (displaySendAdviceButton) {
+    if (isLoggedIn) {
 
         val sendAdviceSubject =
             stringResource(Res.string.check_all_advice_screen_option_advice_mail_subject)
@@ -177,6 +188,7 @@ private fun DisplayExtendedFloatingActionButton(checkAllAdviceViewmodel: CheckAl
         RmExtendedFloatingActionButton(
             drawableResource = Res.drawable.ic_mail,
             text = stringResource(Res.string.check_all_advice_screen_option_send_advice_button),
+            expanded = extended,
             onClick = {
                 giveFeedback.sendEmail(
                     subject = sendAdviceSubject,

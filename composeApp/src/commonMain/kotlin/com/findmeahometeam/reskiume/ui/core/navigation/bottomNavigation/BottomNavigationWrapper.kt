@@ -9,14 +9,16 @@ import com.findmeahometeam.reskiume.ui.core.navigation.CheckAllMyFosterHomes
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckAllMyNonHumanAnimals
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckAllMyRescueEvents
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckFosterHome
+import com.findmeahometeam.reskiume.ui.core.navigation.CheckRescueEvent
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckReviews
 import com.findmeahometeam.reskiume.ui.core.navigation.CreateFosterHome
 import com.findmeahometeam.reskiume.ui.core.navigation.CreateRescueEvent
 import com.findmeahometeam.reskiume.ui.core.navigation.ModifyFosterHome
+import com.findmeahometeam.reskiume.ui.core.navigation.ModifyRescueEvent
 import com.findmeahometeam.reskiume.ui.core.navigation.Routes
 import com.findmeahometeam.reskiume.ui.fosterHomes.checkAllFosterHomes.CheckAllFosterHomesScreen
 import com.findmeahometeam.reskiume.ui.profile.ProfileScreen
-import com.findmeahometeam.reskiume.ui.rescueEvents.RescueScreen
+import com.findmeahometeam.reskiume.ui.rescueEvents.checkAllRescueEvents.CheckAllRescueEventsScreen
 
 @Composable
 fun BottomNavigationWrapper(
@@ -44,7 +46,17 @@ fun BottomNavigationWrapper(
         }
 
         composable(route = Routes.CHECK_ALL_RESCUE_EVENTS.route) {
-            RescueScreen()
+            CheckAllRescueEventsScreen(
+                onCreateRescueEvent = { creatorId: String ->
+                    mainNavHostController.navigate(CreateRescueEvent(creatorId))
+                },
+                onModifyRescueEvent = { rescueEventId: String ->
+                    mainNavHostController.navigate(ModifyRescueEvent(rescueEventId))
+                },
+                onCheckRescueEvent = { rescueEventId: String, creatorId: String ->
+                    mainNavHostController.navigate(CheckRescueEvent(rescueEventId, creatorId))
+                }
+            )
         }
 
         composable(route = Routes.CHATS.route) {

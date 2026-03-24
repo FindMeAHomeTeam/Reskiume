@@ -52,7 +52,6 @@ import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class CheckAllAdviceViewmodelTest : CoroutineTestDispatcher() {
@@ -312,8 +311,10 @@ class CheckAllAdviceViewmodelTest : CoroutineTestDispatcher() {
             val checkAllAdviceViewmodel = getCheckAllAdviceViewmodel(
                 authStateReturn = null
             )
-            checkAllAdviceViewmodel.checkAuthState { isLoggedIn ->
-                assertFalse { isLoggedIn }
+            checkAllAdviceViewmodel.authState.test {
+                assertEquals(null, awaitItem())
+                awaitComplete()
+                ensureAllEventsConsumed()
             }
         }
 

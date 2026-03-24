@@ -122,9 +122,9 @@ class InsertRescueEventInLocalRepository(
         var isSuccess = true
         rescueEvent.allNeedsToCover.forEach { needToCover: NeedToCover ->
             if (isSuccess) {
-                localRescueEventRepository.insertNeedToCoverEntityForRecueEvent(
+                localRescueEventRepository.insertNeedToCoverEntityForRescueEvent(
                     needToCover.toEntity(),
-                    onInsertNeedToCoverEntityForRecueEvent = { rowId ->
+                    onInsertNeedToCoverEntityForRescueEvent = { rowId ->
                         if (rowId > 0) {
                             log.d(
                                 "InsertRescueEventInLocalRepository",

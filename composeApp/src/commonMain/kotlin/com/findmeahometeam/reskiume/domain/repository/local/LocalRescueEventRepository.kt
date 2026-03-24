@@ -1,6 +1,6 @@
 package com.findmeahometeam.reskiume.domain.repository.local
 
-import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.NeedToCoverEntityForRecueEvent
+import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.NeedToCoverEntityForRescueEvent
 import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.NonHumanAnimalToRescueEntityForRescueEvent
 import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.RescueEventEntity
 import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.RescueEventWithAllNeedsAndNonHumanAnimalData
@@ -18,9 +18,9 @@ interface LocalRescueEventRepository {
         onInsertNonHumanAnimalToRescueEntityForRescueEvent: (rowId: Long) -> Unit
     )
 
-    suspend fun insertNeedToCoverEntityForRecueEvent(
-        needToCoverEntityForRecueEvent: NeedToCoverEntityForRecueEvent,
-        onInsertNeedToCoverEntityForRecueEvent: (rowId: Long) -> Unit
+    suspend fun insertNeedToCoverEntityForRescueEvent(
+        needToCoverEntityForRescueEvent: NeedToCoverEntityForRescueEvent,
+        onInsertNeedToCoverEntityForRescueEvent: (rowId: Long) -> Unit
     )
 
     suspend fun modifyRescueEvent(
@@ -38,9 +38,9 @@ interface LocalRescueEventRepository {
         onDeleteNonHumanAnimalToRescueEntityForRescueEvent: (rowsDeleted: Int) -> Unit
     )
 
-    suspend fun deleteNeedToCoverEntityForRecueEvent(
+    suspend fun deleteNeedToCoverEntityForRescueEvent(
         needToCoverId: Long,
-        onDeleteNeedToCoverEntityForRecueEvent: (rowsDeleted: Int) -> Unit
+        onDeleteNeedToCoverEntityForRescueEvent: (rowsDeleted: Int) -> Unit
     )
 
     suspend fun deleteAllMyRescueEvents(

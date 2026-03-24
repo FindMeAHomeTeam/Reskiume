@@ -1,6 +1,6 @@
 package com.findmeahometeam.reskiume.ui.integrationTests.fakes
 
-import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.NeedToCoverEntityForRecueEvent
+import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.NeedToCoverEntityForRescueEvent
 import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.NonHumanAnimalToRescueEntityForRescueEvent
 import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.RescueEventEntity
 import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.RescueEventWithAllNeedsAndNonHumanAnimalData
@@ -33,30 +33,30 @@ class FakeLocalRescueEventRepository(
         }
     }
 
-    override suspend fun insertNeedToCoverEntityForRecueEvent(
-        needToCoverEntityForRecueEvent: NeedToCoverEntityForRecueEvent,
-        onInsertNeedToCoverEntityForRecueEvent: (rowId: Long) -> Unit
+    override suspend fun insertNeedToCoverEntityForRescueEvent(
+        needToCoverEntityForRescueEvent: NeedToCoverEntityForRescueEvent,
+        onInsertNeedToCoverEntityForRescueEvent: (rowId: Long) -> Unit
     ) {
         val allNeedsToCover =
             localRescueEventWithAllNeedsAndNonHumanAnimalDataList.flatMap { rescueEventWithAllNonHumanAnimalData ->
 
                 rescueEventWithAllNonHumanAnimalData.allNeedsToCover.filter {
-                    it.needToCoverId == needToCoverEntityForRecueEvent.needToCoverId
+                    it.needToCoverId == needToCoverEntityForRescueEvent.needToCoverId
                 }
             }
 
         if (allNeedsToCover.isEmpty()) {
 
             val result = localRescueEventWithAllNeedsAndNonHumanAnimalDataList.map {
-                it.copy(allNeedsToCover = it.allNeedsToCover + needToCoverEntityForRecueEvent)
+                it.copy(allNeedsToCover = it.allNeedsToCover + needToCoverEntityForRescueEvent)
             }
             localRescueEventWithAllNeedsAndNonHumanAnimalDataList.removeAll(
                 localRescueEventWithAllNeedsAndNonHumanAnimalDataList
             )
             localRescueEventWithAllNeedsAndNonHumanAnimalDataList.addAll(result)
-            onInsertNeedToCoverEntityForRecueEvent(1L)
+            onInsertNeedToCoverEntityForRescueEvent(1L)
         } else {
-            onInsertNeedToCoverEntityForRecueEvent(0)
+            onInsertNeedToCoverEntityForRescueEvent(0)
         }
     }
 
@@ -120,9 +120,9 @@ class FakeLocalRescueEventRepository(
         }
     }
 
-    override suspend fun deleteNeedToCoverEntityForRecueEvent(
+    override suspend fun deleteNeedToCoverEntityForRescueEvent(
         needToCoverId: Long,
-        onDeleteNeedToCoverEntityForRecueEvent: (rowsDeleted: Int) -> Unit
+        onDeleteNeedToCoverEntityForRescueEvent: (rowsDeleted: Int) -> Unit
     ) {
         val needToCover =
             localRescueEventWithAllNeedsAndNonHumanAnimalDataList.firstNotNullOfOrNull { rescueEventWithAllNeedsToCoverAndNonHumanAnimalData ->
@@ -130,7 +130,7 @@ class FakeLocalRescueEventRepository(
             }
 
         if (needToCover == null) {
-            onDeleteNeedToCoverEntityForRecueEvent(0)
+            onDeleteNeedToCoverEntityForRescueEvent(0)
         } else {
             val result: List<RescueEventWithAllNeedsAndNonHumanAnimalData> =
                 localRescueEventWithAllNeedsAndNonHumanAnimalDataList.map { rescueEventWithAllNeedsAndNonHumanAnimalData: RescueEventWithAllNeedsAndNonHumanAnimalData ->
@@ -152,7 +152,7 @@ class FakeLocalRescueEventRepository(
                 localRescueEventWithAllNeedsAndNonHumanAnimalDataList
             )
             localRescueEventWithAllNeedsAndNonHumanAnimalDataList.addAll(result)
-            onDeleteNeedToCoverEntityForRecueEvent(1)
+            onDeleteNeedToCoverEntityForRescueEvent(1)
         }
     }
 

@@ -20,7 +20,7 @@ import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueNeed
         Index("rescueEventId")
     ]
 )
-data class NeedToCoverEntityForRecueEvent(
+data class NeedToCoverEntityForRescueEvent(
     @PrimaryKey
     val needToCoverId: Long,
     val rescueNeed: RescueNeed,

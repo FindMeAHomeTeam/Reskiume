@@ -6,7 +6,7 @@ import androidx.room.OnConflictStrategy.Companion.REPLACE
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.NeedToCoverEntityForRecueEvent
+import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.NeedToCoverEntityForRescueEvent
 import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.NonHumanAnimalToRescueEntityForRescueEvent
 import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.RescueEventEntity
 import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.RescueEventWithAllNeedsAndNonHumanAnimalData
@@ -24,7 +24,7 @@ interface RescueEventDao {
     ): Long
 
     @Insert(onConflict = REPLACE)
-    suspend fun insertNeedToCoverEntityForRecueEvent(needToCoverEntityForRecueEvent: NeedToCoverEntityForRecueEvent): Long
+    suspend fun insertNeedToCoverEntityForRescueEvent(needToCoverEntityForRescueEvent: NeedToCoverEntityForRescueEvent): Long
 
     @Update
     suspend fun modifyRescueEvent(rescueEventEntity: RescueEventEntity): Int
@@ -35,8 +35,8 @@ interface RescueEventDao {
     @Query("DELETE FROM NonHumanAnimalToRescueEntityForRescueEvent WHERE nonHumanAnimalId = :nonHumanAnimalId")
     suspend fun deleteNonHumanAnimalToRescueEntityForRescueEvent(nonHumanAnimalId: String): Int
 
-    @Query("DELETE FROM NeedToCoverEntityForRecueEvent WHERE needToCoverId = :needToCoverId")
-    suspend fun deleteNeedToCoverEntityForRecueEvent(needToCoverId: Long): Int
+    @Query("DELETE FROM NeedToCoverEntityForRescueEvent WHERE needToCoverId = :needToCoverId")
+    suspend fun deleteNeedToCoverEntityForRescueEvent(needToCoverId: Long): Int
 
     @Query("DELETE FROM RescueEventEntity WHERE creatorId = :creatorId OR savedBy = :creatorId OR savedBy = ' ' OR savedBy = '' ")
     suspend fun deleteAllMyRescueEvents(creatorId: String): Int

@@ -17,7 +17,7 @@ import com.findmeahometeam.reskiume.data.database.entity.NonHumanAnimalEntity
 import com.findmeahometeam.reskiume.data.database.entity.fosterHome.ResidentNonHumanAnimalIdEntityForFosterHome
 import com.findmeahometeam.reskiume.data.database.entity.ReviewEntity
 import com.findmeahometeam.reskiume.data.database.entity.UserEntity
-import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.NeedToCoverEntityForRecueEvent
+import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.NeedToCoverEntityForRescueEvent
 import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.NonHumanAnimalToRescueEntityForRescueEvent
 import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.RescueEventEntity
 
@@ -32,7 +32,7 @@ import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.RescueEvent
         ResidentNonHumanAnimalIdEntityForFosterHome::class,
         RescueEventEntity::class,
         NonHumanAnimalToRescueEntityForRescueEvent::class,
-        NeedToCoverEntityForRecueEvent::class
+        NeedToCoverEntityForRescueEvent::class
     ], version = 1
 )
 @ConstructedBy(ReskiumeConstructor::class)

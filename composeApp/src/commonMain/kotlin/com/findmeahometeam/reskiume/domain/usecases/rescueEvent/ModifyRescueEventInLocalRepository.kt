@@ -222,9 +222,9 @@ class ModifyRescueEventInLocalRepository(
                             it.needToCoverId == needsToCoverToManage.needToCoverId
                         }.toEntity()
 
-                    localRescueEventRepository.insertNeedToCoverEntityForRecueEvent(
+                    localRescueEventRepository.insertNeedToCoverEntityForRescueEvent(
                         needToCoverEntity,
-                        onInsertNeedToCoverEntityForRecueEvent = { rowId ->
+                        onInsertNeedToCoverEntityForRescueEvent = { rowId ->
                             if (rowId > 0) {
                                 log.d(
                                     "ModifyRescueEventInLocalRepository",
@@ -245,9 +245,9 @@ class ModifyRescueEventInLocalRepository(
                             it.needToCoverId == needsToCoverToManage.needToCoverId
                         }
 
-                    localRescueEventRepository.deleteNeedToCoverEntityForRecueEvent(
+                    localRescueEventRepository.deleteNeedToCoverEntityForRescueEvent(
                         needToCover.needToCoverId,
-                        onDeleteNeedToCoverEntityForRecueEvent = { rowsDeleted ->
+                        onDeleteNeedToCoverEntityForRescueEvent = { rowsDeleted ->
                             if (rowsDeleted > 0) {
                                 log.d(
                                     "ModifyRescueEventInLocalRepository",

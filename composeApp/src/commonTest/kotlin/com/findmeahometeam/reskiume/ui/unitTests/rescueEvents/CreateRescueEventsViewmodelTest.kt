@@ -293,7 +293,7 @@ class CreateRescueEventsViewmodelTest : CoroutineTestDispatcher() {
         val localRescueEventRepository: LocalRescueEventRepository = mock {
 
             everySuspend {
-                insertNeedToCoverEntityForRecueEvent(
+                insertNeedToCoverEntityForRescueEvent(
                     rescueEvent.allNeedsToCover[0].copy(
                         rescueEventId = createdRescueEventId
                     ).toEntity(),
@@ -305,7 +305,7 @@ class CreateRescueEventsViewmodelTest : CoroutineTestDispatcher() {
             }
 
             everySuspend {
-                insertNeedToCoverEntityForRecueEvent(
+                insertNeedToCoverEntityForRescueEvent(
                     rescueEvent.allNeedsToCover[1].copy(
                         rescueEventId = createdRescueEventId
                     ).toEntity(),

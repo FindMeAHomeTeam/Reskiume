@@ -118,7 +118,7 @@ class ModifyRescueEventInLocalRepositoryTest {
         }
 
         everySuspend {
-            insertNeedToCoverEntityForRecueEvent(
+            insertNeedToCoverEntityForRescueEvent(
                 rescueEvent.allNeedsToCover[0].toEntity(),
                 capture(onInsertNeedToCoverForRescueEvent)
             )
@@ -127,7 +127,7 @@ class ModifyRescueEventInLocalRepositoryTest {
         }
 
         everySuspend {
-            insertNeedToCoverEntityForRecueEvent(
+            insertNeedToCoverEntityForRescueEvent(
                 rescueEvent.allNeedsToCover[1].toEntity(),
                 capture(onInsertSecondNeedToCoverForRescueEvent)
             )
@@ -163,7 +163,7 @@ class ModifyRescueEventInLocalRepositoryTest {
         }
 
         everySuspend {
-            deleteNeedToCoverEntityForRecueEvent(
+            deleteNeedToCoverEntityForRescueEvent(
                 rescueEvent.allNeedsToCover[1].needToCoverId,
                 capture(onDeleteNeedToCoverForRescueEvent)
             )
@@ -285,11 +285,11 @@ class ModifyRescueEventInLocalRepositoryTest {
                     rescueEvent.allNonHumanAnimalsToRescue[1].toEntity(),
                     onInsertSecondNonHumanAnimalToRescueForRescueEvent.get()
                 )
-                localRescueEventRepository.insertNeedToCoverEntityForRecueEvent(
+                localRescueEventRepository.insertNeedToCoverEntityForRescueEvent(
                     rescueEvent.allNeedsToCover[0].toEntity(),
                     onInsertNeedToCoverForRescueEvent.get()
                 )
-                localRescueEventRepository.insertNeedToCoverEntityForRecueEvent(
+                localRescueEventRepository.insertNeedToCoverEntityForRescueEvent(
                     rescueEvent.allNeedsToCover[1].toEntity(),
                     onInsertSecondNeedToCoverForRescueEvent.get()
                 )
@@ -335,11 +335,11 @@ class ModifyRescueEventInLocalRepositoryTest {
                     onModifyRescueEvent.get()
                 )
 
-                localRescueEventRepository.insertNeedToCoverEntityForRecueEvent(
+                localRescueEventRepository.insertNeedToCoverEntityForRescueEvent(
                     rescueEvent.allNeedsToCover[0].toEntity(),
                     onInsertNeedToCoverForRescueEvent.get()
                 )
-                localRescueEventRepository.insertNeedToCoverEntityForRecueEvent(
+                localRescueEventRepository.insertNeedToCoverEntityForRescueEvent(
                     rescueEvent.allNeedsToCover[1].toEntity(),
                     onInsertSecondNeedToCoverForRescueEvent.get()
                 )
@@ -385,7 +385,7 @@ class ModifyRescueEventInLocalRepositoryTest {
                     rescueEvent.allNonHumanAnimalsToRescue[0].nonHumanAnimalId,
                     onDeleteNonHumanAnimalToRescueForRescueEvent.get()
                 )
-                localRescueEventRepository.deleteNeedToCoverEntityForRecueEvent(
+                localRescueEventRepository.deleteNeedToCoverEntityForRescueEvent(
                     rescueEvent.allNeedsToCover[1].needToCoverId,
                     onDeleteNeedToCoverForRescueEvent.get()
                 )

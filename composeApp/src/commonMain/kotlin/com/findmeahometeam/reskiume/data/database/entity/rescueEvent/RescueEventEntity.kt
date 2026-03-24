@@ -54,5 +54,5 @@ data class RescueEventWithAllNeedsAndNonHumanAnimalData(
         parentColumn = "id",
         entityColumn = "rescueEventId"
     )
-    val allNeedsToCover: List<NeedToCoverEntityForRecueEvent>
+    val allNeedsToCover: List<NeedToCoverEntityForRescueEvent>
 )

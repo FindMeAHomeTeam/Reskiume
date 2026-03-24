@@ -313,7 +313,7 @@ class CheckAllRescueEventsViewmodelTest : CoroutineTestDispatcher() {
             }
 
             everySuspend {
-                insertNeedToCoverEntityForRecueEvent(
+                insertNeedToCoverEntityForRescueEvent(
                     rescueEvent.allNeedsToCover[0].toEntity(),
                     capture(onInsertNeedToCoverForRescueEvent)
                 )
@@ -323,7 +323,7 @@ class CheckAllRescueEventsViewmodelTest : CoroutineTestDispatcher() {
             }
 
             everySuspend {
-                insertNeedToCoverEntityForRecueEvent(
+                insertNeedToCoverEntityForRescueEvent(
                     rescueEvent.allNeedsToCover[1].toEntity(),
                     capture(onInsertSecondNeedToCoverForRescueEvent)
                 )

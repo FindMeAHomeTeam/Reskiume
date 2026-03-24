@@ -1,6 +1,6 @@
 package com.findmeahometeam.reskiume.data.database
 
-import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.NeedToCoverEntityForRecueEvent
+import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.NeedToCoverEntityForRescueEvent
 import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.NonHumanAnimalToRescueEntityForRescueEvent
 import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.RescueEventEntity
 import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.RescueEventWithAllNeedsAndNonHumanAnimalData
@@ -32,13 +32,13 @@ class LocalRescueEventRepositoryImpl(
         )
     }
 
-    override suspend fun insertNeedToCoverEntityForRecueEvent(
-        needToCoverEntityForRecueEvent: NeedToCoverEntityForRecueEvent,
-        onInsertNeedToCoverEntityForRecueEvent: (rowId: Long) -> Unit
+    override suspend fun insertNeedToCoverEntityForRescueEvent(
+        needToCoverEntityForRescueEvent: NeedToCoverEntityForRescueEvent,
+        onInsertNeedToCoverEntityForRescueEvent: (rowId: Long) -> Unit
     ) {
-        onInsertNeedToCoverEntityForRecueEvent(
+        onInsertNeedToCoverEntityForRescueEvent(
             reskiumeDatabase.getRescueEventDao()
-                .insertNeedToCoverEntityForRecueEvent(needToCoverEntityForRecueEvent)
+                .insertNeedToCoverEntityForRescueEvent(needToCoverEntityForRescueEvent)
         )
     }
 
@@ -68,13 +68,13 @@ class LocalRescueEventRepositoryImpl(
         )
     }
 
-    override suspend fun deleteNeedToCoverEntityForRecueEvent(
+    override suspend fun deleteNeedToCoverEntityForRescueEvent(
         needToCoverId: Long,
-        onDeleteNeedToCoverEntityForRecueEvent: (rowsDeleted: Int) -> Unit
+        onDeleteNeedToCoverEntityForRescueEvent: (rowsDeleted: Int) -> Unit
     ) {
-        onDeleteNeedToCoverEntityForRecueEvent(
+        onDeleteNeedToCoverEntityForRescueEvent(
             reskiumeDatabase.getRescueEventDao()
-                .deleteNeedToCoverEntityForRecueEvent(needToCoverId)
+                .deleteNeedToCoverEntityForRescueEvent(needToCoverId)
         )
     }
 

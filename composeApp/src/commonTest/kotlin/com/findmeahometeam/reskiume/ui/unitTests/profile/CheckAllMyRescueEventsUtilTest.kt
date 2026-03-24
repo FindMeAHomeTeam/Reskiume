@@ -155,7 +155,7 @@ class CheckAllMyRescueEventsUtilTest : CoroutineTestDispatcher() {
             } returns myRescueEventWithAllNonHumanAnimalLocalDataReturn
 
             everySuspend {
-                insertNeedToCoverEntityForRecueEvent(
+                insertNeedToCoverEntityForRescueEvent(
                     rescueEvent.allNeedsToCover[0].copy(
                         rescueEventId = rescueEvent.id
                     ).toEntity(),
@@ -167,7 +167,7 @@ class CheckAllMyRescueEventsUtilTest : CoroutineTestDispatcher() {
             }
 
             everySuspend {
-                insertNeedToCoverEntityForRecueEvent(
+                insertNeedToCoverEntityForRescueEvent(
                     rescueEvent.allNeedsToCover[1].copy(
                         rescueEventId = rescueEvent.id
                     ).toEntity(),
@@ -229,7 +229,7 @@ class CheckAllMyRescueEventsUtilTest : CoroutineTestDispatcher() {
             }
 
             everySuspend {
-                deleteNeedToCoverEntityForRecueEvent(
+                deleteNeedToCoverEntityForRescueEvent(
                     rescueEvent.allNeedsToCover[0].needToCoverId,
                     capture(onDeleteNeedToCoverForRescueEvent)
                 )
@@ -239,7 +239,7 @@ class CheckAllMyRescueEventsUtilTest : CoroutineTestDispatcher() {
             }
 
             everySuspend {
-                deleteNeedToCoverEntityForRecueEvent(
+                deleteNeedToCoverEntityForRescueEvent(
                     rescueEvent.allNeedsToCover[1].needToCoverId,
                     capture(onDeleteSecondNeedToCoverForRescueEvent)
                 )

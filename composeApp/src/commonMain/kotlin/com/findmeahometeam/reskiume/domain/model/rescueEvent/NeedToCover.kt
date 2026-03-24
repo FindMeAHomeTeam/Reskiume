@@ -2,7 +2,7 @@ package com.findmeahometeam.reskiume.domain.model.rescueEvent
 
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
-import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.NeedToCoverEntityForRecueEvent
+import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.NeedToCoverEntityForRescueEvent
 import com.findmeahometeam.reskiume.data.remote.response.rescueEvent.RemoteNeedToCoverForRescueEvent
 import org.jetbrains.compose.resources.StringResource
 import reskiume.composeapp.generated.resources.Res
@@ -15,8 +15,8 @@ data class NeedToCover(
     val rescueNeed: RescueNeed,
     val rescueEventId: String
 ) {
-    fun toEntity(): NeedToCoverEntityForRecueEvent {
-        return NeedToCoverEntityForRecueEvent(
+    fun toEntity(): NeedToCoverEntityForRescueEvent {
+        return NeedToCoverEntityForRescueEvent(
             needToCoverId = needToCoverId,
             rescueNeed = rescueNeed,
             rescueEventId = rescueEventId

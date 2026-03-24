@@ -349,7 +349,7 @@ class ModifyRescueEventViewmodelTest : CoroutineTestDispatcher() {
         val localRescueEventRepository: LocalRescueEventRepository = mock {
 
             everySuspend {
-                insertNeedToCoverEntityForRecueEvent(
+                insertNeedToCoverEntityForRescueEvent(
                     rescueEvent.allNeedsToCover[0].toEntity(),
                     capture(onInsertNeedToCoverForRescueEvent)
                 )
@@ -359,7 +359,7 @@ class ModifyRescueEventViewmodelTest : CoroutineTestDispatcher() {
             }
 
             everySuspend {
-                insertNeedToCoverEntityForRecueEvent(
+                insertNeedToCoverEntityForRescueEvent(
                     rescueEvent.allNeedsToCover[1].toEntity(),
                     capture(onInsertSecondNeedToCoverForRescueEvent)
                 )
@@ -369,7 +369,7 @@ class ModifyRescueEventViewmodelTest : CoroutineTestDispatcher() {
             }
 
             everySuspend {
-                insertNeedToCoverEntityForRecueEvent(
+                insertNeedToCoverEntityForRescueEvent(
                     rescueEvent.allNeedsToCover[0].copy(needToCoverId = 123456).toEntity(),
                     capture(onInsertThirdNeedToCoverForRescueEvent)
                 )

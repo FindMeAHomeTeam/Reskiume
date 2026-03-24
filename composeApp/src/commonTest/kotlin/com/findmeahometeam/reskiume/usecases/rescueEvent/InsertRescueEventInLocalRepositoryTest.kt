@@ -92,7 +92,7 @@ class InsertRescueEventInLocalRepositoryTest {
         }
 
         everySuspend {
-            insertNeedToCoverEntityForRecueEvent(
+            insertNeedToCoverEntityForRescueEvent(
                 rescueEvent.allNeedsToCover[0].toEntity(),
                 capture(onInsertNeedToCoverForRescueEvent)
             )
@@ -101,7 +101,7 @@ class InsertRescueEventInLocalRepositoryTest {
         }
 
         everySuspend {
-            insertNeedToCoverEntityForRecueEvent(
+            insertNeedToCoverEntityForRescueEvent(
                 rescueEvent.allNeedsToCover[1].toEntity(),
                 capture(onInsertSecondNeedToCoverForRescueEvent)
             )
@@ -194,11 +194,11 @@ class InsertRescueEventInLocalRepositoryTest {
                     rescueEvent.allNonHumanAnimalsToRescue[1].toEntity(),
                     onInsertSecondNonHumanAnimalToRescueForRescueEvent.get()
                 )
-                localRescueEventRepository.insertNeedToCoverEntityForRecueEvent(
+                localRescueEventRepository.insertNeedToCoverEntityForRescueEvent(
                     rescueEvent.allNeedsToCover[0].toEntity(),
                     onInsertNeedToCoverForRescueEvent.get()
                 )
-                localRescueEventRepository.insertNeedToCoverEntityForRecueEvent(
+                localRescueEventRepository.insertNeedToCoverEntityForRescueEvent(
                     rescueEvent.allNeedsToCover[1].toEntity(),
                     onInsertSecondNeedToCoverForRescueEvent.get()
                 )
@@ -212,7 +212,7 @@ class InsertRescueEventInLocalRepositoryTest {
         }
 
     @Test
-    fun `given a local rescue event_when the app inserts it but the residents were deleted_then inserts methods are called except insertNeedToCoverEntityForRecueEvent and modifyNonHumanAnimal`() =
+    fun `given a local rescue event_when the app inserts it but the residents were deleted_then inserts methods are called except insertNeedToCoverEntityForRescueEvent and modifyNonHumanAnimal`() =
         runTest {
             insertRescueEventInLocalRepository(
                 rescueEvent.copy(
@@ -236,11 +236,11 @@ class InsertRescueEventInLocalRepositoryTest {
                     ).toEntity(),
                     onInsertRescueEvent.get()
                 )
-                localRescueEventRepository.insertNeedToCoverEntityForRecueEvent(
+                localRescueEventRepository.insertNeedToCoverEntityForRescueEvent(
                     rescueEvent.allNeedsToCover[0].toEntity(),
                     onInsertNeedToCoverForRescueEvent.get()
                 )
-                localRescueEventRepository.insertNeedToCoverEntityForRecueEvent(
+                localRescueEventRepository.insertNeedToCoverEntityForRescueEvent(
                     rescueEvent.allNeedsToCover[1].toEntity(),
                     onInsertSecondNeedToCoverForRescueEvent.get()
                 )

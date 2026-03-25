@@ -29,7 +29,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flatMapLatest
@@ -218,15 +217,11 @@ class CheckAllRescueEventsViewmodel(
                             allRescueEventsFlow,
                             myUid,
                             viewModelScope
-                        ).combine(
-                            getAllRescueEventsByCountryAndCityFromLocalRepository(
-                                country,
-                                city
-                            )
-                        ) { remoteRescueEvents: List<RescueEvent>, localRescueEvents: List<RescueEvent> ->
-
-                            localRescueEvents.ifEmpty { remoteRescueEvents }
-                        }
+                        )
+                        getAllRescueEventsByCountryAndCityFromLocalRepository(
+                            country,
+                            city
+                        )
                     },
                     onCompletionUpdateCache = {
                         val allRescueEventsFlow: Flow<List<RescueEvent>> =
@@ -238,15 +233,11 @@ class CheckAllRescueEventsViewmodel(
                             allRescueEventsFlow,
                             myUid,
                             viewModelScope
-                        ).combine(
-                            getAllRescueEventsByCountryAndCityFromLocalRepository(
-                                country,
-                                city
-                            )
-                        ) { remoteRescueEvents: List<RescueEvent>, localRescueEvents: List<RescueEvent> ->
-
-                            localRescueEvents.ifEmpty { remoteRescueEvents }
-                        }
+                        )
+                        getAllRescueEventsByCountryAndCityFromLocalRepository(
+                            country,
+                            city
+                        )
                     },
                     onVerifyCacheIsRecent = {
                         getAllRescueEventsByCountryAndCityFromLocalRepository(
@@ -300,17 +291,13 @@ class CheckAllRescueEventsViewmodel(
                             allRescueEventsFlow,
                             myUid,
                             viewModelScope
-                        ).combine(
-                            getAllRescueEventsByLocationFromLocalRepository(
-                                activistLongitude = activistLongitude,
-                                activistLatitude = activistLatitude,
-                                rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
-                                rangeLatitude = getRangeLat()
-                            )
-                        ) { remoteRescueEvents: List<RescueEvent>, localRescueEvents: List<RescueEvent> ->
-
-                            localRescueEvents.ifEmpty { remoteRescueEvents }
-                        }
+                        )
+                        getAllRescueEventsByLocationFromLocalRepository(
+                            activistLongitude = activistLongitude,
+                            activistLatitude = activistLatitude,
+                            rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
+                            rangeLatitude = getRangeLat()
+                        )
                     },
                     onCompletionUpdateCache = {
                         val allRescueEventsFlow: Flow<List<RescueEvent>> =
@@ -324,17 +311,13 @@ class CheckAllRescueEventsViewmodel(
                             allRescueEventsFlow,
                             myUid,
                             viewModelScope
-                        ).combine(
-                            getAllRescueEventsByLocationFromLocalRepository(
-                                activistLongitude = activistLongitude,
-                                activistLatitude = activistLatitude,
-                                rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
-                                rangeLatitude = getRangeLat()
-                            )
-                        ) { remoteRescueEvents: List<RescueEvent>, localRescueEvents: List<RescueEvent> ->
-
-                            localRescueEvents.ifEmpty { remoteRescueEvents }
-                        }
+                        )
+                        getAllRescueEventsByLocationFromLocalRepository(
+                            activistLongitude = activistLongitude,
+                            activistLatitude = activistLatitude,
+                            rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
+                            rangeLatitude = getRangeLat()
+                        )
                     },
                     onVerifyCacheIsRecent = {
                         getAllRescueEventsByLocationFromLocalRepository(

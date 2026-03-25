@@ -8,7 +8,6 @@ import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.RescueEvent
 import com.findmeahometeam.reskiume.data.remote.response.rescueEvent.RemoteRescueEvent
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueEvent
 import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalRescueEventRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteRescueEvent.FireStoreRemoteRescueEventRepository
@@ -110,8 +109,7 @@ class CheckAllMyRescueEventsViewmodelTest : CoroutineTestDispatcher() {
         myRescueEventWithAllNonHumanAnimalLocalDataReturn: RescueEventWithAllNeedsAndNonHumanAnimalData? = rescueEventWithAllNeedsAndNonHumanAnimalData,
         allMyRescueEventWithAllNonHumanAnimalLocalDataReturn: Flow<List<RescueEventWithAllNeedsAndNonHumanAnimalData>> = flowOf(
             listOf(rescueEventWithAllNeedsAndNonHumanAnimalData)
-        ),
-        allMyManagedRescueEventsFromLocalReturn: Flow<List<RescueEvent>> = flowOf(listOf(rescueEvent))
+        )
     ): CheckAllMyRescueEventsViewmodel {
 
         val saveStateHandleProvider: SaveStateHandleProvider = mock {
@@ -278,7 +276,7 @@ class CheckAllMyRescueEventsViewmodelTest : CoroutineTestDispatcher() {
                     user.uid,
                     any()
                 )
-            } returns allMyManagedRescueEventsFromLocalReturn
+            } returns Unit
         }
 
         val manageImagePath: ManageImagePath = mock {
@@ -342,7 +340,7 @@ class CheckAllMyRescueEventsViewmodelTest : CoroutineTestDispatcher() {
             verify {
                 log.d(
                     "GetDataByManagingObjectLocalCacheTimestamp",
-                    "userUid123 added to local cache in section RESCUE_EVENTS"
+                    "${user.uid} added to local cache in section ${Section.RESCUE_EVENTS}"
                 )
             }
         }
@@ -385,7 +383,7 @@ class CheckAllMyRescueEventsViewmodelTest : CoroutineTestDispatcher() {
             verify {
                 log.d(
                     "GetDataByManagingObjectLocalCacheTimestamp",
-                    "userUid123 updated in local cache in section RESCUE_EVENTS"
+                    "${user.uid} updated in local cache in section ${Section.RESCUE_EVENTS}"
                 )
             }
         }
@@ -415,7 +413,7 @@ class CheckAllMyRescueEventsViewmodelTest : CoroutineTestDispatcher() {
             verify {
                 log.d(
                     "GetDataByManagingObjectLocalCacheTimestamp",
-                    "Cache for userUid123 in section RESCUE_EVENTS is up-to-date."
+                    "Cache for ${user.uid} in section ${Section.RESCUE_EVENTS} is up-to-date."
                 )
             }
         }

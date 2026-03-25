@@ -85,6 +85,11 @@ class CheckAllMyRescueEventsViewmodelIntegrationTest : CoroutineTestDispatcher()
             val checkAllMyRescueEventsViewmodel = getCheckAllMyRescueEventsViewmodel(
                 fireStoreRemoteRescueEventRepository = FakeFireStoreRemoteRescueEventRepository(
                     remoteRescueEventList = mutableListOf(rescueEvent.toData())
+                ),
+                localRescueEventRepository = FakeLocalRescueEventRepository(
+                    localRescueEventWithAllNeedsAndNonHumanAnimalDataList = mutableListOf(
+                        rescueEventWithAllNeedsAndNonHumanAnimalData
+                    )
                 )
             )
 

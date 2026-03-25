@@ -11,5 +11,5 @@ class FakeCheckAllMyRescueEventsUtil: CheckAllMyRescueEventsUtil {
         allRescueEventsFlow: Flow<List<RescueEvent>>,
         myUid: String,
         coroutineScope: CoroutineScope
-    ): Flow<List<RescueEvent>> = allRescueEventsFlow
+    ) {}
 }

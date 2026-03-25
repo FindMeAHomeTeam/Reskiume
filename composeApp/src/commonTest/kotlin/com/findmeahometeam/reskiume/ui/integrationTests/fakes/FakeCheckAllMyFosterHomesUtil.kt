@@ -11,5 +11,5 @@ class FakeCheckAllMyFosterHomesUtil: CheckAllMyFosterHomesUtil {
         allFosterHomesFlow: Flow<List<FosterHome>>,
         myUid: String,
         coroutineScope: CoroutineScope
-    ): Flow<List<FosterHome>> = allFosterHomesFlow
+    ) {}
 }

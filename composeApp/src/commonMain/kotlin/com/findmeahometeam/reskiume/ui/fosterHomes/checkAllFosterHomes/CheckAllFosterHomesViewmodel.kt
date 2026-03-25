@@ -31,7 +31,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flatMapLatest
@@ -229,15 +228,11 @@ class CheckAllFosterHomesViewmodel(
                             allFosterHomesFlow,
                             myUid,
                             viewModelScope
-                        ).combine(
-                            getAllFosterHomesByCountryAndCityFromLocalRepository(
-                                country,
-                                city
-                            )
-                        ) { remoteFosterHomes: List<FosterHome>, localFosterHomes: List<FosterHome> ->
-
-                            localFosterHomes.ifEmpty { remoteFosterHomes }
-                        }
+                        )
+                        getAllFosterHomesByCountryAndCityFromLocalRepository(
+                            country,
+                            city
+                        )
                     },
                     onCompletionUpdateCache = {
                         val allFosterHomesFlow: Flow<List<FosterHome>> =
@@ -249,15 +244,11 @@ class CheckAllFosterHomesViewmodel(
                             allFosterHomesFlow,
                             myUid,
                             viewModelScope
-                        ).combine(
-                            getAllFosterHomesByCountryAndCityFromLocalRepository(
-                                country,
-                                city
-                            )
-                        ) { remoteFosterHomes: List<FosterHome>, localFosterHomes: List<FosterHome> ->
-
-                            localFosterHomes.ifEmpty { remoteFosterHomes }
-                        }
+                        )
+                        getAllFosterHomesByCountryAndCityFromLocalRepository(
+                            country,
+                            city
+                        )
                     },
                     onVerifyCacheIsRecent = {
                         getAllFosterHomesByCountryAndCityFromLocalRepository(
@@ -273,7 +264,7 @@ class CheckAllFosterHomesViewmodel(
                                 acceptedNonHumanAnimalForFosterHome.acceptedNonHumanAnimalType
                             }.toSet()
 
-                        if (nonHumanAnimalTypeSet.contains(nonHumanAnimalType)) {
+                        if (fosterHome.available && nonHumanAnimalTypeSet.contains(nonHumanAnimalType)) {
                             UiFosterHome(
                                 fosterHome = fosterHome.copy(
                                     imageUrl = if (fosterHome.imageUrl.isEmpty()) {
@@ -322,17 +313,13 @@ class CheckAllFosterHomesViewmodel(
                             allFosterHomesFlow,
                             myUid,
                             viewModelScope
-                        ).combine(
-                            getAllFosterHomesByLocationFromLocalRepository(
-                                activistLongitude = activistLongitude,
-                                activistLatitude = activistLatitude,
-                                rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
-                                rangeLatitude = getRangeLat()
-                            )
-                        ) { remoteFosterHomes: List<FosterHome>, localFosterHomes: List<FosterHome> ->
-
-                            localFosterHomes.ifEmpty { remoteFosterHomes }
-                        }
+                        )
+                        getAllFosterHomesByLocationFromLocalRepository(
+                            activistLongitude = activistLongitude,
+                            activistLatitude = activistLatitude,
+                            rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
+                            rangeLatitude = getRangeLat()
+                        )
                     },
                     onCompletionUpdateCache = {
                         val allFosterHomesFlow: Flow<List<FosterHome>> =
@@ -346,17 +333,13 @@ class CheckAllFosterHomesViewmodel(
                             allFosterHomesFlow,
                             myUid,
                             viewModelScope
-                        ).combine(
-                            getAllFosterHomesByLocationFromLocalRepository(
-                                activistLongitude = activistLongitude,
-                                activistLatitude = activistLatitude,
-                                rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
-                                rangeLatitude = getRangeLat()
-                            )
-                        ) { remoteFosterHomes: List<FosterHome>, localFosterHomes: List<FosterHome> ->
-
-                            localFosterHomes.ifEmpty { remoteFosterHomes }
-                        }
+                        )
+                        getAllFosterHomesByLocationFromLocalRepository(
+                            activistLongitude = activistLongitude,
+                            activistLatitude = activistLatitude,
+                            rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
+                            rangeLatitude = getRangeLat()
+                        )
                     },
                     onVerifyCacheIsRecent = {
                         getAllFosterHomesByLocationFromLocalRepository(
@@ -374,7 +357,7 @@ class CheckAllFosterHomesViewmodel(
                                 acceptedNonHumanAnimalForFosterHome.acceptedNonHumanAnimalType
                             }.toSet()
 
-                        if (nonHumanAnimalTypeSet.contains(nonHumanAnimalType)) {
+                        if (fosterHome.available && nonHumanAnimalTypeSet.contains(nonHumanAnimalType)) {
                             UiFosterHome(
                                 fosterHome = fosterHome.copy(
                                     imageUrl = if (fosterHome.imageUrl.isEmpty()) {
@@ -405,7 +388,6 @@ class CheckAllFosterHomesViewmodel(
                 }
             }
             .toUiState()
-
 
     private fun getRangeLon(maxDistanceInKm: Double = 150.0, activistLatitude: Double): Double =
         1.0 * maxDistanceInKm / (111.320 * cos((activistLatitude * PI) / (180)))

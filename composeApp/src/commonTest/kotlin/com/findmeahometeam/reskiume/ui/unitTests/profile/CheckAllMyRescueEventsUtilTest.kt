@@ -1,6 +1,5 @@
 package com.findmeahometeam.reskiume.ui.unitTests.profile
 
-import app.cash.turbine.test
 import com.findmeahometeam.reskiume.CoroutineTestDispatcher
 import com.findmeahometeam.reskiume.authUser
 import com.findmeahometeam.reskiume.data.database.entity.LocalCacheEntity
@@ -38,10 +37,11 @@ import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
 import dev.mokkery.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
-import kotlin.test.assertEquals
 
 class CheckAllMyRescueEventsUtilTest : CoroutineTestDispatcher() {
 
@@ -431,6 +431,7 @@ class CheckAllMyRescueEventsUtilTest : CoroutineTestDispatcher() {
         )
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `given a new rescue event list_when the app manage them_then it inserts it in the local repository`() =
         runTest {
@@ -440,10 +441,10 @@ class CheckAllMyRescueEventsUtilTest : CoroutineTestDispatcher() {
                 flowOf(listOf(rescueEvent)),
                 user.uid,
                 this
-            ).test {
-                assertEquals(listOf(rescueEvent), awaitItem())
-                awaitComplete()
-            }
+            )
+
+            runCurrent()
+
             verify {
                 log.d(
                     "CheckAllMyRescueEventsUtilImpl",
@@ -456,8 +457,9 @@ class CheckAllMyRescueEventsUtilTest : CoroutineTestDispatcher() {
             }
         }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `given a new rescue event list_when the app manage them but fails the insertion in the local repo_then it wont be inserted`() =
+    fun `given a new rescue event list_when the app manage them but fails the insertion in the local repo_then it wont be inserted in the local repo`() =
         runTest {
             getCheckAllMyRescueEventsUtil(
                 myRescueEventWithAllNonHumanAnimalLocalDataReturn = null,
@@ -466,10 +468,10 @@ class CheckAllMyRescueEventsUtilTest : CoroutineTestDispatcher() {
                 flowOf(listOf(rescueEvent)),
                 user.uid,
                 this
-            ).test {
-                assertEquals(listOf(rescueEvent), awaitItem())
-                awaitComplete()
-            }
+            )
+
+            runCurrent()
+
             verify {
                 log.e(
                     "CheckAllMyRescueEventsUtilImpl",
@@ -478,8 +480,9 @@ class CheckAllMyRescueEventsUtilTest : CoroutineTestDispatcher() {
             }
         }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `given a new rescue event list without avatar_when the app manage them but fails the insertion in the local cache_then it wont be inserted`() =
+    fun `given a new rescue event list without avatar_when the app manage them but fails the insertion in the local cache_then it wont be inserted in the local cache`() =
         runTest {
             getCheckAllMyRescueEventsUtil(
                 imagePathToUploadToRemoteForRescueEventArg = "",
@@ -489,10 +492,10 @@ class CheckAllMyRescueEventsUtilTest : CoroutineTestDispatcher() {
                 flowOf(listOf(rescueEvent.copy(imageUrl = ""))),
                 user.uid,
                 this
-            ).test {
-                assertEquals(listOf(rescueEvent.copy(imageUrl = "")), awaitItem())
-                awaitComplete()
-            }
+            )
+
+            runCurrent()
+
             verify {
                 log.d(
                     "CheckAllMyRescueEventsUtilImpl",
@@ -505,6 +508,7 @@ class CheckAllMyRescueEventsUtilTest : CoroutineTestDispatcher() {
             }
         }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `given an existent rescue event list_when the app manage them_then it modifies it in the local repository`() =
         runTest {
@@ -512,10 +516,10 @@ class CheckAllMyRescueEventsUtilTest : CoroutineTestDispatcher() {
                 flowOf(listOf(rescueEvent)),
                 user.uid,
                 this
-            ).test {
-                assertEquals(listOf(rescueEvent), awaitItem())
-                awaitComplete()
-            }
+            )
+
+            runCurrent()
+
             verify {
                 log.d(
                     "CheckAllMyRescueEventsUtilImpl",
@@ -528,8 +532,9 @@ class CheckAllMyRescueEventsUtilTest : CoroutineTestDispatcher() {
             }
         }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `given an existent rescue event list_when the app manage them but fails the modification in the local repo_then it wont be modified`() =
+    fun `given an existent rescue event list_when the app manage them but fails the modification in the local repo_then it wont be modified in the local repo`() =
         runTest {
             getCheckAllMyRescueEventsUtil(
                 modifiedRowIdsOfRescueEventInLocalArg = 0
@@ -537,10 +542,10 @@ class CheckAllMyRescueEventsUtilTest : CoroutineTestDispatcher() {
                 flowOf(listOf(rescueEvent)),
                 user.uid,
                 this
-            ).test {
-                assertEquals(listOf(rescueEvent), awaitItem())
-                awaitComplete()
-            }
+            )
+
+            runCurrent()
+
             verify {
                 log.e(
                     "CheckAllMyRescueEventsUtilImpl",
@@ -549,8 +554,9 @@ class CheckAllMyRescueEventsUtilTest : CoroutineTestDispatcher() {
             }
         }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `given an existent rescue event list without avatar_when the app manage them but fails the modification in the local cache_then it wont be inserted`() =
+    fun `given an existent rescue event list without avatar_when the app manage them but fails the modification in the local cache_then it wont be inserted in the local cache`() =
         runTest {
             getCheckAllMyRescueEventsUtil(
                 imagePathToUploadToRemoteForRescueEventArg = "",
@@ -559,10 +565,10 @@ class CheckAllMyRescueEventsUtilTest : CoroutineTestDispatcher() {
                 flowOf(listOf(rescueEvent.copy(imageUrl = ""))),
                 user.uid,
                 this
-            ).test {
-                assertEquals(listOf(rescueEvent.copy(imageUrl = "")), awaitItem())
-                awaitComplete()
-            }
+            )
+
+            runCurrent()
+
             verify {
                 log.d(
                     "CheckAllMyRescueEventsUtilImpl",

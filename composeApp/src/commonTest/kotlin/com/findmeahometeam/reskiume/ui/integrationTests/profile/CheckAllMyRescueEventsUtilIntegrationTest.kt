@@ -1,6 +1,5 @@
 package com.findmeahometeam.reskiume.ui.integrationTests.profile
 
-import app.cash.turbine.test
 import com.findmeahometeam.reskiume.CoroutineTestDispatcher
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
@@ -31,24 +30,33 @@ import com.findmeahometeam.reskiume.ui.profile.checkAllMyRescueEvents.CheckAllMy
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.findmeahometeam.reskiume.user
-import dev.mokkery.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
-import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class CheckAllMyRescueEventsUtilIntegrationTest : CoroutineTestDispatcher() {
-
-    private val log: Log = FakeLog()
 
     private fun getCheckAllMyRescueEventsUtil(
         storageRepository: StorageRepository = FakeStorageRepository(),
         localRescueEventRepository: LocalRescueEventRepository = FakeLocalRescueEventRepository(),
-        checkNonHumanAnimalUtil: CheckNonHumanAnimalUtil = FakeCheckNonHumanAnimalUtil(),
-        localNonHumanAnimalRepository: LocalNonHumanAnimalRepository = FakeLocalNonHumanAnimalRepository(),
-        manageImagePath: ManageImagePath = FakeManageImagePath(),
+        checkNonHumanAnimalUtil: CheckNonHumanAnimalUtil = FakeCheckNonHumanAnimalUtil(
+            mutableListOf(
+                nonHumanAnimal,
+                nonHumanAnimal.copy(id = nonHumanAnimal.id + "second")
+            )
+        ),
+        localNonHumanAnimalRepository: LocalNonHumanAnimalRepository = FakeLocalNonHumanAnimalRepository(
+            mutableListOf(
+                nonHumanAnimal.toEntity(),
+                nonHumanAnimal.copy(id = nonHumanAnimal.id + "second").toEntity()
+            )
+        ), manageImagePath: ManageImagePath = FakeManageImagePath(),
         authRepository: AuthRepository = FakeAuthRepository(),
-        localCacheRepository: LocalCacheRepository = FakeLocalCacheRepository()
+        localCacheRepository: LocalCacheRepository = FakeLocalCacheRepository(),
+        log: Log = FakeLog()
     ): CheckAllMyRescueEventsUtilImpl {
 
         val downloadImageToLocalDataSource =
@@ -94,44 +102,44 @@ class CheckAllMyRescueEventsUtilIntegrationTest : CoroutineTestDispatcher() {
         )
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `given a new rescue event list_when the app manage them_then it inserts it in the local repository`() =
         runTest {
-            getCheckAllMyRescueEventsUtil().downloadImageAndManageRescueEventsInLocalRepositoryFromFlow(
+            val localRescueEventRepository: LocalRescueEventRepository =
+                FakeLocalRescueEventRepository()
+
+            getCheckAllMyRescueEventsUtil(
+                localRescueEventRepository = localRescueEventRepository,
+            ).downloadImageAndManageRescueEventsInLocalRepositoryFromFlow(
                 flowOf(listOf(rescueEvent)),
                 user.uid,
                 this
-            ).test {
-                assertEquals(
-                    listOf(rescueEvent.copy(imageUrl = "${rescueEvent.creatorId}${rescueEvent.id}.webp")),
-                    awaitItem()
-                )
-                awaitComplete()
-            }
-            verify {
-                log.d(
-                    "CheckAllMyRescueEventsUtilImpl",
-                    "insertRescueEventInLocalRepo: Rescue event ${rescueEvent.id} added to local database"
-                )
-                log.d(
-                    "CheckAllMyRescueEventsUtilImpl",
-                    "insertRescueEventInLocalRepo: ${rescueEvent.id} added to local cache in section ${Section.RESCUE_EVENTS}"
-                )
-            }
+            )
+
+            runCurrent()
+
+            assertTrue { localRescueEventRepository.getRescueEvent(rescueEvent.id) != null }
         }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `given a new rescue event list without avatar_when the app manage them but fails the insertion in the local cache_then it wont be inserted`() =
+    fun `given a new rescue event list without avatar_when the app manage them but fails the insertion in the local cache_then it wont be inserted in the local cache`() =
         runTest {
+            val localRescueEventRepository: LocalRescueEventRepository =
+                FakeLocalRescueEventRepository()
+            val localCacheRepository = FakeLocalCacheRepository(
+                mutableListOf(
+                    localCache.copy(
+                        cachedObjectId = rescueEvent.id,
+                        section = Section.RESCUE_EVENTS
+                    ).toEntity()
+                )
+            )
+
             getCheckAllMyRescueEventsUtil(
-                localCacheRepository = FakeLocalCacheRepository(
-                    mutableListOf(
-                        localCache.copy(
-                            cachedObjectId = rescueEvent.id,
-                            section = Section.RESCUE_EVENTS
-                        ).toEntity()
-                    )
-                ),
+                localRescueEventRepository = localRescueEventRepository,
+                localCacheRepository = localCacheRepository,
                 checkNonHumanAnimalUtil = FakeCheckNonHumanAnimalUtil(
                     mutableListOf(
                         nonHumanAnimal,
@@ -148,29 +156,29 @@ class CheckAllMyRescueEventsUtilIntegrationTest : CoroutineTestDispatcher() {
                 flowOf(listOf(rescueEvent.copy(imageUrl = ""))),
                 user.uid,
                 this
-            ).test {
-                assertEquals(listOf(rescueEvent.copy(imageUrl = "")), awaitItem())
-                awaitComplete()
-            }
-            verify {
-                log.d(
-                    "CheckAllMyRescueEventsUtilImpl",
-                    "downloadImageAndManageRescueEventsInLocalRepositoryFromFlow: Rescue event ${rescueEvent.id} has no avatar image to save locally."
-                )
-                log.e(
-                    "CheckAllMyRescueEventsUtilImpl",
-                    "insertRescueEventInLocalRepo: Error adding ${rescueEvent.id} to local cache in section ${Section.RESCUE_EVENTS}"
-                )
-            }
+            )
+
+            runCurrent()
+
+            assertTrue { localRescueEventRepository.getRescueEvent(rescueEvent.id) != null }
         }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `given a rescue event list_when the app manage them but it does exist in cache_then it modifies it in the local repository`() =
+    fun `given an existent rescue event list_when the app manage them_then it modifies it in the local repository`() =
         runTest {
+            val localRescueEventRepository: LocalRescueEventRepository =
+                FakeLocalRescueEventRepository(
+                    mutableListOf(
+                        rescueEventWithAllNeedsAndNonHumanAnimalData.copy(
+                            rescueEventEntity = rescueEvent.copy(description = "vegan activism")
+                                .toEntity()
+                        )
+                    )
+                )
+
             getCheckAllMyRescueEventsUtil(
-                localRescueEventRepository = FakeLocalRescueEventRepository(
-                    mutableListOf(rescueEventWithAllNeedsAndNonHumanAnimalData)
-                ),
+                localRescueEventRepository = localRescueEventRepository,
                 localCacheRepository = FakeLocalCacheRepository(
                     mutableListOf(
                         localCache.copy(
@@ -183,22 +191,13 @@ class CheckAllMyRescueEventsUtilIntegrationTest : CoroutineTestDispatcher() {
                 flowOf(listOf(rescueEvent)),
                 user.uid,
                 this
-            ).test {
-                assertEquals(
-                    listOf(rescueEvent.copy(imageUrl = "${rescueEvent.creatorId}${rescueEvent.id}.webp")),
-                    awaitItem()
-                )
-                awaitComplete()
-            }
-            verify {
-                log.d(
-                    "CheckAllMyRescueEventsUtilImpl",
-                    "modifyRescueEventInLocalRepo: Rescue event ${rescueEvent.id} modified in local database"
-                )
-                log.d(
-                    "CheckAllMyRescueEventsUtilImpl",
-                    "modifyRescueEventInLocalRepo: ${rescueEvent.id} updated in local cache in section ${Section.RESCUE_EVENTS}"
-                )
-            }
+            )
+
+            runCurrent()
+
+            val expectedRescueEventEntity =
+                rescueEvent.copy(imageUrl = "userUid123456userUid123.webp").toEntity()
+
+            assertTrue { localRescueEventRepository.getRescueEvent(rescueEvent.id)!!.rescueEventEntity == expectedRescueEventEntity }
         }
 }

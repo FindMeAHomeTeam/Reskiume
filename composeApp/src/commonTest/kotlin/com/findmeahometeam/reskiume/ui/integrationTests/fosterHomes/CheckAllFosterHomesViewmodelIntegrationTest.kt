@@ -63,9 +63,6 @@ import kotlin.test.assertTrue
 
 class CheckAllFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() {
 
-    private val stringProvider: StringProvider =
-        FakeStringProvider("I found a non-human animal in the street. What can I do?")
-
     private fun getCheckAllFosterHomesViewmodel(
         authRepository: AuthRepository = FakeAuthRepository(
             authUser = authUser,
@@ -74,7 +71,12 @@ class CheckAllFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() {
         ),
         localCacheRepository: LocalCacheRepository = FakeLocalCacheRepository(),
         fireStoreRemoteFosterHomeRepository: FireStoreRemoteFosterHomeRepository = FakeFireStoreRemoteFosterHomeRepository(),
-        checkNonHumanAnimalUtil: CheckNonHumanAnimalUtil = FakeCheckNonHumanAnimalUtil(),
+        checkNonHumanAnimalUtil: CheckNonHumanAnimalUtil = FakeCheckNonHumanAnimalUtil(
+            mutableListOf(
+                nonHumanAnimal,
+                nonHumanAnimal.copy(id = nonHumanAnimal.id + "other")
+            )
+        ),
         localFosterHomeRepository: LocalFosterHomeRepository = FakeLocalFosterHomeRepository(),
         locationRepository: LocationRepository = FakeLocationRepository(
             location = Pair(
@@ -85,7 +87,13 @@ class CheckAllFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() {
         storageRepository: StorageRepository = FakeStorageRepository(),
         konnectivity: Konnectivity = FakeKonnectivity(),
         manageImagePath: ManageImagePath = FakeManageImagePath(),
-        localNonHumanAnimalRepository: LocalNonHumanAnimalRepository = FakeLocalNonHumanAnimalRepository(),
+        localNonHumanAnimalRepository: LocalNonHumanAnimalRepository = FakeLocalNonHumanAnimalRepository(
+            mutableListOf(
+                nonHumanAnimal.toEntity(),
+                nonHumanAnimal.copy(id = nonHumanAnimal.id + "other").toEntity()
+            )
+        ),
+        stringProvider: StringProvider = FakeStringProvider("I found a non-human animal in the street. What can I do?"),
         log: Log = FakeLog()
     ): CheckAllFosterHomesViewmodel {
 
@@ -185,7 +193,32 @@ class CheckAllFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() {
         runTest {
             val checkAllFosterHomesViewmodel = getCheckAllFosterHomesViewmodel(
                 fireStoreRemoteFosterHomeRepository = FakeFireStoreRemoteFosterHomeRepository(
-                    remoteFosterHomeList = mutableListOf(fosterHome.toData())
+                    remoteFosterHomeList = mutableListOf(
+                        fosterHome.copy(
+                            id = fosterHome.id + "other",
+                            allResidentNonHumanAnimals = listOf(
+                                fosterHome.allResidentNonHumanAnimals[0].copy(
+                                    fosterHomeId = fosterHome.id + "other",
+                                    nonHumanAnimalId = nonHumanAnimal.id + "other"
+                                )
+                            ),
+                            allAcceptedNonHumanAnimals = listOf(
+                                fosterHome.allAcceptedNonHumanAnimals[0].copy(
+                                    fosterHomeId = fosterHome.id + "other",
+                                    acceptedNonHumanAnimalId = 3
+                                ),
+                                fosterHome.allAcceptedNonHumanAnimals[1].copy(
+                                    fosterHomeId = fosterHome.id + "other",
+                                    acceptedNonHumanAnimalId = 4
+                                )
+                            )
+                        ).toData()
+                    )
+                ),
+                localFosterHomeRepository = FakeLocalFosterHomeRepository(
+                    localFosterHomeWithAllNonHumanAnimalDataList = mutableListOf(
+                        fosterHomeWithAllNonHumanAnimalData
+                    )
                 )
             )
             checkAllFosterHomesViewmodel.fetchAllFosterHomesStateByPlace(
@@ -200,7 +233,7 @@ class CheckAllFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     UiState.Success(
                         listOf(
                             UiFosterHome(
-                                fosterHome.copy(imageUrl = "${fosterHome.ownerId}${fosterHome.id}.webp"),
+                                fosterHome,
                                 listOf(nonHumanAnimal)
                             )
                         )
@@ -216,7 +249,37 @@ class CheckAllFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() {
         runTest {
             val checkAllFosterHomesViewmodel = getCheckAllFosterHomesViewmodel(
                 fireStoreRemoteFosterHomeRepository = FakeFireStoreRemoteFosterHomeRepository(
-                    remoteFosterHomeList = mutableListOf(fosterHome.copy(imageUrl = "").toData())
+                    remoteFosterHomeList = mutableListOf(
+                        fosterHome.copy(
+                            id = fosterHome.id + "other",
+                            imageUrl = "",
+                            allResidentNonHumanAnimals = listOf(
+                                fosterHome.allResidentNonHumanAnimals[0].copy(
+                                    fosterHomeId = fosterHome.id + "other",
+                                    nonHumanAnimalId = nonHumanAnimal.id + "other"
+                                )
+                            ),
+                            allAcceptedNonHumanAnimals = listOf(
+                                fosterHome.allAcceptedNonHumanAnimals[0].copy(
+                                    fosterHomeId = fosterHome.id + "other",
+                                    acceptedNonHumanAnimalId = 3
+                                ),
+                                fosterHome.allAcceptedNonHumanAnimals[1].copy(
+                                    fosterHomeId = fosterHome.id + "other",
+                                    acceptedNonHumanAnimalId = 4
+                                )
+                            )
+                        ).toData()
+                    )
+                ),
+                localFosterHomeRepository = FakeLocalFosterHomeRepository(
+                    localFosterHomeWithAllNonHumanAnimalDataList = mutableListOf(
+                        fosterHomeWithAllNonHumanAnimalData.copy(
+                            fosterHomeEntity = fosterHome.copy(
+                                imageUrl = ""
+                            ).toEntity()
+                        )
+                    )
                 )
             )
             checkAllFosterHomesViewmodel.fetchAllFosterHomesStateByPlace(
@@ -242,18 +305,42 @@ class CheckAllFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() {
             }
         }
 
-
     @Test
     fun `given a user requesting all FHs from cordoba_when the user clicks on the search button but the app fails saving FHs in the local cache_then FHs are not saved in the local cache but displayed`() =
         runTest {
             val checkAllFosterHomesViewmodel = getCheckAllFosterHomesViewmodel(
                 fireStoreRemoteFosterHomeRepository = FakeFireStoreRemoteFosterHomeRepository(
-                    remoteFosterHomeList = mutableListOf(fosterHome.toData())
+                    remoteFosterHomeList = mutableListOf(
+                        fosterHome.copy(
+                            id = fosterHome.id + "other",
+                            allResidentNonHumanAnimals = listOf(
+                                fosterHome.allResidentNonHumanAnimals[0].copy(
+                                    fosterHomeId = fosterHome.id + "other",
+                                    nonHumanAnimalId = nonHumanAnimal.id + "other"
+                                )
+                            ),
+                            allAcceptedNonHumanAnimals = listOf(
+                                fosterHome.allAcceptedNonHumanAnimals[0].copy(
+                                    fosterHomeId = fosterHome.id + "other",
+                                    acceptedNonHumanAnimalId = 3
+                                ),
+                                fosterHome.allAcceptedNonHumanAnimals[1].copy(
+                                    fosterHomeId = fosterHome.id + "other",
+                                    acceptedNonHumanAnimalId = 4
+                                )
+                            )
+                        ).toData()
+                    )
+                ),
+                localFosterHomeRepository = FakeLocalFosterHomeRepository(
+                    localFosterHomeWithAllNonHumanAnimalDataList = mutableListOf(
+                        fosterHomeWithAllNonHumanAnimalData
+                    )
                 ),
                 localCacheRepository = FakeLocalCacheRepository(
                     localCacheList = mutableListOf(
                         localCache.copy(
-                            cachedObjectId = fosterHome.id,
+                            cachedObjectId = fosterHome.id + "other",
                             section = Section.FOSTER_HOMES
                         ).toEntity()
                     )
@@ -271,7 +358,7 @@ class CheckAllFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     UiState.Success(
                         listOf(
                             UiFosterHome(
-                                fosterHome.copy(imageUrl = "${fosterHome.ownerId}${fosterHome.id}.webp"),
+                                fosterHome,
                                 listOf(nonHumanAnimal)
                             )
                         )
@@ -422,7 +509,32 @@ class CheckAllFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() {
         runTest {
             val checkAllFosterHomesViewmodel = getCheckAllFosterHomesViewmodel(
                 fireStoreRemoteFosterHomeRepository = FakeFireStoreRemoteFosterHomeRepository(
-                    remoteFosterHomeList = mutableListOf(fosterHome.toData())
+                    remoteFosterHomeList = mutableListOf(
+                        fosterHome.copy(
+                            id = fosterHome.id + "other",
+                            allResidentNonHumanAnimals = listOf(
+                                fosterHome.allResidentNonHumanAnimals[0].copy(
+                                    fosterHomeId = fosterHome.id + "other",
+                                    nonHumanAnimalId = nonHumanAnimal.id + "other"
+                                )
+                            ),
+                            allAcceptedNonHumanAnimals = listOf(
+                                fosterHome.allAcceptedNonHumanAnimals[0].copy(
+                                    fosterHomeId = fosterHome.id + "other",
+                                    acceptedNonHumanAnimalId = 3
+                                ),
+                                fosterHome.allAcceptedNonHumanAnimals[1].copy(
+                                    fosterHomeId = fosterHome.id + "other",
+                                    acceptedNonHumanAnimalId = 4
+                                )
+                            )
+                        ).toData()
+                    )
+                ),
+                localFosterHomeRepository = FakeLocalFosterHomeRepository(
+                    localFosterHomeWithAllNonHumanAnimalDataList = mutableListOf(
+                        fosterHomeWithAllNonHumanAnimalData
+                    )
                 )
             )
             checkAllFosterHomesViewmodel.fetchAllFosterHomesStateByLocation(nonHumanAnimal.nonHumanAnimalType)
@@ -434,7 +546,7 @@ class CheckAllFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     UiState.Success(
                         listOf(
                             UiFosterHome(
-                                fosterHome.copy(imageUrl = "${fosterHome.ownerId}${fosterHome.id}.webp"),
+                                fosterHome,
                                 listOf(nonHumanAnimal),
                                 22.1
                             )
@@ -455,7 +567,8 @@ class CheckAllFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 ),
                 locationRepository = FakeLocationRepository(
                     location = Pair(0.0, 0.0)
-                )
+                ),
+                stringProvider = FakeStringProvider("Please, turn on the location to get your position")
             )
             checkAllFosterHomesViewmodel.fetchAllFosterHomesStateByLocation(nonHumanAnimal.nonHumanAnimalType)
 

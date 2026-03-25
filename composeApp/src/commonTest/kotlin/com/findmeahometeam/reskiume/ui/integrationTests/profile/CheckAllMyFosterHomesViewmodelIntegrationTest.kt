@@ -83,6 +83,11 @@ class CheckAllMyFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() 
             val checkAllMyFosterHomesViewmodel = getCheckAllMyFosterHomesViewmodel(
                 fireStoreRemoteFosterHomeRepository = FakeFireStoreRemoteFosterHomeRepository(
                     remoteFosterHomeList = mutableListOf(fosterHome.toData())
+                ),
+                localFosterHomeRepository = FakeLocalFosterHomeRepository(
+                    localFosterHomeWithAllNonHumanAnimalDataList = mutableListOf(
+                        fosterHomeWithAllNonHumanAnimalData
+                    )
                 )
             )
 

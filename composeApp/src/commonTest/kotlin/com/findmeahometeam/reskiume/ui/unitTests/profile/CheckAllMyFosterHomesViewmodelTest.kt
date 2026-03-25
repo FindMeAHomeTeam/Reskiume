@@ -8,7 +8,6 @@ import com.findmeahometeam.reskiume.data.database.entity.fosterHome.FosterHomeWi
 import com.findmeahometeam.reskiume.data.remote.response.fosterHome.RemoteFosterHome
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
 import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteFosterHome.FireStoreRemoteFosterHomeRepository
@@ -40,6 +39,7 @@ import dev.mokkery.matcher.capture.Capture
 import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
+import dev.mokkery.verify
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
@@ -105,8 +105,7 @@ class CheckAllMyFosterHomesViewmodelTest : CoroutineTestDispatcher() {
         myFosterHomeWithAllNonHumanAnimalLocalDataReturn: FosterHomeWithAllNonHumanAnimalData? = fosterHomeWithAllNonHumanAnimalData,
         allMyFosterHomeWithAllNonHumanAnimalLocalDataReturn: Flow<List<FosterHomeWithAllNonHumanAnimalData>> = flowOf(
             listOf(fosterHomeWithAllNonHumanAnimalData)
-        ),
-        allMyManagedFosterHomesFromLocalReturn: Flow<List<FosterHome>> = flowOf(listOf(fosterHome))
+        )
     ): CheckAllMyFosterHomesViewmodel {
 
         val saveStateHandleProvider: SaveStateHandleProvider = mock {
@@ -255,7 +254,7 @@ class CheckAllMyFosterHomesViewmodelTest : CoroutineTestDispatcher() {
                     user.uid,
                     any()
                 )
-            } returns allMyManagedFosterHomesFromLocalReturn
+            } returns Unit
         }
 
         val manageImagePath: ManageImagePath = mock {
@@ -301,8 +300,23 @@ class CheckAllMyFosterHomesViewmodelTest : CoroutineTestDispatcher() {
             )
 
             checkAllMyFosterHomesViewmodel.fetchAllMyFosterHomes().test {
-                assertEquals(UiState.Success(listOf(UiFosterHome(fosterHome, listOf(nonHumanAnimal)))), awaitItem())
+                assertEquals(
+                    UiState.Success(
+                        listOf(
+                            UiFosterHome(
+                                fosterHome,
+                                listOf(nonHumanAnimal)
+                            )
+                        )
+                    ), awaitItem()
+                )
                 awaitComplete()
+            }
+            verify {
+                log.d(
+                    "GetDataByManagingObjectLocalCacheTimestamp",
+                    "${user.uid} added to local cache in section ${Section.FOSTER_HOMES}"
+                )
             }
         }
 
@@ -331,6 +345,12 @@ class CheckAllMyFosterHomesViewmodelTest : CoroutineTestDispatcher() {
                 )
                 awaitComplete()
             }
+            verify {
+                log.d(
+                    "GetDataByManagingObjectLocalCacheTimestamp",
+                    "${user.uid} updated in local cache in section ${Section.FOSTER_HOMES}"
+                )
+            }
         }
 
     @Test
@@ -344,6 +364,12 @@ class CheckAllMyFosterHomesViewmodelTest : CoroutineTestDispatcher() {
                     awaitItem()
                 )
                 awaitComplete()
+            }
+            verify {
+                log.d(
+                    "GetDataByManagingObjectLocalCacheTimestamp",
+                    "Cache for ${user.uid} in section ${Section.FOSTER_HOMES} is up-to-date."
+                )
             }
         }
 }

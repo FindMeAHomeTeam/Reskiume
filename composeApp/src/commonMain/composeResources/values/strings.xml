@@ -256,9 +256,11 @@
     <string name="country_city_selector_country">Country</string>
     <string name="country_city_selector_city">City</string>
 
+    <!-- element types -->
+    <string name="foster_home">foster home</string>
+    <string name="rescue_event">rescue event</string>
+
     <!-- Manage location permission for a foster home and a rescue event -->
-    <string name="manage_location_permission_foster_home">foster home</string>
-    <string name="manage_location_permission_rescue_event">rescue event</string>
     <string name="manage_location_permission_title">Location permission</string>
     <string name="manage_location_permission_message_check_all">You can grant the location permission to display %1$ss near you. We will never track your location.</string>
     <string name="manage_location_permission_message">You must grant location permission to access your %1$s's coarse location. Users can see the distance between nearby %1$ss using their current location. Furthermore, we will never track and reveal your location.</string>

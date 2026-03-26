@@ -53,7 +53,7 @@ import reskiume.composeapp.generated.resources.create_rescue_event_screen_rescue
 import reskiume.composeapp.generated.resources.create_rescue_event_screen_rescue_event_title
 import reskiume.composeapp.generated.resources.create_rescue_event_screen_title
 import reskiume.composeapp.generated.resources.manage_location_permission_message
-import reskiume.composeapp.generated.resources.manage_location_permission_rescue_event
+import reskiume.composeapp.generated.resources.rescue_event
 import reskiume.composeapp.generated.resources.manage_location_permission_turn_on_location_message
 import reskiume.composeapp.generated.resources.non_human_animal_list_creator_save_title
 
@@ -149,11 +149,11 @@ fun CreateRescueEventScreen(
             RmManageLocationPermission(
                 explainingLocationPermissionMessage = stringResource(
                     Res.string.manage_location_permission_turn_on_location_message,
-                    stringResource(Res.string.manage_location_permission_rescue_event)
+                    stringResource(Res.string.rescue_event)
                 ),
                 explainingLocationActivationMessage = stringResource(
                     Res.string.manage_location_permission_message,
-                    stringResource(Res.string.manage_location_permission_rescue_event)
+                    stringResource(Res.string.rescue_event)
                 ),
                 permissionState = permissionState,
                 isLocationEnabledState = isLocationEnabledState,

@@ -53,7 +53,7 @@ import reskiume.composeapp.generated.resources.create_foster_home_screen_foster_
 import reskiume.composeapp.generated.resources.create_foster_home_screen_foster_home_description
 import reskiume.composeapp.generated.resources.create_foster_home_screen_foster_home_title
 import reskiume.composeapp.generated.resources.create_foster_home_screen_title
-import reskiume.composeapp.generated.resources.manage_location_permission_foster_home
+import reskiume.composeapp.generated.resources.foster_home
 import reskiume.composeapp.generated.resources.manage_location_permission_message
 import reskiume.composeapp.generated.resources.manage_location_permission_turn_on_location_message
 import reskiume.composeapp.generated.resources.non_human_animal_list_creator_resident_title
@@ -153,11 +153,11 @@ fun CreateFosterHomeScreen(
             RmManageLocationPermission(
                 explainingLocationPermissionMessage = stringResource(
                     Res.string.manage_location_permission_turn_on_location_message,
-                    stringResource(Res.string.manage_location_permission_foster_home)
+                    stringResource(Res.string.foster_home)
                 ),
                 explainingLocationActivationMessage = stringResource(
                     Res.string.manage_location_permission_message,
-                    stringResource(Res.string.manage_location_permission_foster_home)
+                    stringResource(Res.string.foster_home)
                 ),
                 permissionState = permissionState,
                 isLocationEnabledState = isLocationEnabledState,

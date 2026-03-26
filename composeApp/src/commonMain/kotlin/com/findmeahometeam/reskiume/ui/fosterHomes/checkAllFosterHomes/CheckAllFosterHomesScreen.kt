@@ -63,7 +63,7 @@ import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_sea
 import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_search_foster_homes_button
 import reskiume.composeapp.generated.resources.check_all_foster_homes_screen_title
 import reskiume.composeapp.generated.resources.ic_add
-import reskiume.composeapp.generated.resources.manage_location_permission_foster_home
+import reskiume.composeapp.generated.resources.foster_home
 import reskiume.composeapp.generated.resources.manage_location_permission_message_check_all
 import reskiume.composeapp.generated.resources.manage_location_permission_turn_on_location_message_check_all
 
@@ -163,12 +163,12 @@ fun CheckAllFosterHomesScreen(
                         explainingLocationPermissionMessage =
                             stringResource(
                                 Res.string.manage_location_permission_turn_on_location_message_check_all,
-                                stringResource(Res.string.manage_location_permission_foster_home)
+                                stringResource(Res.string.foster_home)
                             ),
                         explainingLocationActivationMessage =
                             stringResource(
                                 Res.string.manage_location_permission_message_check_all,
-                                stringResource(Res.string.manage_location_permission_foster_home)
+                                stringResource(Res.string.foster_home)
                             ),
                         permissionState = permissionState,
                         isLocationEnabledState = isLocationEnabledState,

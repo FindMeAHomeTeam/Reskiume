@@ -62,7 +62,7 @@ import reskiume.composeapp.generated.resources.check_all_rescue_events_screen_se
 import reskiume.composeapp.generated.resources.check_all_rescue_events_screen_title
 import reskiume.composeapp.generated.resources.ic_add
 import reskiume.composeapp.generated.resources.manage_location_permission_message_check_all
-import reskiume.composeapp.generated.resources.manage_location_permission_rescue_event
+import reskiume.composeapp.generated.resources.rescue_event
 import reskiume.composeapp.generated.resources.manage_location_permission_turn_on_location_message_check_all
 
 @Composable
@@ -157,12 +157,12 @@ fun CheckAllRescueEventsScreen(
                         explainingLocationPermissionMessage =
                             stringResource(
                                 Res.string.manage_location_permission_turn_on_location_message_check_all,
-                                stringResource(Res.string.manage_location_permission_rescue_event)
+                                stringResource(Res.string.rescue_event)
                             ),
                         explainingLocationActivationMessage =
                             stringResource(
                                 Res.string.manage_location_permission_message_check_all,
-                                stringResource(Res.string.manage_location_permission_rescue_event)
+                                stringResource(Res.string.rescue_event)
                             ),
                         permissionState = permissionState,
                         isLocationEnabledState = isLocationEnabledState,

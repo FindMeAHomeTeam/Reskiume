@@ -184,6 +184,7 @@ fun CheckFosterHomeScreen(
                 if (isShareButtonClicked) {
                     DisplayShareService(
                         allAcceptedNonHumanAnimals = uiFosterHome.fosterHome.allAcceptedNonHumanAnimals,
+                        fosterHomeTitle = uiFosterHome.fosterHome.title,
                         fosterHomeOwnerId = uiFosterHome.fosterHome.ownerId,
                         fosterHomeId = uiFosterHome.fosterHome.id
                     )

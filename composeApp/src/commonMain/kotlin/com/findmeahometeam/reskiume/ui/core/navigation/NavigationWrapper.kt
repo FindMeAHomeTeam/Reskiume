@@ -23,6 +23,7 @@ import com.findmeahometeam.reskiume.ui.profile.modifyAccount.ModifyAccountScreen
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsScreen
 import com.findmeahometeam.reskiume.ui.profile.createNonHumanAnimal.CreateNonHumanAnimalScreen
 import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.ModifyNonHumanAnimalScreen
+import com.findmeahometeam.reskiume.ui.rescueEvents.checkRescueEvent.CheckRescueEventScreen
 import com.findmeahometeam.reskiume.ui.rescueEvents.createRescueEvent.CreateRescueEventScreen
 import com.findmeahometeam.reskiume.ui.rescueEvents.modifyRescueEvent.ModifyRescueEventScreen
 
@@ -71,7 +72,7 @@ fun NavigationWrapper() {
             )
         ) {
             CheckFosterHomeScreen(
-                onContactFosterHome = { fosterHomeId: String, nonHumanAnimalId: String ->
+                onContactFosterHome = { fosterHomeId: String, nonHumanAnimalIds: List<String> ->
                     // TODO
                 },
                 onReviewClick = { uid ->
@@ -121,7 +122,17 @@ fun NavigationWrapper() {
                 }
             )
         ) {
-            //
+            CheckRescueEventScreen(
+                onContactRescueEvent = { rescueEventId: String, nonHumanAnimalIds: List<String> ->
+                    // TODO
+                },
+                onCreateAccount = {
+                    mainNavController.navigate(Routes.CREATE_ACCOUNT.route)
+                },
+                onBackPressed = {
+                    mainNavController.navigateUp()
+                }
+            )
         }
 
         composable(route = Routes.CREATE_ACCOUNT.route) {

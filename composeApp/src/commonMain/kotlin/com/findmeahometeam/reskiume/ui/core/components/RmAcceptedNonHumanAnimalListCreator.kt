@@ -137,7 +137,7 @@ fun RmAcceptedNonHumanAnimalListCreator(
                         }
                         if (existingItems.isEmpty()) {
                             val acceptedNonHumanAnimal = AcceptedNonHumanAnimalForFosterHome(
-                                acceptedNonHumanAnimalId = Clock.System.now().epochSeconds,
+                                acceptedNonHumanAnimalId = "${nonHumanAnimalType.name}${gender.name}${Clock.System.now().epochSeconds}",
                                 fosterHomeId = fosterHomeId,
                                 acceptedNonHumanAnimalType = nonHumanAnimalType,
                                 acceptedNonHumanAnimalGender = gender

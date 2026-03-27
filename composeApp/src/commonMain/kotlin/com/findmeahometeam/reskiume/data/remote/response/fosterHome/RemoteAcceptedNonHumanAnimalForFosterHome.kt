@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class RemoteAcceptedNonHumanAnimalForFosterHome(
-    val acceptedNonHumanAnimalId: Long? = 0,
+    val acceptedNonHumanAnimalId: String? = "",
     val fosterHomeId: String? = "",
     val acceptedNonHumanAnimalType: NonHumanAnimalType? = NonHumanAnimalType.UNSELECTED,
     val acceptedNonHumanAnimalGender: Gender? = Gender.UNSELECTED
@@ -23,7 +23,7 @@ data class RemoteAcceptedNonHumanAnimalForFosterHome(
 
     fun toDomain(): AcceptedNonHumanAnimalForFosterHome {
         return AcceptedNonHumanAnimalForFosterHome(
-            acceptedNonHumanAnimalId = acceptedNonHumanAnimalId ?: 0,
+            acceptedNonHumanAnimalId = acceptedNonHumanAnimalId ?: "",
             fosterHomeId = fosterHomeId ?: "",
             acceptedNonHumanAnimalType = acceptedNonHumanAnimalType ?: NonHumanAnimalType.UNSELECTED,
             acceptedNonHumanAnimalGender = acceptedNonHumanAnimalGender ?: Gender.UNSELECTED

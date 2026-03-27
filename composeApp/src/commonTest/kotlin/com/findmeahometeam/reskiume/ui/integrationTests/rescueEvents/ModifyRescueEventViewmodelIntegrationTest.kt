@@ -246,7 +246,7 @@ class ModifyRescueEventViewmodelIntegrationTest : CoroutineTestDispatcher() {
             )
 
             val needToCover = NeedToCover(
-                needToCoverId = 123456,
+                needToCoverId = "${RescueNeed.RESCUERS.name}123456",
                 rescueNeed = RescueNeed.RESCUERS,
                 rescueEventId = rescueEvent.id
             )
@@ -424,7 +424,7 @@ class ModifyRescueEventViewmodelIntegrationTest : CoroutineTestDispatcher() {
             )
 
             val needToCover = NeedToCover(
-                needToCoverId = 123456,
+                needToCoverId = "${RescueNeed.RESCUERS.name}123456",
                 rescueNeed = RescueNeed.RESCUERS,
                 rescueEventId = rescueEvent.id
             )

@@ -8,7 +8,7 @@ import com.findmeahometeam.reskiume.domain.model.Gender
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
 
 data class AcceptedNonHumanAnimalForFosterHome(
-    val acceptedNonHumanAnimalId: Long = 0,
+    val acceptedNonHumanAnimalId: String = "",
     val fosterHomeId: String,
     val acceptedNonHumanAnimalType: NonHumanAnimalType,
     val acceptedNonHumanAnimalGender: Gender
@@ -40,7 +40,7 @@ private fun AcceptedNonHumanAnimalForFosterHome.toSaveableList(): List<Any?> = l
 )
 
 private fun List<Any?>.fromSaveableList(): AcceptedNonHumanAnimalForFosterHome = AcceptedNonHumanAnimalForFosterHome(
-    acceptedNonHumanAnimalId = this[0] as Long,
+    acceptedNonHumanAnimalId = this[0] as String,
     fosterHomeId = this[1] as String,
     acceptedNonHumanAnimalType = NonHumanAnimalType.valueOf(this[2] as String),
     acceptedNonHumanAnimalGender = Gender.valueOf(this[3] as String)

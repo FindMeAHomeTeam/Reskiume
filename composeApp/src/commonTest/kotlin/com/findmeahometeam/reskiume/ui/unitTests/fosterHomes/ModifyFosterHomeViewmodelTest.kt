@@ -176,7 +176,7 @@ class ModifyFosterHomeViewmodelTest : CoroutineTestDispatcher() {
             everySuspend {
 
                 val acceptedNonHumanAnimal = AcceptedNonHumanAnimalForFosterHome(
-                    acceptedNonHumanAnimalId = 123456,
+                    acceptedNonHumanAnimalId = "${NonHumanAnimalType.BIRD.name}${Gender.MALE.name}123456",
                     fosterHomeId = fosterHome.id,
                     acceptedNonHumanAnimalType = NonHumanAnimalType.BIRD,
                     acceptedNonHumanAnimalGender = Gender.MALE
@@ -205,7 +205,7 @@ class ModifyFosterHomeViewmodelTest : CoroutineTestDispatcher() {
             everySuspend {
 
                 val acceptedNonHumanAnimal = AcceptedNonHumanAnimalForFosterHome(
-                    acceptedNonHumanAnimalId = 123456,
+                    acceptedNonHumanAnimalId = "${NonHumanAnimalType.BIRD.name}${Gender.MALE.name}123456",
                     fosterHomeId = fosterHome.id,
                     acceptedNonHumanAnimalType = NonHumanAnimalType.BIRD,
                     acceptedNonHumanAnimalGender = Gender.MALE
@@ -361,7 +361,7 @@ class ModifyFosterHomeViewmodelTest : CoroutineTestDispatcher() {
             everySuspend {
                 insertAcceptedNonHumanAnimalForFosterHome(
                     AcceptedNonHumanAnimalForFosterHome(
-                        acceptedNonHumanAnimalId = 123456,
+                        acceptedNonHumanAnimalId = "${NonHumanAnimalType.BIRD.name}${Gender.MALE.name}123456",
                         fosterHomeId = fosterHome.id,
                         acceptedNonHumanAnimalType = NonHumanAnimalType.BIRD,
                         acceptedNonHumanAnimalGender = Gender.MALE
@@ -577,7 +577,7 @@ class ModifyFosterHomeViewmodelTest : CoroutineTestDispatcher() {
             val modifyFosterHomeViewmodel = getModifyFosterHomeViewmodel()
 
             val acceptedNonHumanAnimal = AcceptedNonHumanAnimalForFosterHome(
-                acceptedNonHumanAnimalId = 123456,
+                acceptedNonHumanAnimalId = "${NonHumanAnimalType.BIRD.name}${Gender.MALE.name}123456",
                 fosterHomeId = fosterHome.id,
                 acceptedNonHumanAnimalType = NonHumanAnimalType.BIRD,
                 acceptedNonHumanAnimalGender = Gender.MALE
@@ -679,7 +679,7 @@ class ModifyFosterHomeViewmodelTest : CoroutineTestDispatcher() {
             val modifyFosterHomeViewmodel = getModifyFosterHomeViewmodel()
 
             val acceptedNonHumanAnimal = AcceptedNonHumanAnimalForFosterHome(
-                acceptedNonHumanAnimalId = 123456,
+                acceptedNonHumanAnimalId = "${NonHumanAnimalType.BIRD.name}${Gender.MALE.name}123456",
                 fosterHomeId = fosterHome.id,
                 acceptedNonHumanAnimalType = NonHumanAnimalType.BIRD,
                 acceptedNonHumanAnimalGender = Gender.MALE
@@ -721,7 +721,7 @@ class ModifyFosterHomeViewmodelTest : CoroutineTestDispatcher() {
             )
 
             val acceptedNonHumanAnimal = AcceptedNonHumanAnimalForFosterHome(
-                acceptedNonHumanAnimalId = 123456,
+                acceptedNonHumanAnimalId = "${NonHumanAnimalType.BIRD.name}${Gender.MALE.name}123456",
                 fosterHomeId = fosterHome.id,
                 acceptedNonHumanAnimalType = NonHumanAnimalType.BIRD,
                 acceptedNonHumanAnimalGender = Gender.MALE
@@ -762,7 +762,7 @@ class ModifyFosterHomeViewmodelTest : CoroutineTestDispatcher() {
             )
 
             val acceptedNonHumanAnimal = AcceptedNonHumanAnimalForFosterHome(
-                acceptedNonHumanAnimalId = 123456,
+                acceptedNonHumanAnimalId = "${NonHumanAnimalType.BIRD.name}${Gender.MALE.name}123456",
                 fosterHomeId = fosterHome.id,
                 acceptedNonHumanAnimalType = NonHumanAnimalType.BIRD,
                 acceptedNonHumanAnimalGender = Gender.MALE
@@ -803,7 +803,7 @@ class ModifyFosterHomeViewmodelTest : CoroutineTestDispatcher() {
             )
 
             val acceptedNonHumanAnimal = AcceptedNonHumanAnimalForFosterHome(
-                acceptedNonHumanAnimalId = 123456,
+                acceptedNonHumanAnimalId = "${NonHumanAnimalType.BIRD.name}${Gender.MALE.name}123456",
                 fosterHomeId = fosterHome.id,
                 acceptedNonHumanAnimalType = NonHumanAnimalType.BIRD,
                 acceptedNonHumanAnimalGender = Gender.MALE

@@ -53,7 +53,7 @@ class LocalFosterHomeRepositoryImpl(
     }
 
     override suspend fun deleteAcceptedNonHumanAnimal(
-        acceptedNonHumanAnimalId: Long,
+        acceptedNonHumanAnimalId: String,
         onDeleteAcceptedNonHumanAnimal: (rowsDeleted: Int) -> Unit
     ) {
         onDeleteAcceptedNonHumanAnimal(reskiumeDatabase.getFosterHomeDao().deleteAcceptedNonHumanAnimalEntityForFosterHome(acceptedNonHumanAnimalId))

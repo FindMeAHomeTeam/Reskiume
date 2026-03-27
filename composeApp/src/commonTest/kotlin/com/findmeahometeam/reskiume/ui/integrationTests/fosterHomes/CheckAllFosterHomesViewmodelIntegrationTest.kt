@@ -7,6 +7,8 @@ import com.findmeahometeam.reskiume.activistLongitude
 import com.findmeahometeam.reskiume.authUser
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
+import com.findmeahometeam.reskiume.domain.model.Gender
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
 import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
@@ -205,11 +207,11 @@ class CheckAllFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() {
                             allAcceptedNonHumanAnimals = listOf(
                                 fosterHome.allAcceptedNonHumanAnimals[0].copy(
                                     fosterHomeId = fosterHome.id + "other",
-                                    acceptedNonHumanAnimalId = 3
+                                    acceptedNonHumanAnimalId = "${NonHumanAnimalType.DOG.name}${Gender.FEMALE.name}4",
                                 ),
                                 fosterHome.allAcceptedNonHumanAnimals[1].copy(
                                     fosterHomeId = fosterHome.id + "other",
-                                    acceptedNonHumanAnimalId = 4
+                                    acceptedNonHumanAnimalId = "${NonHumanAnimalType.CAT.name}${Gender.MALE.name}5"
                                 )
                             )
                         ).toData()
@@ -262,11 +264,11 @@ class CheckAllFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() {
                             allAcceptedNonHumanAnimals = listOf(
                                 fosterHome.allAcceptedNonHumanAnimals[0].copy(
                                     fosterHomeId = fosterHome.id + "other",
-                                    acceptedNonHumanAnimalId = 3
+                                    acceptedNonHumanAnimalId = "${NonHumanAnimalType.DOG.name}${Gender.FEMALE.name}4",
                                 ),
                                 fosterHome.allAcceptedNonHumanAnimals[1].copy(
                                     fosterHomeId = fosterHome.id + "other",
-                                    acceptedNonHumanAnimalId = 4
+                                    acceptedNonHumanAnimalId = "${NonHumanAnimalType.CAT.name}${Gender.MALE.name}5"
                                 )
                             )
                         ).toData()
@@ -322,11 +324,11 @@ class CheckAllFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() {
                             allAcceptedNonHumanAnimals = listOf(
                                 fosterHome.allAcceptedNonHumanAnimals[0].copy(
                                     fosterHomeId = fosterHome.id + "other",
-                                    acceptedNonHumanAnimalId = 3
+                                    acceptedNonHumanAnimalId = "${NonHumanAnimalType.DOG.name}${Gender.FEMALE.name}4",
                                 ),
                                 fosterHome.allAcceptedNonHumanAnimals[1].copy(
                                     fosterHomeId = fosterHome.id + "other",
-                                    acceptedNonHumanAnimalId = 4
+                                    acceptedNonHumanAnimalId = "${NonHumanAnimalType.CAT.name}${Gender.MALE.name}5"
                                 )
                             )
                         ).toData()
@@ -521,11 +523,11 @@ class CheckAllFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() {
                             allAcceptedNonHumanAnimals = listOf(
                                 fosterHome.allAcceptedNonHumanAnimals[0].copy(
                                     fosterHomeId = fosterHome.id + "other",
-                                    acceptedNonHumanAnimalId = 3
+                                    acceptedNonHumanAnimalId = "${NonHumanAnimalType.DOG.name}${Gender.FEMALE.name}4",
                                 ),
                                 fosterHome.allAcceptedNonHumanAnimals[1].copy(
                                     fosterHomeId = fosterHome.id + "other",
-                                    acceptedNonHumanAnimalId = 4
+                                    acceptedNonHumanAnimalId = "${NonHumanAnimalType.CAT.name}${Gender.MALE.name}5"
                                 )
                             )
                         ).toData()

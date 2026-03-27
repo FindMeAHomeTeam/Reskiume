@@ -22,8 +22,8 @@ import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
     ]
 )
 data class AcceptedNonHumanAnimalEntityForFosterHome(
-    @PrimaryKey(autoGenerate = true)
-    val acceptedNonHumanAnimalId: Long = 0,
+    @PrimaryKey
+    val acceptedNonHumanAnimalId: String,
     val fosterHomeId: String,
     val acceptedNonHumanAnimalType: NonHumanAnimalType,
     val acceptedNonHumanAnimalGender: Gender

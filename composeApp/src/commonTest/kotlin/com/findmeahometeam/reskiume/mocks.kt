@@ -115,13 +115,13 @@ val fosterHome = FosterHome(
     imageUrl = "fosterHomeImageUrl.webp",
     allAcceptedNonHumanAnimals = listOf(
         AcceptedNonHumanAnimalForFosterHome(
-            acceptedNonHumanAnimalId = 1,
+            acceptedNonHumanAnimalId = "${NonHumanAnimalType.CAT.name}${Gender.FEMALE.name}1",
             fosterHomeId = "123" + user.uid,
             acceptedNonHumanAnimalType = NonHumanAnimalType.CAT,
             acceptedNonHumanAnimalGender = Gender.FEMALE
         ),
         AcceptedNonHumanAnimalForFosterHome(
-            acceptedNonHumanAnimalId = 2,
+            acceptedNonHumanAnimalId = "${NonHumanAnimalType.DOG.name}${Gender.MALE.name}2",
             fosterHomeId = "123" + user.uid,
             acceptedNonHumanAnimalType = NonHumanAnimalType.DOG,
             acceptedNonHumanAnimalGender = Gender.MALE
@@ -174,12 +174,12 @@ val rescueEvent = RescueEvent(
     ),
     allNeedsToCover = listOf(
         NeedToCover(
-            needToCoverId = 1,
+            needToCoverId = "${RescueNeed.RESCUERS.name}123",
             rescueNeed = RescueNeed.RESCUERS,
             rescueEventId = "456" + user.uid
         ),
         NeedToCover(
-            needToCoverId = 2,
+            needToCoverId = "${RescueNeed.FOSTER_HOME}456",
             rescueNeed = RescueNeed.FOSTER_HOME,
             rescueEventId = "456" + user.uid
         )

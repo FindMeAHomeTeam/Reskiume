@@ -199,7 +199,7 @@ class FireStoreRemoteFosterHomeRepositoryForIosDelegateImpl: FireStoreRemoteFost
     private func remoteAcceptedNonHumanAnimalForFosterHomeTodictArray(from items: [RemoteAcceptedNonHumanAnimalForFosterHome]?) -> [[String: Any]] {
         (items ?? []).map {
             [
-                "acceptedNonHumanAnimalId": $0.acceptedNonHumanAnimalId ?? 0,
+                "acceptedNonHumanAnimalId": $0.acceptedNonHumanAnimalId ?? "",
                 "fosterHomeId": $0.fosterHomeId!,
                 "acceptedNonHumanAnimalType": $0.acceptedNonHumanAnimalType?.name ?? NonHumanAnimalType.unselected,
                 "acceptedNonHumanAnimalGender": $0.acceptedNonHumanAnimalGender?.name ?? Gender.unselected

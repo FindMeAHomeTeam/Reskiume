@@ -236,7 +236,7 @@ class ModifyFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
             )
 
             val acceptedNonHumanAnimal = AcceptedNonHumanAnimalForFosterHome(
-                acceptedNonHumanAnimalId = 123456,
+                acceptedNonHumanAnimalId = "${NonHumanAnimalType.BIRD.name}${Gender.MALE.name}123456",
                 fosterHomeId = fosterHome.id,
                 acceptedNonHumanAnimalType = NonHumanAnimalType.BIRD,
                 acceptedNonHumanAnimalGender = Gender.MALE
@@ -391,7 +391,7 @@ class ModifyFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
             )
 
             val acceptedNonHumanAnimal = AcceptedNonHumanAnimalForFosterHome(
-                acceptedNonHumanAnimalId = 123456,
+                acceptedNonHumanAnimalId = "${NonHumanAnimalType.BIRD.name}${Gender.MALE.name}123456",
                 fosterHomeId = fosterHome.id,
                 acceptedNonHumanAnimalType = NonHumanAnimalType.BIRD,
                 acceptedNonHumanAnimalGender = Gender.MALE

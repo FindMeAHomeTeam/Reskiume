@@ -31,7 +31,7 @@ interface FosterHomeDao {
     suspend fun deleteFosterHome(id: String): Int
 
     @Query("DELETE FROM AcceptedNonHumanAnimalEntityForFosterHome WHERE acceptedNonHumanAnimalId = :acceptedNonHumanAnimalId")
-    suspend fun deleteAcceptedNonHumanAnimalEntityForFosterHome(acceptedNonHumanAnimalId: Long): Int
+    suspend fun deleteAcceptedNonHumanAnimalEntityForFosterHome(acceptedNonHumanAnimalId: String): Int
 
     @Query("DELETE FROM ResidentNonHumanAnimalIdEntityForFosterHome WHERE nonHumanAnimalId = :nonHumanAnimalId")
     suspend fun deleteResidentNonHumanAnimalIdEntityForFosterHome(nonHumanAnimalId: String): Int

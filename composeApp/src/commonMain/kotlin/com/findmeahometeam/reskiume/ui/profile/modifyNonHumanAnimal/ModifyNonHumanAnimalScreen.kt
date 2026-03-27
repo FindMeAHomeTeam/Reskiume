@@ -20,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.findmeahometeam.reskiume.domain.model.AdoptionState
 import com.findmeahometeam.reskiume.domain.model.AgeCategory
 import com.findmeahometeam.reskiume.domain.model.Gender
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
@@ -39,6 +40,7 @@ import com.findmeahometeam.reskiume.ui.core.components.UiState
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import reskiume.composeapp.generated.resources.Res
+import reskiume.composeapp.generated.resources.foster_home
 import reskiume.composeapp.generated.resources.modify_non_human_animal_screen_delete_non_human_animal_button
 import reskiume.composeapp.generated.resources.modify_non_human_animal_screen_delete_non_human_animal_message
 import reskiume.composeapp.generated.resources.modify_non_human_animal_screen_delete_non_human_animal_text
@@ -47,13 +49,14 @@ import reskiume.composeapp.generated.resources.modify_non_human_animal_screen_di
 import reskiume.composeapp.generated.resources.modify_non_human_animal_screen_non_human_animal_age_category
 import reskiume.composeapp.generated.resources.modify_non_human_animal_screen_non_human_animal_description
 import reskiume.composeapp.generated.resources.modify_non_human_animal_screen_non_human_animal_gender
-import reskiume.composeapp.generated.resources.modify_non_human_animal_screen_non_human_animal_in_foster_home_message
+import reskiume.composeapp.generated.resources.modify_non_human_animal_screen_non_human_animal_in_foster_home_rescue_event_message
 import reskiume.composeapp.generated.resources.modify_non_human_animal_screen_non_human_animal_in_foster_home_ok_button
-import reskiume.composeapp.generated.resources.modify_non_human_animal_screen_non_human_animal_in_foster_home_title
+import reskiume.composeapp.generated.resources.modify_non_human_animal_screen_non_human_animal_in_foster_home_rescue_event_title
 import reskiume.composeapp.generated.resources.modify_non_human_animal_screen_non_human_animal_name
 import reskiume.composeapp.generated.resources.modify_non_human_animal_screen_non_human_animal_profile_title
 import reskiume.composeapp.generated.resources.modify_non_human_animal_screen_non_human_animal_type
 import reskiume.composeapp.generated.resources.modify_non_human_animal_screen_save_non_human_animal_changes_button
+import reskiume.composeapp.generated.resources.rescue_event
 
 @Composable
 fun ModifyNonHumanAnimalScreen(
@@ -109,7 +112,7 @@ fun ModifyNonHumanAnimalScreen(
                 var ageCategory: AgeCategory by rememberSaveable { mutableStateOf(nonHumanAnimal.ageCategory) }
                 var description: String by rememberSaveable { mutableStateOf(nonHumanAnimal.description) }
                 var displayDeleteDialog: Boolean by rememberSaveable { mutableStateOf(false) }
-                var displayNonHumanAnimalInFosterHomeDialog: Boolean by rememberSaveable {
+                var displayNonHumanAnimalInFosterHomeOrRescueEventDialog: Boolean by rememberSaveable {
                     mutableStateOf(
                         false
                     )
@@ -198,7 +201,7 @@ fun ModifyNonHumanAnimalScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
                 RmTextField(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().height(100.dp),
                     text = description,
                     label = stringResource(Res.string.modify_non_human_animal_screen_non_human_animal_description),
                     onValueChange = { description = it }
@@ -212,10 +215,16 @@ fun ModifyNonHumanAnimalScreen(
                     ),
                     textToLink = stringResource(Res.string.modify_non_human_animal_screen_delete_non_human_animal_button),
                     onClick = {
-                        if (nonHumanAnimal.fosterHomeId.isBlank()) {
-                            displayDeleteDialog = true
-                        } else {
-                            displayNonHumanAnimalInFosterHomeDialog = true
+                        when(nonHumanAnimal.adoptionState) {
+                            AdoptionState.NEEDS_TO_BE_RESCUED -> {
+                                displayNonHumanAnimalInFosterHomeOrRescueEventDialog = true
+                            }
+                            AdoptionState.REHOMED -> {
+                                displayNonHumanAnimalInFosterHomeOrRescueEventDialog = true
+                            }
+                            else -> {
+                                displayDeleteDialog = true
+                            }
                         }
                     }
                 )
@@ -239,22 +248,30 @@ fun ModifyNonHumanAnimalScreen(
                         onClickDeny = { displayDeleteDialog = false }
                     )
                 }
-                if (displayNonHumanAnimalInFosterHomeDialog) {
+                if (displayNonHumanAnimalInFosterHomeOrRescueEventDialog) {
+
+                    val elementType = stringResource(when(nonHumanAnimal.adoptionState) {
+                        AdoptionState.REHOMED -> Res.string.foster_home
+                        AdoptionState.NEEDS_TO_BE_RESCUED -> Res.string.rescue_event
+                        else -> Res.string.foster_home
+                    })
                     RmDialog(
                         emoji = nonHumanAnimalType.toEmoji(),
                         title = stringResource(
-                            Res.string.modify_non_human_animal_screen_non_human_animal_in_foster_home_title,
-                            nonHumanAnimal.name
+                            Res.string.modify_non_human_animal_screen_non_human_animal_in_foster_home_rescue_event_title,
+                            nonHumanAnimal.name,
+                            elementType
                         ),
                         message = stringResource(
-                            Res.string.modify_non_human_animal_screen_non_human_animal_in_foster_home_message,
-                            nonHumanAnimal.name
+                            Res.string.modify_non_human_animal_screen_non_human_animal_in_foster_home_rescue_event_message,
+                            nonHumanAnimal.name,
+                            elementType
                         ),
                         allowMessage = stringResource(Res.string.modify_non_human_animal_screen_non_human_animal_in_foster_home_ok_button),
                         onClickAllow = {
-                            displayNonHumanAnimalInFosterHomeDialog = false
+                            displayNonHumanAnimalInFosterHomeOrRescueEventDialog = false
                         },
-                        onClickDeny = { displayNonHumanAnimalInFosterHomeDialog = false }
+                        onClickDeny = { displayNonHumanAnimalInFosterHomeOrRescueEventDialog = false }
                     )
                 }
 

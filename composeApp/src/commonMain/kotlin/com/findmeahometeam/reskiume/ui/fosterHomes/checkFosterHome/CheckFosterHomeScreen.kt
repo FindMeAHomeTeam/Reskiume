@@ -38,39 +38,41 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.findmeahometeam.reskiume.domain.model.Gender
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalListSaver
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.model.fosterHome.AcceptedNonHumanAnimalForFosterHome
+import com.findmeahometeam.reskiume.domain.model.fosterHome.City
+import com.findmeahometeam.reskiume.domain.model.fosterHome.Country
+import com.findmeahometeam.reskiume.domain.model.fosterHome.toStringResource
 import com.findmeahometeam.reskiume.domain.model.toEmoji
 import com.findmeahometeam.reskiume.domain.model.toStringResource
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.backgroundColorForItems
 import com.findmeahometeam.reskiume.ui.core.components.RmButton
-import com.findmeahometeam.reskiume.ui.core.components.RmDialog
-import com.findmeahometeam.reskiume.ui.core.components.RmDropDownMenu
 import com.findmeahometeam.reskiume.ui.core.components.RmImage
 import com.findmeahometeam.reskiume.ui.core.components.RmListAvatarType
 import com.findmeahometeam.reskiume.ui.core.components.RmListReviewItem
+import com.findmeahometeam.reskiume.ui.core.components.RmNonHumanAnimalListCreator
+import com.findmeahometeam.reskiume.ui.core.components.RmReport
 import com.findmeahometeam.reskiume.ui.core.components.RmResultState
 import com.findmeahometeam.reskiume.ui.core.components.RmScaffold
+import com.findmeahometeam.reskiume.ui.core.components.RmShareService
 import com.findmeahometeam.reskiume.ui.core.components.RmText
 import com.findmeahometeam.reskiume.ui.core.components.RmTextLink
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.navigation.FOSTER_HOME_DEEP_LINK
 import com.findmeahometeam.reskiume.ui.core.primaryGreen
-import com.findmeahometeam.reskiume.ui.core.primaryRed
 import com.findmeahometeam.reskiume.ui.core.textColor
 import com.findmeahometeam.reskiume.ui.fosterHomes.checkAllFosterHomes.UiFosterHome
-import com.findmeahometeam.reskiume.ui.fosterHomes.shareService.ShareService
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.UiReview
-import com.findmeahometeam.reskiume.ui.profile.giveFeedback.GiveFeedback
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import reskiume.composeapp.generated.resources.Res
 import reskiume.composeapp.generated.resources.check_foster_home_screen_accepted_both_genders_non_human_animal
 import reskiume.composeapp.generated.resources.check_foster_home_screen_accepted_non_human_animals
+import reskiume.composeapp.generated.resources.check_foster_home_screen_add_non_human_animals_to_foster_title
 import reskiume.composeapp.generated.resources.check_foster_home_screen_foster_home_accepted_non_human_animals_label
 import reskiume.composeapp.generated.resources.check_foster_home_screen_foster_home_avatar_content_description
 import reskiume.composeapp.generated.resources.check_foster_home_screen_foster_home_conditions_label
@@ -78,33 +80,23 @@ import reskiume.composeapp.generated.resources.check_foster_home_screen_foster_h
 import reskiume.composeapp.generated.resources.check_foster_home_screen_foster_home_resident_non_human_animals_label
 import reskiume.composeapp.generated.resources.check_foster_home_screen_no_account_button
 import reskiume.composeapp.generated.resources.check_foster_home_screen_no_account_label
-import reskiume.composeapp.generated.resources.check_foster_home_screen_non_human_animal_label
 import reskiume.composeapp.generated.resources.check_foster_home_screen_owner_avatar_content_description
 import reskiume.composeapp.generated.resources.check_foster_home_screen_owner_reviews_label
 import reskiume.composeapp.generated.resources.check_foster_home_screen_register_non_human_animal_button
 import reskiume.composeapp.generated.resources.check_foster_home_screen_register_non_human_animal_to_talk_to_owner_label
-import reskiume.composeapp.generated.resources.check_foster_home_screen_report_foster_home
-import reskiume.composeapp.generated.resources.check_foster_home_screen_report_foster_home_body
-import reskiume.composeapp.generated.resources.check_foster_home_screen_report_foster_home_subject
 import reskiume.composeapp.generated.resources.check_foster_home_screen_share_content_description
 import reskiume.composeapp.generated.resources.check_foster_home_screen_share_foster_home_title
-import reskiume.composeapp.generated.resources.check_foster_home_screen_share_message
-import reskiume.composeapp.generated.resources.check_foster_home_screen_share_ok_button
-import reskiume.composeapp.generated.resources.check_foster_home_screen_share_title
 import reskiume.composeapp.generated.resources.check_foster_home_screen_start_chat_button
 import reskiume.composeapp.generated.resources.check_foster_home_screen_talk_to_owner_label
 import reskiume.composeapp.generated.resources.check_foster_home_screen_title
-import reskiume.composeapp.generated.resources.check_foster_home_screen_unselected_non_human_animal_label
 import reskiume.composeapp.generated.resources.check_reviews_screen_user_deleted
-import reskiume.composeapp.generated.resources.dialog_no_email_app_dialog_message
-import reskiume.composeapp.generated.resources.dialog_no_email_app_dialog_ok_button
-import reskiume.composeapp.generated.resources.dialog_no_email_app_dialog_title
+import reskiume.composeapp.generated.resources.foster_home
 import reskiume.composeapp.generated.resources.ic_share
 import reskiume.composeapp.generated.resources.reskiume
 
 @Composable
 fun CheckFosterHomeScreen(
-    onContactFosterHome: (fosterHomeId: String, nonHumanAnimalId: String) -> Unit,
+    onContactFosterHome: (fosterHomeId: String, nonHumanAnimalIds: List<String>) -> Unit,
     onReviewClick: (uid: String) -> Unit,
     onCreateAccount: () -> Unit,
     onCreateNonHumanAnimal: () -> Unit,
@@ -281,55 +273,61 @@ fun CheckFosterHomeScreen(
                     DisplayReviews(allUserUiReviewsState, onReviewClick)
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
-                HorizontalDivider(modifier = Modifier.fillMaxWidth().alpha(0.1f), color = textColor)
+                if(checkFosterHomeViewmodel.canIStartTheChat()) {
 
-                Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
+                    HorizontalDivider(
+                        modifier = Modifier.fillMaxWidth().alpha(0.1f),
+                        color = textColor
+                    )
 
-                if (checkFosterHomeViewmodel.isLoggedIn()) {
-                    if (allAvailableNonHumanAnimals.isEmpty()) {
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    if (checkFosterHomeViewmodel.isLoggedIn()) {
+                        if (allAvailableNonHumanAnimals.isEmpty()) {
+                            RmTextLink(
+                                modifier = Modifier.fillMaxWidth().padding(10.dp),
+                                text = stringResource(
+                                    Res.string.check_foster_home_screen_register_non_human_animal_to_talk_to_owner_label,
+                                    uiFosterHome.owner!!.username
+                                ),
+                                textToLink = stringResource(Res.string.check_foster_home_screen_register_non_human_animal_button),
+                                textAlign = TextAlign.Start,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                onClick = onCreateNonHumanAnimal
+                            )
+                        } else {
+                            RmText(
+                                modifier = Modifier.fillMaxWidth().padding(10.dp),
+                                text = stringResource(
+                                    Res.string.check_foster_home_screen_talk_to_owner_label,
+                                    uiFosterHome.owner!!.username
+                                ),
+                                textAlign = TextAlign.Start,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.ExtraBold
+                            )
+                            DisplayChatToOwner(
+                                allAvailableNonHumanAnimals = allAvailableNonHumanAnimals,
+                                fosterHomeId = uiFosterHome.fosterHome.id,
+                                onContactFosterHome = onContactFosterHome
+                            )
+                        }
+                    } else {
                         RmTextLink(
                             modifier = Modifier.fillMaxWidth().padding(10.dp),
                             text = stringResource(
-                                Res.string.check_foster_home_screen_register_non_human_animal_to_talk_to_owner_label,
+                                Res.string.check_foster_home_screen_no_account_label,
                                 uiFosterHome.owner!!.username
                             ),
-                            textToLink = stringResource(Res.string.check_foster_home_screen_register_non_human_animal_button),
+                            textToLink = stringResource(Res.string.check_foster_home_screen_no_account_button),
                             textAlign = TextAlign.Start,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.ExtraBold,
-                            onClick = onCreateNonHumanAnimal
-                        )
-                    } else {
-                        RmText(
-                            modifier = Modifier.fillMaxWidth().padding(10.dp),
-                            text = stringResource(
-                                Res.string.check_foster_home_screen_talk_to_owner_label,
-                                uiFosterHome.owner!!.username
-                            ),
-                            textAlign = TextAlign.Start,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.ExtraBold
-                        )
-                        DisplayChatToOwner(
-                            allAvailableNonHumanAnimals = allAvailableNonHumanAnimals,
-                            fosterHomeId = uiFosterHome.fosterHome.id,
-                            onContactFosterHome = onContactFosterHome
+                            onClick = onCreateAccount
                         )
                     }
-                } else {
-                    RmTextLink(
-                        modifier = Modifier.fillMaxWidth().padding(10.dp),
-                        text = stringResource(
-                            Res.string.check_foster_home_screen_no_account_label,
-                            uiFosterHome.owner!!.username
-                        ),
-                        textToLink = stringResource(Res.string.check_foster_home_screen_no_account_button),
-                        textAlign = TextAlign.Start,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        onClick = onCreateAccount
-                    )
                 }
                 Spacer(modifier = Modifier.height(10.dp))
             }
@@ -521,33 +519,30 @@ fun DisplayReviews(
 fun DisplayChatToOwner(
     allAvailableNonHumanAnimals: List<NonHumanAnimal>,
     fosterHomeId: String,
-    onContactFosterHome: (fosterHomeId: String, nonHumanAnimalId: String) -> Unit
+    onContactFosterHome: (fosterHomeId: String, nonHumanAnimalIds: List<String>) -> Unit
 ) {
-    var selectedNonHumanAnimalIdToFoster: String by rememberSaveable { mutableStateOf("") }
+    var allSelectedNonHumanAnimalsToFoster: List<NonHumanAnimal> by rememberSaveable(stateSaver = NonHumanAnimalListSaver) {
+        mutableStateOf(
+            emptyList()
+        )
+    }
+    RmNonHumanAnimalListCreator(
+        title = stringResource(Res.string.check_foster_home_screen_add_non_human_animals_to_foster_title),
+        allAvailableNonHumanAnimals = allAvailableNonHumanAnimals,
+        allExistentNonHumanAnimals = allSelectedNonHumanAnimalsToFoster
+    ) { allNonHumanAnimalsSelected ->
+        allSelectedNonHumanAnimalsToFoster = allNonHumanAnimalsSelected
+    }
 
-    RmDropDownMenu(
-        modifier = Modifier.fillMaxWidth(),
-        dropDownLabel = stringResource(Res.string.check_foster_home_screen_non_human_animal_label),
-        defaultElementText = if (selectedNonHumanAnimalIdToFoster.isEmpty()) {
-            stringResource(Res.string.check_foster_home_screen_unselected_non_human_animal_label)
-        } else {
-            val selectedNonHumanAnimalToFoster: NonHumanAnimal =
-                allAvailableNonHumanAnimals.first { it.id == selectedNonHumanAnimalIdToFoster }
-            selectedNonHumanAnimalToFoster.nonHumanAnimalType.toEmoji() + " " + selectedNonHumanAnimalToFoster.name
-        },
-        items = allAvailableNonHumanAnimals.map {
-            Pair(it, it.nonHumanAnimalType.toEmoji() + " " + it.name)
-        },
-        onClick = {
-            selectedNonHumanAnimalIdToFoster = it.id
-        },
-    )
     Spacer(modifier = Modifier.height(8.dp))
     RmButton(
         modifier = Modifier.fillMaxWidth(),
         text = stringResource(Res.string.check_foster_home_screen_start_chat_button),
-        enabled = selectedNonHumanAnimalIdToFoster.isNotEmpty()
+        enabled = allSelectedNonHumanAnimalsToFoster.isNotEmpty()
     ) {
-        onContactFosterHome(fosterHomeId, selectedNonHumanAnimalIdToFoster)
+        onContactFosterHome(
+            fosterHomeId,
+            allSelectedNonHumanAnimalsToFoster.map { it.id }
+        )
     }
 }

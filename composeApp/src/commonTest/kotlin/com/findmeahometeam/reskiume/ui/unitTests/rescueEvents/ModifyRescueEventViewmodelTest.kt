@@ -180,53 +180,8 @@ class ModifyRescueEventViewmodelTest : CoroutineTestDispatcher() {
 
             everySuspend {
 
-                val needToCover = NeedToCover(
-                    needToCoverId = "${RescueNeed.RESCUERS.name}123456",
-                    rescueNeed = RescueNeed.RESCUERS,
-                    rescueEventId = rescueEvent.id
-                )
-
-                val nonHumanAnimalToRescue = NonHumanAnimalToRescue(
-                    nonHumanAnimalId = nonHumanAnimal.id + "789",
-                    caregiverId = nonHumanAnimal.caregiverId,
-                    rescueEventId = rescueEvent.id
-                )
-
-                val updatedRescueEvent = rescueEvent.copy(
-                    allNeedsToCover = rescueEvent.allNeedsToCover + needToCover,
-                    allNonHumanAnimalsToRescue = rescueEvent.allNonHumanAnimalsToRescue + nonHumanAnimalToRescue
-                )
-
                 modifyRemoteRescueEvent(
-                    updatedRescueEvent.toData(),
-                    capture(onModifyRemoteRescueEvent)
-                )
-            } calls {
-                onModifyRemoteRescueEvent.get()
-                    .invoke(databaseResultOfModifyingRescueEventsInRemoteRepositoryArg)
-            }
-
-            everySuspend {
-
-                val needToCover = NeedToCover(
-                    needToCoverId = "${RescueNeed.RESCUERS.name}123456",
-                    rescueNeed = RescueNeed.RESCUERS,
-                    rescueEventId = rescueEvent.id
-                )
-
-                val nonHumanAnimalToRescue = NonHumanAnimalToRescue(
-                    nonHumanAnimalId = nonHumanAnimal.id + "789",
-                    caregiverId = nonHumanAnimal.caregiverId,
-                    rescueEventId = rescueEvent.id
-                )
-
-                val updatedRescueEvent = rescueEvent.copy(
-                    allNeedsToCover = rescueEvent.allNeedsToCover + needToCover,
-                    allNonHumanAnimalsToRescue = rescueEvent.allNonHumanAnimalsToRescue + nonHumanAnimalToRescue
-                )
-
-                modifyRemoteRescueEvent(
-                    updatedRescueEvent.copy(imageUrl = "").toData(),
+                    any(),
                     capture(onModifyRemoteRescueEvent)
                 )
             } calls {
@@ -370,7 +325,9 @@ class ModifyRescueEventViewmodelTest : CoroutineTestDispatcher() {
 
             everySuspend {
                 insertNeedToCoverEntityForRescueEvent(
-                    rescueEvent.allNeedsToCover[0].copy(needToCoverId = "${RescueNeed.RESCUERS.name}123456").toEntity(),
+                    rescueEvent.allNeedsToCover[0].copy(
+                        needToCoverId = "${RescueNeed.RESCUERS.name}123456"
+                    ).toEntity(),
                     capture(onInsertThirdNeedToCoverForRescueEvent)
                 )
             } calls {

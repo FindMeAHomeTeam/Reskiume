@@ -9,5 +9,5 @@ interface CheckFosterHomeUtil {
         fosterHomeId: String,
         ownerId: String,
         coroutineScope: CoroutineScope
-    ): Flow<FosterHome>
+    ): Flow<FosterHome?>
 }

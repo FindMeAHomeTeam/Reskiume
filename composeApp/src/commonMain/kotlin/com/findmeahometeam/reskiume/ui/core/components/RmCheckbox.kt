@@ -10,7 +10,7 @@ import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,7 +25,7 @@ fun RmCheckbox(
     isChecked: Boolean = false,
     onChecked: (isChecked: Boolean) -> Unit
 ) {
-    var checked by remember { mutableStateOf(isChecked) }
+    var checked by rememberSaveable { mutableStateOf(isChecked) }
 
     val onCheckedChange: (Boolean) -> Unit = {
         checked = it

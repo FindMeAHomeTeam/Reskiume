@@ -263,7 +263,10 @@ fun ModifyAccountScreen(onBackPressed: () -> Unit) {
             )
 
             Spacer(modifier = Modifier.height(10.dp))
-            RmCheckbox(stringResource(Res.string.modify_account_change_your_password_checkbox_label)) { isChecked ->
+            RmCheckbox(
+                label = stringResource(Res.string.modify_account_change_your_password_checkbox_label),
+                isChecked = isNewPassword
+            ) { isChecked ->
                 isNewPassword = isChecked
             }
 

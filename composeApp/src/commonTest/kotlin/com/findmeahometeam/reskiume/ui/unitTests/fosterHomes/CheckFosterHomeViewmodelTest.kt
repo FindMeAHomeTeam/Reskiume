@@ -39,6 +39,8 @@ import kotlin.test.assertTrue
 class CheckFosterHomeViewmodelTest : CoroutineTestDispatcher() {
 
     private fun getCheckFosterHomeViewmodel(
+        fosterHomeId: String = fosterHome.id,
+        ownerId: String = fosterHome.ownerId,
         userReturned: User? = user,
         allNonHumanAnimalsReturned: Flow<List<NonHumanAnimalEntity>> = flowOf(listOf(nonHumanAnimal.toEntity()))
     ): CheckFosterHomeViewmodel {
@@ -46,7 +48,7 @@ class CheckFosterHomeViewmodelTest : CoroutineTestDispatcher() {
         val saveStateHandleProvider: SaveStateHandleProvider = mock {
             every {
                 provideObjectRoute<CheckFosterHome>(any(), any())
-            } returns CheckFosterHome(fosterHome.id, fosterHome.ownerId)
+            } returns CheckFosterHome(fosterHomeId, ownerId)
         }
 
         val checkFosterHomeUtil: CheckFosterHomeUtil = mock {
@@ -54,6 +56,14 @@ class CheckFosterHomeViewmodelTest : CoroutineTestDispatcher() {
             every {
                 getFosterHomeFlow(fosterHome.id, fosterHome.ownerId, any())
             } returns flowOf(fosterHome)
+
+            every {
+                getFosterHomeFlow("otherId", "otherOwnerId", any())
+            } returns flowOf(fosterHome)
+
+            every {
+                getFosterHomeFlow("wrongId", fosterHome.ownerId, any())
+            } returns flowOf(null)
         }
 
         val checkActivistUtil: CheckActivistUtil = mock {
@@ -82,6 +92,10 @@ class CheckFosterHomeViewmodelTest : CoroutineTestDispatcher() {
 
             every {
                 getReviewListFlow(user.uid)
+            } returns flowOf(listOf(uiReview))
+
+            every {
+                getReviewListFlow("otherOwnerId")
             } returns flowOf(listOf(uiReview))
         }
 
@@ -139,6 +153,20 @@ class CheckFosterHomeViewmodelTest : CoroutineTestDispatcher() {
         }
 
     @Test
+    fun `given a foster home_when I click to check it but the foster home was not found_then an error is shown`() =
+        runTest {
+            getCheckFosterHomeViewmodel(
+                fosterHomeId = "wrongId"
+            ).fosterHomeFlow.test {
+                assertEquals(
+                    UiState.Error(),
+                    awaitItem()
+                )
+                awaitComplete()
+            }
+        }
+
+    @Test
     fun `given a foster home_when I click to check it but the owner deleted it_then an error is shown`() =
         runTest {
             getCheckFosterHomeViewmodel(
@@ -182,7 +210,7 @@ class CheckFosterHomeViewmodelTest : CoroutineTestDispatcher() {
         }
 
     @Test
-    fun `given a foster home to check_when I want to talk to the owner and I am logged in_then the foster home check the available non human animals`() =
+    fun `given a foster home to check_when I want to talk to the owner_then the app checks if the user is logged in first`() =
         runTest {
             val checkFosterHomeViewmodel = getCheckFosterHomeViewmodel()
 
@@ -201,6 +229,33 @@ class CheckFosterHomeViewmodelTest : CoroutineTestDispatcher() {
             }
 
             val result = checkFosterHomeViewmodel.isLoggedIn()
+
+            assertTrue { result }
+        }
+
+    @Test
+    fun `given a foster home to check_when I want to talk to the owner_then the app checks if the user is not the same as the owner`() =
+        runTest {
+            val checkFosterHomeViewmodel = getCheckFosterHomeViewmodel(
+                fosterHomeId = "otherId",
+                ownerId = "otherOwnerId"
+            )
+
+            checkFosterHomeViewmodel.fosterHomeFlow.test {
+                assertEquals(
+                    UiState.Success(
+                        UiFosterHome(
+                            fosterHome = fosterHome,
+                            allResidentUiNonHumanAnimals = listOf(nonHumanAnimal),
+                            owner = user
+                        )
+                    ),
+                    awaitItem()
+                )
+                awaitComplete()
+            }
+
+            val result = checkFosterHomeViewmodel.canIStartTheChat()
 
             assertTrue { result }
         }

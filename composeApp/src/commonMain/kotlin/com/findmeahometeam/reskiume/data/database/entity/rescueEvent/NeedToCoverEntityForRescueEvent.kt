@@ -22,7 +22,7 @@ import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueNeed
 )
 data class NeedToCoverEntityForRescueEvent(
     @PrimaryKey
-    val needToCoverId: Long,
+    val needToCoverId: String,
     val rescueNeed: RescueNeed,
     val rescueEventId: String
 ) {

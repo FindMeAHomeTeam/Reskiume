@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class RemoteNeedToCoverForRescueEvent(
-    val needToCoverId: Long? = 0,
+    val needToCoverId: String? = "",
     val rescueNeed: RescueNeed? = RescueNeed.UNSELECTED,
     val rescueEventId: String? = "",
 ) {
@@ -20,7 +20,7 @@ data class RemoteNeedToCoverForRescueEvent(
 
     fun toDomain(): NeedToCover {
         return NeedToCover(
-            needToCoverId = needToCoverId ?: 0,
+            needToCoverId = needToCoverId ?: "",
             rescueNeed = rescueNeed ?: RescueNeed.UNSELECTED,
             rescueEventId = rescueEventId ?: "",
         )

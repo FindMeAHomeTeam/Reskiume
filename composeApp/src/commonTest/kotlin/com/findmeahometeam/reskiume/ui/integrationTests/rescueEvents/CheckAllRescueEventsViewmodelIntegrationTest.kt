@@ -213,11 +213,11 @@ class CheckAllRescueEventsViewmodelIntegrationTest : CoroutineTestDispatcher() {
                             allNeedsToCover = listOf(
                                 rescueEvent.allNeedsToCover[0].copy(
                                     rescueEventId = rescueEvent.id + "other",
-                                    needToCoverId = 3
+                                    needToCoverId = "${rescueEvent.allNeedsToCover[0].rescueNeed.name}567"
                                 ),
                                 rescueEvent.allNeedsToCover[1].copy(
                                     rescueEventId = rescueEvent.id + "other",
-                                    needToCoverId = 4
+                                    needToCoverId = "${rescueEvent.allNeedsToCover[1].rescueNeed.name}890"
                                 )
                             )
                         ).toData()
@@ -276,11 +276,11 @@ class CheckAllRescueEventsViewmodelIntegrationTest : CoroutineTestDispatcher() {
                             allNeedsToCover = listOf(
                                 rescueEvent.allNeedsToCover[0].copy(
                                     rescueEventId = rescueEvent.id + "other",
-                                    needToCoverId = 3
+                                    needToCoverId = "${rescueEvent.allNeedsToCover[0].rescueNeed.name}567"
                                 ),
                                 rescueEvent.allNeedsToCover[1].copy(
                                     rescueEventId = rescueEvent.id + "other",
-                                    needToCoverId = 4
+                                    needToCoverId = "${rescueEvent.allNeedsToCover[1].rescueNeed.name}890"
                                 )
                             )
                         ).toData()
@@ -342,11 +342,11 @@ class CheckAllRescueEventsViewmodelIntegrationTest : CoroutineTestDispatcher() {
                             allNeedsToCover = listOf(
                                 rescueEvent.allNeedsToCover[0].copy(
                                     rescueEventId = rescueEvent.id + "other",
-                                    needToCoverId = 3
+                                    needToCoverId = "${rescueEvent.allNeedsToCover[0].rescueNeed.name}567"
                                 ),
                                 rescueEvent.allNeedsToCover[1].copy(
                                     rescueEventId = rescueEvent.id + "other",
-                                    needToCoverId = 4
+                                    needToCoverId = "${rescueEvent.allNeedsToCover[1].rescueNeed.name}890"
                                 )
                             )
                         ).toData()
@@ -567,11 +567,11 @@ class CheckAllRescueEventsViewmodelIntegrationTest : CoroutineTestDispatcher() {
                             allNeedsToCover = listOf(
                                 rescueEvent.allNeedsToCover[0].copy(
                                     rescueEventId = rescueEvent.id + "other",
-                                    needToCoverId = 3
+                                    needToCoverId = "${rescueEvent.allNeedsToCover[0].rescueNeed.name}567"
                                 ),
                                 rescueEvent.allNeedsToCover[1].copy(
                                     rescueEventId = rescueEvent.id + "other",
-                                    needToCoverId = 4
+                                    needToCoverId = "${rescueEvent.allNeedsToCover[1].rescueNeed.name}890"
                                 )
                             )
                         ).toData()

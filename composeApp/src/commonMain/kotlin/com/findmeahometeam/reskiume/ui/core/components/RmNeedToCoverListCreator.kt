@@ -79,7 +79,7 @@ fun RmNeedToCoverListCreator(
                         itemsAdded =
                             if (isChecked) {
                                 itemsAdded + NeedToCover(
-                                    needToCoverId = Clock.System.now().epochSeconds,
+                                    needToCoverId = rescueNeed.name + Clock.System.now().epochSeconds,
                                     rescueNeed = rescueNeed,
                                     rescueEventId = rescueEventId
                                 )

@@ -11,7 +11,7 @@ import reskiume.composeapp.generated.resources.need_to_cover_rescuers
 import reskiume.composeapp.generated.resources.need_to_cover_unselected
 
 data class NeedToCover(
-    val needToCoverId: Long,
+    val needToCoverId: String,
     val rescueNeed: RescueNeed,
     val rescueEventId: String
 ) {
@@ -51,7 +51,7 @@ private fun NeedToCover.toSaveableList(): List<Any?> = listOf(
 )
 
 private fun List<Any?>.fromSaveableList(): NeedToCover = NeedToCover(
-    needToCoverId = this[0] as Long,
+    needToCoverId = this[0] as String,
     rescueNeed = RescueNeed.valueOf(this[1] as String),
     rescueEventId = this[2] as String
 )

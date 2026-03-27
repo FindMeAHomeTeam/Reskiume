@@ -36,7 +36,7 @@ interface RescueEventDao {
     suspend fun deleteNonHumanAnimalToRescueEntityForRescueEvent(nonHumanAnimalId: String): Int
 
     @Query("DELETE FROM NeedToCoverEntityForRescueEvent WHERE needToCoverId = :needToCoverId")
-    suspend fun deleteNeedToCoverEntityForRescueEvent(needToCoverId: Long): Int
+    suspend fun deleteNeedToCoverEntityForRescueEvent(needToCoverId: String): Int
 
     @Query("DELETE FROM RescueEventEntity WHERE creatorId = :creatorId OR savedBy = :creatorId OR savedBy = ' ' OR savedBy = '' ")
     suspend fun deleteAllMyRescueEvents(creatorId: String): Int

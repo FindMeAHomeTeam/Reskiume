@@ -121,7 +121,7 @@ class FakeLocalRescueEventRepository(
     }
 
     override suspend fun deleteNeedToCoverEntityForRescueEvent(
-        needToCoverId: Long,
+        needToCoverId: String,
         onDeleteNeedToCoverEntityForRescueEvent: (rowsDeleted: Int) -> Unit
     ) {
         val needToCover =

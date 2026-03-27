@@ -135,8 +135,16 @@ fun CheckFosterHomeScreen(
                 stringResource(
                     Res.string.check_foster_home_screen_title,
                     (uiFosterHomeState as UiState.Success<UiFosterHome>).data.fosterHome.title,
-                    (uiFosterHomeState as UiState.Success<UiFosterHome>).data.fosterHome.city,
-                    (uiFosterHomeState as UiState.Success<UiFosterHome>).data.fosterHome.country
+                    stringResource(
+                        City
+                            .valueOf((uiFosterHomeState as UiState.Success<UiFosterHome>).data.fosterHome.city)
+                            .toStringResource()
+                    ).substring(5),
+                    stringResource(
+                        Country
+                            .valueOf((uiFosterHomeState as UiState.Success<UiFosterHome>).data.fosterHome.country)
+                            .toStringResource()
+                    ).substring(5)
                 )
             } else {
                 ""

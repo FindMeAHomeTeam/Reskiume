@@ -96,10 +96,26 @@ class CheckFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
         }
 
     @Test
+    fun `given a foster home_when I click to check it but the foster home was not found_then an error is shown`() =
+        runTest {
+            getCheckFosterHomeViewmodel(
+                saveStateHandleProvider = FakeSaveStateHandleProvider(
+                    CheckFosterHome("wrongId", fosterHome.ownerId)
+                )
+            ).fosterHomeFlow.test {
+                assertEquals(
+                    UiState.Error(),
+                    awaitItem()
+                )
+                awaitComplete()
+            }
+        }
+
+    @Test
     fun `given a foster home_when I click to check it but the owner deleted it_then an error is shown`() =
         runTest {
             getCheckFosterHomeViewmodel(
-                checkActivistUtil = FakeCheckActivistUtil(null),
+                checkActivistUtil = FakeCheckActivistUtil(null)
             ).fosterHomeFlow.test {
                 assertEquals(
                     UiState.Error(),
@@ -127,7 +143,9 @@ class CheckFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
         runTest {
             getCheckFosterHomeViewmodel(
                 localNonHumanAnimalRepository = FakeLocalNonHumanAnimalRepository(
-                    mutableListOf(nonHumanAnimal.copy(adoptionState = AdoptionState.REHOMED).toEntity())
+                    mutableListOf(
+                        nonHumanAnimal.copy(adoptionState = AdoptionState.REHOMED).toEntity()
+                    )
                 )
             ).allAvailableNonHumanAnimalsLookingForAdoptionFlow.test {
                 assertEquals(emptyList(), awaitItem())
@@ -145,7 +163,7 @@ class CheckFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
         }
 
     @Test
-    fun `given a foster home to check_when I want to talk to the owner and I am logged in_then the foster home check the available non human animals`() =
+    fun `given a foster home to check_when I want to talk to the owner_then the app checks if the user is logged in first`() =
         runTest {
             val checkFosterHomeViewmodel = getCheckFosterHomeViewmodel()
 
@@ -164,6 +182,38 @@ class CheckFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
             }
 
             val result = checkFosterHomeViewmodel.isLoggedIn()
+
+            assertTrue { result }
+        }
+
+    @Test
+    fun `given a foster home to check_when I want to talk to the owner_then the app checks if the user is not the same as the owner`() =
+        runTest {
+            val checkRescueEventViewmodel = getCheckFosterHomeViewmodel(
+                saveStateHandleProvider = FakeSaveStateHandleProvider(
+                    CheckFosterHome("wrongId", "otherOwnerId")
+                ),
+                checkFosterHomeUtil = FakeCheckFosterHomeUtil(
+                    fosterHome.copy(id = "wrongId", ownerId = "otherOwnerId")
+                ),
+                checkActivistUtil = FakeCheckActivistUtil(user.copy(uid = "otherOwnerId"))
+            )
+
+            checkRescueEventViewmodel.fosterHomeFlow.test {
+                assertEquals(
+                    UiState.Success(
+                        UiFosterHome(
+                            fosterHome = fosterHome.copy(id = "wrongId", ownerId = "otherOwnerId"),
+                            allResidentUiNonHumanAnimals = listOf(nonHumanAnimal),
+                            owner = user
+                        )
+                    ),
+                    awaitItem()
+                )
+                awaitComplete()
+            }
+
+            val result = checkRescueEventViewmodel.canIStartTheChat()
 
             assertTrue { result }
         }

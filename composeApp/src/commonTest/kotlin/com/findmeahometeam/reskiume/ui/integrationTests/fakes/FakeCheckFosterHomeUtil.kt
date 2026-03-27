@@ -15,11 +15,11 @@ class FakeCheckFosterHomeUtil(
         fosterHomeId: String,
         ownerId: String,
         coroutineScope: CoroutineScope
-    ): Flow<FosterHome> {
+    ): Flow<FosterHome?> {
         return if (fosterHomeId == fosterHomeToCheck.id && ownerId == fosterHomeToCheck.ownerId) {
             flowOf(fosterHomeToCheck)
         } else {
-            flowOf()
+            flowOf(null)
         }
     }
 }

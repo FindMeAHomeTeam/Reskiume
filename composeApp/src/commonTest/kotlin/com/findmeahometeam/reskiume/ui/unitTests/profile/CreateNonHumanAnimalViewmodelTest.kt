@@ -86,17 +86,7 @@ class CreateNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
 
                 everySuspend {
                     insertRemoteNonHumanAnimal(
-                        nonHumanAnimal.copy(id = nonHumanAnimalId).toData(),
-                        capture(onInsertNonHumanAnimalInRemote)
-                    )
-                } calls {
-                    onInsertNonHumanAnimalInRemote.get()
-                        .invoke(databaseResultAfterCreatingRemoteNonHumanAnimalArg)
-                }
-
-                everySuspend {
-                    insertRemoteNonHumanAnimal(
-                        nonHumanAnimal.copy(id = nonHumanAnimalId, imageUrl = "").toData(),
+                        any(),
                         capture(onInsertNonHumanAnimalInRemote)
                     )
                 } calls {

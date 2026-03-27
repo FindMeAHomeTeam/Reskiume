@@ -8,7 +8,7 @@ import com.findmeahometeam.reskiume.domain.model.Gender
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
 
 data class AcceptedNonHumanAnimalForFosterHome(
-    val acceptedNonHumanAnimalId: String = "",
+    val acceptedNonHumanAnimalId: String,
     val fosterHomeId: String,
     val acceptedNonHumanAnimalType: NonHumanAnimalType,
     val acceptedNonHumanAnimalGender: Gender

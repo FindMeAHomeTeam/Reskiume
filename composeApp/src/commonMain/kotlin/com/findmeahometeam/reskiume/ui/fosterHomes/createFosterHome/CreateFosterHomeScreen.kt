@@ -187,7 +187,7 @@ fun CreateFosterHomeScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
             RmTextField(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().height(100.dp),
                 text = description,
                 label = stringResource(Res.string.create_foster_home_screen_foster_home_description),
                 onValueChange = { description = it }
@@ -195,13 +195,13 @@ fun CreateFosterHomeScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
             RmTextField(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().height(100.dp),
                 text = conditions,
                 label = stringResource(Res.string.create_foster_home_screen_foster_home_conditions),
                 onValueChange = { conditions = it }
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             RmAcceptedNonHumanAnimalListCreator(
                 fosterHomeId = "",
                 allAcceptedNonHumanAnimals = allAcceptedNonHumanAnimals
@@ -209,7 +209,7 @@ fun CreateFosterHomeScreen(
                 allAcceptedNonHumanAnimals = it
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             RmNonHumanAnimalListCreator(
                 title = stringResource(Res.string.non_human_animal_list_creator_resident_title),
                 allAvailableNonHumanAnimals = allAvailableUiNonHumanAnimals.minus(

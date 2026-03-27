@@ -156,7 +156,7 @@ fun CreateNonHumanAnimalScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
             RmTextField(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().height(100.dp),
                 text = description,
                 label = stringResource(Res.string.create_non_human_animal_screen_non_human_animal_description),
                 onValueChange = { description = it }

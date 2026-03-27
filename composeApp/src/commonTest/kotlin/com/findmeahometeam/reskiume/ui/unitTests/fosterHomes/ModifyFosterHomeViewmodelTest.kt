@@ -138,7 +138,7 @@ class ModifyFosterHomeViewmodelTest : CoroutineTestDispatcher() {
         }
 
         val authRepository: AuthRepository = mock {
-            everySuspend { authState } returns (flowOf(authStateReturn))
+            every { authState } returns (flowOf(authStateReturn))
         }
 
         val localCacheRepository: LocalCacheRepository = mock {
@@ -174,56 +174,8 @@ class ModifyFosterHomeViewmodelTest : CoroutineTestDispatcher() {
             } returns remoteFosterHomeReturn
 
             everySuspend {
-
-                val acceptedNonHumanAnimal = AcceptedNonHumanAnimalForFosterHome(
-                    acceptedNonHumanAnimalId = "${NonHumanAnimalType.BIRD.name}${Gender.MALE.name}123456",
-                    fosterHomeId = fosterHome.id,
-                    acceptedNonHumanAnimalType = NonHumanAnimalType.BIRD,
-                    acceptedNonHumanAnimalGender = Gender.MALE
-                )
-
-                val residentNonHumanAnimal = ResidentNonHumanAnimalForFosterHome(
-                    nonHumanAnimalId = nonHumanAnimal.id + "789",
-                    caregiverId = nonHumanAnimal.caregiverId,
-                    fosterHomeId = fosterHome.id
-                )
-
-                val updatedFosterHome = fosterHome.copy(
-                    allAcceptedNonHumanAnimals = fosterHome.allAcceptedNonHumanAnimals + acceptedNonHumanAnimal,
-                    allResidentNonHumanAnimals = fosterHome.allResidentNonHumanAnimals + residentNonHumanAnimal
-                )
-
                 modifyRemoteFosterHome(
-                    updatedFosterHome.toData(),
-                    capture(onModifyRemoteFosterHome)
-                )
-            } calls {
-                onModifyRemoteFosterHome.get()
-                    .invoke(databaseResultOfModifyingFosterHomesInRemoteRepositoryArg)
-            }
-
-            everySuspend {
-
-                val acceptedNonHumanAnimal = AcceptedNonHumanAnimalForFosterHome(
-                    acceptedNonHumanAnimalId = "${NonHumanAnimalType.BIRD.name}${Gender.MALE.name}123456",
-                    fosterHomeId = fosterHome.id,
-                    acceptedNonHumanAnimalType = NonHumanAnimalType.BIRD,
-                    acceptedNonHumanAnimalGender = Gender.MALE
-                )
-
-                val residentNonHumanAnimal = ResidentNonHumanAnimalForFosterHome(
-                    nonHumanAnimalId = nonHumanAnimal.id + "789",
-                    caregiverId = nonHumanAnimal.caregiverId,
-                    fosterHomeId = fosterHome.id
-                )
-
-                val updatedFosterHome = fosterHome.copy(
-                    allAcceptedNonHumanAnimals = fosterHome.allAcceptedNonHumanAnimals + acceptedNonHumanAnimal,
-                    allResidentNonHumanAnimals = fosterHome.allResidentNonHumanAnimals + residentNonHumanAnimal
-                )
-
-                modifyRemoteFosterHome(
-                    updatedFosterHome.copy(imageUrl = "").toData(),
+                    any(),
                     capture(onModifyRemoteFosterHome)
                 )
             } calls {

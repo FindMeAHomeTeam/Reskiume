@@ -138,8 +138,8 @@
     <string name="modify_non_human_animal_screen_delete_non_human_animal_title">Do you want to delete %1$s's profile?</string>
     <string name="modify_non_human_animal_screen_delete_non_human_animal_message">This action can not be undone</string>
     <string name="modify_non_human_animal_screen_save_non_human_animal_changes_button">Save %1$s's changes</string>
-    <string name="modify_non_human_animal_screen_non_human_animal_in_foster_home_title">%1$s is in a foster home</string>
-    <string name="modify_non_human_animal_screen_non_human_animal_in_foster_home_message">Please finish the process with %1$s from the foster home first</string>
+    <string name="modify_non_human_animal_screen_non_human_animal_in_foster_home_rescue_event_title">%1$s is in a %2$s</string>
+    <string name="modify_non_human_animal_screen_non_human_animal_in_foster_home_rescue_event_message">Please finish the process with %1$s from the %2$s first</string>
     <string name="modify_non_human_animal_screen_non_human_animal_in_foster_home_ok_button">Ok</string>
 
     <!-- No human animal types -->
@@ -295,14 +295,8 @@
     <string name="check_foster_home_screen_share_content_description">Share this foster home</string>
     <string name="check_foster_home_screen_accepted_both_genders_non_human_animal">female &amp; male</string>
     <string name="check_foster_home_screen_accepted_non_human_animals">%1$s and %2$s</string>
-    <string name="check_foster_home_screen_share_title">You have no sharing app installed</string>
-    <string name="check_foster_home_screen_share_message">Please, go to the store and install one</string>
-    <string name="check_foster_home_screen_share_ok_button">Ok</string>
     <string name="check_foster_home_screen_foster_home_avatar_content_description">%1$s's avatar</string>
     <string name="check_foster_home_screen_owner_avatar_content_description">%1$s's avatar</string>
-    <string name="check_foster_home_screen_report_foster_home">Report this foster home</string>
-    <string name="check_foster_home_screen_report_foster_home_subject">Report the foster home %1$s (%2$s)</string>
-    <string name="check_foster_home_screen_report_foster_home_body">My name: \n\nI am reporting the foster home %1$s (%2$s) because: </string>
     <string name="check_foster_home_screen_foster_home_description_label">Description</string>
     <string name="check_foster_home_screen_foster_home_conditions_label">Conditions</string>
     <string name="check_foster_home_screen_foster_home_accepted_non_human_animals_label">Accepted non-human animals</string>
@@ -313,10 +307,10 @@
     <string name="check_foster_home_screen_register_non_human_animal_to_talk_to_owner_label">Register first a non-human animal to foster and then talk to %1$s</string>
     <string name="check_foster_home_screen_register_non_human_animal_button">Register first a non-human animal</string>
     <string name="check_foster_home_screen_talk_to_owner_label">Talk to %1$s to foster a non-human animal</string>
-    <string name="check_foster_home_screen_non_human_animal_label">Non-human animal</string>
-    <string name="check_foster_home_screen_unselected_non_human_animal_label">Unselected</string>
     <string name="check_foster_home_screen_start_chat_button">Start chat</string>
-    <string name="check_foster_home_screen_share_foster_home_title">Do you need me to foster a non-human animal? I can care for these non-human animal kinds: %1$s. Find me in the Reskiume app using the following link %2$s</string>
+    <string name="check_foster_home_screen_share_foster_home_title">Do you need to foster a non-human animal? The foster home %1$s can take care of: %2$s. Find it in the Reskiume app using the following link %3$s</string>
+    <string name="check_foster_home_screen_add_non_human_animals_to_foster_title">Add non-human animals to foster</string>
+
 
     <!-- Check all my rescue events -->
     <string name="check_all_my_rescue_events_screen_title">Check my rescue events</string>
@@ -362,7 +356,7 @@
     <string name="modify_rescue_event_screen_delete_rescue_event_message">This action can not be undone</string>
     <string name="modify_rescue_event_screen_save_rescue_event_changes_button">Save %1$s's changes</string>
 
-    <!-- Check all foster homes -->
+    <!-- Check all rescue events -->
     <string name="check_all_rescue_events_screen_title">Search rescue events by</string>
     <string name="check_all_rescue_events_screen_search_rescue_events_button">🔎 Search rescue events %1$s</string>
     <string name="check_all_rescue_events_screen_search_by_place">by place</string>
@@ -371,6 +365,31 @@
     <string name="check_all_rescue_events_screen_no_rescue_event_found">⚠️ No rescue event found.</string>
     <string name="check_all_rescue_events_screen_turn_on_location">Please, turn on the location to get your position</string>
     <string name="check_all_rescue_events_screen_register_rescue_event">Add rescue event</string>
+
+    <!-- Check rescue event -->
+    <string name="check_rescue_event_screen_title">%1$s - %2$s (%3$s)</string>
+    <string name="check_rescue_event_screen_share_content_description">Share this rescue event</string>
+    <string name="check_rescue_event_screen_non_human_animals_to_rescue">%1$s and %2$s</string>
+    <string name="check_rescue_event_screen_rescue_event_avatar_content_description">%1$s's avatar</string>
+    <string name="check_rescue_event_screen_creator_avatar_content_description">%1$s's avatar</string>
+    <string name="check_rescue_event_screen_rescue_event_description_label">Description</string>
+    <string name="check_rescue_event_screen_rescue_event_needs_to_cover_label">Needs to cover</string>
+    <string name="check_rescue_event_screen_rescue_event_non_human_animals_to_rescue_label">Non-human animals to rescue</string>
+    <string name="check_rescue_event_screen_no_account_label">Create an account to join the rescue event %1$s</string>
+    <string name="check_rescue_event_screen_no_account_button">Create an account</string>
+    <string name="check_rescue_event_screen_join_the_rescue_event_label">Join the rescue event %1$s</string>
+    <string name="check_rescue_event_screen_start_chat_button">Start chat</string>
+    <string name="check_foster_home_screen_share_rescue_event_title">Join the rescue event %1$s to rescue %2$s. Find it in the Reskiume app using the following link %3$s</string>
+
+    <!-- Share service -->
+    <string name="share_service_install_title">You have no sharing app installed</string>
+    <string name="share_service_install_message">Please, go to the store and install one</string>
+    <string name="share_service_ok_button">Ok</string>
+
+    <!-- Report -->
+    <string name="report_element_link">Report this %1$s</string>
+    <string name="report_subject">Report the %1$s %2$s (%3$s)</string>
+    <string name="report_body">My name: \n\nI am reporting the %1$s %2$s (%3$s) because: </string>
 
     <!-- Check all advice -->
     <string name="check_all_advice_screen_title">Check all advice</string>

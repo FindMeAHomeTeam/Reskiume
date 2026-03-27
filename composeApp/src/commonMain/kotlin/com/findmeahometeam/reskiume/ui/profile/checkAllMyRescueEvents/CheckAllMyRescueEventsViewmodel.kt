@@ -98,5 +98,5 @@ data class UiRescueEvent(
     val rescueEvent: RescueEvent,
     val allUiNonHumanAnimalsToRescue: List<NonHumanAnimal>,
     val distance: Double? = null,
-    val owner: User? = null
+    val creator: User? = null
 )

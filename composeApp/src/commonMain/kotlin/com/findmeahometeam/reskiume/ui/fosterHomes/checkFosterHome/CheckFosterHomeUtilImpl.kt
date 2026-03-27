@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
 
 class CheckFosterHomeUtilImpl(
     private val observeAuthStateInAuthDataSource: ObserveAuthStateInAuthDataSource,
@@ -37,7 +36,7 @@ class CheckFosterHomeUtilImpl(
         fosterHomeId: String,
         ownerId: String,
         coroutineScope: CoroutineScope
-    ): Flow<FosterHome> =
+    ): Flow<FosterHome?> =
         observeAuthStateInAuthDataSource().flatMapConcat { authUser: AuthUser? ->
 
             val myUid = authUser?.uid ?: " "
@@ -57,7 +56,7 @@ class CheckFosterHomeUtilImpl(
                     ).downloadImageAndModifyFosterHomeInLocalRepository(coroutineScope)
                 },
                 onVerifyCacheIsRecent = {
-                    getFosterHomeFromLocalRepository(fosterHomeId).mapNotNull {
+                    getFosterHomeFromLocalRepository(fosterHomeId).map {
                         if (it == null) {
                             deleteFosterHomeCacheFromLocalDataSource(fosterHomeId)
                         }

@@ -555,6 +555,10 @@ class CheckFosterHomeUtilTest : CoroutineTestDispatcher() {
                 fosterHome.ownerId,
                 this
             ).test {
+                assertEquals(
+                    null,
+                    awaitItem()
+                )
                 awaitComplete()
             }
         }

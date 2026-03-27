@@ -340,12 +340,10 @@ fun CheckFosterHomeScreen(
 @Composable
 fun DisplayShareService(
     allAcceptedNonHumanAnimals: List<AcceptedNonHumanAnimalForFosterHome>,
+    fosterHomeTitle: String,
     fosterHomeOwnerId: String,
-    fosterHomeId: String
+    fosterHomeId: String,
 ) {
-    val shareService = koinInject<ShareService>()
-    var displayNoSharingAppError: Boolean by remember { mutableStateOf(false) }
-
     val nonHumanAnimalHashMap = HashMap<NonHumanAnimalType, Set<Gender>>()
 
     allAcceptedNonHumanAnimals.forEach { accepted ->
@@ -368,36 +366,25 @@ fun DisplayShareService(
             "$nonHumanAnimalText ($genderText)"
         }
 
-    val acceptedNonHumanAnimalsText = stringResource(
-        Res.string.check_foster_home_screen_accepted_non_human_animals,
-        allAcceptedNonHumanAnimalTextList.toList()
-            .subList(0, allAcceptedNonHumanAnimalTextList.size - 1)
-            .joinToString(", "),
-        allAcceptedNonHumanAnimalTextList.last()
-    )
-    val fosterHomeDeepLink = "$FOSTER_HOME_DEEP_LINK/$fosterHomeOwnerId/$fosterHomeId"
-
-    shareService.shareContent(
-        text = stringResource(
-            Res.string.check_foster_home_screen_share_foster_home_title,
-            acceptedNonHumanAnimalsText,
-            fosterHomeDeepLink
-        ),
-        onError = {
-            displayNoSharingAppError = true
-        }
-    )
-    if (displayNoSharingAppError) {
-
-        RmDialog(
-            emoji = "📲",
-            title = stringResource(Res.string.check_foster_home_screen_share_title),
-            message = stringResource(Res.string.check_foster_home_screen_share_message),
-            allowMessage = stringResource(Res.string.check_foster_home_screen_share_ok_button),
-            onClickAllow = { displayNoSharingAppError = false },
-            onClickDeny = { displayNoSharingAppError = false }
+    val acceptedNonHumanAnimalsText = if (allAcceptedNonHumanAnimalTextList.size == 1) {
+        allAcceptedNonHumanAnimalTextList[0]
+    } else {
+        stringResource(
+            Res.string.check_foster_home_screen_accepted_non_human_animals,
+            allAcceptedNonHumanAnimalTextList.toList()
+                .subList(0, allAcceptedNonHumanAnimalTextList.size - 1)
+                .joinToString(", "),
+            allAcceptedNonHumanAnimalTextList.last()
         )
     }
+    val fosterHomeDeepLink = "$FOSTER_HOME_DEEP_LINK/$fosterHomeOwnerId/$fosterHomeId"
+
+    RmShareService(
+        Res.string.check_foster_home_screen_share_foster_home_title,
+        fosterHomeTitle,
+        acceptedNonHumanAnimalsText,
+        fosterHomeDeepLink
+    )
 }
 
 @Composable

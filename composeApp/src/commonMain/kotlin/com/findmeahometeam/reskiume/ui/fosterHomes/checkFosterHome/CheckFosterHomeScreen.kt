@@ -210,7 +210,8 @@ fun CheckFosterHomeScreen(
                 ) {
                     DisplayOwner(uiFosterHome.owner!!)
 
-                    DisplayReportFosterHome(
+                    RmReport(
+                        stringResource(Res.string.foster_home),
                         uiFosterHome.fosterHome.id,
                         uiFosterHome.fosterHome.title
                     )
@@ -432,53 +433,6 @@ fun DisplayOwner(owner: User) {
         RmText(
             text = owner.username,
             fontWeight = FontWeight.Bold
-        )
-    }
-}
-
-@Composable
-fun DisplayReportFosterHome(
-    fosterHomeId: String,
-    title: String
-) {
-    val giveFeedback: GiveFeedback = koinInject<GiveFeedback>()
-    var displayNoEmailAppError: Boolean by remember { mutableStateOf(false) }
-
-    val sendReportSubject =
-        stringResource(
-            Res.string.check_foster_home_screen_report_foster_home_subject,
-            title,
-            fosterHomeId
-        )
-    val sendReportBody =
-        stringResource(
-            Res.string.check_foster_home_screen_report_foster_home_body,
-            title,
-            fosterHomeId
-        )
-    RmTextLink(
-        modifier = Modifier.padding(10.dp),
-        text = stringResource(Res.string.check_foster_home_screen_report_foster_home),
-        textToLink = stringResource(Res.string.check_foster_home_screen_report_foster_home),
-        linkColor = primaryRed,
-        onClick = {
-            giveFeedback.sendEmail(
-                subject = sendReportSubject,
-                body = sendReportBody,
-                onError = {
-                    displayNoEmailAppError = true
-                }
-            )
-        }
-    )
-    if (displayNoEmailAppError) {
-        RmDialog(
-            emoji = "✉️",
-            title = stringResource(Res.string.dialog_no_email_app_dialog_title),
-            message = stringResource(Res.string.dialog_no_email_app_dialog_message),
-            allowMessage = stringResource(Res.string.dialog_no_email_app_dialog_ok_button),
-            onClickAllow = { displayNoEmailAppError = false },
-            onClickDeny = { displayNoEmailAppError = false }
         )
     }
 }

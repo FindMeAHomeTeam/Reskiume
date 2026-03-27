@@ -87,7 +87,10 @@ class CheckFosterHomeViewmodel(
             }
         }
 
-    val reviewListFlowState: Flow<UiState<List<UiReview>>> = checkReviewsUtil.getReviewListFlow(ownerId).toUiState()
+    val reviewListFlowState: Flow<UiState<List<UiReview>>> =
+        checkReviewsUtil.getReviewListFlow(ownerId).toUiState()
 
     fun isLoggedIn(): Boolean = myUid.isNotBlank()
+
+    fun canIStartTheChat(): Boolean = myUid != ownerId
 }

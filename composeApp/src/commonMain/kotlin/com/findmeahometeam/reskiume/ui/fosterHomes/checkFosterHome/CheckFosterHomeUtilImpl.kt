@@ -48,12 +48,22 @@ class CheckFosterHomeUtilImpl(
                 onCompletionInsertCache = {
                     getFosterHomeFromRemoteRepository(
                         fosterHomeId
-                    ).downloadImageAndInsertFosterHomeInLocalRepository(coroutineScope)
+                    ).downloadImageAndInsertFosterHomeInLocalRepository(coroutineScope).map {
+                        if (it == null) {
+                            deleteFosterHomeCacheFromLocalDataSource(fosterHomeId)
+                        }
+                        it
+                    }
                 },
                 onCompletionUpdateCache = {
                     getFosterHomeFromRemoteRepository(
                         fosterHomeId
-                    ).downloadImageAndModifyFosterHomeInLocalRepository(coroutineScope)
+                    ).downloadImageAndModifyFosterHomeInLocalRepository(coroutineScope).map {
+                        if (it == null) {
+                            deleteFosterHomeCacheFromLocalDataSource(fosterHomeId)
+                        }
+                        it
+                    }
                 },
                 onVerifyCacheIsRecent = {
                     getFosterHomeFromLocalRepository(fosterHomeId).map {
@@ -66,10 +76,12 @@ class CheckFosterHomeUtilImpl(
             )
         }
 
-    private fun Flow<FosterHome>.downloadImageAndInsertFosterHomeInLocalRepository(coroutineScope: CoroutineScope): Flow<FosterHome> =
-        this.map { fosterHome: FosterHome ->
+    private fun Flow<FosterHome?>.downloadImageAndInsertFosterHomeInLocalRepository(coroutineScope: CoroutineScope): Flow<FosterHome?> =
+        this.map { fosterHome: FosterHome? ->
 
             when {
+                fosterHome == null -> null
+
                 fosterHome.imageUrl.isBlank() -> {
                     log.d(
                         "CheckFosterHomeUtilImpl",
@@ -137,10 +149,12 @@ class CheckFosterHomeUtilImpl(
         }
     }
 
-    private fun Flow<FosterHome>.downloadImageAndModifyFosterHomeInLocalRepository(coroutineScope: CoroutineScope): Flow<FosterHome> =
-        this.map { fosterHome: FosterHome ->
+    private fun Flow<FosterHome?>.downloadImageAndModifyFosterHomeInLocalRepository(coroutineScope: CoroutineScope): Flow<FosterHome?> =
+        this.map { fosterHome: FosterHome? ->
 
             when {
+                fosterHome == null -> null
+
                 fosterHome.imageUrl.isBlank() -> {
                     log.d(
                         "CheckFosterHomeUtilImpl",

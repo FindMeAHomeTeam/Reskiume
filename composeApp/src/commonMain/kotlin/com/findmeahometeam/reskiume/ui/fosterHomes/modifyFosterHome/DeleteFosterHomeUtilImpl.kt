@@ -4,15 +4,14 @@ import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
-import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
-import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteCacheFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.DeleteMyFosterHomeFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.DeleteMyFosterHomeFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetFosterHomeFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetFosterHomeFromRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteCacheFromLocalRepository
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
@@ -85,7 +84,16 @@ class DeleteFosterHomeUtilImpl(
 
             val remoteFosterHome = getFosterHomeFromRemoteRepository(
                 fosterHomeId
-            ).first()
+            ).firstOrNull()
+
+            if (remoteFosterHome == null) {
+                log.e(
+                    "DeleteFosterHomeUtil",
+                    "deleteCurrentImageFromRemoteDataSource: failed to delete the image from the foster home $fosterHomeId in the remote data source because the remote foster home does not exist!"
+                )
+                onError()
+                return@launch
+            }
 
             deleteImageFromRemoteDataSource(
                 userUid = ownerId,

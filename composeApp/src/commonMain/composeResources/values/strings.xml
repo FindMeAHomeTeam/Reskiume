@@ -107,6 +107,7 @@
     <!-- General error messages -->
     <string name="general_error_network_message">Network error. Please check your internet connection and try again</string>
     <string name="general_error_unknown_message">An unknown error occurred. Please try again later</string>
+    <string name="general_error_invalid_deep_link">This link is invalid. Please ask for it again or search for %1$ss in the app</string>
 
     <!-- Check reviews screen -->
     <string name="check_reviews_screen_my_reviews_title">My reviews</string>

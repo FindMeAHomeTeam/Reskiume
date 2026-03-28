@@ -21,7 +21,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,6 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.findmeahometeam.reskiume.domain.model.Gender
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalListSaver
@@ -91,6 +91,7 @@ import reskiume.composeapp.generated.resources.check_foster_home_screen_talk_to_
 import reskiume.composeapp.generated.resources.check_foster_home_screen_title
 import reskiume.composeapp.generated.resources.check_reviews_screen_user_deleted
 import reskiume.composeapp.generated.resources.foster_home
+import reskiume.composeapp.generated.resources.general_error_invalid_deep_link
 import reskiume.composeapp.generated.resources.ic_share
 import reskiume.composeapp.generated.resources.reskiume
 
@@ -105,16 +106,16 @@ fun CheckFosterHomeScreen(
     val checkFosterHomeViewmodel: CheckFosterHomeViewmodel =
         koinViewModel<CheckFosterHomeViewmodel>()
 
-    val uiFosterHomeState: UiState<UiFosterHome> by checkFosterHomeViewmodel.fosterHomeFlow.collectAsState(
-        initial = UiState.Loading()
+    val uiFosterHomeState: UiState<UiFosterHome> by checkFosterHomeViewmodel.fosterHomeFlow.collectAsStateWithLifecycle(
+        initialValue = UiState.Loading()
     )
 
-    val allUserUiReviewsState: UiState<List<UiReview>> by checkFosterHomeViewmodel.reviewListFlowState.collectAsState(
-        initial = UiState.Loading()
+    val allUserUiReviewsState: UiState<List<UiReview>> by checkFosterHomeViewmodel.reviewListFlowState.collectAsStateWithLifecycle(
+        initialValue = UiState.Loading()
     )
 
-    val allAvailableNonHumanAnimals: List<NonHumanAnimal> by checkFosterHomeViewmodel.allAvailableNonHumanAnimalsLookingForAdoptionFlow.collectAsState(
-        initial = emptyList()
+    val allAvailableNonHumanAnimals: List<NonHumanAnimal> by checkFosterHomeViewmodel.allAvailableNonHumanAnimalsLookingForAdoptionFlow.collectAsStateWithLifecycle(
+        initialValue = emptyList()
     )
 
     var isShareButtonClicked: Boolean by remember { mutableStateOf(false) }
@@ -170,8 +171,13 @@ fun CheckFosterHomeScreen(
                 .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            RmResultState(uiFosterHomeState) { uiFosterHome: UiFosterHome ->
+            RmResultState(
+                uiState = uiFosterHomeState,
+                customErrorMessage = stringResource(
+                    Res.string.general_error_invalid_deep_link,
+                    stringResource(Res.string.foster_home)
+                )
+            ) { uiFosterHome: UiFosterHome ->
 
                 if (isShareButtonClicked) {
                     DisplayShareService(

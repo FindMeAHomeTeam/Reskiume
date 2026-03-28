@@ -116,7 +116,7 @@ class ModifyFosterHomeViewmodelTest : CoroutineTestDispatcher() {
             ).toEntity(),
         localCacheUpdatedInLocalDatasourceArg: Int = 1,
         numberOfRowsDeletedInLocalDatasourceArg: Int = 1,
-        remoteFosterHomeReturn: Flow<RemoteFosterHome> = flowOf(fosterHome.toData()),
+        remoteFosterHomeReturn: Flow<RemoteFosterHome?> = flowOf(fosterHome.toData()),
         databaseResultOfModifyingFosterHomesInRemoteRepositoryArg: DatabaseResult = DatabaseResult.Success,
         databaseResultOfModifyingNonHumanAnimalInRemoteRepositoryArg: DatabaseResult = DatabaseResult.Success,
         isRemoteImageDeletedFlagForFosterHome: Boolean = true,
@@ -557,6 +557,29 @@ class ModifyFosterHomeViewmodelTest : CoroutineTestDispatcher() {
         }
 
     @Test
+    fun `given my foster home to modify_when the app tries to delete the remote image but fails to retrieve the foster home from the remote repo_then the app retrieves an error`() =
+        runTest {
+            val modifyFosterHomeViewmodel = getModifyFosterHomeViewmodel(
+                remoteFosterHomeReturn = flowOf(null)
+            )
+
+            modifyFosterHomeViewmodel.saveFosterHomeChanges(true, fosterHome)
+
+            modifyFosterHomeViewmodel.manageChangesUiState.test {
+                assertTrue { awaitItem() is UiState.Idle }
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Error }
+                ensureAllEventsConsumed()
+            }
+            verify {
+                log.e(
+                    "ModifyFosterHomeViewmodel",
+                    "deleteCurrentImageFromRemoteDataSource: failed to delete the image from the foster home ${fosterHome.id} in the remote data source because the remote foster home does not exist!"
+                )
+            }
+        }
+
+    @Test
     fun `given my foster home to modify_when I click to update my foster home but fails deleting the remote foster home image_then the app retrieves an error`() =
         runTest {
             val modifyFosterHomeViewmodel = getModifyFosterHomeViewmodel(
@@ -661,6 +684,29 @@ class ModifyFosterHomeViewmodelTest : CoroutineTestDispatcher() {
                 log.d(
                     "ModifyFosterHomeViewModel",
                     "uploadNewImageToRemoteDataSource: the download URI from the foster home ${updatedFosterHome.id} is blank"
+                )
+            }
+        }
+
+    @Test
+    fun `given my foster home to modify_when I click to update my foster home but fails retrieving the foster home from the remote repo_then the foster home is not updated`() =
+        runTest {
+            val modifyFosterHomeViewmodel = getModifyFosterHomeViewmodel(
+                remoteFosterHomeReturn = flowOf(null)
+            )
+
+            modifyFosterHomeViewmodel.saveFosterHomeChanges(false, fosterHome)
+
+            modifyFosterHomeViewmodel.manageChangesUiState.test {
+                assertTrue { awaitItem() is UiState.Idle }
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Error }
+                ensureAllEventsConsumed()
+            }
+            verify {
+                log.e(
+                    "ModifyFosterHomeViewmodel",
+                    "saveFosterHomeChanges: failed to collect the remote foster home ${fosterHome.id} in the remote data source because the it does not exist!"
                 )
             }
         }

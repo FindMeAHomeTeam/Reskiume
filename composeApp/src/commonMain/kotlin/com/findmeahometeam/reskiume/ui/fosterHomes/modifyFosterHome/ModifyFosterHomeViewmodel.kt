@@ -127,8 +127,16 @@ class ModifyFosterHomeViewmodel(
             } else {
                 val collectedFosterHome = getFosterHomeFromRemoteRepository(
                     modifiedFosterHome.id
-                ).first()
+                ).firstOrNull()
 
+                if (collectedFosterHome == null) {
+                    log.e(
+                        "ModifyFosterHomeViewmodel",
+                        "saveFosterHomeChanges: failed to collect the remote foster home $fosterHomeId in the remote data source because the it does not exist!"
+                    )
+                    _manageChangesUiState.value = UiState.Error()
+                    return@launch
+                }
                 modifyFosterHomeInRemoteDataSource(
                     modifiedFosterHome.copy(imageUrl = collectedFosterHome.imageUrl)
                 ) {
@@ -150,7 +158,16 @@ class ModifyFosterHomeViewmodel(
 
             val remoteFosterHome = getFosterHomeFromRemoteRepository(
                 fosterHomeId
-            ).first()
+            ).firstOrNull()
+
+            if (remoteFosterHome == null) {
+                log.e(
+                    "ModifyFosterHomeViewmodel",
+                    "deleteCurrentImageFromRemoteDataSource: failed to delete the image from the foster home $fosterHomeId in the remote data source because the remote foster home does not exist!"
+                )
+                _manageChangesUiState.value = UiState.Error()
+                return@launch
+            }
 
             deleteImageFromRemoteDataSource(
                 userUid = ownerId,

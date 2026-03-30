@@ -10,26 +10,26 @@ import com.findmeahometeam.reskiume.data.remote.response.rescueEvent.RemoteRescu
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
-import com.findmeahometeam.reskiume.domain.repository.local.LocalRescueEventRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalRescueEventRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteRescueEvent.FireStoreRemoteRescueEventRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteCacheFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.DeleteMyRescueEventFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.DeleteMyRescueEventFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetRescueEventFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetRescueEventFromRemoteRepository
-import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
-import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteCacheFromLocalRepository
-import com.findmeahometeam.reskiume.rescueEvent
 import com.findmeahometeam.reskiume.localCache
 import com.findmeahometeam.reskiume.nonHumanAnimal
+import com.findmeahometeam.reskiume.rescueEvent
 import com.findmeahometeam.reskiume.rescueEventWithAllNeedsAndNonHumanAnimalData
-import com.findmeahometeam.reskiume.ui.rescueEvents.modifyRescueEvent.DeleteRescueEventUtilImpl
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.DeleteNonHumanAnimalUtil
+import com.findmeahometeam.reskiume.ui.rescueEvents.modifyRescueEvent.DeleteRescueEventUtilImpl
 import com.findmeahometeam.reskiume.user
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
@@ -83,7 +83,7 @@ class DeleteRescueEventUtilTest : CoroutineTestDispatcher() {
                 section = Section.RESCUE_EVENTS
             ).toEntity(),
         numberOfRowsDeletedInLocalCacheArg: Int = 1,
-        remoteRescueEventReturn: Flow<RemoteRescueEvent> = flowOf(rescueEvent.toData()),
+        remoteRescueEventReturn: Flow<RemoteRescueEvent?> = flowOf(rescueEvent.toData()),
         databaseResultOfDeletingRescueEventsInRemoteRepositoryArg: DatabaseResult = DatabaseResult.Success,
         databaseResultOfModifyingNonHumanAnimalInRemoteRepositoryArg: DatabaseResult = DatabaseResult.Success,
         databaseResultOfModifyingSecondNonHumanAnimalInRemoteRepositoryArg: DatabaseResult = DatabaseResult.Success,
@@ -351,6 +351,33 @@ class DeleteRescueEventUtilTest : CoroutineTestDispatcher() {
                 log.d(
                     "DeleteRescueEventUtil",
                     "deleteRescueEventCacheFromLocalDataSource: Rescue event ${rescueEvent.id} deleted in the local cache in section ${Section.RESCUE_EVENTS}"
+                )
+            }
+        }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `given my rescue event_when I click to delete my rescue event but fails retrieving the remote rescue event_then the app displays an error`() =
+        runTest {
+            val deleteRescueEventUtil = getDeleteRescueEventUtil(
+                remoteRescueEventReturn = flowOf(null)
+            )
+
+            deleteRescueEventUtil.deleteRescueEvent(
+                rescueEvent.id,
+                rescueEvent.creatorId,
+                this,
+                false,
+                {},
+                {},
+            )
+
+            runCurrent()
+
+            verify {
+                log.e(
+                    "DeleteRescueEventUtil",
+                    "deleteCurrentImageFromRemoteDataSource: failed to delete the image from the rescue event ${rescueEvent.id} in the remote data source because the remote rescue event does not exist!"
                 )
             }
         }

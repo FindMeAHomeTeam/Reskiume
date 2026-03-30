@@ -48,12 +48,22 @@ class CheckRescueEventUtilImpl(
                 onCompletionInsertCache = {
                     getRescueEventFromRemoteRepository(
                         rescueEventId
-                    ).downloadImageAndInsertRescueEventInLocalRepository(coroutineScope)
+                    ).downloadImageAndInsertRescueEventInLocalRepository(coroutineScope).map {
+                        if (it == null) {
+                            deleteRescueEventCacheFromLocalDataSource(rescueEventId)
+                        }
+                        it
+                    }
                 },
                 onCompletionUpdateCache = {
                     getRescueEventFromRemoteRepository(
                         rescueEventId
-                    ).downloadImageAndModifyRescueEventInLocalRepository(coroutineScope)
+                    ).downloadImageAndModifyRescueEventInLocalRepository(coroutineScope).map {
+                        if (it == null) {
+                            deleteRescueEventCacheFromLocalDataSource(rescueEventId)
+                        }
+                        it
+                    }
                 },
                 onVerifyCacheIsRecent = {
                     getRescueEventFromLocalRepository(rescueEventId).map {
@@ -66,10 +76,12 @@ class CheckRescueEventUtilImpl(
             )
         }
 
-    private fun Flow<RescueEvent>.downloadImageAndInsertRescueEventInLocalRepository(coroutineScope: CoroutineScope): Flow<RescueEvent> =
-        this.map { rescueEvent: RescueEvent ->
+    private fun Flow<RescueEvent?>.downloadImageAndInsertRescueEventInLocalRepository(coroutineScope: CoroutineScope): Flow<RescueEvent?> =
+        this.map { rescueEvent: RescueEvent? ->
 
             when {
+                rescueEvent == null -> null
+
                 rescueEvent.imageUrl.isBlank() -> {
                     log.d(
                         "CheckRescueEventUtilImpl",
@@ -137,10 +149,12 @@ class CheckRescueEventUtilImpl(
         }
     }
 
-    private fun Flow<RescueEvent>.downloadImageAndModifyRescueEventInLocalRepository(coroutineScope: CoroutineScope): Flow<RescueEvent> =
-        this.map { rescueEvent: RescueEvent ->
+    private fun Flow<RescueEvent?>.downloadImageAndModifyRescueEventInLocalRepository(coroutineScope: CoroutineScope): Flow<RescueEvent?> =
+        this.map { rescueEvent: RescueEvent? ->
 
             when {
+                rescueEvent == null -> null
+
                 rescueEvent.imageUrl.isBlank() -> {
                     log.d(
                         "CheckRescueEventUtilImpl",

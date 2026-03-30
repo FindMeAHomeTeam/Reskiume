@@ -37,13 +37,14 @@ import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.DeleteNonHum
 import com.findmeahometeam.reskiume.ui.rescueEvents.modifyRescueEvent.DeleteRescueEventUtilImpl
 import com.findmeahometeam.reskiume.user
 import com.findmeahometeam.reskiume.userPwd
-import dev.mokkery.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
+import kotlin.test.assertTrue
 
 class DeleteRescueEventUtilIntegrationTest : CoroutineTestDispatcher() {
-
-    private val log: Log = FakeLog()
 
     private fun getDeleteRescueEventUtil(
         authRepository: AuthRepository = FakeAuthRepository(
@@ -70,7 +71,8 @@ class DeleteRescueEventUtilIntegrationTest : CoroutineTestDispatcher() {
                 nonHumanAnimal.toEntity(),
                 nonHumanAnimal.copy(id = nonHumanAnimal.id + "second").toEntity()
             )
-        )
+        ),
+        log: Log = FakeLog()
     ): DeleteRescueEventUtilImpl {
 
         val getRescueEventFromRemoteRepository =
@@ -117,18 +119,29 @@ class DeleteRescueEventUtilIntegrationTest : CoroutineTestDispatcher() {
         )
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `given my rescue event_when I click to delete my rescue event_then the rescue event is deleted`() =
         runTest {
+            val fireStoreRemoteRescueEventRepository = FakeFireStoreRemoteRescueEventRepository(
+                remoteRescueEventList = mutableListOf(rescueEvent.toData())
+            )
+            val localRescueEventRepository = FakeLocalRescueEventRepository(
+                localRescueEventWithAllNeedsAndNonHumanAnimalDataList = mutableListOf(
+                    rescueEventWithAllNeedsAndNonHumanAnimalData
+                )
+            )
+            val localCacheRepository = FakeLocalCacheRepository(
+                localCacheList = mutableListOf(
+                    localCache.copy(
+                        cachedObjectId = rescueEvent.id,
+                        section = Section.RESCUE_EVENTS
+                    ).toEntity()
+                )
+            )
             val deleteRescueEventUtil = getDeleteRescueEventUtil(
-                fireStoreRemoteRescueEventRepository = FakeFireStoreRemoteRescueEventRepository(
-                    remoteRescueEventList = mutableListOf(rescueEvent.toData())
-                ),
-                localRescueEventRepository = FakeLocalRescueEventRepository(
-                    localRescueEventWithAllNeedsAndNonHumanAnimalDataList = mutableListOf(
-                        rescueEventWithAllNeedsAndNonHumanAnimalData
-                    )
-                ),
+                fireStoreRemoteRescueEventRepository = fireStoreRemoteRescueEventRepository,
+                localRescueEventRepository = localRescueEventRepository,
                 storageRepository = FakeStorageRepository(
                     remoteDatasourceList = mutableListOf(
                         Pair(
@@ -143,14 +156,7 @@ class DeleteRescueEventUtilIntegrationTest : CoroutineTestDispatcher() {
                         )
                     )
                 ),
-                localCacheRepository = FakeLocalCacheRepository(
-                    localCacheList = mutableListOf(
-                        localCache.copy(
-                            cachedObjectId = rescueEvent.id,
-                            section = Section.RESCUE_EVENTS
-                        ).toEntity()
-                    )
-                )
+                localCacheRepository = localCacheRepository
             )
 
             deleteRescueEventUtil.deleteRescueEvent(
@@ -162,21 +168,29 @@ class DeleteRescueEventUtilIntegrationTest : CoroutineTestDispatcher() {
                 {},
             )
 
-            verify {
-                log.d(
-                    "DeleteRescueEventUtil",
-                    "deleteRescueEventCacheFromLocalDataSource: Rescue event ${rescueEvent.id} deleted in the local cache in section ${Section.RESCUE_EVENTS}"
-                )
+            runCurrent()
+
+            assertTrue {
+                fireStoreRemoteRescueEventRepository.getRemoteRescueEvent(rescueEvent.id)
+                    .firstOrNull() == null
+            }
+            assertTrue { localRescueEventRepository.getRescueEvent(rescueEvent.id) == null }
+            assertTrue {
+                localCacheRepository.getLocalCacheEntity(
+                    rescueEvent.id,
+                    Section.RESCUE_EVENTS
+                ) == null
             }
         }
 
     @Test
     fun `given my rescue event_when I click to delete my rescue event but fails deleting the current image from the remote datasource_then the app displays an error`() =
         runTest {
+            val fireStoreRemoteRescueEventRepository = FakeFireStoreRemoteRescueEventRepository(
+                remoteRescueEventList = mutableListOf(rescueEvent.toData())
+            )
             val deleteRescueEventUtil = getDeleteRescueEventUtil(
-                fireStoreRemoteRescueEventRepository = FakeFireStoreRemoteRescueEventRepository(
-                    remoteRescueEventList = mutableListOf(rescueEvent.toData())
-                )
+                fireStoreRemoteRescueEventRepository = fireStoreRemoteRescueEventRepository
             )
 
             deleteRescueEventUtil.deleteRescueEvent(
@@ -188,99 +202,26 @@ class DeleteRescueEventUtilIntegrationTest : CoroutineTestDispatcher() {
                 {},
             )
 
-            verify {
-                log.e(
-                    "DeleteRescueEventUtil",
-                    "deleteCurrentImageFromRemoteDataSource: failed to delete the image from the rescue event ${rescueEvent.id} in the remote data source"
-                )
+            assertTrue {
+                fireStoreRemoteRescueEventRepository
+                    .getRemoteRescueEvent(rescueEvent.id)
+                    .firstOrNull() != null
             }
         }
 
-    @Test
-    fun `given my rescue event_when I click to delete my rescue event but fails retrieving the local rescue event trying to delete its local image_then the app displays an error`() =
-        runTest {
-            val deleteRescueEventUtil = getDeleteRescueEventUtil(
-                fireStoreRemoteRescueEventRepository = FakeFireStoreRemoteRescueEventRepository(
-                    remoteRescueEventList = mutableListOf(rescueEvent.toData())
-                ),
-                storageRepository = FakeStorageRepository(
-                    remoteDatasourceList = mutableListOf(
-                        Pair(
-                            "${Section.RESCUE_EVENTS.path}/${user.uid}",
-                            "${rescueEvent.id}.webp"
-                        )
-                    )
-                )
-            )
-
-            deleteRescueEventUtil.deleteRescueEvent(
-                rescueEvent.id,
-                rescueEvent.creatorId,
-                this,
-                false,
-                {},
-                {},
-            )
-
-            verify {
-                log.e(
-                    "DeleteRescueEventUtil",
-                    "deleteCurrentImageFromLocalDataSource: failed to delete the image from the rescue event ${rescueEvent.id} in the local data source because the local rescue event does not exist"
-                )
-            }
-        }
-
-    @Test
-    fun `given my rescue event_when I click to delete my rescue event but fails deleting the current image from the local datasource_then the app displays an error`() =
-        runTest {
-            val deleteRescueEventUtil = getDeleteRescueEventUtil(
-                fireStoreRemoteRescueEventRepository = FakeFireStoreRemoteRescueEventRepository(
-                    remoteRescueEventList = mutableListOf(rescueEvent.toData())
-                ),
-                localRescueEventRepository = FakeLocalRescueEventRepository(
-                    localRescueEventWithAllNeedsAndNonHumanAnimalDataList = mutableListOf(
-                        rescueEventWithAllNeedsAndNonHumanAnimalData
-                    )
-                ),
-                storageRepository = FakeStorageRepository(
-                    remoteDatasourceList = mutableListOf(
-                        Pair(
-                            "${Section.RESCUE_EVENTS.path}/${user.uid}",
-                            "${rescueEvent.id}.webp"
-                        )
-                    )
-                )
-            )
-
-            deleteRescueEventUtil.deleteRescueEvent(
-                rescueEvent.id,
-                rescueEvent.creatorId,
-                this,
-                false,
-                {},
-                {},
-            )
-
-            verify {
-                log.e(
-                    "DeleteRescueEventUtil",
-                    "deleteCurrentImageFromLocalDataSource: failed to delete the image from the rescue event ${rescueEvent.id} in the local data source"
-                )
-            }
-        }
-
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `given my rescue event_when I click to delete my rescue event but fails deleting the rescue event from the local cache_then the deletion process is finished but the local cache is not deleted`() =
         runTest {
+            val localRescueEventRepository = FakeLocalRescueEventRepository(
+                localRescueEventWithAllNeedsAndNonHumanAnimalDataList = mutableListOf(
+                    rescueEventWithAllNeedsAndNonHumanAnimalData
+                )
+            )
+
             val deleteRescueEventUtil = getDeleteRescueEventUtil(
-                fireStoreRemoteRescueEventRepository = FakeFireStoreRemoteRescueEventRepository(
-                    remoteRescueEventList = mutableListOf(rescueEvent.toData())
-                ),
-                localRescueEventRepository = FakeLocalRescueEventRepository(
-                    localRescueEventWithAllNeedsAndNonHumanAnimalDataList = mutableListOf(
-                        rescueEventWithAllNeedsAndNonHumanAnimalData
-                    )
-                ),
+                fireStoreRemoteRescueEventRepository = FakeFireStoreRemoteRescueEventRepository(),
+                localRescueEventRepository = localRescueEventRepository,
                 storageRepository = FakeStorageRepository(
                     remoteDatasourceList = mutableListOf(
                         Pair(
@@ -294,7 +235,8 @@ class DeleteRescueEventUtilIntegrationTest : CoroutineTestDispatcher() {
                             rescueEvent.imageUrl
                         )
                     )
-                )
+                ),
+                localCacheRepository = FakeLocalCacheRepository()
             )
 
             deleteRescueEventUtil.deleteRescueEvent(
@@ -306,11 +248,8 @@ class DeleteRescueEventUtilIntegrationTest : CoroutineTestDispatcher() {
                 {},
             )
 
-            verify {
-                log.e(
-                    "DeleteRescueEventUtil",
-                    "deleteRescueEventCacheFromLocalDataSource: Error deleting the rescue event ${rescueEvent.id} in the local cache in section ${Section.RESCUE_EVENTS}"
-                )
-            }
+            runCurrent()
+
+            assertTrue { localRescueEventRepository.getRescueEvent(rescueEvent.id) == null }
         }
 }

@@ -193,6 +193,22 @@ class CheckRescueEventUtilIntegrationTest : CoroutineTestDispatcher() {
         }
 
     @Test
+    fun `given an empty cache_when the user request a rescue event but there is an issue retrieving it from the remote repo_then it is not retrieved`() =
+        runTest {
+            getCheckRescueEventUtilImpl().getRescueEventFlow(
+                rescueEvent.id,
+                rescueEvent.creatorId,
+                this
+            ).test {
+                assertEquals(
+                    null,
+                    awaitItem()
+                )
+                awaitComplete()
+            }
+        }
+
+    @Test
     fun `given an outdated cache_when the user request a rescue event from remote_then rescue event is retrieved and modified in the local cache`() =
         runTest {
             getCheckRescueEventUtilImpl(
@@ -258,6 +274,32 @@ class CheckRescueEventUtilIntegrationTest : CoroutineTestDispatcher() {
             ).test {
                 assertEquals(
                     rescueEvent.copy(imageUrl = ""),
+                    awaitItem()
+                )
+                awaitComplete()
+            }
+        }
+
+    @Test
+    fun `given an outdated cache_when the user request a rescue event but there is an issue retrieving it from the remote repo_then it is not retrieved`() =
+        runTest {
+            getCheckRescueEventUtilImpl(
+                localCacheRepository = FakeLocalCacheRepository(
+                    localCacheList = mutableListOf(
+                        localCache.copy(
+                            cachedObjectId = rescueEvent.id,
+                            section = Section.RESCUE_EVENTS,
+                            timestamp = 123L
+                        ).toEntity()
+                    )
+                )
+            ).getRescueEventFlow(
+                rescueEvent.id,
+                rescueEvent.creatorId,
+                this
+            ).test {
+                assertEquals(
+                    null,
                     awaitItem()
                 )
                 awaitComplete()

@@ -100,7 +100,8 @@ class CheckRescueEventUtilTest : CoroutineTestDispatcher() {
                 cachedObjectId = rescueEvent.id,
                 section = Section.RESCUE_EVENTS
             ).toEntity(),
-        remoteRescueEventReturn: Flow<RemoteRescueEvent> = flowOf(rescueEvent.toData()),
+        rowsDeletedOfLocalCacheArg: Int = 1,
+        remoteRescueEventReturn: Flow<RemoteRescueEvent?> = flowOf(rescueEvent.toData()),
         insertedRescueEventInLocalRowsUpdatedArg: Long = 1L,
         modifiedRescueEventInLocalRowsUpdatedArg: Int = 1,
         insertedRowIdOfNeedToCoverForRescueEventInLocalArg: Long = 1L,
@@ -152,7 +153,7 @@ class CheckRescueEventUtilTest : CoroutineTestDispatcher() {
                     capture(onDeleteLocalCacheEntity)
                 )
             } calls {
-                onDeleteLocalCacheEntity.get().invoke(1)
+                onDeleteLocalCacheEntity.get().invoke(rowsDeletedOfLocalCacheArg)
             }
         }
 
@@ -475,6 +476,57 @@ class CheckRescueEventUtilTest : CoroutineTestDispatcher() {
         }
 
     @Test
+    fun `given an empty cache_when the user request a rescue event but there is an issue retrieving it from the remote repo_then it is not retrieved`() =
+        runTest {
+            getCheckRescueEventUtilImpl(
+                getLocalCacheEntityReturnForRescueEvent = null,
+                remoteRescueEventReturn = flowOf(null)
+            ).getRescueEventFlow(
+                rescueEvent.id,
+                rescueEvent.creatorId,
+                this
+            ).test {
+                assertEquals(
+                    null,
+                    awaitItem()
+                )
+                awaitComplete()
+            }
+            verify {
+                log.d(
+                    "CheckRescueEventUtilImpl",
+                    "deleteRescueEventCacheFromLocalDataSource: Rescue event ${rescueEvent.id} deleted in the local cache in section ${Section.RESCUE_EVENTS}"
+                )
+            }
+        }
+
+    @Test
+    fun `given an empty cache_when the user request a rescue event but there is an issue retrieving it from the remote repo and fails deleting the cache_then it is not retrieved`() =
+        runTest {
+            getCheckRescueEventUtilImpl(
+                getLocalCacheEntityReturnForRescueEvent = null,
+                remoteRescueEventReturn = flowOf(null),
+                rowsDeletedOfLocalCacheArg = 0
+            ).getRescueEventFlow(
+                rescueEvent.id,
+                rescueEvent.creatorId,
+                this
+            ).test {
+                assertEquals(
+                    null,
+                    awaitItem()
+                )
+                awaitComplete()
+            }
+            verify {
+                log.e(
+                    "CheckRescueEventUtilImpl",
+                    "deleteRescueEventCacheFromLocalDataSource: Error deleting the Rescue event ${rescueEvent.id} in the local cache in section ${Section.RESCUE_EVENTS}"
+                )
+            }
+        }
+
+    @Test
     fun `given an outdated cache_when the user request a rescue event from remote_then rescue event is retrieved and modified in the local cache`() =
         runTest {
             getCheckRescueEventUtilImpl(
@@ -559,6 +611,36 @@ class CheckRescueEventUtilTest : CoroutineTestDispatcher() {
                 log.e(
                     "CheckRescueEventUtilImpl",
                     "modifyRescueEventsInLocalRepository: Error modifying the Rescue event ${rescueEvent.id} in local database"
+                )
+            }
+        }
+
+    @Test
+    fun `given an outdated cache_when the user request a rescue event but there is an issue retrieving it from the remote repo_then it is not retrieved`() =
+        runTest {
+            getCheckRescueEventUtilImpl(
+                remoteRescueEventReturn = flowOf(null),
+                getLocalCacheEntityReturnForRescueEvent =
+                    localCache.copy(
+                        cachedObjectId = rescueEvent.id,
+                        section = Section.RESCUE_EVENTS,
+                        timestamp = 123L
+                    ).toEntity()
+            ).getRescueEventFlow(
+                rescueEvent.id,
+                rescueEvent.creatorId,
+                this
+            ).test {
+                assertEquals(
+                    null,
+                    awaitItem()
+                )
+                awaitComplete()
+            }
+            verify {
+                log.d(
+                    "CheckRescueEventUtilImpl",
+                    "deleteRescueEventCacheFromLocalDataSource: Rescue event ${rescueEvent.id} deleted in the local cache in section ${Section.RESCUE_EVENTS}"
                 )
             }
         }

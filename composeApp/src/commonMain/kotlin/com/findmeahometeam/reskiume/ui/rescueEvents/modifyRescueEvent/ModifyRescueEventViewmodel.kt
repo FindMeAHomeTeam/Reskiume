@@ -125,7 +125,16 @@ class ModifyRescueEventViewmodel(
             } else {
                 val collectedRescueEvent = getRescueEventFromRemoteRepository(
                     modifiedRescueEvent.id
-                ).first()
+                ).firstOrNull()
+
+                if (collectedRescueEvent == null) {
+                    log.e(
+                        "ModifyRescueEventViewmodel",
+                        "saveRescueEventChanges: failed to collect the remote rescue event $rescueEventId in the remote data source because the it does not exist!"
+                    )
+                    _manageChangesUiState.value = UiState.Error()
+                    return@launch
+                }
 
                 modifyRescueEventInRemoteDataSource(
                     modifiedRescueEvent.copy(imageUrl = collectedRescueEvent.imageUrl)
@@ -148,7 +157,16 @@ class ModifyRescueEventViewmodel(
 
             val remoteRescueEvent = getRescueEventFromRemoteRepository(
                 rescueEventId
-            ).first()
+            ).firstOrNull()
+
+            if (remoteRescueEvent == null) {
+                log.e(
+                    "ModifyRescueEventViewmodel",
+                    "deleteCurrentImageFromRemoteDataSource: failed to delete the image from the rescue event $rescueEventId in the remote data source because the remote rescue event does not exist!"
+                )
+                _manageChangesUiState.value = UiState.Error()
+                return@launch
+            }
 
             deleteImageFromRemoteDataSource(
                 userUid = creatorId,

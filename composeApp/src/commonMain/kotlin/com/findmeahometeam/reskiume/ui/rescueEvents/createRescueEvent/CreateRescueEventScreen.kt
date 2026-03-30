@@ -66,7 +66,7 @@ fun CreateRescueEventScreen(
 
     val placeUtil: PlaceUtil = koinInject<PlaceUtil>()
 
-    val allAvailableNonHumanAnimals: List<NonHumanAnimal> by createRescueEventViewmodel.allAvailableNonHumanAnimalsLookingForAdoptionFlow.collectAsStateWithLifecycle(
+    val allAvailableNonHumanAnimals: List<NonHumanAnimal> by createRescueEventViewmodel.allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow.collectAsStateWithLifecycle(
         initialValue = emptyList()
     )
     val manageChangesUiState: UiState<Unit> by createRescueEventViewmodel.saveChangesUiState.collectAsState()

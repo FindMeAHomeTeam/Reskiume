@@ -64,7 +64,7 @@ fun ModifyRescueEventScreen(
     val uiRescueEventState: UiState<UiRescueEvent> by modifyRescueEventViewmodel.rescueEventFlow.collectAsState(
         initial = UiState.Loading()
     )
-    val allAvailableNonHumanAnimals: List<NonHumanAnimal> by modifyRescueEventViewmodel.allAvailableNonHumanAnimalsLookingForAdoptionFlow.collectAsState(
+    val allAvailableNonHumanAnimals: List<NonHumanAnimal> by modifyRescueEventViewmodel.allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow.collectAsState(
         initial = emptyList()
     )
     val manageChangesUiState: UiState<Unit> by modifyRescueEventViewmodel.manageChangesUiState.collectAsState()

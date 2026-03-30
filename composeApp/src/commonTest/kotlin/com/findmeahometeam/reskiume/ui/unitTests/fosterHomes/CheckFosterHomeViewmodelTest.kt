@@ -183,7 +183,7 @@ class CheckFosterHomeViewmodelTest : CoroutineTestDispatcher() {
     @Test
     fun `given a foster home to check_when I want to talk to the owner about a non human animal_then the foster home list available non human animals`() =
         runTest {
-            getCheckFosterHomeViewmodel().allAvailableNonHumanAnimalsLookingForAdoptionFlow.test {
+            getCheckFosterHomeViewmodel().allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow.test {
                 assertEquals(listOf(nonHumanAnimal), awaitItem())
                 awaitComplete()
             }
@@ -194,7 +194,7 @@ class CheckFosterHomeViewmodelTest : CoroutineTestDispatcher() {
         runTest {
             getCheckFosterHomeViewmodel(
                 allNonHumanAnimalsReturned = flowOf(emptyList())
-            ).allAvailableNonHumanAnimalsLookingForAdoptionFlow.test {
+            ).allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow.test {
                 assertEquals(emptyList(), awaitItem())
                 awaitComplete()
             }

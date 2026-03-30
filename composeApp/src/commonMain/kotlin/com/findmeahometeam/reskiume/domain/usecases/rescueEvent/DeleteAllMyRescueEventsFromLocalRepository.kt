@@ -2,7 +2,7 @@ package com.findmeahometeam.reskiume.domain.usecases.rescueEvent
 
 import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.RescueEventWithAllNeedsAndNonHumanAnimalData
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.model.AdoptionState
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalRescueEventRepository
@@ -54,24 +54,24 @@ class DeleteAllMyRescueEventsFromLocalRepository(
                     if (nonHumanAnimal == null) {
                         log.d(
                             "DeleteAllMyRescueEventsFromLocalRepository",
-                            "updateAdoptionStates: Can not update the adoption state for the non human animal ${nonHumanAnimalToRescueEntity.nonHumanAnimalId} in the rescue event ${nonHumanAnimalToRescueEntity.rescueEventId} because the non human animal has been unregistered in the local data source"
+                            "updateAdoptionStates: Can not update the non human animal state for the non human animal ${nonHumanAnimalToRescueEntity.nonHumanAnimalId} in the rescue event ${nonHumanAnimalToRescueEntity.rescueEventId} because the non human animal has been unregistered in the local data source"
                         )
                     } else {
                         localNonHumanAnimalRepository.modifyNonHumanAnimal(
                             nonHumanAnimal.copy(
-                                adoptionState = AdoptionState.LOOKING_FOR_ADOPTION,
+                                nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_REHOMED,
                                 fosterHomeId = ""
                             ).toEntity()
                         ) { rowsUpdated ->
                             if (rowsUpdated > 0) {
                                 log.d(
                                     "DeleteAllMyRescueEventsFromLocalRepository",
-                                    "updateAdoptionStates: updated adoption state ${AdoptionState.LOOKING_FOR_ADOPTION} for the non human animal ${nonHumanAnimal.id} in the local data source"
+                                    "updateAdoptionStates: updated non human animal state ${NonHumanAnimalState.NEEDS_TO_BE_REHOMED} for the non human animal ${nonHumanAnimal.id} in the local data source"
                                 )
                             } else {
                                 log.e(
                                     "DeleteAllMyRescueEventsFromLocalRepository",
-                                    "updateAdoptionStates: failed to update the adoption state ${AdoptionState.LOOKING_FOR_ADOPTION} for the non human animal ${nonHumanAnimal.id} in the local data source"
+                                    "updateAdoptionStates: failed to update the non human animal state ${NonHumanAnimalState.NEEDS_TO_BE_REHOMED} for the non human animal ${nonHumanAnimal.id} in the local data source"
                                 )
                                 isSuccess = false
                             }

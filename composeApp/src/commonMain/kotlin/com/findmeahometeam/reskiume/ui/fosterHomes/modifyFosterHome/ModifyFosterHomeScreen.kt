@@ -76,7 +76,7 @@ fun ModifyFosterHomeScreen(
     val uiFosterHomeState: UiState<UiFosterHome> by modifyFosterHomeViewmodel.fosterHomeFlow.collectAsState(
         initial = UiState.Loading()
     )
-    val allAvailableNonHumanAnimals: List<NonHumanAnimal> by modifyFosterHomeViewmodel.allAvailableNonHumanAnimalsLookingForAdoptionFlow.collectAsState(
+    val allAvailableNonHumanAnimals: List<NonHumanAnimal> by modifyFosterHomeViewmodel.allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow.collectAsState(
         initial = emptyList()
     )
     val manageChangesUiState: UiState<Unit> by modifyFosterHomeViewmodel.manageChangesUiState.collectAsState()

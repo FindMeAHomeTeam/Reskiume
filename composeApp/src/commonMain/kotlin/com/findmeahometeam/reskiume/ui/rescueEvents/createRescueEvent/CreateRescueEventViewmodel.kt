@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.model.AdoptionState
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.LocalCache
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueEvent
@@ -48,10 +48,10 @@ class CreateRescueEventViewmodel(
     private val log: Log
 ) : ViewModel() {
 
-    val allAvailableNonHumanAnimalsLookingForAdoptionFlow: Flow<List<NonHumanAnimal>> =
+    val allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow: Flow<List<NonHumanAnimal>> =
         getAllNonHumanAnimalsFromLocalRepository().map {
             it.mapNotNull { nonHumanAnimal ->
-                if (nonHumanAnimal.adoptionState == AdoptionState.LOOKING_FOR_ADOPTION) {
+                if (nonHumanAnimal.nonHumanAnimalState == NonHumanAnimalState.NEEDS_TO_BE_REHOMED) {
                     nonHumanAnimal
                 } else {
                     null

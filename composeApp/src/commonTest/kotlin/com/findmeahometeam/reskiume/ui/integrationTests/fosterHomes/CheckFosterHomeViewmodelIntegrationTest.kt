@@ -3,7 +3,7 @@ package com.findmeahometeam.reskiume.ui.integrationTests.fosterHomes
 import app.cash.turbine.test
 import com.findmeahometeam.reskiume.CoroutineTestDispatcher
 import com.findmeahometeam.reskiume.authUser
-import com.findmeahometeam.reskiume.domain.model.AdoptionState
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
@@ -132,7 +132,7 @@ class CheckFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 localNonHumanAnimalRepository = FakeLocalNonHumanAnimalRepository(
                     mutableListOf(nonHumanAnimal.toEntity())
                 )
-            ).allAvailableNonHumanAnimalsLookingForAdoptionFlow.test {
+            ).allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow.test {
                 assertEquals(listOf(nonHumanAnimal), awaitItem())
                 awaitComplete()
             }
@@ -144,10 +144,10 @@ class CheckFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
             getCheckFosterHomeViewmodel(
                 localNonHumanAnimalRepository = FakeLocalNonHumanAnimalRepository(
                     mutableListOf(
-                        nonHumanAnimal.copy(adoptionState = AdoptionState.REHOMED).toEntity()
+                        nonHumanAnimal.copy(nonHumanAnimalState = NonHumanAnimalState.REHOMED).toEntity()
                     )
                 )
-            ).allAvailableNonHumanAnimalsLookingForAdoptionFlow.test {
+            ).allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow.test {
                 assertEquals(emptyList(), awaitItem())
                 awaitComplete()
             }

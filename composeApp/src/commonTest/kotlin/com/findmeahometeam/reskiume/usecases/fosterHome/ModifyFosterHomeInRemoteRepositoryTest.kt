@@ -2,7 +2,7 @@ package com.findmeahometeam.reskiume.usecases.fosterHome
 
 import com.findmeahometeam.reskiume.authUser
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.model.AdoptionState
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteFosterHome.FireStoreRemoteFosterHomeRepository
@@ -65,7 +65,7 @@ class ModifyFosterHomeInRemoteRepositoryTest {
             everySuspend {
                 modifyRemoteNonHumanAnimal(
                     nonHumanAnimal.copy(
-                        adoptionState = AdoptionState.REHOMED,
+                        nonHumanAnimalState = NonHumanAnimalState.REHOMED,
                         fosterHomeId = fosterHome.id
                     ).toData(),
                     any()
@@ -118,7 +118,7 @@ class ModifyFosterHomeInRemoteRepositoryTest {
             verifySuspend {
                 realtimeDatabaseRemoteNonHumanAnimalRepository.modifyRemoteNonHumanAnimal(
                     nonHumanAnimal.copy(
-                        adoptionState = AdoptionState.REHOMED,
+                        nonHumanAnimalState = NonHumanAnimalState.REHOMED,
                         fosterHomeId = fosterHome.id
                     ).toData(),
                     any()
@@ -161,7 +161,7 @@ class ModifyFosterHomeInRemoteRepositoryTest {
             verifySuspend(exactly(0)) {
                 realtimeDatabaseRemoteNonHumanAnimalRepository.modifyRemoteNonHumanAnimal(
                     nonHumanAnimal.copy(
-                        adoptionState = AdoptionState.REHOMED,
+                        nonHumanAnimalState = NonHumanAnimalState.REHOMED,
                         fosterHomeId = fosterHome.id
                     ).toData(),
                     any()

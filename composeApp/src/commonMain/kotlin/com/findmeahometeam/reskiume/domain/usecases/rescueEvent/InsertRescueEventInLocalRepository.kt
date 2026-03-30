@@ -1,7 +1,7 @@
 package com.findmeahometeam.reskiume.domain.usecases.rescueEvent
 
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.model.AdoptionState
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.NeedToCover
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.NonHumanAnimalToRescue
@@ -69,7 +69,7 @@ class InsertRescueEventInLocalRepository(
                 if (nonHumanAnimal == null) {
                     log.d(
                         "InsertRescueEventInLocalRepository",
-                        "insertAllNonHumanAnimalsToRescue: Can not insert nor update the adoption state for the non human animal id ${nonHumanAnimalToRescue.nonHumanAnimalId} in the rescue event id ${nonHumanAnimalToRescue.rescueEventId} in the local data source"
+                        "insertAllNonHumanAnimalsToRescue: Can not insert nor update the non human animal state for the non human animal id ${nonHumanAnimalToRescue.nonHumanAnimalId} in the rescue event id ${nonHumanAnimalToRescue.rescueEventId} in the local data source"
                     )
                 } else {
                     localRescueEventRepository.insertNonHumanAnimalToRescueEntityForRescueEvent(
@@ -93,7 +93,7 @@ class InsertRescueEventInLocalRepository(
                         localNonHumanAnimalRepository.modifyNonHumanAnimal(
                             nonHumanAnimal
                                 .copy(
-                                    adoptionState = AdoptionState.NEEDS_TO_BE_RESCUED,
+                                    nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_RESCUED,
                                     fosterHomeId = ""
                                 )
                                 .toEntity()
@@ -101,12 +101,12 @@ class InsertRescueEventInLocalRepository(
                             if (rowsUpdated > 0) {
                                 log.d(
                                     "InsertRescueEventInLocalRepository",
-                                    "insertAllNonHumanAnimalsToRescue: updated adoption state ${AdoptionState.NEEDS_TO_BE_RESCUED} for the non human animal ${nonHumanAnimal.id} in the local data source"
+                                    "insertAllNonHumanAnimalsToRescue: updated non human animal state ${NonHumanAnimalState.NEEDS_TO_BE_RESCUED} for the non human animal ${nonHumanAnimal.id} in the local data source"
                                 )
                             } else {
                                 log.e(
                                     "InsertRescueEventInLocalRepository",
-                                    "insertAllNonHumanAnimalsToRescue: failed to update the adoption state ${AdoptionState.NEEDS_TO_BE_RESCUED} for the non human animal ${nonHumanAnimal.id} in the local data source"
+                                    "insertAllNonHumanAnimalsToRescue: failed to update the non human animal state ${NonHumanAnimalState.NEEDS_TO_BE_RESCUED} for the non human animal ${nonHumanAnimal.id} in the local data source"
                                 )
                                 isSuccess = false
                             }

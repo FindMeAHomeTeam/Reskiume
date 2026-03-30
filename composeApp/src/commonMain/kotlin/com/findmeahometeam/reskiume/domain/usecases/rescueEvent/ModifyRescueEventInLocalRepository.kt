@@ -1,7 +1,7 @@
 package com.findmeahometeam.reskiume.domain.usecases.rescueEvent
 
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.model.AdoptionState
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.NeedToCover
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.NonHumanAnimalToRescue
@@ -88,7 +88,7 @@ class ModifyRescueEventInLocalRepository(
                 if (nonHumanAnimal == null) {
                     log.d(
                         "ModifyRescueEventInLocalRepository",
-                        "manageAllNonHumanAnimalsToRescue: Can not update the adoption state for the non human animal id ${nonHumanAnimalToRescueToManage.nonHumanAnimalId} in the rescue event id ${nonHumanAnimalToRescueToManage.rescueEventId} in the local data source"
+                        "manageAllNonHumanAnimalsToRescue: Can not update the non human animal state for the non human animal id ${nonHumanAnimalToRescueToManage.nonHumanAnimalId} in the rescue event id ${nonHumanAnimalToRescueToManage.rescueEventId} in the local data source"
                     )
                 }
 
@@ -121,7 +121,7 @@ class ModifyRescueEventInLocalRepository(
                         localNonHumanAnimalRepository.modifyNonHumanAnimal(
                             nonHumanAnimal
                                 .copy(
-                                    adoptionState = AdoptionState.NEEDS_TO_BE_RESCUED,
+                                    nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_RESCUED,
                                     fosterHomeId = ""
                                 )
                                 .toEntity()
@@ -129,12 +129,12 @@ class ModifyRescueEventInLocalRepository(
                             if (rowsUpdated > 0) {
                                 log.d(
                                     "ModifyRescueEventInLocalRepository",
-                                    "manageAllNonHumanAnimalsToRescue: updated adoption state ${AdoptionState.NEEDS_TO_BE_RESCUED} for the non human animal ${nonHumanAnimal.id} in the local data source"
+                                    "manageAllNonHumanAnimalsToRescue: updated non human animal state ${NonHumanAnimalState.NEEDS_TO_BE_RESCUED} for the non human animal ${nonHumanAnimal.id} in the local data source"
                                 )
                             } else {
                                 log.e(
                                     "ModifyRescueEventInLocalRepository",
-                                    "manageAllNonHumanAnimalsToRescue: failed to update the adoption state ${AdoptionState.NEEDS_TO_BE_RESCUED} for the non human animal ${nonHumanAnimal.id} in the local data source"
+                                    "manageAllNonHumanAnimalsToRescue: failed to update the non human animal state ${NonHumanAnimalState.NEEDS_TO_BE_RESCUED} for the non human animal ${nonHumanAnimal.id} in the local data source"
                                 )
                                 isSuccess = false
                             }
@@ -166,13 +166,13 @@ class ModifyRescueEventInLocalRepository(
                         }
                     )
                     if (nonHumanAnimal != null
-                        && nonHumanAnimal.adoptionState != AdoptionState.ADOPTED
+                        && nonHumanAnimal.nonHumanAnimalState != NonHumanAnimalState.SAVED
                         && isSuccess
                     ) {
                         localNonHumanAnimalRepository.modifyNonHumanAnimal(
                             nonHumanAnimal
                                 .copy(
-                                    adoptionState = AdoptionState.LOOKING_FOR_ADOPTION,
+                                    nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_REHOMED,
                                     fosterHomeId = ""
                                 )
                                 .toEntity()
@@ -180,12 +180,12 @@ class ModifyRescueEventInLocalRepository(
                             if (rowsUpdated > 0) {
                                 log.d(
                                     "ModifyRescueEventInLocalRepository",
-                                    "manageAllNonHumanAnimalsToRescue: updated adoption state ${AdoptionState.LOOKING_FOR_ADOPTION} for the non human animal ${nonHumanAnimal.id} in the local data source"
+                                    "manageAllNonHumanAnimalsToRescue: updated non human animal state ${NonHumanAnimalState.NEEDS_TO_BE_REHOMED} for the non human animal ${nonHumanAnimal.id} in the local data source"
                                 )
                             } else {
                                 log.e(
                                     "ModifyRescueEventInLocalRepository",
-                                    "manageAllNonHumanAnimalsToRescue: failed to update the adoption state ${AdoptionState.LOOKING_FOR_ADOPTION} for the non human animal ${nonHumanAnimal.id} in the local data source"
+                                    "manageAllNonHumanAnimalsToRescue: failed to update the non human animal state ${NonHumanAnimalState.NEEDS_TO_BE_REHOMED} for the non human animal ${nonHumanAnimal.id} in the local data source"
                                 )
                                 isSuccess = false
                             }

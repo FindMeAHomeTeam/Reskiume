@@ -2,7 +2,7 @@ package com.findmeahometeam.reskiume.data.database.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.findmeahometeam.reskiume.domain.model.AdoptionState
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.AgeCategory
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
@@ -19,7 +19,7 @@ data class NonHumanAnimalEntity(
     val imageUrl: String,
     val nonHumanAnimalType: NonHumanAnimalType,
     val gender: Gender,
-    val adoptionState: AdoptionState,
+    val nonHumanAnimalState: NonHumanAnimalState,
     val fosterHomeId: String
 ) {
 
@@ -34,7 +34,7 @@ data class NonHumanAnimalEntity(
             imageUrl = imageUrl,
             nonHumanAnimalType = nonHumanAnimalType,
             gender = gender,
-            adoptionState = adoptionState,
+            nonHumanAnimalState = nonHumanAnimalState,
             fosterHomeId = fosterHomeId
         )
     }

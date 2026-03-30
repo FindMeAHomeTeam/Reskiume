@@ -114,7 +114,7 @@ fun CheckFosterHomeScreen(
         initialValue = UiState.Loading()
     )
 
-    val allAvailableNonHumanAnimals: List<NonHumanAnimal> by checkFosterHomeViewmodel.allAvailableNonHumanAnimalsLookingForAdoptionFlow.collectAsStateWithLifecycle(
+    val allAvailableNonHumanAnimals: List<NonHumanAnimal> by checkFosterHomeViewmodel.allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow.collectAsStateWithLifecycle(
         initialValue = emptyList()
     )
 

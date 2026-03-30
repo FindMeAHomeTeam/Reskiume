@@ -11,7 +11,7 @@ import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.remote.response.fosterHome.RemoteFosterHome
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.model.AdoptionState
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
@@ -371,7 +371,7 @@ class CheckAllFosterHomesViewmodelTest : CoroutineTestDispatcher() {
             everySuspend {
                 modifyNonHumanAnimal(
                     nonHumanAnimal.copy(
-                        adoptionState = AdoptionState.REHOMED,
+                        nonHumanAnimalState = NonHumanAnimalState.REHOMED,
                         fosterHomeId = fosterHome.id
                     ).toEntity(),
                     capture(onModifyNonHumanAnimalInLocal)

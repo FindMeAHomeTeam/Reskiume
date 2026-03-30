@@ -10,7 +10,7 @@ import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.remote.response.rescueEvent.RemoteRescueEvent
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.model.AdoptionState
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.NeedToCover
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.NonHumanAnimalToRescue
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueNeed
@@ -203,7 +203,7 @@ class ModifyRescueEventViewmodelTest : CoroutineTestDispatcher() {
                 everySuspend {
                     modifyRemoteNonHumanAnimal(
                         nonHumanAnimal.copy(
-                            adoptionState = AdoptionState.NEEDS_TO_BE_RESCUED
+                            nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_RESCUED
                         ).toData(),
                         capture(onModifyRemoteNonHumanAnimal)
                     )
@@ -404,7 +404,7 @@ class ModifyRescueEventViewmodelTest : CoroutineTestDispatcher() {
                 modifyNonHumanAnimal(
                     nonHumanAnimal.copy(
                         id = nonHumanAnimal.id + "789",
-                        adoptionState = AdoptionState.NEEDS_TO_BE_RESCUED
+                        nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_RESCUED
                     ).toEntity(),
                     capture(modifyNonHumanAnimalInLocalRepository)
                 )
@@ -534,7 +534,7 @@ class ModifyRescueEventViewmodelTest : CoroutineTestDispatcher() {
     @Test
     fun `given my rescue event to modify_when I want to add non human animals to rescue_then rescue event list available non human animals`() =
         runTest {
-            getModifyRescueEventViewmodel().allAvailableNonHumanAnimalsLookingForAdoptionFlow.test {
+            getModifyRescueEventViewmodel().allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow.test {
                 assertEquals(listOf(nonHumanAnimal), awaitItem())
                 awaitComplete()
             }

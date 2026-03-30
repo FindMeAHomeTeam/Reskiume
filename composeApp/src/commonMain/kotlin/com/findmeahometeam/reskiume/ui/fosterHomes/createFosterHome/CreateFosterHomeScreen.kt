@@ -67,7 +67,7 @@ fun CreateFosterHomeScreen(
 
     val placeUtil: PlaceUtil = koinInject<PlaceUtil>()
 
-    val allAvailableUiNonHumanAnimals: List<NonHumanAnimal> by createFosterHomeViewmodel.allAvailableNonHumanAnimalsLookingForAdoptionFlow.collectAsStateWithLifecycle(
+    val allAvailableUiNonHumanAnimals: List<NonHumanAnimal> by createFosterHomeViewmodel.allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow.collectAsStateWithLifecycle(
         initialValue = emptyList()
     )
     val manageChangesUiState: UiState<Unit> by createFosterHomeViewmodel.saveChangesUiState.collectAsState()

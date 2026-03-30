@@ -148,7 +148,7 @@ class CreateFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
                         nonHumanAnimal.toEntity()
                     )
                 )
-            ).allAvailableNonHumanAnimalsLookingForAdoptionFlow.test {
+            ).allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow.test {
                 assertEquals(listOf(nonHumanAnimal), awaitItem())
                 awaitComplete()
             }

@@ -3,7 +3,7 @@ package com.findmeahometeam.reskiume.domain.usecases.fosterHome
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.remote.response.RemoteNonHumanAnimal
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.model.AdoptionState
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepository
@@ -77,19 +77,19 @@ class InsertFosterHomeInRemoteRepository(
                     realtimeDatabaseRemoteNonHumanAnimalRepository.modifyRemoteNonHumanAnimal(
                         remoteResidentNonHumanAnimal
                             .copy(
-                                adoptionState = AdoptionState.REHOMED,
+                                nonHumanAnimalState = NonHumanAnimalState.REHOMED,
                                 fosterHomeId = fosterHome.id
                             )
                     ) { databaseResult ->
                         if (databaseResult is DatabaseResult.Success) {
                             log.d(
                                 "InsertFosterHomeInRemoteRepository",
-                                "updateAdoptionStates: updated adoption state for the non human animal ${residentNonHumanAnimalToManage.nonHumanAnimalId} in the remote data source"
+                                "updateAdoptionStates: updated non human animal state for the non human animal ${residentNonHumanAnimalToManage.nonHumanAnimalId} in the remote data source"
                             )
                         } else {
                             log.e(
                                 "InsertFosterHomeInRemoteRepository",
-                                "updateAdoptionStates: failed to update the adoption state for the non human animal ${residentNonHumanAnimalToManage.nonHumanAnimalId} in the remote data source"
+                                "updateAdoptionStates: failed to update the non human animal state for the non human animal ${residentNonHumanAnimalToManage.nonHumanAnimalId} in the remote data source"
                             )
                             isSuccess = false
                         }

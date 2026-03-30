@@ -10,7 +10,7 @@ import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.remote.response.fosterHome.RemoteFosterHome
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.model.AdoptionState
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.Gender
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
 import com.findmeahometeam.reskiume.domain.model.fosterHome.AcceptedNonHumanAnimalForFosterHome
@@ -197,7 +197,7 @@ class ModifyFosterHomeViewmodelTest : CoroutineTestDispatcher() {
                 everySuspend {
                     modifyRemoteNonHumanAnimal(
                         nonHumanAnimal.copy(
-                            adoptionState = AdoptionState.REHOMED,
+                            nonHumanAnimalState = NonHumanAnimalState.REHOMED,
                             fosterHomeId = fosterHome.id
                         ).toData(),
                         capture(onModifyRemoteNonHumanAnimal)
@@ -387,7 +387,7 @@ class ModifyFosterHomeViewmodelTest : CoroutineTestDispatcher() {
                 modifyNonHumanAnimal(
                     nonHumanAnimal.copy(
                         id = nonHumanAnimal.id + "789",
-                        adoptionState = AdoptionState.REHOMED,
+                        nonHumanAnimalState = NonHumanAnimalState.REHOMED,
                         fosterHomeId = fosterHome.id
                     ).toEntity(),
                     capture(modifyNonHumanAnimalInLocalRepository)
@@ -517,7 +517,7 @@ class ModifyFosterHomeViewmodelTest : CoroutineTestDispatcher() {
     @Test
     fun `given my foster home to modify_when I want to add residents_then foster home list available non human animals`() =
         runTest {
-            getModifyFosterHomeViewmodel().allAvailableNonHumanAnimalsLookingForAdoptionFlow.test {
+            getModifyFosterHomeViewmodel().allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow.test {
                 assertEquals(listOf(nonHumanAnimal), awaitItem())
                 awaitComplete()
             }

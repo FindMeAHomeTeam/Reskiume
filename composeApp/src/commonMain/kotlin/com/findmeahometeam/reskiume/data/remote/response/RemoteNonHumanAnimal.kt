@@ -1,6 +1,6 @@
 package com.findmeahometeam.reskiume.data.remote.response
 
-import com.findmeahometeam.reskiume.domain.model.AdoptionState
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.AgeCategory
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
@@ -15,7 +15,7 @@ data class RemoteNonHumanAnimal(
     val imageUrl: String? = "",
     val nonHumanAnimalType: NonHumanAnimalType? = NonHumanAnimalType.UNSELECTED,
     val gender: Gender? = Gender.UNSELECTED,
-    val adoptionState: AdoptionState? = AdoptionState.LOOKING_FOR_ADOPTION,
+    val nonHumanAnimalState: NonHumanAnimalState? = NonHumanAnimalState.NEEDS_TO_BE_REHOMED,
     val fosterHomeId: String? = ""
 ) {
     fun toMap(): Map<String, Any?> {
@@ -28,7 +28,7 @@ data class RemoteNonHumanAnimal(
             "imageUrl" to imageUrl,
             "nonHumanAnimalType" to nonHumanAnimalType,
             "gender" to gender,
-            "adoptionState" to adoptionState,
+            "nonHumanAnimalState" to nonHumanAnimalState,
             "fosterHomeId" to fosterHomeId
         )
     }
@@ -44,7 +44,7 @@ data class RemoteNonHumanAnimal(
             imageUrl = imageUrl ?: "",
             nonHumanAnimalType = nonHumanAnimalType ?: NonHumanAnimalType.UNSELECTED,
             gender = gender ?: Gender.UNSELECTED,
-            adoptionState = adoptionState ?: AdoptionState.LOOKING_FOR_ADOPTION,
+            nonHumanAnimalState = nonHumanAnimalState ?: NonHumanAnimalState.NEEDS_TO_BE_REHOMED,
             fosterHomeId = fosterHomeId ?: ""
         )
     }

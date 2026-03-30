@@ -19,7 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.findmeahometeam.reskiume.domain.model.AdoptionState
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.toStringResource
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
@@ -92,12 +92,12 @@ fun CheckAllMyNonHumanAnimalsScreen(
                         ) { nonHumanAnimal ->
                             RmListItem(
                                 title = nonHumanAnimal.name,
-                                titleTag = stringResource(nonHumanAnimal.adoptionState.toStringResource()),
-                                titleTagColor = when (nonHumanAnimal.adoptionState) {
-                                    AdoptionState.LOOKING_FOR_ADOPTION -> tertiaryGreen
-                                    AdoptionState.NEEDS_TO_BE_RESCUED -> secondaryGreen
-                                    AdoptionState.REHOMED -> secondaryGreen
-                                    AdoptionState.ADOPTED -> primaryGreen
+                                titleTag = stringResource(nonHumanAnimal.nonHumanAnimalState.toStringResource()),
+                                titleTagColor = when (nonHumanAnimal.nonHumanAnimalState) {
+                                    NonHumanAnimalState.NEEDS_TO_BE_REHOMED -> tertiaryGreen
+                                    NonHumanAnimalState.NEEDS_TO_BE_RESCUED -> secondaryGreen
+                                    NonHumanAnimalState.REHOMED -> secondaryGreen
+                                    NonHumanAnimalState.SAVED -> primaryGreen
                                 },
                                 description = nonHumanAnimal.description,
                                 listAvatarType = RmListAvatarType.Image(nonHumanAnimal.imageUrl),

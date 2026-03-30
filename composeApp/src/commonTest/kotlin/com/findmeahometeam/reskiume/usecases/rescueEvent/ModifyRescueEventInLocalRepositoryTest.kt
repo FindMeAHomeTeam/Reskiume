@@ -2,7 +2,7 @@ package com.findmeahometeam.reskiume.usecases.rescueEvent
 
 import com.findmeahometeam.reskiume.authUser
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.model.AdoptionState
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalRescueEventRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
@@ -193,7 +193,7 @@ class ModifyRescueEventInLocalRepositoryTest {
         everySuspend {
             modifyNonHumanAnimal(
                 nonHumanAnimal.copy(
-                    adoptionState = AdoptionState.NEEDS_TO_BE_RESCUED
+                    nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_RESCUED
                 ).toEntity(),
                 any()
             )
@@ -202,7 +202,7 @@ class ModifyRescueEventInLocalRepositoryTest {
         everySuspend {
             modifyNonHumanAnimal(
                 nonHumanAnimal.copy(
-                    adoptionState = AdoptionState.LOOKING_FOR_ADOPTION
+                    nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_REHOMED
                 ).toEntity(),
                 any()
             )
@@ -232,7 +232,7 @@ class ModifyRescueEventInLocalRepositoryTest {
                 nonHumanAnimal.caregiverId,
                 any()
             )
-        } returns flowOf(nonHumanAnimal.copy(adoptionState = AdoptionState.ADOPTED))
+        } returns flowOf(nonHumanAnimal.copy(nonHumanAnimalState = NonHumanAnimalState.SAVED))
 
         every {
             getNonHumanAnimalFlow(
@@ -295,7 +295,7 @@ class ModifyRescueEventInLocalRepositoryTest {
                 )
                 localNonHumanAnimalRepository.modifyNonHumanAnimal(
                     nonHumanAnimal.copy(
-                        adoptionState = AdoptionState.NEEDS_TO_BE_RESCUED
+                        nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_RESCUED
                     ).toEntity(),
                     any()
                 )
@@ -352,7 +352,7 @@ class ModifyRescueEventInLocalRepositoryTest {
                 )
                 localNonHumanAnimalRepository.modifyNonHumanAnimal(
                     nonHumanAnimal.copy(
-                        adoptionState = AdoptionState.NEEDS_TO_BE_RESCUED
+                        nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_RESCUED
                     ).toEntity(),
                     any()
                 )
@@ -391,7 +391,7 @@ class ModifyRescueEventInLocalRepositoryTest {
                 )
                 localNonHumanAnimalRepository.modifyNonHumanAnimal(
                     nonHumanAnimal.copy(
-                        adoptionState = AdoptionState.LOOKING_FOR_ADOPTION
+                        nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_REHOMED
                     ).toEntity(),
                     any()
                 )
@@ -433,7 +433,7 @@ class ModifyRescueEventInLocalRepositoryTest {
             verifySuspend(exactly(0)) {
                 localNonHumanAnimalRepository.modifyNonHumanAnimal(
                     nonHumanAnimal.copy(
-                        adoptionState = AdoptionState.LOOKING_FOR_ADOPTION,
+                        nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_REHOMED,
                     ).toEntity(),
                     any()
                 )
@@ -481,7 +481,7 @@ class ModifyRescueEventInLocalRepositoryTest {
             verifySuspend(exactly(0)) {
                 localNonHumanAnimalRepository.modifyNonHumanAnimal(
                     nonHumanAnimal.copy(
-                        adoptionState = AdoptionState.LOOKING_FOR_ADOPTION,
+                        nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_REHOMED,
                     ).toEntity(),
                     any()
                 )

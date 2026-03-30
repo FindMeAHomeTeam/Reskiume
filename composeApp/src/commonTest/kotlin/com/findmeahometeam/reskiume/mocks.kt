@@ -4,7 +4,7 @@ import com.findmeahometeam.reskiume.data.database.entity.fosterHome.FosterHomeWi
 import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.RescueEventWithAllNeedsAndNonHumanAnimalData
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.util.Section
-import com.findmeahometeam.reskiume.domain.model.AdoptionState
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.AgeCategory
 import com.findmeahometeam.reskiume.domain.model.Gender
 import com.findmeahometeam.reskiume.domain.model.LocalCache
@@ -99,7 +99,7 @@ val nonHumanAnimal = NonHumanAnimal(
     imageUrl = "1.webp",
     nonHumanAnimalType = NonHumanAnimalType.DOG,
     gender = Gender.MALE,
-    adoptionState = AdoptionState.LOOKING_FOR_ADOPTION,
+    nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_REHOMED,
     fosterHomeId = ""
 )
 

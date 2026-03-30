@@ -1,7 +1,7 @@
 package com.findmeahometeam.reskiume.domain.usecases.fosterHome
 
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.model.AdoptionState
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
 import com.findmeahometeam.reskiume.domain.repository.local.LocalFosterHomeRepository
@@ -91,7 +91,7 @@ class InsertFosterHomeInLocalRepository(
                 if (residentNonHumanAnimal == null) {
                     log.d(
                         "InsertFosterHomeInLocalRepository",
-                        "insertAllResidentNonHumanAnimals: Can not insert the resident nor update the adoption state for the resident id ${residentNonHumanAnimalForFosterHome.nonHumanAnimalId} in the foster home ${residentNonHumanAnimalForFosterHome.fosterHomeId} in the local data source"
+                        "insertAllResidentNonHumanAnimals: Can not insert the resident nor update the non human animal state for the resident id ${residentNonHumanAnimalForFosterHome.nonHumanAnimalId} in the foster home ${residentNonHumanAnimalForFosterHome.fosterHomeId} in the local data source"
                     )
                 } else {
                     localFosterHomeRepository.insertResidentNonHumanAnimalIdForFosterHome(
@@ -117,7 +117,7 @@ class InsertFosterHomeInLocalRepository(
                         )
                         localNonHumanAnimalRepository.modifyNonHumanAnimal(
                             residentNonHumanAnimal.copy(
-                                adoptionState = AdoptionState.REHOMED,
+                                nonHumanAnimalState = NonHumanAnimalState.REHOMED,
                                 fosterHomeId = fosterHome.id,
                                 imageUrl = imageFileName
                             ).toEntity()
@@ -125,12 +125,12 @@ class InsertFosterHomeInLocalRepository(
                             if (rowsUpdated > 0) {
                                 log.d(
                                     "InsertFosterHomeInLocalRepository",
-                                    "insertAllResidentNonHumanAnimals: updated adoption state for the non human animal ${residentNonHumanAnimal.id} in the local data source"
+                                    "insertAllResidentNonHumanAnimals: updated non human animal state for the non human animal ${residentNonHumanAnimal.id} in the local data source"
                                 )
                             } else {
                                 log.e(
                                     "InsertFosterHomeInLocalRepository",
-                                    "insertAllResidentNonHumanAnimals: failed to update the adoption state for the non human animal ${residentNonHumanAnimal.id} in the local data source"
+                                    "insertAllResidentNonHumanAnimals: failed to update the non human animal state for the non human animal ${residentNonHumanAnimal.id} in the local data source"
                                 )
                                 isSuccess = false
                             }

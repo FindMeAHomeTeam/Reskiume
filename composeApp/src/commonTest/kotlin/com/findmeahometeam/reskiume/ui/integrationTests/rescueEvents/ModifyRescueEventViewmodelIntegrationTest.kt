@@ -182,7 +182,7 @@ class ModifyRescueEventViewmodelIntegrationTest : CoroutineTestDispatcher() {
     @Test
     fun `given my rescue event to modify_when I want to add non human animals to rescue_then rescue event list available non human animals`() =
         runTest {
-            getModifyRescueEventViewmodel().allAvailableNonHumanAnimalsLookingForAdoptionFlow.test {
+            getModifyRescueEventViewmodel().allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow.test {
                 assertEquals(
                     listOf(
                         nonHumanAnimal,

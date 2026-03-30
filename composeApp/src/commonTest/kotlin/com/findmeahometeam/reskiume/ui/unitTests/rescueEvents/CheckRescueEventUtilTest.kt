@@ -10,7 +10,7 @@ import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.remote.response.rescueEvent.RemoteRescueEvent
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.model.AdoptionState
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalRescueEventRepository
@@ -310,7 +310,7 @@ class CheckRescueEventUtilTest : CoroutineTestDispatcher() {
             everySuspend {
                 modifyNonHumanAnimal(
                     nonHumanAnimal.copy(
-                        adoptionState = AdoptionState.NEEDS_TO_BE_RESCUED
+                        nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_RESCUED
                     ).toEntity(),
                     capture(modifyNonHumanAnimalInLocalRepository)
                 )
@@ -323,7 +323,7 @@ class CheckRescueEventUtilTest : CoroutineTestDispatcher() {
                 modifyNonHumanAnimal(
                     nonHumanAnimal.copy(
                         id = nonHumanAnimal.id + "second",
-                        adoptionState = AdoptionState.NEEDS_TO_BE_RESCUED
+                        nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_RESCUED
                     ).toEntity(),
                     capture(modifySecondNonHumanAnimalInLocalRepository)
                 )

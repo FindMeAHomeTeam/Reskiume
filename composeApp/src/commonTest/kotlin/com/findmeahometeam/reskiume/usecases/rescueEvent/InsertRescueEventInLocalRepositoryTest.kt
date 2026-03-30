@@ -2,7 +2,7 @@ package com.findmeahometeam.reskiume.usecases.rescueEvent
 
 import com.findmeahometeam.reskiume.authUser
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.model.AdoptionState
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalRescueEventRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
@@ -122,7 +122,7 @@ class InsertRescueEventInLocalRepositoryTest {
         everySuspend {
             modifyNonHumanAnimal(
                 nonHumanAnimal.copy(
-                    adoptionState = AdoptionState.NEEDS_TO_BE_RESCUED
+                    nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_RESCUED
                 ).toEntity(),
                 any()
             )
@@ -204,7 +204,7 @@ class InsertRescueEventInLocalRepositoryTest {
                 )
                 localNonHumanAnimalRepository.modifyNonHumanAnimal(
                     nonHumanAnimal.copy(
-                        adoptionState = AdoptionState.NEEDS_TO_BE_RESCUED
+                        nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_RESCUED
                     ).toEntity(),
                     any()
                 )
@@ -256,7 +256,7 @@ class InsertRescueEventInLocalRepositoryTest {
                 )
                 localNonHumanAnimalRepository.modifyNonHumanAnimal(
                     nonHumanAnimal.copy(
-                        adoptionState = AdoptionState.NEEDS_TO_BE_RESCUED
+                        nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_RESCUED
                     ).toEntity(),
                     any()
                 )

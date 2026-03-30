@@ -4,7 +4,7 @@ import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.remote.response.RemoteNonHumanAnimal
 import com.findmeahometeam.reskiume.data.remote.response.fosterHome.RemoteFosterHome
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.model.AdoptionState
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteFosterHome.FireStoreRemoteFosterHomeRepository
@@ -82,19 +82,19 @@ class DeleteAllMyFosterHomesFromRemoteRepository(
                     } else {
                         realtimeDatabaseRemoteNonHumanAnimalRepository.modifyRemoteNonHumanAnimal(
                             remoteResidentNonHumanAnimal.copy(
-                                adoptionState = AdoptionState.LOOKING_FOR_ADOPTION,
+                                nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_REHOMED,
                                 fosterHomeId = ""
                             )
                         ) { databaseResult ->
                             if (databaseResult is DatabaseResult.Success) {
                                 log.d(
                                     "DeleteAllMyFosterHomesFromRemoteRepository",
-                                    "manageResidents: updated adoption state for the non human animal ${remoteResidentNonHumanAnimal.id} in the remote data source"
+                                    "manageResidents: updated non human animal state for the non human animal ${remoteResidentNonHumanAnimal.id} in the remote data source"
                                 )
                             } else {
                                 log.e(
                                     "DeleteAllMyFosterHomesFromRemoteRepository",
-                                    "manageResidents: failed to update the adoption state for the non human animal ${remoteResidentNonHumanAnimal.id} in the remote data source"
+                                    "manageResidents: failed to update the non human animal state for the non human animal ${remoteResidentNonHumanAnimal.id} in the remote data source"
                                 )
                                 isSuccess = false
                             }

@@ -3,7 +3,7 @@ package com.findmeahometeam.reskiume.domain.usecases.rescueEvent
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.remote.response.RemoteNonHumanAnimal
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.model.AdoptionState
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueEvent
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepository
@@ -77,19 +77,19 @@ class InsertRescueEventInRemoteRepository(
                     realtimeDatabaseRemoteNonHumanAnimalRepository.modifyRemoteNonHumanAnimal(
                         remoteResidentNonHumanAnimal
                             .copy(
-                                adoptionState = AdoptionState.NEEDS_TO_BE_RESCUED,
+                                nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_RESCUED,
                                 fosterHomeId = ""
                             )
                     ) { databaseResult ->
                         if (databaseResult is DatabaseResult.Success) {
                             log.d(
                                 "InsertRescueEventInRemoteRepository",
-                                "getUpdatedRescueEventWithUpdatedNonHumanAnimalsToRescue: updated adoption state ${AdoptionState.NEEDS_TO_BE_RESCUED} for the non human animal ${nonHumanAnimalToRescue.nonHumanAnimalId} in the remote data source"
+                                "getUpdatedRescueEventWithUpdatedNonHumanAnimalsToRescue: updated non human animal state ${NonHumanAnimalState.NEEDS_TO_BE_RESCUED} for the non human animal ${nonHumanAnimalToRescue.nonHumanAnimalId} in the remote data source"
                             )
                         } else {
                             log.e(
                                 "InsertRescueEventInRemoteRepository",
-                                "getUpdatedRescueEventWithUpdatedNonHumanAnimalsToRescue: failed to update the adoption state ${AdoptionState.NEEDS_TO_BE_RESCUED} for the non human animal ${nonHumanAnimalToRescue.nonHumanAnimalId} in the remote data source"
+                                "getUpdatedRescueEventWithUpdatedNonHumanAnimalsToRescue: failed to update the non human animal state ${NonHumanAnimalState.NEEDS_TO_BE_RESCUED} for the non human animal ${nonHumanAnimalToRescue.nonHumanAnimalId} in the remote data source"
                             )
                             isSuccess = false
                         }

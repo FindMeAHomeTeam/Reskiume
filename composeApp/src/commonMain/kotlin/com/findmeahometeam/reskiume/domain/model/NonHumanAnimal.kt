@@ -20,7 +20,7 @@ import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType.RODENT
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType.UNSELECTED
 import org.jetbrains.compose.resources.StringResource
 import reskiume.composeapp.generated.resources.Res
-import reskiume.composeapp.generated.resources.non_human_animal_adopted
+import reskiume.composeapp.generated.resources.non_human_animal_saved
 import reskiume.composeapp.generated.resources.non_human_animal_age_category_adult
 import reskiume.composeapp.generated.resources.non_human_animal_age_category_baby
 import reskiume.composeapp.generated.resources.non_human_animal_age_category_senior
@@ -29,7 +29,7 @@ import reskiume.composeapp.generated.resources.non_human_animal_age_category_you
 import reskiume.composeapp.generated.resources.non_human_animal_gender_female
 import reskiume.composeapp.generated.resources.non_human_animal_gender_male
 import reskiume.composeapp.generated.resources.non_human_animal_gender_unselected
-import reskiume.composeapp.generated.resources.non_human_animal_looking_for_adoption
+import reskiume.composeapp.generated.resources.non_human_animal_needs_to_be_rehomed
 import reskiume.composeapp.generated.resources.non_human_animal_needs_to_be_rescued
 import reskiume.composeapp.generated.resources.non_human_animal_rehomed
 import reskiume.composeapp.generated.resources.non_human_animal_type_bird
@@ -59,7 +59,7 @@ data class NonHumanAnimal(
     val imageUrl: String,
     val nonHumanAnimalType: NonHumanAnimalType,
     val gender: Gender,
-    val adoptionState: AdoptionState = AdoptionState.LOOKING_FOR_ADOPTION,
+    val nonHumanAnimalState: NonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_REHOMED,
     val fosterHomeId: String = ""
 ) {
     @OptIn(ExperimentalTime::class)
@@ -77,7 +77,7 @@ data class NonHumanAnimal(
             imageUrl = imageUrl,
             nonHumanAnimalType = nonHumanAnimalType,
             gender = gender,
-            adoptionState = adoptionState,
+            nonHumanAnimalState = nonHumanAnimalState,
             fosterHomeId = fosterHomeId
         )
     }
@@ -92,7 +92,7 @@ data class NonHumanAnimal(
             imageUrl = imageUrl,
             nonHumanAnimalType = nonHumanAnimalType,
             gender = gender,
-            adoptionState = adoptionState,
+            nonHumanAnimalState = nonHumanAnimalState,
             fosterHomeId = fosterHomeId
         )
     }
@@ -108,7 +108,7 @@ private fun NonHumanAnimal.toSaveableList(): List<Any?> = listOf(
     imageUrl,
     nonHumanAnimalType.name,
     gender.name,
-    adoptionState.name,
+    nonHumanAnimalState.name,
     fosterHomeId
 )
 
@@ -122,7 +122,7 @@ private fun List<Any?>.fromSaveableList(): NonHumanAnimal = NonHumanAnimal(
     imageUrl = this[6] as String,
     nonHumanAnimalType = NonHumanAnimalType.valueOf(this[7] as String),
     gender = Gender.valueOf(this[8] as String),
-    adoptionState = AdoptionState.valueOf(this[9] as String),
+    nonHumanAnimalState = NonHumanAnimalState.valueOf(this[9] as String),
     fosterHomeId = this[10] as String
 )
 
@@ -170,8 +170,8 @@ enum class Gender {
     UNSELECTED, FEMALE, MALE
 }
 
-enum class AdoptionState {
-    LOOKING_FOR_ADOPTION, NEEDS_TO_BE_RESCUED, REHOMED, ADOPTED
+enum class NonHumanAnimalState {
+    NEEDS_TO_BE_REHOMED, NEEDS_TO_BE_RESCUED, REHOMED, SAVED
 }
 
 fun AgeCategory.toStringResource(): StringResource {
@@ -211,12 +211,12 @@ fun Gender.toStringResource(): StringResource {
     }
 }
 
-fun AdoptionState.toStringResource(): StringResource {
+fun NonHumanAnimalState.toStringResource(): StringResource {
     return when (this) {
-        AdoptionState.LOOKING_FOR_ADOPTION -> Res.string.non_human_animal_looking_for_adoption
-        AdoptionState.NEEDS_TO_BE_RESCUED -> Res.string.non_human_animal_needs_to_be_rescued
-        AdoptionState.REHOMED -> Res.string.non_human_animal_rehomed
-        AdoptionState.ADOPTED -> Res.string.non_human_animal_adopted
+        NonHumanAnimalState.NEEDS_TO_BE_REHOMED -> Res.string.non_human_animal_needs_to_be_rehomed
+        NonHumanAnimalState.NEEDS_TO_BE_RESCUED -> Res.string.non_human_animal_needs_to_be_rescued
+        NonHumanAnimalState.REHOMED -> Res.string.non_human_animal_rehomed
+        NonHumanAnimalState.SAVED -> Res.string.non_human_animal_saved
     }
 }
 

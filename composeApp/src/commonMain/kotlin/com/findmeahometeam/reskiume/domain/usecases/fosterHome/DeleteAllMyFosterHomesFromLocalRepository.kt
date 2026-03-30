@@ -2,7 +2,7 @@ package com.findmeahometeam.reskiume.domain.usecases.fosterHome
 
 import com.findmeahometeam.reskiume.data.database.entity.fosterHome.FosterHomeWithAllNonHumanAnimalData
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.model.AdoptionState
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.repository.local.LocalFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
@@ -55,24 +55,24 @@ class DeleteAllMyFosterHomesFromLocalRepository(
                     if (residentNonHumanAnimal == null) {
                         log.d(
                             "DeleteAllMyFosterHomesFromLocalRepository",
-                            "updateAdoptionStates: Can not update the adoption state for the non human animal ${residentNonHumanAnimalForFosterHome.nonHumanAnimalId} in the foster home ${residentNonHumanAnimalForFosterHome.fosterHomeId} because the non human animal has been unregistered in the local data source"
+                            "updateAdoptionStates: Can not update the non human animal state for the non human animal ${residentNonHumanAnimalForFosterHome.nonHumanAnimalId} in the foster home ${residentNonHumanAnimalForFosterHome.fosterHomeId} because the non human animal has been unregistered in the local data source"
                         )
                     } else {
                         localNonHumanAnimalRepository.modifyNonHumanAnimal(
                             residentNonHumanAnimal.copy(
-                                adoptionState = AdoptionState.LOOKING_FOR_ADOPTION,
+                                nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_REHOMED,
                                 fosterHomeId = ""
                             ).toEntity()
                         ) { rowsUpdated ->
                             if (rowsUpdated > 0) {
                                 log.d(
                                     "DeleteAllMyFosterHomesFromLocalRepository",
-                                    "updateAdoptionStates: updated adoption state for the non human animal ${residentNonHumanAnimal.id} in the local data source"
+                                    "updateAdoptionStates: updated non human animal state for the non human animal ${residentNonHumanAnimal.id} in the local data source"
                                 )
                             } else {
                                 log.e(
                                     "DeleteAllMyFosterHomesFromLocalRepository",
-                                    "updateAdoptionStates: failed to update the adoption state for the non human animal ${residentNonHumanAnimal.id} in the local data source"
+                                    "updateAdoptionStates: failed to update the non human animal state for the non human animal ${residentNonHumanAnimal.id} in the local data source"
                                 )
                                 isSuccess = false
                             }

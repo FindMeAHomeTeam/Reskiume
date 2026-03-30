@@ -29,7 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.findmeahometeam.reskiume.domain.model.AdoptionState
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.Gender
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.toEmoji
@@ -99,18 +99,18 @@ fun CheckNonHumanAnimalScreen(
                     Box(
                         modifier = Modifier.wrapContentSize()
                             .background(
-                                color = when(nonHumanAnimal.adoptionState) {
-                                    AdoptionState.LOOKING_FOR_ADOPTION -> tertiaryGreen
-                                    AdoptionState.NEEDS_TO_BE_RESCUED -> secondaryGreen
-                                    AdoptionState.REHOMED -> secondaryGreen
-                                    AdoptionState.ADOPTED -> primaryGreen
+                                color = when(nonHumanAnimal.nonHumanAnimalState) {
+                                    NonHumanAnimalState.NEEDS_TO_BE_REHOMED -> tertiaryGreen
+                                    NonHumanAnimalState.NEEDS_TO_BE_RESCUED -> secondaryGreen
+                                    NonHumanAnimalState.REHOMED -> secondaryGreen
+                                    NonHumanAnimalState.SAVED -> primaryGreen
                                 },
                                 shape = RoundedCornerShape(15.dp)
                             )
                             .padding(8.dp)
                     ) {
                         RmText(
-                            text = stringResource(nonHumanAnimal.adoptionState.toStringResource()),
+                            text = stringResource(nonHumanAnimal.nonHumanAnimalState.toStringResource()),
                             color = Color.Black
                         )
                     }

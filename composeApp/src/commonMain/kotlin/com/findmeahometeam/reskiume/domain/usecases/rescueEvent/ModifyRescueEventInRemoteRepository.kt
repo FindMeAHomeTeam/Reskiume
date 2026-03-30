@@ -3,7 +3,7 @@ package com.findmeahometeam.reskiume.domain.usecases.rescueEvent
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.remote.response.RemoteNonHumanAnimal
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.model.AdoptionState
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.NonHumanAnimalToRescue
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueEvent
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
@@ -94,7 +94,7 @@ class ModifyRescueEventInRemoteRepository(
     ) {
         log.d(
             "ModifyRescueEventInRemoteRepository",
-            "deleteNonHumanAnimal: Can not update the adoption state for the non human animal in the rescue event ${nonHumanAnimalToRescue.rescueEventId} because the non human animal has been unregistered in the remote data source"
+            "deleteNonHumanAnimal: Can not update the non human animal state for the non human animal in the rescue event ${nonHumanAnimalToRescue.rescueEventId} because the non human animal has been unregistered in the remote data source"
         )
 
         deleteNonHumanAnimalUtil.deleteNonHumanAnimal(
@@ -121,18 +121,18 @@ class ModifyRescueEventInRemoteRepository(
         remoteNonHumanAnimal: RemoteNonHumanAnimal,
         containsNonHumanAnimalToRescue: Boolean
     ) {
-        val adoptionState = when {
+        val nonHumanAnimalState = when {
             containsNonHumanAnimalToRescue -> {
-                AdoptionState.NEEDS_TO_BE_RESCUED
+                NonHumanAnimalState.NEEDS_TO_BE_RESCUED
             }
-            remoteNonHumanAnimal.adoptionState != AdoptionState.ADOPTED -> {
-                AdoptionState.LOOKING_FOR_ADOPTION
+            remoteNonHumanAnimal.nonHumanAnimalState != NonHumanAnimalState.SAVED -> {
+                NonHumanAnimalState.NEEDS_TO_BE_REHOMED
             }
             else -> return // is adopted
         }
         realtimeDatabaseRemoteNonHumanAnimalRepository.modifyRemoteNonHumanAnimal(
             remoteNonHumanAnimal.copy(
-                adoptionState = adoptionState,
+                nonHumanAnimalState = nonHumanAnimalState,
                 fosterHomeId = ""
             )
         ) { databaseResult ->
@@ -140,12 +140,12 @@ class ModifyRescueEventInRemoteRepository(
             if (databaseResult is DatabaseResult.Success) {
                 log.d(
                     "ModifyRescueEventInRemoteRepository",
-                    "updateAdoptionState: updated adoption state $adoptionState for the non human animal ${remoteNonHumanAnimal.id} in the remote data source"
+                    "updateAdoptionState: updated non human animal state $nonHumanAnimalState for the non human animal ${remoteNonHumanAnimal.id} in the remote data source"
                 )
             } else {
                 log.e(
                     "ModifyRescueEventInRemoteRepository",
-                    "updateAdoptionState: failed to update the adoption state $adoptionState for the non human animal ${remoteNonHumanAnimal.id} in the remote data source"
+                    "updateAdoptionState: failed to update the non human animal state $nonHumanAnimalState for the non human animal ${remoteNonHumanAnimal.id} in the remote data source"
                 )
             }
         }

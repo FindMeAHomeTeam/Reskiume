@@ -3,7 +3,7 @@ package com.findmeahometeam.reskiume.domain.usecases.fosterHome
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.remote.response.RemoteNonHumanAnimal
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.model.AdoptionState
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteFosterHome.FireStoreRemoteFosterHomeRepository
@@ -116,17 +116,17 @@ class ModifyFosterHomeInRemoteRepository(
         if (remoteResidentNonHumanAnimal == null) {
             log.d(
                 "ModifyFosterHomeInRemoteRepository",
-                "updateAdoptionStates: Can not update the adoption state for the non human animal in the foster home $fosterHomeId because the non human animal has been unregistered in the remote data source"
+                "updateAdoptionStates: Can not update the non human animal state for the non human animal in the foster home $fosterHomeId because the non human animal has been unregistered in the remote data source"
             )
             isSuccess = false
         } else {
             realtimeDatabaseRemoteNonHumanAnimalRepository.modifyRemoteNonHumanAnimal(
                 remoteResidentNonHumanAnimal
                     .copy(
-                        adoptionState = if (containsResidentNonHumanAnimal) {
-                            AdoptionState.REHOMED
+                        nonHumanAnimalState = if (containsResidentNonHumanAnimal) {
+                            NonHumanAnimalState.REHOMED
                         } else {
-                            AdoptionState.LOOKING_FOR_ADOPTION
+                            NonHumanAnimalState.NEEDS_TO_BE_REHOMED
                         },
                         fosterHomeId = if (containsResidentNonHumanAnimal) {
                             fosterHomeId
@@ -138,12 +138,12 @@ class ModifyFosterHomeInRemoteRepository(
                 if (databaseResult is DatabaseResult.Success) {
                     log.d(
                         "ModifyFosterHomeInRemoteRepository",
-                        "updateAdoptionStates: updated adoption state for the non human animal ${remoteResidentNonHumanAnimal.id} in the remote data source"
+                        "updateAdoptionStates: updated non human animal state for the non human animal ${remoteResidentNonHumanAnimal.id} in the remote data source"
                     )
                 } else {
                     log.e(
                         "ModifyFosterHomeInRemoteRepository",
-                        "updateAdoptionStates: failed to update the adoption state for the non human animal ${remoteResidentNonHumanAnimal.id} in the remote data source"
+                        "updateAdoptionStates: failed to update the non human animal state for the non human animal ${remoteResidentNonHumanAnimal.id} in the remote data source"
                     )
                     isSuccess = false
                 }

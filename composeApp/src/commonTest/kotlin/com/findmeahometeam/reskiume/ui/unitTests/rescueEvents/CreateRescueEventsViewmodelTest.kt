@@ -7,7 +7,7 @@ import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.model.AdoptionState
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalRescueEventRepository
@@ -122,7 +122,7 @@ class CreateRescueEventsViewmodelTest : CoroutineTestDispatcher() {
             everySuspend {
                 modifyNonHumanAnimal(
                     nonHumanAnimal.copy(
-                        adoptionState = AdoptionState.NEEDS_TO_BE_RESCUED
+                        nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_RESCUED
                     ).toEntity(),
                     capture(modifyNonHumanAnimalInLocalRepository)
                 )
@@ -135,7 +135,7 @@ class CreateRescueEventsViewmodelTest : CoroutineTestDispatcher() {
                 modifyNonHumanAnimal(
                     nonHumanAnimal.copy(
                         id = nonHumanAnimal.id + "second",
-                        adoptionState = AdoptionState.NEEDS_TO_BE_RESCUED
+                        nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_RESCUED
                     ).toEntity(),
                     capture(modifySecondNonHumanAnimalInLocalRepository)
                 )
@@ -267,7 +267,7 @@ class CreateRescueEventsViewmodelTest : CoroutineTestDispatcher() {
                 everySuspend {
                     modifyRemoteNonHumanAnimal(
                         nonHumanAnimal.copy(
-                            adoptionState = AdoptionState.NEEDS_TO_BE_RESCUED
+                            nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_RESCUED
                         ).toData(),
                         capture(onModifyRemoteNonHumanAnimal)
                     )
@@ -280,7 +280,7 @@ class CreateRescueEventsViewmodelTest : CoroutineTestDispatcher() {
                     modifyRemoteNonHumanAnimal(
                         nonHumanAnimal.copy(
                             id = nonHumanAnimal.id + "second",
-                            adoptionState = AdoptionState.NEEDS_TO_BE_RESCUED
+                            nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_RESCUED
                         ).toData(),
                         capture(onModifySecondRemoteNonHumanAnimal)
                     )
@@ -473,7 +473,7 @@ class CreateRescueEventsViewmodelTest : CoroutineTestDispatcher() {
     @Test
     fun `given my rescue event to create_when I want to add non human animals to rescue_then the rescue event list available non human animals`() =
         runTest {
-            getCreateRescueEventViewmodel().allAvailableNonHumanAnimalsLookingForAdoptionFlow.test {
+            getCreateRescueEventViewmodel().allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow.test {
                 assertEquals(listOf(nonHumanAnimal), awaitItem())
                 awaitComplete()
             }

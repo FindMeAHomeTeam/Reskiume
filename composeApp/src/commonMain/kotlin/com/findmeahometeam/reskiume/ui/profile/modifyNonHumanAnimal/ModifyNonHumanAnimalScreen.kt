@@ -20,7 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.findmeahometeam.reskiume.domain.model.AdoptionState
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.AgeCategory
 import com.findmeahometeam.reskiume.domain.model.Gender
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
@@ -81,7 +81,7 @@ fun ModifyNonHumanAnimalScreen(
                 ""
             },
             if (nonHumanAnimalState is UiState.Success) {
-                "- ${stringResource((nonHumanAnimalState as UiState.Success<NonHumanAnimal>).data.adoptionState.toStringResource())}"
+                "- ${stringResource((nonHumanAnimalState as UiState.Success<NonHumanAnimal>).data.nonHumanAnimalState.toStringResource())}"
             } else {
                 ""
             }
@@ -215,11 +215,11 @@ fun ModifyNonHumanAnimalScreen(
                     ),
                     textToLink = stringResource(Res.string.modify_non_human_animal_screen_delete_non_human_animal_button),
                     onClick = {
-                        when(nonHumanAnimal.adoptionState) {
-                            AdoptionState.NEEDS_TO_BE_RESCUED -> {
+                        when(nonHumanAnimal.nonHumanAnimalState) {
+                            NonHumanAnimalState.NEEDS_TO_BE_RESCUED -> {
                                 displayNonHumanAnimalInFosterHomeOrRescueEventDialog = true
                             }
-                            AdoptionState.REHOMED -> {
+                            NonHumanAnimalState.REHOMED -> {
                                 displayNonHumanAnimalInFosterHomeOrRescueEventDialog = true
                             }
                             else -> {
@@ -250,9 +250,9 @@ fun ModifyNonHumanAnimalScreen(
                 }
                 if (displayNonHumanAnimalInFosterHomeOrRescueEventDialog) {
 
-                    val elementType = stringResource(when(nonHumanAnimal.adoptionState) {
-                        AdoptionState.REHOMED -> Res.string.foster_home
-                        AdoptionState.NEEDS_TO_BE_RESCUED -> Res.string.rescue_event
+                    val elementType = stringResource(when(nonHumanAnimal.nonHumanAnimalState) {
+                        NonHumanAnimalState.REHOMED -> Res.string.foster_home
+                        NonHumanAnimalState.NEEDS_TO_BE_RESCUED -> Res.string.rescue_event
                         else -> Res.string.foster_home
                     })
                     RmDialog(

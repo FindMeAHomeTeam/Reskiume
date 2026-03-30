@@ -1,7 +1,7 @@
 package com.findmeahometeam.reskiume.domain.usecases.fosterHome
 
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.model.AdoptionState
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.Gender
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
@@ -165,7 +165,7 @@ class ModifyFosterHomeInLocalRepository(
                     if (residentNonHumanAnimal == null) {
                         log.d(
                             "ModifyFosterHomeInLocalRepository",
-                            "manageAllResidentNonHumanAnimals: Can not insert the resident nor update the adoption state for the resident id ${residentNonHumanAnimalToManage.nonHumanAnimalId} in the foster home ${residentNonHumanAnimalToManage.fosterHomeId} in the local data source"
+                            "manageAllResidentNonHumanAnimals: Can not insert the resident nor update the non human animal state for the resident id ${residentNonHumanAnimalToManage.nonHumanAnimalId} in the foster home ${residentNonHumanAnimalToManage.fosterHomeId} in the local data source"
                         )
                     } else {
                         localFosterHomeRepository.insertResidentNonHumanAnimalIdForFosterHome(
@@ -189,19 +189,19 @@ class ModifyFosterHomeInLocalRepository(
                             localNonHumanAnimalRepository.modifyNonHumanAnimal(
                                 residentNonHumanAnimal
                                     .copy(
-                                        adoptionState = AdoptionState.REHOMED,
+                                        nonHumanAnimalState = NonHumanAnimalState.REHOMED,
                                         fosterHomeId = updatedFosterHome.id
                                     ).toEntity()
                             ) { rowsUpdated ->
                                 if (rowsUpdated > 0) {
                                     log.d(
                                         "ModifyFosterHomeInLocalRepository",
-                                        "manageAllResidentNonHumanAnimals: updated adoption state for the non human animal ${residentNonHumanAnimal.id} in the local data source"
+                                        "manageAllResidentNonHumanAnimals: updated non human animal state for the non human animal ${residentNonHumanAnimal.id} in the local data source"
                                     )
                                 } else {
                                     log.e(
                                         "ModifyFosterHomeInLocalRepository",
-                                        "manageAllResidentNonHumanAnimals: failed to update the adoption state for the non human animal ${residentNonHumanAnimal.id} in the local data source"
+                                        "manageAllResidentNonHumanAnimals: failed to update the non human animal state for the non human animal ${residentNonHumanAnimal.id} in the local data source"
                                     )
                                     isSuccess = false
                                 }
@@ -230,25 +230,25 @@ class ModifyFosterHomeInLocalRepository(
                     if (!isSuccess || residentNonHumanAnimal == null) {
                         log.d(
                             "ModifyFosterHomeInLocalRepository",
-                            "manageAllResidentNonHumanAnimals: Can not modify the the adoption state for the resident id ${residentNonHumanAnimalToManage.nonHumanAnimalId} in the foster home ${residentNonHumanAnimalToManage.fosterHomeId} in the local data source"
+                            "manageAllResidentNonHumanAnimals: Can not modify the the non human animal state for the resident id ${residentNonHumanAnimalToManage.nonHumanAnimalId} in the foster home ${residentNonHumanAnimalToManage.fosterHomeId} in the local data source"
                         )
                     } else {
                         localNonHumanAnimalRepository.modifyNonHumanAnimal(
                             residentNonHumanAnimal
                                 .copy(
-                                    adoptionState = AdoptionState.LOOKING_FOR_ADOPTION,
+                                    nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_REHOMED,
                                     fosterHomeId = ""
                                 ).toEntity()
                         ) { rowsUpdated ->
                             if (rowsUpdated > 0) {
                                 log.d(
                                     "ModifyFosterHomeInLocalRepository",
-                                    "manageAllResidentNonHumanAnimals: updated adoption state for the non human animal ${residentNonHumanAnimalToManage.nonHumanAnimalId} in the local data source"
+                                    "manageAllResidentNonHumanAnimals: updated non human animal state for the non human animal ${residentNonHumanAnimalToManage.nonHumanAnimalId} in the local data source"
                                 )
                             } else {
                                 log.e(
                                     "ModifyFosterHomeInLocalRepository",
-                                    "manageAllResidentNonHumanAnimals: failed to update the adoption state for the non human animal ${residentNonHumanAnimalToManage.nonHumanAnimalId} in the local data source"
+                                    "manageAllResidentNonHumanAnimals: failed to update the non human animal state for the non human animal ${residentNonHumanAnimalToManage.nonHumanAnimalId} in the local data source"
                                 )
                                 isSuccess = false
                             }

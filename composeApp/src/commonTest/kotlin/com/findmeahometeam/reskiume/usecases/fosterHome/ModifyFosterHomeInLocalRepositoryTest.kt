@@ -2,7 +2,7 @@ package com.findmeahometeam.reskiume.usecases.fosterHome
 
 import com.findmeahometeam.reskiume.authUser
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.model.AdoptionState
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.repository.local.LocalFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
@@ -134,7 +134,7 @@ class ModifyFosterHomeInLocalRepositoryTest {
         everySuspend {
             modifyNonHumanAnimal(
                 nonHumanAnimal.copy(
-                    adoptionState = AdoptionState.REHOMED,
+                    nonHumanAnimalState = NonHumanAnimalState.REHOMED,
                     fosterHomeId = fosterHome.id
                 ).toEntity(),
                 any()
@@ -144,7 +144,7 @@ class ModifyFosterHomeInLocalRepositoryTest {
         everySuspend {
             modifyNonHumanAnimal(
                 nonHumanAnimal.copy(
-                    adoptionState = AdoptionState.LOOKING_FOR_ADOPTION,
+                    nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_REHOMED,
                     fosterHomeId = ""
                 ).toEntity(),
                 any()
@@ -218,7 +218,7 @@ class ModifyFosterHomeInLocalRepositoryTest {
                 )
                 localNonHumanAnimalRepository.modifyNonHumanAnimal(
                     nonHumanAnimal.copy(
-                        adoptionState = AdoptionState.REHOMED,
+                        nonHumanAnimalState = NonHumanAnimalState.REHOMED,
                         fosterHomeId = fosterHome.id
                     ).toEntity(),
                     any()
@@ -270,7 +270,7 @@ class ModifyFosterHomeInLocalRepositoryTest {
                 )
                 localNonHumanAnimalRepository.modifyNonHumanAnimal(
                     nonHumanAnimal.copy(
-                        adoptionState = AdoptionState.REHOMED,
+                        nonHumanAnimalState = NonHumanAnimalState.REHOMED,
                         fosterHomeId = fosterHome.id
                     ).toEntity(),
                     any()
@@ -310,7 +310,7 @@ class ModifyFosterHomeInLocalRepositoryTest {
                 )
                 localNonHumanAnimalRepository.modifyNonHumanAnimal(
                     nonHumanAnimal.copy(
-                        adoptionState = AdoptionState.LOOKING_FOR_ADOPTION,
+                        nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_REHOMED,
                         fosterHomeId = ""
                     ).toEntity(),
                     any()
@@ -353,7 +353,7 @@ class ModifyFosterHomeInLocalRepositoryTest {
             verifySuspend(exactly(0)) {
                 localNonHumanAnimalRepository.modifyNonHumanAnimal(
                     nonHumanAnimal.copy(
-                        adoptionState = AdoptionState.LOOKING_FOR_ADOPTION,
+                        nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_REHOMED,
                         fosterHomeId = ""
                     ).toEntity(),
                     any()

@@ -4,7 +4,7 @@ import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.remote.response.RemoteNonHumanAnimal
 import com.findmeahometeam.reskiume.data.remote.response.rescueEvent.RemoteRescueEvent
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.model.AdoptionState
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteRescueEvent.FireStoreRemoteRescueEventRepository
@@ -82,19 +82,19 @@ class DeleteAllMyRescueEventsFromRemoteRepository(
                     } else {
                         realtimeDatabaseRemoteNonHumanAnimalRepository.modifyRemoteNonHumanAnimal(
                             remoteNonHumanAnimal.copy(
-                                adoptionState = AdoptionState.LOOKING_FOR_ADOPTION,
+                                nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_REHOMED,
                                 fosterHomeId = ""
                             )
                         ) { databaseResult ->
                             if (databaseResult is DatabaseResult.Success) {
                                 log.d(
                                     "DeleteAllMyRescueEventsFromRemoteRepository",
-                                    "manageNonHumanAnimals: updated adoption state ${AdoptionState.LOOKING_FOR_ADOPTION} for the non human animal ${remoteNonHumanAnimal.id} in the remote data source"
+                                    "manageNonHumanAnimals: updated non human animal state ${NonHumanAnimalState.NEEDS_TO_BE_REHOMED} for the non human animal ${remoteNonHumanAnimal.id} in the remote data source"
                                 )
                             } else {
                                 log.e(
                                     "DeleteAllMyRescueEventsFromRemoteRepository",
-                                    "manageNonHumanAnimals: failed to update the adoption state ${AdoptionState.LOOKING_FOR_ADOPTION} for the non human animal ${remoteNonHumanAnimal.id} in the remote data source"
+                                    "manageNonHumanAnimals: failed to update the non human animal state ${NonHumanAnimalState.NEEDS_TO_BE_REHOMED} for the non human animal ${remoteNonHumanAnimal.id} in the remote data source"
                                 )
                                 isSuccess = false
                             }

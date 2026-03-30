@@ -12,9 +12,8 @@ import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.InsertRescueEven
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.ModifyRescueEventInLocalRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.map
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -32,11 +31,9 @@ class CheckAllMyRescueEventsUtilImpl(
         allRescueEventsFlow: Flow<List<RescueEvent>>,
         myUid: String,
         coroutineScope: CoroutineScope
-    ) {
-        coroutineScope.launch {
-
-            val rescueEventList = allRescueEventsFlow.first()
-            rescueEventList.forEach { rescueEvent ->
+    ): Flow<List<RescueEvent>> =
+        allRescueEventsFlow.map { rescueEventList ->
+            rescueEventList.map { rescueEvent ->
 
                 val localRescueEvent: RescueEvent? = getRescueEventFromLocalRepository(
                     rescueEvent.id
@@ -66,6 +63,7 @@ class CheckAllMyRescueEventsUtilImpl(
                             myUid = myUid
                         )
                     }
+                    rescueEventWithLocalImage
                 } else {
                     log.d(
                         "CheckAllMyRescueEventsUtilImpl",
@@ -86,10 +84,10 @@ class CheckAllMyRescueEventsUtilImpl(
                             myUid = myUid
                         )
                     }
+                    rescueEvent
                 }
             }
         }
-    }
 
     @OptIn(ExperimentalTime::class)
     private suspend fun insertRescueEventInLocalRepo(

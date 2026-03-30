@@ -14,7 +14,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.map
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -32,11 +32,9 @@ class CheckAllMyFosterHomesUtilImpl(
         allFosterHomesFlow: Flow<List<FosterHome>>,
         myUid: String,
         coroutineScope: CoroutineScope
-    ) {
-        coroutineScope.launch {
-
-            val fosterHomeList = allFosterHomesFlow.first()
-            fosterHomeList.forEach { fosterHome ->
+    ): Flow<List<FosterHome>> =
+        allFosterHomesFlow.map { fosterHomeList ->
+            fosterHomeList.map { fosterHome ->
 
                 if (fosterHome.imageUrl.isNotBlank()) {
 
@@ -65,6 +63,7 @@ class CheckAllMyFosterHomesUtilImpl(
                             myUid
                         )
                     }
+                    fosterHomeWithLocalImage
                 } else {
                     log.d(
                         "CheckAllMyFosterHomesUtilImpl",
@@ -87,10 +86,10 @@ class CheckAllMyFosterHomesUtilImpl(
                             myUid
                         )
                     }
+                    fosterHome
                 }
             }
         }
-    }
 
     @OptIn(ExperimentalTime::class)
     private suspend fun insertFosterHomeInLocalRepo(

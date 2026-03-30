@@ -169,7 +169,7 @@ class ModifyFosterHomeViewmodelTest : CoroutineTestDispatcher() {
 
         val fireStoreRemoteFosterHomeRepository: FireStoreRemoteFosterHomeRepository = mock {
 
-            everySuspend {
+            every {
                 getRemoteFosterHome(fosterHome.id)
             } returns remoteFosterHomeReturn
 
@@ -186,11 +186,11 @@ class ModifyFosterHomeViewmodelTest : CoroutineTestDispatcher() {
 
         val realtimeDatabaseRemoteNonHumanAnimalRepository: RealtimeDatabaseRemoteNonHumanAnimalRepository =
             mock {
-                everySuspend {
+                every {
                     getRemoteNonHumanAnimal(nonHumanAnimal.id, nonHumanAnimal.caregiverId)
                 } returns flowOf(nonHumanAnimal.toData())
 
-                everySuspend {
+                every {
                     getRemoteNonHumanAnimal(nonHumanAnimal.id + "789", nonHumanAnimal.caregiverId)
                 } returns flowOf(nonHumanAnimal.toData())
 
@@ -219,7 +219,7 @@ class ModifyFosterHomeViewmodelTest : CoroutineTestDispatcher() {
             }
 
         val deleteNonHumanAnimalUtil: DeleteNonHumanAnimalUtil = mock {
-            everySuspend {
+            every {
                 deleteNonHumanAnimal(
                     id = nonHumanAnimal.id,
                     caregiverId = nonHumanAnimal.caregiverId,

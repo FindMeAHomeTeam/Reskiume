@@ -264,6 +264,21 @@ class ModifyFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
         }
 
     @Test
+    fun `given my foster home to modify_when the app tries to delete the remote image but fails to retrieve the foster home from the remote repo_then the app retrieves an error`() =
+        runTest {
+            val modifyFosterHomeViewmodel = getModifyFosterHomeViewmodel()
+
+            modifyFosterHomeViewmodel.saveFosterHomeChanges(true, fosterHome)
+
+            modifyFosterHomeViewmodel.manageChangesUiState.test {
+                assertTrue { awaitItem() is UiState.Idle }
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Error }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
     fun `given my foster home to modify_when I click to update my foster home but fails deleting the remote foster home image_then the app retrieves an error`() =
         runTest {
             val modifyFosterHomeViewmodel = getModifyFosterHomeViewmodel(
@@ -415,6 +430,21 @@ class ModifyFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Success }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given my foster home to modify_when I click to update my foster home but fails retrieving the foster home from the remote repo_then the foster home is not updated`() =
+        runTest {
+            val modifyFosterHomeViewmodel = getModifyFosterHomeViewmodel()
+
+            modifyFosterHomeViewmodel.saveFosterHomeChanges(false, fosterHome)
+
+            modifyFosterHomeViewmodel.manageChangesUiState.test {
+                assertTrue { awaitItem() is UiState.Idle }
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Error }
                 ensureAllEventsConsumed()
             }
         }

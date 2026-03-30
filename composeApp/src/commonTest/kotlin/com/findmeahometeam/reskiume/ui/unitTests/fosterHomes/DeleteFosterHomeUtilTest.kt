@@ -78,7 +78,7 @@ class DeleteFosterHomeUtilTest : CoroutineTestDispatcher() {
                 section = Section.FOSTER_HOMES
             ).toEntity(),
         numberOfRowsDeletedInLocalCacheArg: Int = 1,
-        remoteFosterHomeReturn: Flow<RemoteFosterHome> = flowOf(fosterHome.toData()),
+        remoteFosterHomeReturn: Flow<RemoteFosterHome?> = flowOf(fosterHome.toData()),
         databaseResultOfDeletingFosterHomesInRemoteRepositoryArg: DatabaseResult = DatabaseResult.Success,
         databaseResultOfModifyingNonHumanAnimalInRemoteRepositoryArg: DatabaseResult = DatabaseResult.Success,
         isRemoteImageDeletedFlagForFosterHome: Boolean = true,
@@ -309,6 +309,33 @@ class DeleteFosterHomeUtilTest : CoroutineTestDispatcher() {
                 log.d(
                     "DeleteFosterHomeUtil",
                     "deleteFosterHomeCacheFromLocalDataSource: Foster home ${fosterHome.id} deleted in the local cache in section ${Section.FOSTER_HOMES}"
+                )
+            }
+        }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `given my foster home_when I click to delete my foster home but fails retrieving the remote foster home_then the app displays an error`() =
+        runTest {
+            val deleteFosterHomeUtil = getDeleteFosterHomeUtil(
+                remoteFosterHomeReturn = flowOf(null)
+            )
+
+            deleteFosterHomeUtil.deleteFosterHome(
+                fosterHome.id,
+                fosterHome.ownerId,
+                this,
+                false,
+                {},
+                {},
+            )
+
+            runCurrent()
+
+            verify {
+                log.e(
+                    "DeleteFosterHomeUtil",
+                    "deleteCurrentImageFromRemoteDataSource: failed to delete the image from the foster home ${fosterHome.id} in the remote data source because the remote foster home does not exist!"
                 )
             }
         }

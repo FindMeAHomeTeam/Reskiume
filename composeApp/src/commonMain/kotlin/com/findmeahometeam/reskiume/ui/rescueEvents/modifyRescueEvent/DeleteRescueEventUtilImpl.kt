@@ -12,7 +12,6 @@ import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.DeleteMyRescueEv
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetRescueEventFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetRescueEventFromRemoteRepository
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
@@ -84,7 +83,16 @@ class DeleteRescueEventUtilImpl(
 
             val remoteRescueEvent = getRescueEventFromRemoteRepository(
                 rescueEventId
-            ).first()
+            ).firstOrNull()
+
+            if (remoteRescueEvent == null) {
+                log.e(
+                    "DeleteRescueEventUtil",
+                    "deleteCurrentImageFromRemoteDataSource: failed to delete the image from the rescue event $rescueEventId in the remote data source because the remote rescue event does not exist!"
+                )
+                onError()
+                return@launch
+            }
 
             deleteImageFromRemoteDataSource(
                 userUid = creatorId,

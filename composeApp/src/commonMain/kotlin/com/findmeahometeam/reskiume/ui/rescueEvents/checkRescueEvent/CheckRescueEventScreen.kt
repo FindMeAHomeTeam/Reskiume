@@ -21,7 +21,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.model.fosterHome.City
@@ -76,6 +76,7 @@ import reskiume.composeapp.generated.resources.check_rescue_event_screen_rescue_
 import reskiume.composeapp.generated.resources.check_rescue_event_screen_share_content_description
 import reskiume.composeapp.generated.resources.check_rescue_event_screen_start_chat_button
 import reskiume.composeapp.generated.resources.check_rescue_event_screen_title
+import reskiume.composeapp.generated.resources.general_error_invalid_deep_link
 import reskiume.composeapp.generated.resources.ic_share
 import reskiume.composeapp.generated.resources.rescue_event
 import reskiume.composeapp.generated.resources.reskiume
@@ -89,8 +90,8 @@ fun CheckRescueEventScreen(
     val checkRescueEventViewmodel: CheckRescueEventViewmodel =
         koinViewModel<CheckRescueEventViewmodel>()
 
-    val uiRescueEventState: UiState<UiRescueEvent> by checkRescueEventViewmodel.rescueEventFlow.collectAsState(
-        initial = UiState.Loading()
+    val uiRescueEventState: UiState<UiRescueEvent> by checkRescueEventViewmodel.rescueEventFlow.collectAsStateWithLifecycle(
+        initialValue = UiState.Loading()
     )
 
     var isShareButtonClicked: Boolean by remember { mutableStateOf(false) }
@@ -146,7 +147,13 @@ fun CheckRescueEventScreen(
                 .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            RmResultState(uiRescueEventState) { uiRescueEvent: UiRescueEvent ->
+            RmResultState(
+                uiState = uiRescueEventState,
+                customErrorMessage = stringResource(
+                    Res.string.general_error_invalid_deep_link,
+                    stringResource(Res.string.rescue_event)
+                )
+            ) { uiRescueEvent: UiRescueEvent ->
 
                 if (isShareButtonClicked) {
                     DisplayShareService(

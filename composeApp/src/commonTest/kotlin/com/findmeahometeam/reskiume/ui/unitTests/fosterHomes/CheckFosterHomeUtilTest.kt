@@ -94,7 +94,8 @@ class CheckFosterHomeUtilTest : CoroutineTestDispatcher() {
                 cachedObjectId = fosterHome.id,
                 section = Section.FOSTER_HOMES
             ).toEntity(),
-        remoteFosterHomeReturn: Flow<RemoteFosterHome> = flowOf(fosterHome.toData()),
+        rowsDeletedOfLocalCacheArg: Int = 1,
+        remoteFosterHomeReturn: Flow<RemoteFosterHome?> = flowOf(fosterHome.toData()),
         insertedFosterHomeInLocalRowsUpdatedArg: Long = 1L,
         modifiedFosterHomeInLocalRowsUpdatedArg: Int = 1,
         fosterHomeWithAllNonHumanAnimalLocalDataReturn: FosterHomeWithAllNonHumanAnimalData? = fosterHomeWithAllNonHumanAnimalData,
@@ -142,7 +143,7 @@ class CheckFosterHomeUtilTest : CoroutineTestDispatcher() {
                     capture(onDeleteLocalCacheEntity)
                 )
             } calls {
-                onDeleteLocalCacheEntity.get().invoke(1)
+                onDeleteLocalCacheEntity.get().invoke(rowsDeletedOfLocalCacheArg)
             }
         }
 
@@ -435,6 +436,57 @@ class CheckFosterHomeUtilTest : CoroutineTestDispatcher() {
         }
 
     @Test
+    fun `given an empty cache_when the user request a foster home but there is an issue retrieving it from the remote repo_then it is not retrieved`() =
+        runTest {
+            getCheckFosterHomeUtilImpl(
+                getLocalCacheEntityReturnForFosterHome = null,
+                remoteFosterHomeReturn = flowOf(null)
+            ).getFosterHomeFlow(
+                fosterHome.id,
+                fosterHome.ownerId,
+                this
+            ).test {
+                assertEquals(
+                    null,
+                    awaitItem()
+                )
+                awaitComplete()
+            }
+            verify {
+                log.d(
+                    "CheckFosterHomeUtilImpl",
+                    "deleteFosterHomeCacheFromLocalDataSource: Foster home ${fosterHome.id} deleted in the local cache in section ${Section.FOSTER_HOMES}"
+                )
+            }
+        }
+
+    @Test
+    fun `given an empty cache_when the user request a foster home but there is an issue retrieving it from the remote repo and fails deleting the cache_then it is not retrieved`() =
+        runTest {
+            getCheckFosterHomeUtilImpl(
+                getLocalCacheEntityReturnForFosterHome = null,
+                remoteFosterHomeReturn = flowOf(null),
+                rowsDeletedOfLocalCacheArg = 0
+            ).getFosterHomeFlow(
+                fosterHome.id,
+                fosterHome.ownerId,
+                this
+            ).test {
+                assertEquals(
+                    null,
+                    awaitItem()
+                )
+                awaitComplete()
+            }
+            verify {
+                log.e(
+                    "CheckFosterHomeUtilImpl",
+                    "deleteFosterHomeCacheFromLocalDataSource: Error deleting the Foster home ${fosterHome.id} in the local cache in section ${Section.FOSTER_HOMES}"
+                )
+            }
+        }
+
+    @Test
     fun `given an outdated cache_when the user request a foster home from remote_then foster home is retrieved and modified in the local cache`() =
         runTest {
             getCheckFosterHomeUtilImpl(
@@ -519,6 +571,36 @@ class CheckFosterHomeUtilTest : CoroutineTestDispatcher() {
                 log.e(
                     "CheckFosterHomeUtilImpl",
                     "modifyFosterHomesInLocalRepository: Error modifying the Foster home ${fosterHome.id} in local database"
+                )
+            }
+        }
+
+    @Test
+    fun `given an outdated cache_when the user request a foster home but there is an issue retrieving it from the remote repo_then it is not retrieved`() =
+        runTest {
+            getCheckFosterHomeUtilImpl(
+                remoteFosterHomeReturn = flowOf(null),
+                getLocalCacheEntityReturnForFosterHome =
+                    localCache.copy(
+                        cachedObjectId = fosterHome.id,
+                        section = Section.FOSTER_HOMES,
+                        timestamp = 123L
+                    ).toEntity()
+            ).getFosterHomeFlow(
+                fosterHome.id,
+                fosterHome.ownerId,
+                this
+            ).test {
+                assertEquals(
+                    null,
+                    awaitItem()
+                )
+                awaitComplete()
+            }
+            verify {
+                log.d(
+                    "CheckFosterHomeUtilImpl",
+                    "deleteFosterHomeCacheFromLocalDataSource: Foster home ${fosterHome.id} deleted in the local cache in section ${Section.FOSTER_HOMES}"
                 )
             }
         }

@@ -118,7 +118,7 @@ class ModifyRescueEventViewmodelTest : CoroutineTestDispatcher() {
             ).toEntity(),
         localCacheUpdatedInLocalDatasourceArg: Int = 1,
         numberOfRowsDeletedInLocalDatasourceArg: Int = 1,
-        remoteRescueEventReturn: Flow<RemoteRescueEvent> = flowOf(rescueEvent.toData()),
+        remoteRescueEventReturn: Flow<RemoteRescueEvent?> = flowOf(rescueEvent.toData()),
         databaseResultOfModifyingRescueEventsInRemoteRepositoryArg: DatabaseResult = DatabaseResult.Success,
         databaseResultOfModifyingNonHumanAnimalInRemoteRepositoryArg: DatabaseResult = DatabaseResult.Success,
         isRemoteImageDeletedFlagForRescueEvent: Boolean = true,
@@ -143,7 +143,7 @@ class ModifyRescueEventViewmodelTest : CoroutineTestDispatcher() {
         }
 
         val authRepository: AuthRepository = mock {
-            everySuspend { authState } returns (flowOf(authStateReturn))
+            every { authState } returns (flowOf(authStateReturn))
         }
 
         val localCacheRepository: LocalCacheRepository = mock {
@@ -174,7 +174,7 @@ class ModifyRescueEventViewmodelTest : CoroutineTestDispatcher() {
 
         val fireStoreRemoteRescueEventRepository: FireStoreRemoteRescueEventRepository = mock {
 
-            everySuspend {
+            every {
                 getRemoteRescueEvent(rescueEvent.id)
             } returns remoteRescueEventReturn
 
@@ -192,11 +192,11 @@ class ModifyRescueEventViewmodelTest : CoroutineTestDispatcher() {
 
         val realtimeDatabaseRemoteNonHumanAnimalRepository: RealtimeDatabaseRemoteNonHumanAnimalRepository =
             mock {
-                everySuspend {
+                every {
                     getRemoteNonHumanAnimal(nonHumanAnimal.id, nonHumanAnimal.caregiverId)
                 } returns flowOf(nonHumanAnimal.toData())
 
-                everySuspend {
+                every {
                     getRemoteNonHumanAnimal(nonHumanAnimal.id + "789", nonHumanAnimal.caregiverId)
                 } returns flowOf(nonHumanAnimal.toData())
 
@@ -224,7 +224,7 @@ class ModifyRescueEventViewmodelTest : CoroutineTestDispatcher() {
             }
 
         val deleteNonHumanAnimalUtil: DeleteNonHumanAnimalUtil = mock {
-            everySuspend {
+            every {
                 deleteNonHumanAnimal(
                     id = nonHumanAnimal.id,
                     caregiverId = nonHumanAnimal.caregiverId,
@@ -579,6 +579,29 @@ class ModifyRescueEventViewmodelTest : CoroutineTestDispatcher() {
         }
 
     @Test
+    fun `given my rescue event to modify_when the app tries to delete the remote image but fails to retrieve the rescue event from the remote repo_then the app retrieves an error`() =
+        runTest {
+            val modifyRescueEventViewmodel = getModifyRescueEventViewmodel(
+                remoteRescueEventReturn = flowOf(null)
+            )
+
+            modifyRescueEventViewmodel.saveRescueEventChanges(true, rescueEvent)
+
+            modifyRescueEventViewmodel.manageChangesUiState.test {
+                assertTrue { awaitItem() is UiState.Idle }
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Error }
+                ensureAllEventsConsumed()
+            }
+            verify {
+                log.e(
+                    "ModifyRescueEventViewmodel",
+                    "deleteCurrentImageFromRemoteDataSource: failed to delete the image from the rescue event ${rescueEvent.id} in the remote data source because the remote rescue event does not exist!"
+                )
+            }
+        }
+
+    @Test
     fun `given my rescue event to modify_when I click to update my rescue event but fails deleting the remote rescue event image_then the app retrieves an error`() =
         runTest {
             val modifyRescueEventViewmodel = getModifyRescueEventViewmodel(
@@ -685,6 +708,30 @@ class ModifyRescueEventViewmodelTest : CoroutineTestDispatcher() {
                 )
             }
         }
+
+    @Test
+    fun `given my rescue event to modify_when I click to update my rescue event but fails retrieving the rescue event from the remote repo_then the rescue event is not updated`() =
+        runTest {
+            val modifyRescueEventViewmodel = getModifyRescueEventViewmodel(
+                remoteRescueEventReturn = flowOf(null)
+            )
+
+            modifyRescueEventViewmodel.saveRescueEventChanges(false, rescueEvent)
+
+            modifyRescueEventViewmodel.manageChangesUiState.test {
+                assertTrue { awaitItem() is UiState.Idle }
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Error }
+                ensureAllEventsConsumed()
+            }
+            verify {
+                log.e(
+                    "ModifyRescueEventViewmodel",
+                    "saveRescueEventChanges: failed to collect the remote rescue event ${rescueEvent.id} in the remote data source because the it does not exist!"
+                )
+            }
+        }
+
 
     @Test
     fun `given my rescue event to modify_when I click to update my rescue event but fails modifying the rescue event in the remote repo_then the app retrieves an error`() =

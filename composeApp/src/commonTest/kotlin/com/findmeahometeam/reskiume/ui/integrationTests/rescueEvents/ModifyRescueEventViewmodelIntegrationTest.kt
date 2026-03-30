@@ -53,15 +53,12 @@ import com.findmeahometeam.reskiume.ui.rescueEvents.modifyRescueEvent.ModifyResc
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.findmeahometeam.reskiume.user
 import com.findmeahometeam.reskiume.userPwd
-import dev.mokkery.verify
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class ModifyRescueEventViewmodelIntegrationTest : CoroutineTestDispatcher() {
-
-    private val log: Log = FakeLog()
 
     private fun getModifyRescueEventViewmodel(
         saveStateHandleProvider: SaveStateHandleProvider = FakeSaveStateHandleProvider(
@@ -91,7 +88,8 @@ class ModifyRescueEventViewmodelIntegrationTest : CoroutineTestDispatcher() {
             )
         ),
         manageImagePath: ManageImagePath = FakeManageImagePath(),
-        deleteRescueEventUtil: DeleteRescueEventUtil = FakeDeleteRescueEventUtil()
+        deleteRescueEventUtil: DeleteRescueEventUtil = FakeDeleteRescueEventUtil(),
+        log: Log = FakeLog()
     ): ModifyRescueEventViewmodel {
 
         val getRescueEventFromLocalRepository =
@@ -270,11 +268,20 @@ class ModifyRescueEventViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 assertTrue { awaitItem() is UiState.Success }
                 ensureAllEventsConsumed()
             }
-            verify {
-                log.d(
-                    "ModifyRescueEventViewModel",
-                    "modifyCacheForRescueEventInLocalDataSource: ${rescueEvent.id} updated in local cache in section ${Section.RESCUE_EVENTS}"
-                )
+        }
+
+    @Test
+    fun `given my rescue event to modify_when the app tries to delete the remote image but fails to retrieve the rescue event from the remote repo_then the app retrieves an error`() =
+        runTest {
+            val modifyRescueEventViewmodel = getModifyRescueEventViewmodel()
+
+            modifyRescueEventViewmodel.saveRescueEventChanges(true, rescueEvent)
+
+            modifyRescueEventViewmodel.manageChangesUiState.test {
+                assertTrue { awaitItem() is UiState.Idle }
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Error }
+                ensureAllEventsConsumed()
             }
         }
 
@@ -294,12 +301,6 @@ class ModifyRescueEventViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Error }
                 ensureAllEventsConsumed()
-            }
-            verify {
-                log.e(
-                    "ModifyRescueEventViewModel",
-                    "deleteCurrentImageFromRemoteDataSource: failed to delete the image from the rescue event ${rescueEvent.id} in the remote data source"
-                )
             }
         }
 
@@ -327,12 +328,6 @@ class ModifyRescueEventViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Error }
                 ensureAllEventsConsumed()
-            }
-            verify {
-                log.e(
-                    "ModifyRescueEventViewModel",
-                    "deleteCurrentImageFromLocalDataSource: failed to delete the image from the rescue event ${rescueEvent.id} in the local data source because the local rescue event does not exist!"
-                )
             }
         }
 
@@ -365,12 +360,6 @@ class ModifyRescueEventViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Error }
                 ensureAllEventsConsumed()
-            }
-            verify {
-                log.e(
-                    "ModifyRescueEventViewModel",
-                    "deleteCurrentImageFromLocalDataSource: failed to delete the image from the rescue event ${rescueEvent.id} in the local data source"
-                )
             }
         }
 
@@ -449,11 +438,20 @@ class ModifyRescueEventViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 assertTrue { awaitItem() is UiState.Success }
                 ensureAllEventsConsumed()
             }
-            verify {
-                log.d(
-                    "ModifyRescueEventViewModel",
-                    "uploadNewImageToRemoteDataSource: the download URI from the rescue event ${updatedRescueEvent.id} is blank"
-                )
+        }
+
+    @Test
+    fun `given my rescue event to modify_when I click to update my rescue event but fails retrieving the rescue event from the remote repo_then the rescue event is not updated`() =
+        runTest {
+            val modifyRescueEventViewmodel = getModifyRescueEventViewmodel()
+
+            modifyRescueEventViewmodel.saveRescueEventChanges(false, rescueEvent)
+
+            modifyRescueEventViewmodel.manageChangesUiState.test {
+                assertTrue { awaitItem() is UiState.Idle }
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Error }
+                ensureAllEventsConsumed()
             }
         }
 

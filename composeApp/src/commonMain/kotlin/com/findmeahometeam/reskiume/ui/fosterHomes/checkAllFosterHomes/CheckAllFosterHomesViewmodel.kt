@@ -228,11 +228,13 @@ class CheckAllFosterHomesViewmodel(
                             allFosterHomesFlow,
                             myUid,
                             viewModelScope
-                        )
-                        getAllFosterHomesByCountryAndCityFromLocalRepository(
-                            country,
-                            city
-                        )
+                        ).flatMapConcat {
+
+                            getAllFosterHomesByCountryAndCityFromLocalRepository(
+                                country,
+                                city
+                            )
+                        }
                     },
                     onCompletionUpdateCache = {
                         val allFosterHomesFlow: Flow<List<FosterHome>> =
@@ -244,11 +246,13 @@ class CheckAllFosterHomesViewmodel(
                             allFosterHomesFlow,
                             myUid,
                             viewModelScope
-                        )
-                        getAllFosterHomesByCountryAndCityFromLocalRepository(
-                            country,
-                            city
-                        )
+                        ).flatMapConcat {
+
+                            getAllFosterHomesByCountryAndCityFromLocalRepository(
+                                country,
+                                city
+                            )
+                        }
                     },
                     onVerifyCacheIsRecent = {
                         getAllFosterHomesByCountryAndCityFromLocalRepository(
@@ -313,13 +317,15 @@ class CheckAllFosterHomesViewmodel(
                             allFosterHomesFlow,
                             myUid,
                             viewModelScope
-                        )
-                        getAllFosterHomesByLocationFromLocalRepository(
-                            activistLongitude = activistLongitude,
-                            activistLatitude = activistLatitude,
-                            rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
-                            rangeLatitude = getRangeLat()
-                        )
+                        ).flatMapConcat {
+
+                            getAllFosterHomesByLocationFromLocalRepository(
+                                activistLongitude = activistLongitude,
+                                activistLatitude = activistLatitude,
+                                rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
+                                rangeLatitude = getRangeLat()
+                            )
+                        }
                     },
                     onCompletionUpdateCache = {
                         val allFosterHomesFlow: Flow<List<FosterHome>> =
@@ -333,13 +339,15 @@ class CheckAllFosterHomesViewmodel(
                             allFosterHomesFlow,
                             myUid,
                             viewModelScope
-                        )
-                        getAllFosterHomesByLocationFromLocalRepository(
-                            activistLongitude = activistLongitude,
-                            activistLatitude = activistLatitude,
-                            rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
-                            rangeLatitude = getRangeLat()
-                        )
+                        ).flatMapConcat {
+
+                            getAllFosterHomesByLocationFromLocalRepository(
+                                activistLongitude = activistLongitude,
+                                activistLatitude = activistLatitude,
+                                rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
+                                rangeLatitude = getRangeLat()
+                            )
+                        }
                     },
                     onVerifyCacheIsRecent = {
                         getAllFosterHomesByLocationFromLocalRepository(

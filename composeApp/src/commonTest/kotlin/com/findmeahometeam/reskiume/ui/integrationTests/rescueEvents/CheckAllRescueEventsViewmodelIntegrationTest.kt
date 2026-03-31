@@ -198,34 +198,7 @@ class CheckAllRescueEventsViewmodelIntegrationTest : CoroutineTestDispatcher() {
             val checkAllRescueEventsViewmodel = getCheckAllRescueEventsViewmodel(
                 fireStoreRemoteRescueEventRepository = FakeFireStoreRemoteRescueEventRepository(
                     remoteRescueEventList = mutableListOf(
-                        rescueEvent.copy(
-                            id = rescueEvent.id + "other",
-                            allNonHumanAnimalsToRescue = listOf(
-                                rescueEvent.allNonHumanAnimalsToRescue[0].copy(
-                                    rescueEventId = rescueEvent.id + "other",
-                                    nonHumanAnimalId = nonHumanAnimal.id + "other"
-                                ),
-                                rescueEvent.allNonHumanAnimalsToRescue[1].copy(
-                                    rescueEventId = rescueEvent.id + "other",
-                                    nonHumanAnimalId = nonHumanAnimal.id + "secondOther"
-                                )
-                            ),
-                            allNeedsToCover = listOf(
-                                rescueEvent.allNeedsToCover[0].copy(
-                                    rescueEventId = rescueEvent.id + "other",
-                                    needToCoverId = "${rescueEvent.allNeedsToCover[0].rescueNeed.name}567"
-                                ),
-                                rescueEvent.allNeedsToCover[1].copy(
-                                    rescueEventId = rescueEvent.id + "other",
-                                    needToCoverId = "${rescueEvent.allNeedsToCover[1].rescueNeed.name}890"
-                                )
-                            )
-                        ).toData()
-                    )
-                ),
-                localRescueEventRepository = FakeLocalRescueEventRepository(
-                    localRescueEventWithAllNeedsAndNonHumanAnimalDataList = mutableListOf(
-                        rescueEventWithAllNeedsAndNonHumanAnimalData
+                        rescueEvent.toData()
                     )
                 )
             )
@@ -240,7 +213,10 @@ class CheckAllRescueEventsViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     UiState.Success(
                         listOf(
                             UiRescueEvent(
-                                rescueEvent,
+                                rescueEvent.copy(
+                                    savedBy = rescueEvent.creatorId,
+                                    imageUrl = "${rescueEvent.creatorId}${rescueEvent.id}.webp"
+                                ),
                                 listOf(
                                     nonHumanAnimal,
                                     nonHumanAnimal.copy(id = nonHumanAnimal.id + "second")
@@ -260,39 +236,7 @@ class CheckAllRescueEventsViewmodelIntegrationTest : CoroutineTestDispatcher() {
             val checkAllRescueEventsViewmodel = getCheckAllRescueEventsViewmodel(
                 fireStoreRemoteRescueEventRepository = FakeFireStoreRemoteRescueEventRepository(
                     remoteRescueEventList = mutableListOf(
-                        rescueEvent.copy(
-                            id = rescueEvent.id + "other",
-                            imageUrl = "",
-                            allNonHumanAnimalsToRescue = listOf(
-                                rescueEvent.allNonHumanAnimalsToRescue[0].copy(
-                                    rescueEventId = rescueEvent.id + "other",
-                                    nonHumanAnimalId = nonHumanAnimal.id + "other"
-                                ),
-                                rescueEvent.allNonHumanAnimalsToRescue[1].copy(
-                                    rescueEventId = rescueEvent.id + "other",
-                                    nonHumanAnimalId = nonHumanAnimal.id + "secondOther"
-                                )
-                            ),
-                            allNeedsToCover = listOf(
-                                rescueEvent.allNeedsToCover[0].copy(
-                                    rescueEventId = rescueEvent.id + "other",
-                                    needToCoverId = "${rescueEvent.allNeedsToCover[0].rescueNeed.name}567"
-                                ),
-                                rescueEvent.allNeedsToCover[1].copy(
-                                    rescueEventId = rescueEvent.id + "other",
-                                    needToCoverId = "${rescueEvent.allNeedsToCover[1].rescueNeed.name}890"
-                                )
-                            )
-                        ).toData()
-                    )
-                ),
-                localRescueEventRepository = FakeLocalRescueEventRepository(
-                    localRescueEventWithAllNeedsAndNonHumanAnimalDataList = mutableListOf(
-                        rescueEventWithAllNeedsAndNonHumanAnimalData.copy(
-                            rescueEventEntity = rescueEvent.copy(
-                                imageUrl = ""
-                            ).toEntity()
-                        )
+                        rescueEvent.copy(imageUrl = "").toData()
                     )
                 )
             )
@@ -307,7 +251,10 @@ class CheckAllRescueEventsViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     UiState.Success(
                         listOf(
                             UiRescueEvent(
-                                rescueEvent.copy(imageUrl = ""),
+                                rescueEvent.copy(
+                                    savedBy = rescueEvent.creatorId,
+                                    imageUrl = ""
+                                ),
                                 listOf(
                                     nonHumanAnimal,
                                     nonHumanAnimal.copy(id = nonHumanAnimal.id + "second")
@@ -327,40 +274,13 @@ class CheckAllRescueEventsViewmodelIntegrationTest : CoroutineTestDispatcher() {
             val checkAllRescueEventsViewmodel = getCheckAllRescueEventsViewmodel(
                 fireStoreRemoteRescueEventRepository = FakeFireStoreRemoteRescueEventRepository(
                     remoteRescueEventList = mutableListOf(
-                        rescueEvent.copy(
-                            id = rescueEvent.id + "other",
-                            allNonHumanAnimalsToRescue = listOf(
-                                rescueEvent.allNonHumanAnimalsToRescue[0].copy(
-                                    rescueEventId = rescueEvent.id + "other",
-                                    nonHumanAnimalId = nonHumanAnimal.id + "other"
-                                ),
-                                rescueEvent.allNonHumanAnimalsToRescue[1].copy(
-                                    rescueEventId = rescueEvent.id + "other",
-                                    nonHumanAnimalId = nonHumanAnimal.id + "secondOther"
-                                )
-                            ),
-                            allNeedsToCover = listOf(
-                                rescueEvent.allNeedsToCover[0].copy(
-                                    rescueEventId = rescueEvent.id + "other",
-                                    needToCoverId = "${rescueEvent.allNeedsToCover[0].rescueNeed.name}567"
-                                ),
-                                rescueEvent.allNeedsToCover[1].copy(
-                                    rescueEventId = rescueEvent.id + "other",
-                                    needToCoverId = "${rescueEvent.allNeedsToCover[1].rescueNeed.name}890"
-                                )
-                            )
-                        ).toData()
-                    )
-                ),
-                localRescueEventRepository = FakeLocalRescueEventRepository(
-                    localRescueEventWithAllNeedsAndNonHumanAnimalDataList = mutableListOf(
-                        rescueEventWithAllNeedsAndNonHumanAnimalData
+                        rescueEvent.toData()
                     )
                 ),
                 localCacheRepository = FakeLocalCacheRepository(
                     localCacheList = mutableListOf(
                         localCache.copy(
-                            cachedObjectId = rescueEvent.id + "other",
+                            cachedObjectId = rescueEvent.id,
                             section = Section.RESCUE_EVENTS
                         ).toEntity()
                     )
@@ -377,7 +297,10 @@ class CheckAllRescueEventsViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     UiState.Success(
                         listOf(
                             UiRescueEvent(
-                                rescueEvent,
+                                rescueEvent.copy(
+                                    savedBy = rescueEvent.creatorId,
+                                    imageUrl = "${rescueEvent.creatorId}${rescueEvent.id}.webp"
+                                ),
                                 listOf(
                                     nonHumanAnimal,
                                     nonHumanAnimal.copy(id = nonHumanAnimal.id + "second")
@@ -396,7 +319,19 @@ class CheckAllRescueEventsViewmodelIntegrationTest : CoroutineTestDispatcher() {
         runTest {
             val checkAllRescueEventsViewmodel = getCheckAllRescueEventsViewmodel(
                 fireStoreRemoteRescueEventRepository = FakeFireStoreRemoteRescueEventRepository(
-                    remoteRescueEventList = mutableListOf(rescueEvent.toData())
+                    remoteRescueEventList = mutableListOf(
+                        rescueEvent.copy(
+                            allNonHumanAnimalsToRescue = rescueEvent.allNonHumanAnimalsToRescue + listOf(
+                                rescueEvent.allNonHumanAnimalsToRescue[0].copy(
+                                    nonHumanAnimalId = nonHumanAnimal.id + "other"
+                                ),
+                                rescueEvent.allNonHumanAnimalsToRescue[1].copy(
+                                    nonHumanAnimalId = nonHumanAnimal.id + "secondOther"
+                                )
+                            ),
+                            allNeedsToCover = listOf(rescueEvent.allNeedsToCover[0])
+                        ).toData()
+                    )
                 ),
                 localRescueEventRepository = FakeLocalRescueEventRepository(
                     localRescueEventWithAllNeedsAndNonHumanAnimalDataList = mutableListOf(
@@ -429,10 +364,24 @@ class CheckAllRescueEventsViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     UiState.Success(
                         listOf(
                             UiRescueEvent(
-                                rescueEvent,
+                                rescueEvent.copy(
+                                    savedBy = rescueEvent.creatorId,
+                                    imageUrl = "${rescueEvent.creatorId}${rescueEvent.id}.webp",
+                                    allNonHumanAnimalsToRescue = rescueEvent.allNonHumanAnimalsToRescue + listOf(
+                                        rescueEvent.allNonHumanAnimalsToRescue[0].copy(
+                                            nonHumanAnimalId = nonHumanAnimal.id + "other"
+                                        ),
+                                        rescueEvent.allNonHumanAnimalsToRescue[1].copy(
+                                            nonHumanAnimalId = nonHumanAnimal.id + "secondOther"
+                                        )
+                                    ),
+                                    allNeedsToCover = listOf(rescueEvent.allNeedsToCover[0])
+                                ),
                                 listOf(
                                     nonHumanAnimal,
-                                    nonHumanAnimal.copy(id = nonHumanAnimal.id + "second")
+                                    nonHumanAnimal.copy(id = nonHumanAnimal.id + "second"),
+                                    nonHumanAnimal.copy(id = nonHumanAnimal.id + "other"),
+                                    nonHumanAnimal.copy(id = nonHumanAnimal.id + "secondOther")
                                 )
                             )
                         )
@@ -448,13 +397,27 @@ class CheckAllRescueEventsViewmodelIntegrationTest : CoroutineTestDispatcher() {
         runTest {
             val checkAllRescueEventsViewmodel = getCheckAllRescueEventsViewmodel(
                 fireStoreRemoteRescueEventRepository = FakeFireStoreRemoteRescueEventRepository(
-                    remoteRescueEventList = mutableListOf(rescueEvent.copy(imageUrl = "").toData())
+
+                    remoteRescueEventList = mutableListOf(
+                        rescueEvent.copy(
+                            imageUrl = "",
+                            allNonHumanAnimalsToRescue = rescueEvent.allNonHumanAnimalsToRescue + listOf(
+                                rescueEvent.allNonHumanAnimalsToRescue[0].copy(
+                                    nonHumanAnimalId = nonHumanAnimal.id + "other"
+                                ),
+                                rescueEvent.allNonHumanAnimalsToRescue[1].copy(
+                                    nonHumanAnimalId = nonHumanAnimal.id + "secondOther"
+                                )
+                            )
+                        ).toData()
+                    )
                 ),
                 localRescueEventRepository = FakeLocalRescueEventRepository(
                     localRescueEventWithAllNeedsAndNonHumanAnimalDataList = mutableListOf(
                         rescueEventWithAllNeedsAndNonHumanAnimalData.copy(
                             rescueEventEntity = rescueEvent.copy(
-                                imageUrl = ""
+                                imageUrl = "",
+                                allNeedsToCover = emptyList()
                             ).toEntity()
                         )
                     )
@@ -485,10 +448,23 @@ class CheckAllRescueEventsViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     UiState.Success(
                         listOf(
                             UiRescueEvent(
-                                rescueEvent.copy(imageUrl = ""),
+                                rescueEvent.copy(
+                                    imageUrl = "",
+                                    savedBy = rescueEvent.creatorId,
+                                    allNonHumanAnimalsToRescue = rescueEvent.allNonHumanAnimalsToRescue + listOf(
+                                        rescueEvent.allNonHumanAnimalsToRescue[0].copy(
+                                            nonHumanAnimalId = nonHumanAnimal.id + "other"
+                                        ),
+                                        rescueEvent.allNonHumanAnimalsToRescue[1].copy(
+                                            nonHumanAnimalId = nonHumanAnimal.id + "secondOther"
+                                        )
+                                    )
+                                ),
                                 listOf(
                                     nonHumanAnimal,
-                                    nonHumanAnimal.copy(id = nonHumanAnimal.id + "second")
+                                    nonHumanAnimal.copy(id = nonHumanAnimal.id + "second"),
+                                    nonHumanAnimal.copy(id = nonHumanAnimal.id + "other"),
+                                    nonHumanAnimal.copy(id = nonHumanAnimal.id + "secondOther")
                                 )
                             )
                         )
@@ -552,34 +528,7 @@ class CheckAllRescueEventsViewmodelIntegrationTest : CoroutineTestDispatcher() {
             val checkAllRescueEventsViewmodel = getCheckAllRescueEventsViewmodel(
                 fireStoreRemoteRescueEventRepository = FakeFireStoreRemoteRescueEventRepository(
                     remoteRescueEventList = mutableListOf(
-                        rescueEvent.copy(
-                            id = rescueEvent.id + "other",
-                            allNonHumanAnimalsToRescue = listOf(
-                                rescueEvent.allNonHumanAnimalsToRescue[0].copy(
-                                    rescueEventId = rescueEvent.id + "other",
-                                    nonHumanAnimalId = nonHumanAnimal.id + "other"
-                                ),
-                                rescueEvent.allNonHumanAnimalsToRescue[1].copy(
-                                    rescueEventId = rescueEvent.id + "other",
-                                    nonHumanAnimalId = nonHumanAnimal.id + "secondOther"
-                                )
-                            ),
-                            allNeedsToCover = listOf(
-                                rescueEvent.allNeedsToCover[0].copy(
-                                    rescueEventId = rescueEvent.id + "other",
-                                    needToCoverId = "${rescueEvent.allNeedsToCover[0].rescueNeed.name}567"
-                                ),
-                                rescueEvent.allNeedsToCover[1].copy(
-                                    rescueEventId = rescueEvent.id + "other",
-                                    needToCoverId = "${rescueEvent.allNeedsToCover[1].rescueNeed.name}890"
-                                )
-                            )
-                        ).toData()
-                    )
-                ),
-                localRescueEventRepository = FakeLocalRescueEventRepository(
-                    localRescueEventWithAllNeedsAndNonHumanAnimalDataList = mutableListOf(
-                        rescueEventWithAllNeedsAndNonHumanAnimalData
+                        rescueEvent.toData()
                     )
                 )
             )
@@ -592,7 +541,10 @@ class CheckAllRescueEventsViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     UiState.Success(
                         listOf(
                             UiRescueEvent(
-                                rescueEvent,
+                                rescueEvent.copy(
+                                    savedBy = rescueEvent.creatorId,
+                                    imageUrl = "${rescueEvent.creatorId}${rescueEvent.id}.webp"
+                                ),
                                 listOf(
                                     nonHumanAnimal,
                                     nonHumanAnimal.copy(id = nonHumanAnimal.id + "second")
@@ -633,7 +585,19 @@ class CheckAllRescueEventsViewmodelIntegrationTest : CoroutineTestDispatcher() {
         runTest {
             val checkAllRescueEventsViewmodel = getCheckAllRescueEventsViewmodel(
                 fireStoreRemoteRescueEventRepository = FakeFireStoreRemoteRescueEventRepository(
-                    remoteRescueEventList = mutableListOf(rescueEvent.toData())
+                    remoteRescueEventList = mutableListOf(
+                        rescueEvent.copy(
+                            allNonHumanAnimalsToRescue = rescueEvent.allNonHumanAnimalsToRescue + listOf(
+                                rescueEvent.allNonHumanAnimalsToRescue[0].copy(
+                                    nonHumanAnimalId = nonHumanAnimal.id + "other"
+                                ),
+                                rescueEvent.allNonHumanAnimalsToRescue[1].copy(
+                                    nonHumanAnimalId = nonHumanAnimal.id + "secondOther"
+                                )
+                            ),
+                            allNeedsToCover = emptyList()
+                        ).toData()
+                    )
                 ),
                 localRescueEventRepository = FakeLocalRescueEventRepository(
                     localRescueEventWithAllNeedsAndNonHumanAnimalDataList = mutableListOf(
@@ -664,10 +628,23 @@ class CheckAllRescueEventsViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     UiState.Success(
                         listOf(
                             UiRescueEvent(
-                                rescueEvent,
+                                rescueEvent.copy(
+                                    savedBy = rescueEvent.creatorId,
+                                    imageUrl = "${rescueEvent.creatorId}${rescueEvent.id}.webp",
+                                    allNonHumanAnimalsToRescue = rescueEvent.allNonHumanAnimalsToRescue + listOf(
+                                        rescueEvent.allNonHumanAnimalsToRescue[0].copy(
+                                            nonHumanAnimalId = nonHumanAnimal.id + "other"
+                                        ),
+                                        rescueEvent.allNonHumanAnimalsToRescue[1].copy(
+                                            nonHumanAnimalId = nonHumanAnimal.id + "secondOther"
+                                        )
+                                    ), allNeedsToCover = emptyList()
+                                ),
                                 listOf(
                                     nonHumanAnimal,
-                                    nonHumanAnimal.copy(id = nonHumanAnimal.id + "second")
+                                    nonHumanAnimal.copy(id = nonHumanAnimal.id + "second"),
+                                    nonHumanAnimal.copy(id = nonHumanAnimal.id + "other"),
+                                    nonHumanAnimal.copy(id = nonHumanAnimal.id + "secondOther")
                                 ),
                                 22.1
                             )

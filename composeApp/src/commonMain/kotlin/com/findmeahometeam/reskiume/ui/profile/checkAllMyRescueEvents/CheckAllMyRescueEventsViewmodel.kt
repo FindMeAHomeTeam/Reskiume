@@ -54,7 +54,6 @@ class CheckAllMyRescueEventsViewmodel(
                             myUid,
                             viewModelScope
                         )
-                        getAllMyRescueEventsFromLocalRepository(myUid)
                     },
                     onCompletionUpdateCache = {
                         val allRescueEventsFlow: Flow<List<RescueEvent>> =
@@ -65,7 +64,6 @@ class CheckAllMyRescueEventsViewmodel(
                             myUid,
                             viewModelScope
                         )
-                        getAllMyRescueEventsFromLocalRepository(myUid)
                     },
                     onVerifyCacheIsRecent = {
                         getAllMyRescueEventsFromLocalRepository(myUid)

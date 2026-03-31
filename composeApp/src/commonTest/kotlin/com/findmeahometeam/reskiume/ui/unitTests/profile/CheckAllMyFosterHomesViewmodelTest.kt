@@ -254,7 +254,7 @@ class CheckAllMyFosterHomesViewmodelTest : CoroutineTestDispatcher() {
                     user.uid,
                     any()
                 )
-            } returns Unit
+            } returns flowOf(listOf(fosterHome))
         }
 
         val manageImagePath: ManageImagePath = mock {

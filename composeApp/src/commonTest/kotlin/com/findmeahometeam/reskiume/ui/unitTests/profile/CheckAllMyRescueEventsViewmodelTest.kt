@@ -276,7 +276,7 @@ class CheckAllMyRescueEventsViewmodelTest : CoroutineTestDispatcher() {
                     user.uid,
                     any()
                 )
-            } returns Unit
+            } returns flowOf(listOf(rescueEvent))
         }
 
         val manageImagePath: ManageImagePath = mock {

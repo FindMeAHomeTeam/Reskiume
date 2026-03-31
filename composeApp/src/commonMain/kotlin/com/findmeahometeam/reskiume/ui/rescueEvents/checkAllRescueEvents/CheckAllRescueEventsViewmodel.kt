@@ -217,11 +217,13 @@ class CheckAllRescueEventsViewmodel(
                             allRescueEventsFlow,
                             myUid,
                             viewModelScope
-                        )
-                        getAllRescueEventsByCountryAndCityFromLocalRepository(
-                            country,
-                            city
-                        )
+                        ).flatMapConcat {
+
+                            getAllRescueEventsByCountryAndCityFromLocalRepository(
+                                country,
+                                city
+                            )
+                        }
                     },
                     onCompletionUpdateCache = {
                         val allRescueEventsFlow: Flow<List<RescueEvent>> =
@@ -233,11 +235,13 @@ class CheckAllRescueEventsViewmodel(
                             allRescueEventsFlow,
                             myUid,
                             viewModelScope
-                        )
-                        getAllRescueEventsByCountryAndCityFromLocalRepository(
-                            country,
-                            city
-                        )
+                        ).flatMapConcat {
+
+                            getAllRescueEventsByCountryAndCityFromLocalRepository(
+                                country,
+                                city
+                            )
+                        }
                     },
                     onVerifyCacheIsRecent = {
                         getAllRescueEventsByCountryAndCityFromLocalRepository(
@@ -291,13 +295,15 @@ class CheckAllRescueEventsViewmodel(
                             allRescueEventsFlow,
                             myUid,
                             viewModelScope
-                        )
-                        getAllRescueEventsByLocationFromLocalRepository(
-                            activistLongitude = activistLongitude,
-                            activistLatitude = activistLatitude,
-                            rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
-                            rangeLatitude = getRangeLat()
-                        )
+                        ).flatMapConcat {
+
+                            getAllRescueEventsByLocationFromLocalRepository(
+                                activistLongitude = activistLongitude,
+                                activistLatitude = activistLatitude,
+                                rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
+                                rangeLatitude = getRangeLat()
+                            )
+                        }
                     },
                     onCompletionUpdateCache = {
                         val allRescueEventsFlow: Flow<List<RescueEvent>> =
@@ -311,13 +317,15 @@ class CheckAllRescueEventsViewmodel(
                             allRescueEventsFlow,
                             myUid,
                             viewModelScope
-                        )
-                        getAllRescueEventsByLocationFromLocalRepository(
-                            activistLongitude = activistLongitude,
-                            activistLatitude = activistLatitude,
-                            rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
-                            rangeLatitude = getRangeLat()
-                        )
+                        ).flatMapConcat {
+
+                            getAllRescueEventsByLocationFromLocalRepository(
+                                activistLongitude = activistLongitude,
+                                activistLatitude = activistLatitude,
+                                rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
+                                rangeLatitude = getRangeLat()
+                            )
+                        }
                     },
                     onVerifyCacheIsRecent = {
                         getAllRescueEventsByLocationFromLocalRepository(

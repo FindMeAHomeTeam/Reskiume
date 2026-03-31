@@ -1,5 +1,6 @@
 package com.findmeahometeam.reskiume.ui.integrationTests.profile
 
+import app.cash.turbine.test
 import com.findmeahometeam.reskiume.CoroutineTestDispatcher
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
@@ -35,6 +36,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class CheckAllMyRescueEventsUtilIntegrationTest : CoroutineTestDispatcher() {
@@ -115,7 +117,13 @@ class CheckAllMyRescueEventsUtilIntegrationTest : CoroutineTestDispatcher() {
                 flowOf(listOf(rescueEvent)),
                 user.uid,
                 this
-            )
+            ).test {
+                assertEquals(
+                    listOf(rescueEvent.copy(imageUrl = "${rescueEvent.creatorId}${rescueEvent.id}.webp")),
+                    awaitItem()
+                )
+                awaitComplete()
+            }
 
             runCurrent()
 
@@ -156,7 +164,13 @@ class CheckAllMyRescueEventsUtilIntegrationTest : CoroutineTestDispatcher() {
                 flowOf(listOf(rescueEvent.copy(imageUrl = ""))),
                 user.uid,
                 this
-            )
+            ).test {
+                assertEquals(
+                    listOf(rescueEvent.copy(imageUrl = "")),
+                    awaitItem()
+                )
+                awaitComplete()
+            }
 
             runCurrent()
 
@@ -191,7 +205,13 @@ class CheckAllMyRescueEventsUtilIntegrationTest : CoroutineTestDispatcher() {
                 flowOf(listOf(rescueEvent)),
                 user.uid,
                 this
-            )
+            ).test {
+                assertEquals(
+                    listOf(rescueEvent.copy(imageUrl = "${rescueEvent.creatorId}${rescueEvent.id}.webp")),
+                    awaitItem()
+                )
+                awaitComplete()
+            }
 
             runCurrent()
 

@@ -1,5 +1,6 @@
 package com.findmeahometeam.reskiume.ui.unitTests.profile
 
+import app.cash.turbine.test
 import com.findmeahometeam.reskiume.CoroutineTestDispatcher
 import com.findmeahometeam.reskiume.authUser
 import com.findmeahometeam.reskiume.data.database.entity.LocalCacheEntity
@@ -42,6 +43,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class CheckAllMyRescueEventsUtilTest : CoroutineTestDispatcher() {
 
@@ -441,7 +443,10 @@ class CheckAllMyRescueEventsUtilTest : CoroutineTestDispatcher() {
                 flowOf(listOf(rescueEvent)),
                 user.uid,
                 this
-            )
+            ).test {
+                assertEquals(listOf(rescueEvent), awaitItem())
+                awaitComplete()
+            }
 
             runCurrent()
 
@@ -468,7 +473,10 @@ class CheckAllMyRescueEventsUtilTest : CoroutineTestDispatcher() {
                 flowOf(listOf(rescueEvent)),
                 user.uid,
                 this
-            )
+            ).test {
+                assertEquals(listOf(rescueEvent), awaitItem())
+                awaitComplete()
+            }
 
             runCurrent()
 
@@ -492,7 +500,10 @@ class CheckAllMyRescueEventsUtilTest : CoroutineTestDispatcher() {
                 flowOf(listOf(rescueEvent.copy(imageUrl = ""))),
                 user.uid,
                 this
-            )
+            ).test {
+                assertEquals(listOf(rescueEvent.copy(imageUrl = "")), awaitItem())
+                awaitComplete()
+            }
 
             runCurrent()
 
@@ -516,7 +527,10 @@ class CheckAllMyRescueEventsUtilTest : CoroutineTestDispatcher() {
                 flowOf(listOf(rescueEvent)),
                 user.uid,
                 this
-            )
+            ).test {
+                assertEquals(listOf(rescueEvent), awaitItem())
+                awaitComplete()
+            }
 
             runCurrent()
 
@@ -542,7 +556,10 @@ class CheckAllMyRescueEventsUtilTest : CoroutineTestDispatcher() {
                 flowOf(listOf(rescueEvent)),
                 user.uid,
                 this
-            )
+            ).test {
+                assertEquals(listOf(rescueEvent), awaitItem())
+                awaitComplete()
+            }
 
             runCurrent()
 
@@ -565,7 +582,10 @@ class CheckAllMyRescueEventsUtilTest : CoroutineTestDispatcher() {
                 flowOf(listOf(rescueEvent.copy(imageUrl = ""))),
                 user.uid,
                 this
-            )
+            ).test {
+                assertEquals(listOf(rescueEvent.copy(imageUrl = "")), awaitItem())
+                awaitComplete()
+            }
 
             runCurrent()
 

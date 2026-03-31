@@ -53,7 +53,6 @@ class CheckAllMyFosterHomesViewmodel(
                             myUid,
                             viewModelScope
                         )
-                        getAllMyFosterHomesFromLocalRepository(myUid)
                     },
                     onCompletionUpdateCache = {
                         val allFosterHomesFlow: Flow<List<FosterHome>> =
@@ -65,7 +64,6 @@ class CheckAllMyFosterHomesViewmodel(
                             myUid,
                             viewModelScope
                         )
-                        getAllMyFosterHomesFromLocalRepository(myUid)
                     },
                     onVerifyCacheIsRecent = {
                         getAllMyFosterHomesFromLocalRepository(myUid)

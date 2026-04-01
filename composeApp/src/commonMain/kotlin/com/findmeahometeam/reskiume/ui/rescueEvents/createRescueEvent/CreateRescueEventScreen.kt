@@ -139,8 +139,8 @@ fun CreateRescueEventScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
             RmCountryAndCitySelectors(
-                placeUtil,
-                selectedCountry,
+                placeUtil = placeUtil,
+                selectedCountry = selectedCountry,
                 onSelectedCountry = {
                     selectedCountry = it
                 },

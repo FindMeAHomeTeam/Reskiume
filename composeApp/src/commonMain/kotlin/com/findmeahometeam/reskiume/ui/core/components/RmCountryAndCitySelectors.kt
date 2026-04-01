@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.findmeahometeam.reskiume.domain.model.fosterHome.City
 import com.findmeahometeam.reskiume.domain.model.fosterHome.Country
+import com.findmeahometeam.reskiume.domain.model.fosterHome.toStringResource
 import com.findmeahometeam.reskiume.ui.fosterHomes.checkAllFosterHomes.PlaceUtil
 import org.jetbrains.compose.resources.stringResource
 import reskiume.composeapp.generated.resources.Res
@@ -29,15 +30,24 @@ import reskiume.composeapp.generated.resources.country_city_selector_country
 fun RmCountryAndCitySelectors(
     placeUtil: PlaceUtil,
     selectedCountry: Country,
+    selectedCity: City = City.UNSELECTED,
     onSelectedCountry: (country: Country) -> Unit = {},
     onSelectedCity: (city: City) -> Unit = {}
 ) {
     var isCountryVisible: Boolean by rememberSaveable { mutableStateOf(true) }
-    val countryFieldState = rememberTextFieldState()
+    val countryFieldState = rememberTextFieldState(if (selectedCountry == Country.UNSELECTED) {
+        ""
+    } else {
+        stringResource(selectedCountry.toStringResource())
+    })
     val countryItems: List<Pair<Country, String>> by placeUtil.allCountryItems()
         .collectAsState(initial = emptyList())
-    var isCityVisible: Boolean by rememberSaveable { mutableStateOf(false) }
-    val cityFieldState = rememberTextFieldState()
+    var isCityVisible: Boolean by rememberSaveable { mutableStateOf(selectedCity != City.UNSELECTED) }
+    val cityFieldState = rememberTextFieldState(if (selectedCity == City.UNSELECTED) {
+        ""
+    } else {
+        stringResource(selectedCity.toStringResource())
+    })
     val cityItems: List<Pair<City, String>> by placeUtil.allCityItems(
         selectedCountry
     ).collectAsState(initial = emptyList())

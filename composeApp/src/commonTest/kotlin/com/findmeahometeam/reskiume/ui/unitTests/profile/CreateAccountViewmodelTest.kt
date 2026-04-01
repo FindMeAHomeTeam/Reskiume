@@ -57,8 +57,8 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
     private val onInsertUserInLocal = Capture.slot<(Long) -> Unit>()
 
     private val log: Log = mock {
-        every { d(any(), any()) } returns Unit
-        every { e(any(), any()) } returns Unit
+        every { d(any(), any()) } calls { println(it) }
+        every { e(any(), any()) } calls { println(it) }
     }
 
     private fun getCreateAccountViewmodel(
@@ -66,7 +66,7 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
         onDeleteUserErrorArg: String = "",
         onImageUploadedArg: String = user.image,
         onImageDeletedArg: Boolean = true,
-        rowIdInsertedCacheArg : Long = 1L,
+        rowIdInsertedCacheArg: Long = 1L,
         insertRemoteUserArg: DatabaseResult = DatabaseResult.Success,
         deleteRemoteUserArg: DatabaseResult = DatabaseResult.Success,
         onInsertUserArg: Long = 1L
@@ -189,12 +189,17 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
     fun `given an unregistered user_when that user creates an account using email_then the account is created`() =
         runTest {
             val createAccountViewmodel = getCreateAccountViewmodel()
-            createAccountViewmodel.createUserUsingEmailAndPwd(user, userPwd)
+            createAccountViewmodel.saveUserChanges(user, userPwd)
             createAccountViewmodel.state.test {
-                assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Success }
                 ensureAllEventsConsumed()
+            }
+            verify {
+                log.d(
+                    "CreateAccountViewmodel",
+                    "saveUserCacheLocally: user ${user.uid} added to the local cache in section ${Section.USERS}"
+                )
             }
         }
 
@@ -204,50 +209,84 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
             val createAccountViewmodel = getCreateAccountViewmodel(
                 createUserWithEmailAndPasswordResult = AuthResult.Error("error"),
             )
-            createAccountViewmodel.createUserUsingEmailAndPwd(user, userPwd)
+            createAccountViewmodel.saveUserChanges(user, userPwd)
             createAccountViewmodel.state.test {
-                assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Error }
                 ensureAllEventsConsumed()
             }
+            verify {
+                log.e(
+                    "CreateAccountViewmodel",
+                    "createAuthUserUsingEmailAndPwd: auth user not created in the auth repository - error"
+                )
+            }
         }
 
     @Test
-    fun `given an unregistered user_when that user creates an account using email but there is an error storing user data and deleting their avatar in the remote data sources_then the app displays an error`() =
+    fun `given an unregistered user_when that user creates an account using email but there is an error deleting the user avatar in the remote data source_then the account is created`() =
         runTest {
             val createAccountViewmodel = getCreateAccountViewmodel(
-                onImageUploadedArg = "",
-                insertRemoteUserArg = DatabaseResult.Error("error"),
-                onImageDeletedArg = false
+                onImageUploadedArg = ""
             )
-            createAccountViewmodel.createUserUsingEmailAndPwd(user, userPwd)
+            createAccountViewmodel.saveUserChanges(user, userPwd)
             createAccountViewmodel.state.test {
-                assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
-                assertTrue { awaitItem() is UiState.Error }
+                assertTrue { awaitItem() is UiState.Success }
                 ensureAllEventsConsumed()
+            }
+            verify {
+                log.d(
+                    "CreateAccountViewmodel",
+                    "uploadImageToRemoteRepo: Download URI is blank"
+                )
             }
         }
 
     @Test
-    fun `given an unregistered user_when that user creates an account using email but there is an error storing user data and deleting their data in the remote data sources_then the app displays an error`() =
+    fun `given an unregistered user_when that user creates an account using email but there is an error storing user data in the remote data source_then the app displays an error`() =
         runTest {
             val createAccountViewmodel = getCreateAccountViewmodel(
-                onImageUploadedArg = "",
+                insertRemoteUserArg = DatabaseResult.Error("error")
+            )
+            createAccountViewmodel.saveUserChanges(user, userPwd)
+            createAccountViewmodel.state.test {
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Error }
+                ensureAllEventsConsumed()
+            }
+            verify {
+                log.e(
+                    "CreateAccountViewmodel",
+                    "deleteAccountFromAuthDataSource: deleted account from the auth repository - error"
+                )
+            }
+        }
+
+    @Test
+    fun `given an unregistered user_when that user creates an account using email but there is an error storing user data and deleting their data in the remote data source_then the app displays an error`() =
+        runTest {
+            val createAccountViewmodel = getCreateAccountViewmodel(
                 insertRemoteUserArg = DatabaseResult.Error("error"),
-                onImageDeletedArg = false,
                 onDeleteUserErrorArg = "error"
             )
-            createAccountViewmodel.createUserUsingEmailAndPwd(user, userPwd)
+            createAccountViewmodel.saveUserChanges(user, userPwd)
             createAccountViewmodel.state.test {
-                assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Error }
                 ensureAllEventsConsumed()
             }
+            verify {
+                log.e(
+                    "CreateAccountViewmodel",
+                    "saveUserToRemoteRepo: failed to save the user ${user.uid} in the remote repository"
+                )
+                log.e(
+                    "CreateAccountViewmodel",
+                    "deleteAccountFromAuthDataSource: failed to delete account from the auth repository - error - error"
+                )
+            }
         }
-
 
     @Test
     fun `given an unregistered user_when that user creates an account using email but there is an error storing that user in the local datasource_then the app displays an error`() =
@@ -255,28 +294,42 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
             val createAccountViewmodel = getCreateAccountViewmodel(
                 onInsertUserArg = 0
             )
-            createAccountViewmodel.createUserUsingEmailAndPwd(user, userPwd)
+            createAccountViewmodel.saveUserChanges(user, userPwd)
             createAccountViewmodel.state.test {
-                assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Error }
                 ensureAllEventsConsumed()
             }
+            verify {
+                log.e(
+                    "CreateAccountViewmodel",
+                    "insertUserInLocalRepo: failed to create the user ${user.uid} in the local repository"
+                )
+            }
         }
 
     @Test
-    fun `given an unregistered user_when that user creates an account using email but there is an error storing that user in the local datasource and deleting their data in the remote datasource_then the app displays an error`() =
+    fun `given an unregistered user_when that user creates an account using email but there is an error storing the user in the local repo and deleting their data in the remote repo_then the app displays an error`() =
         runTest {
             val createAccountViewmodel = getCreateAccountViewmodel(
                 onInsertUserArg = 0,
                 deleteRemoteUserArg = DatabaseResult.Error("error")
             )
-            createAccountViewmodel.createUserUsingEmailAndPwd(user, userPwd)
+            createAccountViewmodel.saveUserChanges(user, userPwd)
             createAccountViewmodel.state.test {
-                assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Error }
                 ensureAllEventsConsumed()
+            }
+            verify {
+                log.e(
+                    "CreateAccountViewmodel",
+                    "insertUserInLocalRepo: failed to create the user ${user.uid} in the local repository"
+                )
+                log.e(
+                    "CreateAccountViewmodel",
+                    "deleteAccountFromRemoteDataSource: failed to delete the user ${user.uid} in the remote repository - error"
+                )
             }
         }
 
@@ -287,10 +340,9 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
             val createAccountViewmodel = getCreateAccountViewmodel(
                 rowIdInsertedCacheArg = 0
             )
-            createAccountViewmodel.createUserUsingEmailAndPwd(user, userPwd)
+            createAccountViewmodel.saveUserChanges(user, userPwd)
 
             createAccountViewmodel.state.test {
-                assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
                 ensureAllEventsConsumed()
             }
@@ -299,7 +351,7 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
             verify {
                 log.e(
                     "CreateAccountViewmodel",
-                    "Error adding ${user.uid} to local cache in section ${Section.USERS}"
+                    "saveUserCacheLocally: Error adding the user ${user.uid} to the local cache in section ${Section.USERS}"
                 )
             }
         }

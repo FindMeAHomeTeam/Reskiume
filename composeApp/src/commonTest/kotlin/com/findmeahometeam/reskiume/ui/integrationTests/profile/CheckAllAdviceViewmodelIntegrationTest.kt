@@ -217,7 +217,11 @@ class CheckAllAdviceViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 localUserRepository = FakeLocalUserRepository(mutableListOf(user))
             )
             checkAllAdviceViewmodel.retrieveAdviceAuthor(user.uid) { actualUser ->
-                assertEquals(user.copy(savedBy = "", email = null), actualUser)
+                assertEquals(user.copy(
+                    savedBy = "",
+                    email = null,
+                    isLoggedIn = false
+                ), actualUser)
             }
         }
 

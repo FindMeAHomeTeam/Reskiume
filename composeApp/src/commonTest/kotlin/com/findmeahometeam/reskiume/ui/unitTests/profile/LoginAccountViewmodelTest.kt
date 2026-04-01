@@ -17,6 +17,7 @@ import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepo
 import com.findmeahometeam.reskiume.domain.usecases.authUser.SignInWithEmailAndPasswordFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInLocalDataSource
@@ -106,6 +107,10 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
 
         val localUserRepository: LocalUserRepository = mock {
 
+            everySuspend {
+                getUser(user.uid)
+            } returns user
+
             everySuspend { insertUser(any(), capture(onInsertUserInLocal)) } calls {
                 onInsertUserInLocal.get().invoke(rowIdInsertedUserArg)
             }
@@ -139,8 +144,8 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
         }
 
         val log: Log = mock {
-            every { d(any(), any()) } returns Unit
-            every { e(any(), any()) } returns Unit
+            every { d(any(), any()) } calls { println(it) }
+            every { e(any(), any()) } calls { println(it) }
         }
 
         val konnectivity: Konnectivity = mock {
@@ -159,6 +164,9 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
         val getUserFromRemoteDataSource =
             GetUserFromRemoteDataSource(realtimeDatabaseRemoteUserRepository)
 
+        val getUserFromLocalDataSource =
+            GetUserFromLocalDataSource(localUserRepository)
+
         val downloadImageToLocalDataSource =
             DownloadImageToLocalDataSource(storageRepository)
 
@@ -173,6 +181,7 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
             signInWithEmailAndPasswordFromAuthDataSource,
             getDataByManagingObjectLocalCacheTimestamp,
             getUserFromRemoteDataSource,
+            getUserFromLocalDataSource,
             downloadImageToLocalDataSource,
             insertUserInLocalDataSource,
             modifyUserInLocalDataSource,

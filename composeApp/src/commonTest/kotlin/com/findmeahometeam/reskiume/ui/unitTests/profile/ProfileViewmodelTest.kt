@@ -13,6 +13,7 @@ import com.findmeahometeam.reskiume.ui.profile.ProfileViewmodel
 import com.findmeahometeam.reskiume.ui.profile.ProfileViewmodel.ProfileUiState
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.findmeahometeam.reskiume.user
+import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
@@ -42,8 +43,8 @@ class ProfileViewmodelTest : CoroutineTestDispatcher() {
         GetImagePathForFileNameFromLocalDataSource(manageImagePath)
 
     private val log: Log = mock {
-        every { d(any(), any()) } returns Unit
-        every { e(any(), any()) } returns Unit
+        every { d(any(), any()) } calls { println(it) }
+        every { e(any(), any()) } calls { println(it) }
     }
 
     private fun getProfileViewmodel(authRepository: AuthRepository): ProfileViewmodel {
@@ -76,10 +77,16 @@ class ProfileViewmodelTest : CoroutineTestDispatcher() {
             }
             getProfileViewmodel(authRepository).state.test {
                 assertEquals(
-                    ProfileUiState.Error("ProfileViewmodel - User wrongUid not found"),
+                    ProfileUiState.Error(""),
                     awaitItem()
                 )
                 awaitComplete()
+            }
+            verify {
+                log.e(
+                    "ProfileViewmodel",
+                    "User wrongUid not found"
+                )
             }
         }
 
@@ -94,13 +101,4 @@ class ProfileViewmodelTest : CoroutineTestDispatcher() {
                 awaitComplete()
             }
         }
-
-    @Test
-    fun `given an error loading the profile_when the app register the error_then it will call to logE`() {
-        val authRepository: AuthRepository = mock {
-            everySuspend { authState } returns (flowOf(authUser))
-        }
-        getProfileViewmodel(authRepository).logError("TestTag", "This is a test error")
-        verify { log.e("TestTag", "This is a test error") }
-    }
 }

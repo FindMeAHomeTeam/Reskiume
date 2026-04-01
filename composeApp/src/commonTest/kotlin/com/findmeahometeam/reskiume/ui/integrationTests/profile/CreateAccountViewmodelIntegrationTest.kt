@@ -87,9 +87,8 @@ class CreateAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
     fun `given an unregistered user_when that user creates an account using email_then the account is created`() =
         runTest {
             val createAccountViewmodel = getCreateAccountViewmodel()
-            createAccountViewmodel.createUserUsingEmailAndPwd(user, userPwd)
+            createAccountViewmodel.saveUserChanges(user, userPwd)
             createAccountViewmodel.state.test {
-                assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Success }
                 ensureAllEventsConsumed()
@@ -106,9 +105,8 @@ class CreateAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     authPassword = userPwd
                 )
             )
-            createAccountViewmodel.createUserUsingEmailAndPwd(user, userPwd)
+            createAccountViewmodel.saveUserChanges(user, userPwd)
             createAccountViewmodel.state.test {
-                assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Error }
                 ensureAllEventsConsumed()
@@ -121,9 +119,8 @@ class CreateAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 val createAccountViewmodel = getCreateAccountViewmodel(
                     realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(remoteUserList = mutableListOf(user.toData()))
                 )
-                createAccountViewmodel.createUserUsingEmailAndPwd(user, userPwd)
+                createAccountViewmodel.saveUserChanges(user, userPwd)
                 createAccountViewmodel.state.test {
-                    assertTrue { awaitItem() is UiState.Idle }
                     assertTrue { awaitItem() is UiState.Loading }
                     assertTrue { awaitItem() is UiState.Error }
                     ensureAllEventsConsumed()
@@ -136,9 +133,8 @@ class CreateAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 val createAccountViewmodel = getCreateAccountViewmodel(
                     localUserRepository = FakeLocalUserRepository(localUserList = mutableListOf(user))
                 )
-                createAccountViewmodel.createUserUsingEmailAndPwd(user, userPwd)
+                createAccountViewmodel.saveUserChanges(user, userPwd)
                 createAccountViewmodel.state.test {
-                    assertTrue { awaitItem() is UiState.Idle }
                     assertTrue { awaitItem() is UiState.Loading }
                     assertTrue { awaitItem() is UiState.Error }
                     ensureAllEventsConsumed()

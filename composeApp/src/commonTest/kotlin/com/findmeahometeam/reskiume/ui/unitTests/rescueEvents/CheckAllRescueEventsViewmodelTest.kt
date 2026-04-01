@@ -15,6 +15,7 @@ import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalRescueEventRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteRescueEvent.FireStoreRemoteRescueEventRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
@@ -32,6 +33,7 @@ import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetAllRescueEven
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetRescueEventFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.InsertRescueEventInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.ModifyRescueEventInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.util.location.GetLocationFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.ObserveIfLocationEnabledFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.RequestEnableLocationFromLocationRepository
@@ -175,6 +177,12 @@ class CheckAllRescueEventsViewmodelTest : CoroutineTestDispatcher() {
 
         val authRepository: AuthRepository = mock {
             everySuspend { authState } returns (flowOf(authStateReturn))
+        }
+
+        val localUserRepository: LocalUserRepository = mock {
+            everySuspend {
+                getUser(user.uid)
+            } returns user
         }
 
         val localCacheRepository: LocalCacheRepository = mock {
@@ -485,6 +493,9 @@ class CheckAllRescueEventsViewmodelTest : CoroutineTestDispatcher() {
         val observeAuthStateInAuthDataSource =
             ObserveAuthStateInAuthDataSource(authRepository)
 
+        val getUserFromLocalDataSource =
+            GetUserFromLocalDataSource(localUserRepository)
+
         val getDataByManagingObjectLocalCacheTimestamp =
             GetDataByManagingObjectLocalCacheTimestamp(localCacheRepository, log, konnectivity)
 
@@ -557,6 +568,7 @@ class CheckAllRescueEventsViewmodelTest : CoroutineTestDispatcher() {
 
         return CheckAllRescueEventsViewmodel(
             observeAuthStateInAuthDataSource,
+            getUserFromLocalDataSource,
             getStringProvider,
             getDataByManagingObjectLocalCacheTimestamp,
             getAllRescueEventsByCountryAndCityFromRemoteRepository,

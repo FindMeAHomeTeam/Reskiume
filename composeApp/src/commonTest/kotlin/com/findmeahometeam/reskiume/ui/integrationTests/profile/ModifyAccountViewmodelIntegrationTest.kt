@@ -117,7 +117,9 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     authEmail = user.email,
                     authPassword = userPwd
                 ),
-                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(mutableListOf(user.toData())),
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
+                    mutableListOf(user.toData())
+                ),
                 storageRepository = FakeStorageRepository(
                     remoteDatasourceList = mutableListOf(
                         Pair("${Section.USERS.path}/${user.uid}", user.image)
@@ -193,7 +195,9 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     authEmail = user.email,
                     authPassword = userPwd
                 ),
-                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(mutableListOf(user.toData()))
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
+                    mutableListOf(user.toData())
+                )
             )
             modifyAccountViewmodel.saveUserChanges(
                 isDifferentEmail = true,
@@ -219,7 +223,9 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     authEmail = user.email,
                     authPassword = userPwd
                 ),
-                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(mutableListOf(user.toData())),
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
+                    mutableListOf(user.toData())
+                ),
                 storageRepository = FakeStorageRepository(
                     remoteDatasourceList = mutableListOf(
                         Pair("${Section.USERS.path}/${user.uid}", user.image)
@@ -252,7 +258,9 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     authEmail = user.email,
                     authPassword = userPwd
                 ),
-                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(mutableListOf(user.toData())),
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
+                    mutableListOf(user.toData())
+                ),
                 localUserRepository = FakeLocalUserRepository(mutableListOf(user))
             )
             modifyAccountViewmodel.saveUserChanges(
@@ -279,7 +287,9 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     authEmail = user.email,
                     authPassword = userPwd
                 ),
-                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(mutableListOf(user.toData()))
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
+                    mutableListOf(user.toData())
+                )
             )
             modifyAccountViewmodel.saveUserChanges(
                 isDifferentEmail = false,
@@ -299,7 +309,11 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
     @Test
     fun `given a registered user_when that user logs out_then the user cache is modified`() =
         runTest {
-            val fakeLocalCacheRepository = FakeLocalCacheRepository(mutableListOf(localCache.copy(section = Section.USERS).toEntity()))
+            val fakeLocalCacheRepository = FakeLocalCacheRepository(
+                mutableListOf(
+                    localCache.copy(section = Section.USERS).toEntity()
+                )
+            )
 
             val modifyAccountViewmodel = getModifyAccountViewmodel(
                 authRepository = FakeAuthRepository(
@@ -307,13 +321,17 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     authEmail = user.email,
                     authPassword = userPwd
                 ),
+                localUserRepository = FakeLocalUserRepository(
+                    mutableListOf(user)
+                ),
                 localCacheRepository = fakeLocalCacheRepository
             )
             modifyAccountViewmodel.logOut()
 
             runCurrent()
 
-            val actualFakeLocalCacheEntity = fakeLocalCacheRepository.getLocalCacheEntity(user.uid, Section.USERS)
+            val actualFakeLocalCacheEntity =
+                fakeLocalCacheRepository.getLocalCacheEntity(user.uid, Section.USERS)
 
             assertNotEquals(localCache.toEntity(), actualFakeLocalCacheEntity)
         }

@@ -71,8 +71,8 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
 
 
     private val log: Log = mock {
-        every { d(any(), any()) } returns Unit
-        every { e(any(), any()) } returns Unit
+        every { d(any(), any()) } calls { println(it) }
+        every { e(any(), any()) } calls { println(it) }
     }
 
     private fun getModifyAccountViewmodel(
@@ -415,13 +415,18 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
     @Test
     fun `given a registered user_when that user logs out_then logD is called`() =
         runTest {
-            val modifyAccountViewmodel = getModifyAccountViewmodel()
+            val modifyAccountViewmodel = getModifyAccountViewmodel(
+                modifyUserArg = user.copy(isLoggedIn = false)
+            )
             modifyAccountViewmodel.logOut()
 
             runCurrent()
 
             verify {
-                log.d(any(), any())
+                log.d(
+                    "ModifyAccountViewmodel",
+                    "saveUserChangesInLocalDataSource: User ${user.uid} updated successfully in the local data source"
+                )
             }
         }
 
@@ -430,6 +435,7 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
     fun `given a registered user_when that user logs out and the local cache fails updating the last log out_then logE is called`() =
         runTest {
             val modifyAccountViewmodel = getModifyAccountViewmodel(
+                modifyUserArg = user.copy(isLoggedIn = false),
                 updatedRowsCacheArg = 0
             )
             modifyAccountViewmodel.logOut()
@@ -437,7 +443,10 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
             runCurrent()
 
             verify {
-                log.e(any(), any())
+                log.e(
+                    "ModifyAccountViewmodel",
+                    "modifyCacheInLocalRepo: Error updating ${user.uid} in the local cache in section USERS"
+                )
             }
         }
 }

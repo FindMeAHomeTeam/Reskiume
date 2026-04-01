@@ -27,7 +27,11 @@ class GetUserFromRemoteDataSourceTest: CoroutineTestDispatcher() {
     @Test
     fun `given a user uid_when the app request a user by its uid from the remote data source_then it retrieves it`() =
         runTest {
-            val expectedUser = user.copy(savedBy = "", email = null)
+            val expectedUser = user.copy(
+                savedBy = "",
+                email = null,
+                isLoggedIn = false
+            )
             getUserFromRemoteDataSource(user.uid).test {
                 val actualUser: User? = awaitItem()
                 assertNotNull(actualUser)

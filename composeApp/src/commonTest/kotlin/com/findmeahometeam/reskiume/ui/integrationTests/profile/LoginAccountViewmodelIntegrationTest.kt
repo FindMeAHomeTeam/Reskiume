@@ -16,6 +16,7 @@ import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInLocalDataSo
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.SignInWithEmailAndPasswordFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.localCache
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeAuthRepository
@@ -57,6 +58,9 @@ class LoginAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
         val getUserFromRemoteDataSource =
             GetUserFromRemoteDataSource(realtimeDatabaseRemoteUserRepository)
 
+        val getUserFromLocalDataSource =
+            GetUserFromLocalDataSource(localUserRepository)
+
         val downloadImageToLocalDataSource =
             DownloadImageToLocalDataSource(storageRepository)
 
@@ -72,6 +76,7 @@ class LoginAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
             signInWithEmailAndPasswordFromAuthDataSource,
             getDataByManagingObjectLocalCacheTimestamp,
             getUserFromRemoteDataSource,
+            getUserFromLocalDataSource,
             downloadImageToLocalDataSource,
             insertUserInLocalDataSource,
             modifyUserInLocalDataSource,

@@ -12,6 +12,7 @@ import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
 import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteFosterHome.FireStoreRemoteFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
@@ -29,6 +30,7 @@ import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNam
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.util.location.GetLocationFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.ObserveIfLocationEnabledFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.RequestEnableLocationFromLocationRepository
@@ -46,6 +48,7 @@ import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeKonnectivity
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalCacheRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalFosterHomeRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalNonHumanAnimalRepository
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalUserRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocationRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLog
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeManageImagePath
@@ -70,6 +73,9 @@ class CheckAllFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() {
             authUser = authUser,
             authEmail = user.email,
             authPassword = userPwd
+        ),
+        localUserRepository: LocalUserRepository = FakeLocalUserRepository(
+            mutableListOf(user)
         ),
         localCacheRepository: LocalCacheRepository = FakeLocalCacheRepository(),
         fireStoreRemoteFosterHomeRepository: FireStoreRemoteFosterHomeRepository = FakeFireStoreRemoteFosterHomeRepository(),
@@ -101,6 +107,9 @@ class CheckAllFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() {
 
         val observeAuthStateInAuthDataSource =
             ObserveAuthStateInAuthDataSource(authRepository)
+
+        val getUserFromLocalDataSource =
+            GetUserFromLocalDataSource(localUserRepository)
 
         val getDataByManagingObjectLocalCacheTimestamp =
             GetDataByManagingObjectLocalCacheTimestamp(localCacheRepository, log, konnectivity)
@@ -174,6 +183,7 @@ class CheckAllFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() {
 
         return CheckAllFosterHomesViewmodel(
             observeAuthStateInAuthDataSource,
+            getUserFromLocalDataSource,
             stringProvider,
             getDataByManagingObjectLocalCacheTimestamp,
             getAllFosterHomesByCountryAndCityFromRemoteRepository,

@@ -27,13 +27,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.findmeahometeam.reskiume.domain.model.User
+import com.findmeahometeam.reskiume.domain.model.fosterHome.City
+import com.findmeahometeam.reskiume.domain.model.fosterHome.Country
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.components.MaxCharacters
 import com.findmeahometeam.reskiume.ui.core.components.RmAddPhoto
 import com.findmeahometeam.reskiume.ui.core.components.RmAvatar
 import com.findmeahometeam.reskiume.ui.core.components.RmButton
 import com.findmeahometeam.reskiume.ui.core.components.RmCheckbox
+import com.findmeahometeam.reskiume.ui.core.components.RmCountryAndCitySelectors
 import com.findmeahometeam.reskiume.ui.core.components.RmListAvatarType
 import com.findmeahometeam.reskiume.ui.core.components.RmListSwitchItem
 import com.findmeahometeam.reskiume.ui.core.components.RmPasswordTextField
@@ -45,14 +49,14 @@ import com.findmeahometeam.reskiume.ui.core.components.RmTextLink
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.primaryGreen
 import com.findmeahometeam.reskiume.ui.core.tertiaryGreen
+import com.findmeahometeam.reskiume.ui.fosterHomes.checkAllFosterHomes.PlaceUtil
 import com.findmeahometeam.reskiume.ui.profile.ProfileViewmodel
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import reskiume.composeapp.generated.resources.Res
 import reskiume.composeapp.generated.resources.ic_notifications
 import reskiume.composeapp.generated.resources.ic_warning
-import reskiume.composeapp.generated.resources.modify_account_availability_description
-import reskiume.composeapp.generated.resources.modify_account_available_label
 import reskiume.composeapp.generated.resources.modify_account_change_your_password_checkbox_label
 import reskiume.composeapp.generated.resources.modify_account_current_password_field_label
 import reskiume.composeapp.generated.resources.modify_account_describe_yourself_field_label
@@ -61,8 +65,11 @@ import reskiume.composeapp.generated.resources.modify_account_log_out_account_me
 import reskiume.composeapp.generated.resources.modify_account_log_out_text
 import reskiume.composeapp.generated.resources.modify_account_name_field_label
 import reskiume.composeapp.generated.resources.modify_account_new_password_field_label
+import reskiume.composeapp.generated.resources.modify_account_notifications_off
+import reskiume.composeapp.generated.resources.modify_account_notifications_on
 import reskiume.composeapp.generated.resources.modify_account_save_changes_button
-import reskiume.composeapp.generated.resources.modify_account_unavailable_label
+import reskiume.composeapp.generated.resources.modify_account_screen_notification_area
+import reskiume.composeapp.generated.resources.modify_account_turn_rescue_notifications_on_off
 import reskiume.composeapp.generated.resources.modify_account_user_account_title
 import reskiume.composeapp.generated.resources.modify_account_verify_email_label
 
@@ -72,6 +79,8 @@ fun ModifyAccountScreen(onBackPressed: () -> Unit) {
     val modifyAccountViewmodel: ModifyAccountViewmodel =
         koinViewModel<ModifyAccountViewmodel>()
     val uiState: UiState<Unit> by modifyAccountViewmodel.uiState.collectAsState()
+
+    val placeUtil: PlaceUtil = koinInject<PlaceUtil>()
 
     val profileViewmodel: ProfileViewmodel = koinViewModel<ProfileViewmodel>()
     val profileUiState: ProfileViewmodel.ProfileUiState by profileViewmodel.state.collectAsState(
@@ -87,10 +96,6 @@ fun ModifyAccountScreen(onBackPressed: () -> Unit) {
         }
 
         is ProfileViewmodel.ProfileUiState.Error -> {
-            profileViewmodel.logError(
-                "PersonalInformationScreen",
-                (profileUiState as ProfileViewmodel.ProfileUiState.Error).message
-            )
             onBackPressed()
             return
         }
@@ -100,10 +105,12 @@ fun ModifyAccountScreen(onBackPressed: () -> Unit) {
         }
     }
 
+    var selectedCountry: Country by rememberSaveable { mutableStateOf(Country.valueOf(user!!.country)) }
+    var selectedCity: City by rememberSaveable { mutableStateOf(City.valueOf(user!!.city)) }
     var name: String by rememberSaveable { mutableStateOf(user!!.username) }
     var description: String by rememberSaveable { mutableStateOf(user!!.description) }
     var imageUri: String by rememberSaveable { mutableStateOf(user!!.image) }
-    var isAvailable: Boolean by rememberSaveable { mutableStateOf(user!!.isAvailable) }
+    var receiveRescueNotifications: Boolean by rememberSaveable { mutableStateOf(user!!.receiveRescueNotifications) }
     var email: String by rememberSaveable { mutableStateOf(user!!.email ?: "") }
     val emailRegexPattern =
         Regex("^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$")
@@ -124,24 +131,30 @@ fun ModifyAccountScreen(onBackPressed: () -> Unit) {
         }
     }
     val isUpdateUserButtonEnabled by remember(
+        selectedCountry,
+        selectedCity,
         name,
         description,
         imageUri,
         email,
-        isAvailable,
+        receiveRescueNotifications,
         currentPassword,
         newPassword
     ) {
         derivedStateOf {
-            name.isNotBlank()
+            selectedCountry != Country.UNSELECTED
+                    && selectedCity != City.UNSELECTED
+                    && name.isNotBlank()
                     && email.matches(emailRegexPattern)
                     && (if (isCurrentPasswordVisible) currentPassword.length >= 6 else true)
                     && (if (isNewPassword) newPassword.length >= 6 else true)
-                    && (name != user!!.username
+                    && (selectedCountry.name != user!!.country
+                    || selectedCity.name != user!!.city
+                    || name != user!!.username
                     || description != user!!.description
                     || imageUri != user!!.image
                     || email != user!!.email
-                    || isAvailable != user!!.isAvailable
+                    || receiveRescueNotifications != user!!.receiveRescueNotifications
                     || newPassword != currentPassword)
         }
     }
@@ -161,6 +174,26 @@ fun ModifyAccountScreen(onBackPressed: () -> Unit) {
             }
 
             Spacer(modifier = Modifier.height(15.dp))
+            RmText(
+                modifier = Modifier.fillMaxWidth().padding(10.dp),
+                text = stringResource(Res.string.modify_account_screen_notification_area),
+                textAlign = TextAlign.Start,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.ExtraBold
+            )
+            RmCountryAndCitySelectors(
+                placeUtil = placeUtil,
+                selectedCountry = selectedCountry,
+                selectedCity = selectedCity,
+                onSelectedCountry = {
+                    selectedCountry = it
+                },
+                onSelectedCity = {
+                    selectedCity = it
+                }
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
             RmTextField(
                 modifier = Modifier.fillMaxWidth(),
                 text = name,
@@ -254,21 +287,21 @@ fun ModifyAccountScreen(onBackPressed: () -> Unit) {
 
             Spacer(modifier = Modifier.height(10.dp))
             RmListSwitchItem(
-                title = if (isAvailable) {
-                    stringResource(Res.string.modify_account_available_label)
+                title = if (receiveRescueNotifications) {
+                    stringResource(Res.string.modify_account_notifications_on)
                 } else {
-                    stringResource(Res.string.modify_account_unavailable_label)
+                    stringResource(Res.string.modify_account_notifications_off)
                 },
-                description = stringResource(Res.string.modify_account_availability_description),
+                description = stringResource(Res.string.modify_account_turn_rescue_notifications_on_off),
                 containerColor = backgroundColor,
                 listAvatarType = RmListAvatarType.Icon(
                     backgroundColor = tertiaryGreen,
                     icon = Res.drawable.ic_notifications,
                     iconColor = primaryGreen
                 ),
-                isChecked = isAvailable,
+                isChecked = receiveRescueNotifications,
                 onCheckedChange = { isChecked ->
-                    isAvailable = isChecked
+                    receiveRescueNotifications = isChecked
                 }
             )
 
@@ -297,7 +330,9 @@ fun ModifyAccountScreen(onBackPressed: () -> Unit) {
                             description = description,
                             email = email,
                             image = imageUri,
-                            isAvailable = isAvailable
+                            country = selectedCountry.name,
+                            city = selectedCity.name,
+                            receiveRescueNotifications = receiveRescueNotifications
                         ),
                         currentPassword = currentPassword,
                         newPassword = newPassword

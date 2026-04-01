@@ -46,6 +46,7 @@
     <!-- Create account screen -->
     <string name="create_account_screen_create_account_title">Create an account</string>
     <string name="create_account_screen_add_photo_message">Add a photo</string>
+    <string name="create_account_screen_notification_area">Place to receive rescue event notifications</string>
     <string name="create_account_screen_from_gallery_message">Gallery</string>
     <string name="create_account_screen_from_camera_message">Camera</string>
     <string name="create_account_screen_delete_message">Delete</string>
@@ -83,15 +84,16 @@
 
     <!-- Modify account screen -->
     <string name="modify_account_user_account_title">%1$s's account</string>
+    <string name="modify_account_screen_notification_area">Place to receive rescue event notifications</string>
     <string name="modify_account_log_out_account_message">Log out of your account</string>
     <string name="modify_account_log_out_text">Log out</string>
     <string name="modify_account_name_field_label">Name</string>
     <string name="modify_account_describe_yourself_field_label">Describe yourself</string>
     <string name="modify_account_email_field_label">Email</string>
     <string name="modify_account_verify_email_label">After saving the changes, check your new email, including your spam folder, and accept the request. Then, log back in to the application to confirm the change.</string>
-    <string name="modify_account_available_label">Available</string>
-    <string name="modify_account_unavailable_label">Not available</string>
-    <string name="modify_account_availability_description">Update your availability to receive rescue notifications</string>
+    <string name="modify_account_notifications_on">Turn rescue notifications on</string>
+    <string name="modify_account_notifications_off">Turn rescue notifications off</string>
+    <string name="modify_account_turn_rescue_notifications_on_off">Turn rescue notifications on or off</string>
     <string name="modify_account_change_your_password_checkbox_label">I want to change my password</string>
     <string name="modify_account_current_password_field_label">Current password</string>
     <string name="modify_account_new_password_field_label">New password</string>

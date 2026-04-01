@@ -15,6 +15,10 @@ import com.findmeahometeam.reskiume.ui.core.textColor
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
+enum class MaxCharacters(val max: Int) {
+    NORMAL(0), TITLE(30)
+}
+
 @Composable
 fun RmTextField(
     text: String,
@@ -25,6 +29,7 @@ fun RmTextField(
     isError: Boolean = false,
     singleLine: Boolean = false,
     textStyle: TextStyle = LocalTextStyle.current,
+    maxCharacters: MaxCharacters = MaxCharacters.NORMAL,
     supportingText: @Composable (() -> Unit)? = null,
     modifier: Modifier = Modifier,
     onValueChange: (String) -> Unit
@@ -34,7 +39,11 @@ fun RmTextField(
         readOnly = readOnly,
         value = text,
         label = { Text(text = label) },
-        onValueChange = onValueChange,
+        onValueChange = {
+            if (maxCharacters == MaxCharacters.NORMAL || it.length <= maxCharacters.max) {
+                onValueChange(it)
+            }
+        },
         isError = isError,
         supportingText = supportingText,
         singleLine = singleLine,

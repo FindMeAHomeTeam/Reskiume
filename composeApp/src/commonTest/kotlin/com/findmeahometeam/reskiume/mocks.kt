@@ -13,6 +13,8 @@ import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
 import com.findmeahometeam.reskiume.domain.model.Review
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.model.fosterHome.AcceptedNonHumanAnimalForFosterHome
+import com.findmeahometeam.reskiume.domain.model.fosterHome.City
+import com.findmeahometeam.reskiume.domain.model.fosterHome.Country
 import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
 import com.findmeahometeam.reskiume.domain.model.fosterHome.ResidentNonHumanAnimalForFosterHome
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.NeedToCover
@@ -30,7 +32,10 @@ val user = User(
     description = "Hello, this is Juan Antonio's profile.",
     email = "juan@email.com",
     image = "userUid123.webp",
-    isAvailable = true
+    isLoggedIn = true,
+    country = Country.SPAIN.name,
+    city = City.CORDOBA.name,
+    receiveRescueNotifications = true
 )
 
 const val userPwd: String = "myPwd123"
@@ -65,7 +70,10 @@ val author = User(
     description = "Hello, this is Patry's profile.",
     email = "patry@email.com",
     image = "PatryUid123.webp",
-    isAvailable = true
+    isLoggedIn = false,
+    country = Country.SPAIN.name,
+    city = City.CORDOBA.name,
+    receiveRescueNotifications = true
 )
 
 val review = Review(

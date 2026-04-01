@@ -22,26 +22,36 @@ class ProfileViewmodel(
                 ProfileUiState.Idle
             } else {
                 val user: User? = getUserFromLocalDataSource(authUser.uid)
-                if (user == null) {
-                    ProfileUiState.Error("ProfileViewmodel - User ${authUser.uid} not found")
-                } else {
-                    ProfileUiState.Success(
-                        user = user.copy(
-                            email = authUser.email,
-                            image = if (user.image.isBlank() || user.image == "null") {
-                                ""
-                            } else {
-                                getImagePathForFileNameFromLocalDataSource(user.image)
-                            },
+                when {
+                    user == null -> {
+                        log.e(
+                            "ProfileViewmodel",
+                            "User ${authUser.uid} not found"
                         )
-                    )
+                        ProfileUiState.Error("")
+                    }
+                    !user.isLoggedIn -> {
+                        log.e(
+                            "ProfileViewmodel",
+                            "User ${authUser.uid} is not logged in"
+                        )
+                        ProfileUiState.Error("")
+                    }
+                    else -> {
+                        ProfileUiState.Success(
+                            user = user.copy(
+                                email = authUser.email,
+                                image = if (user.image.isBlank() || user.image == "null") {
+                                    ""
+                                } else {
+                                    getImagePathForFileNameFromLocalDataSource(user.image)
+                                },
+                            )
+                        )
+                    }
                 }
             }
         }
-
-    fun logError(tag: String, message: String) {
-        log.e(tag, message)
-    }
 
     sealed class ProfileUiState {
         object Idle : ProfileUiState()

@@ -102,10 +102,6 @@ fun ProfileScreen(
         }
 
         is ProfileViewmodel.ProfileUiState.Error -> {
-            profileViewmodel.logError(
-                "ProfileScreen",
-                (profileUiState as ProfileViewmodel.ProfileUiState.Error).message
-            )
             null
         }
 

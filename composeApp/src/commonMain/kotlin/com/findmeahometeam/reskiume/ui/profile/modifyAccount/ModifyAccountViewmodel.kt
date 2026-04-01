@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlin.time.Clock
@@ -74,7 +75,10 @@ class ModifyAccountViewmodel(
 
                                     updateUserInRemoteDataSource(userWithPossibleImageDownloadUri) {
 
-                                        saveUserChangesInLocalDataSource(user)
+                                        saveUserChangesInLocalDataSource(user) {
+
+                                            _uiState.value = UiState.Success(Unit)
+                                        }
                                     }
                                 }
                             }
@@ -86,7 +90,10 @@ class ModifyAccountViewmodel(
 
                         updateUserInRemoteDataSource(user.copy(image = collectedUser.image)) {
 
-                            saveUserChangesInLocalDataSource(user)
+                            saveUserChangesInLocalDataSource(user) {
+
+                                _uiState.value = UiState.Success(Unit)
+                            }
                         }
                     }
                 }
@@ -251,33 +258,53 @@ class ModifyAccountViewmodel(
         }
     }
 
-    private suspend fun saveUserChangesInLocalDataSource(user: User) {
-        modifyUserInLocalDataSource(user) { rowsModified: Int ->
-            if (rowsModified > 0) {
-                log.d(
-                    "ModifyAccountViewmodel",
-                    "saveUserChangesInLocalDataSource: User ${user.uid} updated successfully in the local data source"
-                )
-                _uiState.value = UiState.Success(Unit)
-            } else {
-                log.e(
-                    "ModifyAccountViewmodel",
-                    "saveUserChangesInLocalDataSource: failed to update user ${user.uid} in the local data source"
-                )
-                _uiState.value = UiState.Error()
+    private fun saveUserChangesInLocalDataSource(
+        user: User,
+        onSuccess: () -> Unit
+    ) {
+        viewModelScope.launch {
+
+            modifyUserInLocalDataSource(user) { rowsModified: Int ->
+                if (rowsModified > 0) {
+                    log.d(
+                        "ModifyAccountViewmodel",
+                        "saveUserChangesInLocalDataSource: User ${user.uid} updated successfully in the local data source"
+                    )
+                    onSuccess()
+                } else {
+                    log.e(
+                        "ModifyAccountViewmodel",
+                        "saveUserChangesInLocalDataSource: failed to update user ${user.uid} in the local data source"
+                    )
+                    _uiState.value = UiState.Error()
+                }
             }
         }
     }
 
     @OptIn(ExperimentalTime::class)
     fun logOut() {
+        modifyCacheInLocalRepo { user ->
+
+            saveUserChangesInLocalDataSource(user.copy(isLoggedIn = false)) {
+
+                signOutFromAuthDataSource()
+            }
+        }
+    }
+
+    @OptIn(ExperimentalTime::class)
+    fun modifyCacheInLocalRepo(
+        onCompleted: (user: User) -> Unit
+    ) {
         viewModelScope.launch {
-            val authUser: AuthUser = authUserState.firstOrNull() ?: return@launch
+            val authUser: AuthUser = authUserState.first()!!
+            val user: User = getUserFromLocalDataSource(authUser.uid)!!
 
             modifyCacheInLocalRepository(
                 LocalCache(
-                    cachedObjectId = authUser.uid,
-                    savedBy = authUser.uid,
+                    cachedObjectId = user.uid,
+                    savedBy = user.uid,
                     section = Section.USERS,
                     timestamp = Clock.System.now().epochSeconds
                 )
@@ -286,15 +313,15 @@ class ModifyAccountViewmodel(
                 if (rowsUpdated > 0) {
                     log.d(
                         "ModifyAccountViewmodel",
-                        "${authUser.uid} updated in local cache in section ${Section.USERS}"
+                        "modifyCacheInLocalRepo: ${authUser.uid} updated in the local cache in section ${Section.USERS}"
                     )
                 } else {
                     log.e(
                         "ModifyAccountViewmodel",
-                        "Error updating ${authUser.uid} in local cache in section ${Section.USERS}"
+                        "modifyCacheInLocalRepo: Error updating ${authUser.uid} in the local cache in section ${Section.USERS}"
                     )
                 }
-                signOutFromAuthDataSource()
+                onCompleted(user)
             }
         }
     }

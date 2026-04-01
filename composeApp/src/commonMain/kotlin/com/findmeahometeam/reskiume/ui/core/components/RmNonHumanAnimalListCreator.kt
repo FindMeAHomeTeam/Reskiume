@@ -32,6 +32,7 @@ import com.findmeahometeam.reskiume.domain.model.toStringResource
 import com.findmeahometeam.reskiume.ui.core.backgroundColorForItems
 import com.findmeahometeam.reskiume.ui.core.primaryGreen
 import com.findmeahometeam.reskiume.ui.core.primaryRed
+import com.findmeahometeam.reskiume.ui.core.tertiaryGreen
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import reskiume.composeapp.generated.resources.Res
@@ -121,7 +122,7 @@ fun RmNonHumanAnimalListCreator(
                 Icon(
                     painter = painterResource(Res.drawable.ic_add),
                     contentDescription = stringResource(Res.string.non_human_animal_list_creator_add_content_description),
-                    tint = primaryGreen,
+                    tint = if (selectedNonHumanAnimal == null) tertiaryGreen else primaryGreen,
                     modifier = Modifier.size(24.dp),
                 )
             }

@@ -20,6 +20,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
@@ -32,6 +33,7 @@ import com.findmeahometeam.reskiume.domain.model.rescueEvent.NonHumanAnimalToRes
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueEvent
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.components.ManagePermissionState
+import com.findmeahometeam.reskiume.ui.core.components.MaxCharacters
 import com.findmeahometeam.reskiume.ui.core.components.RmAddPhoto
 import com.findmeahometeam.reskiume.ui.core.components.RmButton
 import com.findmeahometeam.reskiume.ui.core.components.RmCountryAndCitySelectors
@@ -40,6 +42,7 @@ import com.findmeahometeam.reskiume.ui.core.components.RmNeedToCoverListCreator
 import com.findmeahometeam.reskiume.ui.core.components.RmNonHumanAnimalListCreator
 import com.findmeahometeam.reskiume.ui.core.components.RmResultState
 import com.findmeahometeam.reskiume.ui.core.components.RmScaffold
+import com.findmeahometeam.reskiume.ui.core.components.RmText
 import com.findmeahometeam.reskiume.ui.core.components.RmTextField
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.fosterHomes.checkAllFosterHomes.PlaceUtil
@@ -177,8 +180,16 @@ fun CreateRescueEventScreen(
             RmTextField(
                 modifier = Modifier.fillMaxWidth(),
                 text = title,
+                maxCharacters = MaxCharacters.TITLE,
                 label = stringResource(Res.string.create_rescue_event_screen_rescue_event_title),
-                onValueChange = { title = it }
+                onValueChange = { title = it },
+                supportingText = {
+                    RmText(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = "${title.length} / ${MaxCharacters.TITLE.max}",
+                        textAlign = TextAlign.End,
+                    )
+                }
             )
 
             Spacer(modifier = Modifier.height(8.dp))

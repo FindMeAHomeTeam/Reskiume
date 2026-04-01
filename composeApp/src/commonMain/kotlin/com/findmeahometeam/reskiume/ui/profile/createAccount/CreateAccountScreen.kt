@@ -20,14 +20,17 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
+import com.findmeahometeam.reskiume.ui.core.components.MaxCharacters
 import com.findmeahometeam.reskiume.ui.core.components.RmAddPhoto
 import com.findmeahometeam.reskiume.ui.core.components.RmButton
 import com.findmeahometeam.reskiume.ui.core.components.RmPasswordTextField
 import com.findmeahometeam.reskiume.ui.core.components.RmResultState
 import com.findmeahometeam.reskiume.ui.core.components.RmScaffold
+import com.findmeahometeam.reskiume.ui.core.components.RmText
 import com.findmeahometeam.reskiume.ui.core.components.RmTextField
 import com.findmeahometeam.reskiume.ui.core.components.RmTextLink
 import com.findmeahometeam.reskiume.ui.core.components.UiState
@@ -83,8 +86,16 @@ fun CreateAccountScreen(onBackPressed: () -> Unit, navigateToLoginScreen: () -> 
             RmTextField(
                 modifier = Modifier.fillMaxWidth(),
                 text = name,
+                maxCharacters = MaxCharacters.TITLE,
                 label = stringResource(Res.string.create_account_screen_name_field_label),
-                onValueChange = { name = it }
+                onValueChange = { name = it },
+                supportingText = {
+                    RmText(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = "${name.length} / ${MaxCharacters.TITLE.max}",
+                        textAlign = TextAlign.End,
+                    )
+                }
             )
             Spacer(modifier = Modifier.height(10.dp))
             RmTextField(

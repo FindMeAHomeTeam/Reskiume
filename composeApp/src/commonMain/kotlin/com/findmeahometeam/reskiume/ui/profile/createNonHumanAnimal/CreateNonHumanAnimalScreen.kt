@@ -19,6 +19,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.findmeahometeam.reskiume.domain.model.AgeCategory
 import com.findmeahometeam.reskiume.domain.model.Gender
@@ -27,11 +28,13 @@ import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
 import com.findmeahometeam.reskiume.domain.model.toEmoji
 import com.findmeahometeam.reskiume.domain.model.toStringResource
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
+import com.findmeahometeam.reskiume.ui.core.components.MaxCharacters
 import com.findmeahometeam.reskiume.ui.core.components.RmAddPhoto
 import com.findmeahometeam.reskiume.ui.core.components.RmButton
 import com.findmeahometeam.reskiume.ui.core.components.RmDropDownMenu
 import com.findmeahometeam.reskiume.ui.core.components.RmResultState
 import com.findmeahometeam.reskiume.ui.core.components.RmScaffold
+import com.findmeahometeam.reskiume.ui.core.components.RmText
 import com.findmeahometeam.reskiume.ui.core.components.RmTextField
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import org.jetbrains.compose.resources.stringResource
@@ -108,8 +111,16 @@ fun CreateNonHumanAnimalScreen(
             RmTextField(
                 modifier = Modifier.fillMaxWidth(),
                 text = name,
+                maxCharacters = MaxCharacters.TITLE,
                 label = stringResource(Res.string.create_non_human_animal_screen_non_human_animal_name),
-                onValueChange = { name = it }
+                onValueChange = { name = it },
+                supportingText = {
+                    RmText(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = "${name.length} / ${MaxCharacters.TITLE.max}",
+                        textAlign = TextAlign.End,
+                    )
+                }
             )
 
             Spacer(modifier = Modifier.height(8.dp))

@@ -25,9 +25,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
+import com.findmeahometeam.reskiume.ui.core.components.MaxCharacters
 import com.findmeahometeam.reskiume.ui.core.components.RmAddPhoto
 import com.findmeahometeam.reskiume.ui.core.components.RmAvatar
 import com.findmeahometeam.reskiume.ui.core.components.RmButton
@@ -162,8 +164,16 @@ fun ModifyAccountScreen(onBackPressed: () -> Unit) {
             RmTextField(
                 modifier = Modifier.fillMaxWidth(),
                 text = name,
+                maxCharacters = MaxCharacters.TITLE,
                 label = stringResource(Res.string.modify_account_name_field_label),
-                onValueChange = { name = it }
+                onValueChange = { name = it },
+                supportingText = {
+                    RmText(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = "${name.length} / ${MaxCharacters.TITLE.max}",
+                        textAlign = TextAlign.End,
+                    )
+                }
             )
 
             Spacer(modifier = Modifier.height(10.dp))

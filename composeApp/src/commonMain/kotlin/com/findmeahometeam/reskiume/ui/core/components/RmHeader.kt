@@ -60,7 +60,7 @@ fun RmHeader(user: User?, displayDescription: Boolean = false) {
     )
     Spacer(Modifier.height(16.dp))
 
-    if (user != null && user.isAvailable) {
+    if (user != null && user.receiveRescueNotifications) {
         Availability(stringResource(Res.string.profile_screen_available_label), secondaryGreen)
     } else if (user != null) {
         Availability(stringResource(Res.string.profile_screen_unavailable_label), gray)

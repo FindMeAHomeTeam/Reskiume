@@ -16,6 +16,7 @@ import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllFosterHomes
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllFosterHomesByLocationFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.util.location.GetLocationFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.ObserveIfLocationEnabledFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.RequestEnableLocationFromLocationRepository
@@ -59,6 +60,7 @@ private const val WAITING_TIME: Int = 2 * 60 // 2 min
 @OptIn(ExperimentalCoroutinesApi::class)
 class CheckAllFosterHomesViewmodel(
     observeAuthStateInAuthDataSource: ObserveAuthStateInAuthDataSource,
+    private val getUserFromLocalDataSource: GetUserFromLocalDataSource,
     private val getStringProvider: StringProvider,
     private val getDataByManagingObjectLocalCacheTimestamp: GetDataByManagingObjectLocalCacheTimestamp,
     private val getAllFosterHomesByCountryAndCityFromRemoteRepository: GetAllFosterHomesByCountryAndCityFromRemoteRepository,
@@ -89,8 +91,16 @@ class CheckAllFosterHomesViewmodel(
         _allFosterHomesState.asStateFlow()
 
     val authState: Flow<AuthUser?> = observeAuthStateInAuthDataSource().map { authUser ->
-        myUid = authUser?.uid ?: " "
-        authUser
+
+        val user = if (authUser != null) getUserFromLocalDataSource(authUser.uid) else null
+
+        if (user == null || !user.isLoggedIn) {
+            myUid = " "
+            null
+        } else {
+            myUid = user.uid
+            authUser
+        }
     }
 
     private sealed class Query {

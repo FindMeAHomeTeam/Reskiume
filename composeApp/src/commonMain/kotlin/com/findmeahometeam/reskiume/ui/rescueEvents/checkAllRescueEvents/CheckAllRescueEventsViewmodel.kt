@@ -13,6 +13,7 @@ import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetAllRescueEven
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetAllRescueEventsByCountryAndCityFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetAllRescueEventsByLocationFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetAllRescueEventsByLocationFromRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.util.location.GetLocationFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.ObserveIfLocationEnabledFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.RequestEnableLocationFromLocationRepository
@@ -54,6 +55,7 @@ private const val WAITING_TIME: Int = 2 * 60 // 2 min
 @OptIn(ExperimentalCoroutinesApi::class)
 class CheckAllRescueEventsViewmodel(
     observeAuthStateInAuthDataSource: ObserveAuthStateInAuthDataSource,
+    private val getUserFromLocalDataSource: GetUserFromLocalDataSource,
     private val getStringProvider: StringProvider,
     private val getDataByManagingObjectLocalCacheTimestamp: GetDataByManagingObjectLocalCacheTimestamp,
     private val getAllRescueEventsByCountryAndCityFromRemoteRepository: GetAllRescueEventsByCountryAndCityFromRemoteRepository,
@@ -84,8 +86,16 @@ class CheckAllRescueEventsViewmodel(
         _allRescueEventsState.asStateFlow()
 
     val authState: Flow<AuthUser?> = observeAuthStateInAuthDataSource().map { authUser ->
-        myUid = authUser?.uid ?: " "
-        authUser
+
+        val user = if (authUser != null) getUserFromLocalDataSource(authUser.uid) else null
+
+        if (user == null || !user.isLoggedIn) {
+            myUid = " "
+            null
+        } else {
+            myUid = user.uid
+            authUser
+        }
     }
 
     private sealed class Query {

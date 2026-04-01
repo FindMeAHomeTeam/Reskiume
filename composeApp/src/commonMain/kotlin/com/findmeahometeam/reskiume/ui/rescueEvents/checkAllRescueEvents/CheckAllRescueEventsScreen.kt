@@ -182,8 +182,9 @@ fun CheckAllRescueEventsScreen(
                 AnimatedVisibility(visible = searchOption == SearchOption.COUNTRY_CITY) {
 
                     RmCountryAndCitySelectors(
-                        placeUtil,
-                        selectedCountry,
+                        placeUtil = placeUtil,
+                        selectedCountry = selectedCountry,
+                        selectedCity = selectedCity,
                         onSelectedCountry = {
                             selectedCountry = it
                         },

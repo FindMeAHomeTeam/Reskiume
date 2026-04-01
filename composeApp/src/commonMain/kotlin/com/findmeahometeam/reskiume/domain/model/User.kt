@@ -11,7 +11,10 @@ data class User(
     val description: String,
     val email: String? = null,
     val image: String,
-    val isAvailable: Boolean = true
+    val isLoggedIn: Boolean,
+    val country: String,
+    val city: String,
+    val receiveRescueNotifications : Boolean
 ) {
     fun toEntity(): UserEntity {
         return UserEntity(
@@ -20,7 +23,10 @@ data class User(
             username = username,
             description = description,
             image = image,
-            isAvailable = isAvailable
+            isLoggedIn = isLoggedIn,
+            country = country,
+            city = city,
+            receiveRescueNotifications = receiveRescueNotifications
         )
     }
 
@@ -30,7 +36,9 @@ data class User(
             username = username,
             description = description,
             image = image,
-            available = isAvailable
+            country = country,
+            city = city,
+            receiveRescueNotifications = receiveRescueNotifications
         )
     }
 }

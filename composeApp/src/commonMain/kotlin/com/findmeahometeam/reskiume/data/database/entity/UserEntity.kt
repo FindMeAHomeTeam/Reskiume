@@ -11,7 +11,10 @@ data class UserEntity(
     val username: String,
     val description: String,
     val image: String,
-    val isAvailable: Boolean
+    val isLoggedIn: Boolean,
+    val country: String,
+    val city: String,
+    val receiveRescueNotifications: Boolean
 ) {
     fun toDomain(): User {
         return User(
@@ -20,7 +23,10 @@ data class UserEntity(
             username = username,
             description = description,
             image = image,
-            isAvailable = isAvailable
+            isLoggedIn = isLoggedIn,
+            country = country,
+            city = city,
+            receiveRescueNotifications = receiveRescueNotifications
         )
     }
 }

@@ -29,20 +29,22 @@ class RealtimeDatabaseRemoteUserRepositoryForIosDelegateImpl: RealtimeDatabaseRe
                         database.reference().child(Section.users.path).child(userUid).observeSingleEvent (of: .value, with: { snapshot in
                             let nSDictionary: NSDictionary? = snapshot.value as? NSDictionary
                             
-                            let availableAny = nSDictionary?["available"]
+                            let receiveRescueNotificationsAny = nSDictionary?["receiveRescueNotifications"]
 
                             // Support NSNumber, DarwinBoolean, or Bool
-                            let availableBool: Bool? =
-                                (availableAny as? NSNumber)?.boolValue ??
-                                (availableAny as? DarwinBoolean)?.boolValue ??
-                                (availableAny as? Bool)
-                            
+                            let receiveRescueNotificationsBool: Bool? =
+                                (receiveRescueNotificationsAny as? NSNumber)?.boolValue ??
+                                (receiveRescueNotificationsAny as? DarwinBoolean)?.boolValue ??
+                                (receiveRescueNotificationsAny as? Bool)
+
                             let remoteUser: RemoteUser = RemoteUser(
                                 uid: nSDictionary?["uid"] as? String ?? "",
                                 username: nSDictionary?["username"] as? String ?? "",
                                 description: nSDictionary?["description"] as? String ?? "",
                                 image: nSDictionary?["image"] as? String ?? "",
-                                available: KotlinBoolean(value: availableBool ?? false)
+                                country: nSDictionary?["country"] as? String ?? "",
+                                city: nSDictionary?["city"] as? String ?? "",
+                                receiveRescueNotifications: KotlinBoolean(value: receiveRescueNotificationsBool ?? false)
                             )
                             realtimeDatabaseRemoteUserFlowsRepositoryForIosDelegate.updateRealtimeDatabaseRemoteUserRepositoryForIosDelegate(delegate: remoteUser)
                             
@@ -72,7 +74,9 @@ class RealtimeDatabaseRemoteUserRepositoryForIosDelegateImpl: RealtimeDatabaseRe
             "username": remoteUser.username!,
             "description": remoteUser.description_!,
             "image": remoteUser.image!,
-            "available": remoteUser.available?.boolValue == true
+            "country": remoteUser.country!,
+            "city": remoteUser.city!,
+            "receiveRescueNotifications": remoteUser.receiveRescueNotifications?.boolValue == true
         ]
     }
     

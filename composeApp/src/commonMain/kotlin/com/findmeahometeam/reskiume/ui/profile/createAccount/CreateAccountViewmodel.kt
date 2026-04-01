@@ -38,134 +38,224 @@ class CreateAccountViewmodel(
     private var _state: MutableStateFlow<UiState<Unit>> = MutableStateFlow(UiState.Idle())
     val state: StateFlow<UiState<Unit>> = _state.asStateFlow()
 
-    fun createUserUsingEmailAndPwd(
+    fun saveUserChanges(
         user: User,
         password: String
     ) {
-        if (user.email == null) return
+        _state.value = UiState.Loading()
 
-        viewModelScope.launch {
-            _state.value = UiState.Loading()
-            val authResult = createUserWithEmailAndPasswordInAuthDataSource(user.email, password)
-            when (authResult) {
-                is AuthResult.Error -> {
-                    _state.value = UiState.Error(authResult.message)
-                    log.e(
-                        "CreateAccountViewmodel",
-                        "createUserUsingEmailAndPwd: ${authResult.message}"
-                    )
-                }
+        createAuthUserUsingEmailAndPwd(user, password) { updatedUser: User ->
 
-                is AuthResult.Success -> {
-                    saveUserToRemoteSource(user.copy(uid = authResult.user.uid), password)
-                }
+            uploadImageToRemoteRepo(updatedUser) { updatedUserWithImage: User, imageDownloadUri: String ->
+
+                saveUserToRemoteRepo(
+                    user = updatedUserWithImage,
+                    onSuccess = {
+
+                        insertUserInLocalRepo(
+                            user = updatedUserWithImage,
+                            onSuccess = {
+
+                                saveUserCacheLocally(updatedUserWithImage.uid)
+                            },
+                            onError = {
+
+                                deleteAccountFromRemoteDataSource(
+                                    uid = updatedUserWithImage.uid,
+                                    onComplete = {
+                                        deleteImageFromRemoteRepo(
+                                            userUid = updatedUserWithImage.uid,
+                                            currentUserImage = imageDownloadUri
+                                        ) {
+                                            deleteAccountFromAuthDataSource(password)
+                                        }
+                                    },
+                                    onError = { errorMessage ->
+
+                                        deleteImageFromRemoteRepo(
+                                            userUid = updatedUserWithImage.uid,
+                                            currentUserImage = imageDownloadUri
+                                        ) {
+                                            deleteAccountFromAuthDataSource(
+                                                password = password,
+                                                errorMessageFromDataSource = errorMessage
+                                            )
+                                        }
+                                    }
+                                )
+                            }
+                        )
+                    },
+                    onError = { errorMessage ->
+
+                        deleteImageFromRemoteRepo(
+                            userUid = updatedUserWithImage.uid,
+                            currentUserImage = imageDownloadUri
+                        ) {
+                            deleteAccountFromAuthDataSource(
+                                password = password,
+                                errorMessageFromDataSource = errorMessage
+                            )
+                        }
+                    }
+                )
             }
         }
     }
 
-    private fun saveUserToRemoteSource(user: User, password: String) {
+    private fun createAuthUserUsingEmailAndPwd(
+        user: User,
+        password: String,
+        onSuccess: (user: User) -> Unit
+    ) {
+        viewModelScope.launch {
+
+            val authResult = createUserWithEmailAndPasswordInAuthDataSource(user.email!!, password)
+
+            if (authResult is AuthResult.Success) {
+                log.d(
+                    "CreateAccountViewmodel",
+                    "createAuthUserUsingEmailAndPwd: auth user ${authResult.user.uid} created in the auth repository"
+                )
+                onSuccess(user.copy(uid = authResult.user.uid))
+
+            } else {
+                log.e(
+                    "CreateAccountViewmodel",
+                    "createAuthUserUsingEmailAndPwd: auth user not created in the auth repository - ${(authResult as AuthResult.Error).message}"
+                )
+                _state.value = UiState.Error(authResult.message)
+            }
+        }
+    }
+
+    private fun uploadImageToRemoteRepo(
+        user: User,
+        onSuccess: (user: User, imageDownloadUri: String) -> Unit
+    ) {
         uploadImageToRemoteDataSource(
             userUid = user.uid,
             extraId = "",
             section = Section.USERS,
             imageUri = user.image
         ) { imageDownloadUri: String ->
+
             val userWithPossibleImageDownloadUri: User = if (imageDownloadUri.isBlank()) {
                 log.d(
                     "CreateAccountViewmodel",
-                    "saveUserToRemoteSource: Download URI is blank"
+                    "uploadImageToRemoteRepo: Download URI is blank"
                 )
                 user
             } else {
                 log.d(
                     "CreateAccountViewmodel",
-                    "saveUserToRemoteSource: Download URI saved successfully"
+                    "uploadImageToRemoteRepo: Download URI saved successfully"
                 )
                 user.copy(image = imageDownloadUri)
             }
-            viewModelScope.launch {
-                insertUserInRemoteDataSource(userWithPossibleImageDownloadUri) { databaseResult ->
-                    when (databaseResult) {
-                        is DatabaseResult.Error -> {
-                            removeImageFromRemoteDataSource(
-                                userUid = user.uid,
-                                currentUserImage = imageDownloadUri,
-                                password = password,
-                                errorMessage = databaseResult.message
-                            )
-                        }
+            onSuccess(userWithPossibleImageDownloadUri, imageDownloadUri)
+        }
+    }
 
-                        is DatabaseResult.Success -> {
-                            saveUserToLocalSource(user, password, imageDownloadUri)
-                        }
-                    }
+    private fun saveUserToRemoteRepo(
+        user: User,
+        onSuccess: () -> Unit,
+        onError: (errorMessage: String) -> Unit
+    ) {
+        viewModelScope.launch {
+            insertUserInRemoteDataSource(user) { databaseResult ->
+
+                if (databaseResult is DatabaseResult.Success) {
+                    log.d(
+                        "CreateAccountViewmodel",
+                        "saveUserToRemoteRepo: user ${user.uid} saved successfully in the remote repository"
+                    )
+                    onSuccess()
+                } else {
+                    log.e(
+                        "CreateAccountViewmodel",
+                        "saveUserToRemoteRepo: failed to save the user ${user.uid} in the remote repository"
+                    )
+                    onError((databaseResult as DatabaseResult.Error).message)
                 }
             }
         }
     }
 
-    private fun removeImageFromRemoteDataSource(
+    private fun deleteImageFromRemoteRepo(
         userUid: String,
         currentUserImage: String,
-        password: String,
-        errorMessage: String
+        onComplete: () -> Unit
     ) {
         viewModelScope.launch {
+
             deleteImageFromRemoteDataSource(
                 userUid = userUid,
                 extraId = "",
                 section = Section.USERS,
                 currentImage = currentUserImage
             ) { imageDeleted: Boolean ->
-                if (!imageDeleted) {
+
+                if (imageDeleted) {
+
+                    log.d(
+                        "CreateAccountViewmodel",
+                        "deleteImageFromRemoteRepo: user image deleted successfully in the remote repository"
+                    )
+                } else {
                     log.e(
-                        "DeleteAccountViewmodel",
-                        "deleteImageFromRemoteDataSource: Error deleting user image from remote data source"
+                        "CreateAccountViewmodel",
+                        "deleteImageFromRemoteRepo: Error deleting the user image in the remote repository"
                     )
                 }
-                deleteAccountFromAuthDataSource(password, errorMessage)
+                onComplete()
             }
         }
     }
 
     private fun deleteAccountFromAuthDataSource(
         password: String,
-        errorMessageFromDataSource: String
+        errorMessageFromDataSource: String = ""
     ) {
         viewModelScope.launch {
+
             deleteUserFromAuthDataSource(password) { errorMessage: String ->
                 if (errorMessage.isBlank()) {
+                    log.e(
+                        "CreateAccountViewmodel",
+                        "deleteAccountFromAuthDataSource: deleted account from the auth repository - $errorMessageFromDataSource"
+                    )
                     _state.value = UiState.Error(errorMessageFromDataSource)
-                    log.e(
-                        "CreateAccountViewmodel",
-                        "deleteAccountFromAuthDataSource: $errorMessageFromDataSource"
-                    )
                 } else {
-                    _state.value = UiState.Error("$errorMessageFromDataSource - $errorMessage")
                     log.e(
                         "CreateAccountViewmodel",
-                        "deleteAccountFromAuthDataSource: $errorMessageFromDataSource - $errorMessage"
+                        "deleteAccountFromAuthDataSource: failed to delete account from the auth repository - $errorMessageFromDataSource - $errorMessage"
                     )
+                    _state.value = UiState.Error("$errorMessageFromDataSource - $errorMessage")
                 }
             }
         }
     }
 
-    private fun saveUserToLocalSource(user: User, password: String, remoteImageUri: String) {
+    private fun insertUserInLocalRepo(
+        user: User,
+        onSuccess: () -> Unit,
+        onError: () -> Unit
+    ) {
         viewModelScope.launch {
             insertUserInLocalDataSource(user) { rowId ->
                 if (rowId > 0) {
                     log.d(
                         "CreateAccountViewmodel",
-                        "User ${user.uid} created successfully"
+                        "insertUserInLocalRepo: User ${user.uid} created successfully in the local repository"
                     )
-                    saveUserCacheLocally(user.uid)
+                    onSuccess()
                 } else {
-                    deleteAccountFromRemoteDataSource(
-                        user.uid,
-                        remoteImageUri,
-                        password
+                    log.e(
+                        "CreateAccountViewmodel",
+                        "insertUserInLocalRepo: failed to create the user ${user.uid} in the local repository"
                     )
+                    onError()
                 }
             }
         }
@@ -173,32 +263,23 @@ class CreateAccountViewmodel(
 
     private fun deleteAccountFromRemoteDataSource(
         uid: String,
-        remoteImageUri: String,
-        password: String,
+        onComplete: () -> Unit,
+        onError: (errorMessage: String) -> Unit
     ) {
-        val errorMessageFromLocalDataSource = "Error saving the user to local source"
+        deleteUserFromRemoteDataSource(uid) { databaseResult ->
 
-        viewModelScope.launch {
-            deleteUserFromRemoteDataSource(uid) { databaseResult ->
-                when (databaseResult) {
-                    is DatabaseResult.Error -> {
-                        removeImageFromRemoteDataSource(
-                            userUid = uid,
-                            currentUserImage = remoteImageUri,
-                            password = password,
-                            errorMessage = "$errorMessageFromLocalDataSource - ${databaseResult.message}"
-                        )
-                    }
-
-                    is DatabaseResult.Success -> {
-                        removeImageFromRemoteDataSource(
-                            userUid = uid,
-                            currentUserImage = remoteImageUri,
-                            password = password,
-                            errorMessage = errorMessageFromLocalDataSource
-                        )
-                    }
-                }
+            if (databaseResult is DatabaseResult.Success) {
+                log.d(
+                    "CreateAccountViewmodel",
+                    "deleteAccountFromRemoteDataSource: user $uid deleted successfully in the remote repository"
+                )
+                onComplete()
+            } else {
+                log.e(
+                    "CreateAccountViewmodel",
+                    "deleteAccountFromRemoteDataSource: failed to delete the user $uid in the remote repository - ${(databaseResult as DatabaseResult.Error).message}"
+                )
+                onError(databaseResult.message)
             }
         }
     }
@@ -206,6 +287,7 @@ class CreateAccountViewmodel(
     @OptIn(ExperimentalTime::class)
     private fun saveUserCacheLocally(uid: String) {
         viewModelScope.launch {
+
             insertCacheInLocalRepository(
                 LocalCache(
                     cachedObjectId = uid,
@@ -219,12 +301,12 @@ class CreateAccountViewmodel(
                     _state.value = UiState.Success(Unit)
                     log.d(
                         "CreateAccountViewmodel",
-                        "$uid added to local cache in section ${Section.USERS}"
+                        "saveUserCacheLocally: user $uid added to the local cache in section ${Section.USERS}"
                     )
                 } else {
                     log.e(
                         "CreateAccountViewmodel",
-                        "Error adding $uid to local cache in section ${Section.USERS}"
+                        "saveUserCacheLocally: Error adding the user $uid to the local cache in section ${Section.USERS}"
                     )
                 }
             }

@@ -46,25 +46,25 @@ class CreateAccountViewmodel(
 
         createAuthUserUsingEmailAndPwd(user, password) { updatedUser: User ->
 
-            uploadImageToRemoteRepo(updatedUser) { updatedUserWithImage: User, imageDownloadUri: String ->
+            uploadImageToRemoteRepo(updatedUser) { updatedUserWithRemoteImage: User, imageDownloadUri: String ->
 
                 saveUserToRemoteRepo(
-                    user = updatedUserWithImage,
+                    user = updatedUserWithRemoteImage,
                     onSuccess = {
 
                         insertUserInLocalRepo(
-                            user = updatedUserWithImage,
+                            user = updatedUser,
                             onSuccess = {
 
-                                saveUserCacheLocally(updatedUserWithImage.uid)
+                                saveUserCacheLocally(updatedUser.uid)
                             },
                             onError = {
 
                                 deleteAccountFromRemoteDataSource(
-                                    uid = updatedUserWithImage.uid,
+                                    uid = updatedUserWithRemoteImage.uid,
                                     onComplete = {
                                         deleteImageFromRemoteRepo(
-                                            userUid = updatedUserWithImage.uid,
+                                            userUid = updatedUserWithRemoteImage.uid,
                                             currentUserImage = imageDownloadUri
                                         ) {
                                             deleteAccountFromAuthDataSource(password)
@@ -73,7 +73,7 @@ class CreateAccountViewmodel(
                                     onError = { errorMessage ->
 
                                         deleteImageFromRemoteRepo(
-                                            userUid = updatedUserWithImage.uid,
+                                            userUid = updatedUserWithRemoteImage.uid,
                                             currentUserImage = imageDownloadUri
                                         ) {
                                             deleteAccountFromAuthDataSource(
@@ -89,7 +89,7 @@ class CreateAccountViewmodel(
                     onError = { errorMessage ->
 
                         deleteImageFromRemoteRepo(
-                            userUid = updatedUserWithImage.uid,
+                            userUid = updatedUserWithRemoteImage.uid,
                             currentUserImage = imageDownloadUri
                         ) {
                             deleteAccountFromAuthDataSource(

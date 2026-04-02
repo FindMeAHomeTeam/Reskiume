@@ -43,7 +43,7 @@ class CheckRescueEventViewmodel(
             if (rescueEvent == null) {
                 return@map null
             }
-            myUid = observeAuthStateInAuthDataSource().firstOrNull()?.uid ?: ""
+            myUid = observeAuthStateInAuthDataSource().firstOrNull()?.uid ?: " "
 
             val creator = checkActivistUtil.getUser(
                 activistUid = rescueEvent.creatorId,

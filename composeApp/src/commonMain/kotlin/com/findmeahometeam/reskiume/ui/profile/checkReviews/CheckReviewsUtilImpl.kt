@@ -37,21 +37,21 @@ class CheckReviewsUtilImpl (
 
             getDataByManagingObjectLocalCacheTimestamp(
                 cachedObjectId = reviewedUid,
-                savedBy = authUser?.uid ?: "",
+                savedBy = authUser?.uid ?: " ",
                 section = Section.REVIEWS,
                 onCompletionInsertCache = {
                     getReviewsFromRemoteRepository(reviewedUid).insertRemoteReviewsInLocalRepositoryAndMapThemToUiReview(
-                        authUser?.uid ?: ""
+                        authUser?.uid ?: " "
                     )
                 },
                 onCompletionUpdateCache = {
                     getReviewsFromRemoteRepository(reviewedUid).insertRemoteReviewsInLocalRepositoryAndMapThemToUiReview(
-                        authUser?.uid ?: ""
+                        authUser?.uid ?: " "
                     )
                 },
                 onVerifyCacheIsRecent = {
                     getReviewsFromLocalRepository(reviewedUid).mapLocalReviewsToUiReview(
-                        authUser?.uid ?: ""
+                        authUser?.uid ?: " "
                     )
                 }
             )

@@ -50,7 +50,7 @@ class CheckFosterHomeViewmodel(
             if (fosterHome == null) {
                 return@map null
             }
-            myUid = observeAuthStateInAuthDataSource().firstOrNull()?.uid ?: ""
+            myUid = observeAuthStateInAuthDataSource().firstOrNull()?.uid ?: " "
 
             val owner = checkActivistUtil.getUser(
                 activistUid = fosterHome.ownerId,

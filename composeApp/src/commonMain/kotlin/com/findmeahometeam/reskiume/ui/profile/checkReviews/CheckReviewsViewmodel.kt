@@ -29,7 +29,7 @@ class CheckReviewsViewmodel(
             if (authUser?.uid == reviewedUid) {
                 flowOf(null)
             } else {
-                flowOf(getActivist(authUser?.uid ?: ""))
+                flowOf(getActivist(authUser?.uid ?: " "))
             }
         }
 

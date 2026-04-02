@@ -44,7 +44,7 @@ class CheckNonHumanAnimalUtilImpl(
 
             getDataByManagingObjectLocalCacheTimestamp(
                 cachedObjectId = nonHumanAnimalId,
-                savedBy = authUser?.uid ?: "",
+                savedBy = authUser?.uid ?: " ",
                 section = Section.NON_HUMAN_ANIMALS,
                 onCompletionInsertCache = {
                     getNonHumanAnimalFromRemoteRepository(
@@ -56,7 +56,7 @@ class CheckNonHumanAnimalUtilImpl(
                                 deleteNonHumanAnimal(
                                     nonHumanAnimalId,
                                     caregiverId,
-                                    authUser?.uid ?: "",
+                                    authUser?.uid ?: " ",
                                     coroutineScope
                                 )
                             }
@@ -73,7 +73,7 @@ class CheckNonHumanAnimalUtilImpl(
                                 deleteNonHumanAnimal(
                                     nonHumanAnimalId,
                                     caregiverId,
-                                    authUser?.uid ?: "",
+                                    authUser?.uid ?: " ",
                                     coroutineScope
                                 )
                             }

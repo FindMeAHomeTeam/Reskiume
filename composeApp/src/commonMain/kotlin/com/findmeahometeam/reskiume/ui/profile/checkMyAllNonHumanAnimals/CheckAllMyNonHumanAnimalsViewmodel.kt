@@ -54,7 +54,7 @@ class CheckAllMyNonHumanAnimalsViewmodel(
 
                 getDataByManagingObjectLocalCacheTimestamp(
                     cachedObjectId = caregiverId,
-                    savedBy = authUser?.uid ?: "",
+                    savedBy = authUser?.uid ?: " ",
                     section = Section.NON_HUMAN_ANIMALS,
                     onCompletionInsertCache = {
                         getAllNonHumanAnimalsFromRemoteRepository(caregiverId).downloadImageAndInsertNonHumanAnimalsInLocalRepository()

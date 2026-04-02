@@ -8,6 +8,7 @@ import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalRescueEventRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalReviewRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
@@ -15,6 +16,7 @@ import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonH
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteReview.RealtimeDatabaseRemoteReviewRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteFosterHome.FireStoreRemoteFosterHomeRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteRescueEvent.FireStoreRemoteRescueEventRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.usecases.authUser.DeleteUserFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
@@ -29,6 +31,10 @@ import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.DeleteAllNonH
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.DeleteAllNonHumanAnimalsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.DeleteAllMyRescueEventsFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.DeleteAllMyRescueEventsFromRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetAllMyRescueEventsFromRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetAllRescueEventsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.DeleteReviewsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.DeleteReviewsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromRemoteRepository
@@ -40,15 +46,19 @@ import com.findmeahometeam.reskiume.fosterHome
 import com.findmeahometeam.reskiume.fosterHomeWithAllNonHumanAnimalData
 import com.findmeahometeam.reskiume.localCache
 import com.findmeahometeam.reskiume.nonHumanAnimal
+import com.findmeahometeam.reskiume.rescueEvent
+import com.findmeahometeam.reskiume.rescueEventWithAllNeedsAndNonHumanAnimalData
 import com.findmeahometeam.reskiume.review
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeAuthRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeCheckNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeDeleteNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeFireStoreRemoteFosterHomeRepository
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeFireStoreRemoteRescueEventRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalCacheRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalFosterHomeRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalNonHumanAnimalRepository
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalRescueEventRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalReviewRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalUserRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLog
@@ -69,6 +79,8 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
 
     private fun getDeleteAccountViewmodel(
         authRepository: AuthRepository = FakeAuthRepository(),
+        fireStoreRemoteRescueEventRepository: FireStoreRemoteRescueEventRepository = FakeFireStoreRemoteRescueEventRepository(),
+        localRescueEventRepository: LocalRescueEventRepository = FakeLocalRescueEventRepository(),
         fireStoreRemoteFosterHomeRepository: FireStoreRemoteFosterHomeRepository = FakeFireStoreRemoteFosterHomeRepository(),
         localFosterHomeRepository: LocalFosterHomeRepository = FakeLocalFosterHomeRepository(),
         deleteNonHumanAnimalUtil: DeleteNonHumanAnimalUtil = FakeDeleteNonHumanAnimalUtil(),
@@ -86,6 +98,29 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
 
         val observeAuthStateInAuthDataSource =
             ObserveAuthStateInAuthDataSource(authRepository)
+
+        val getAllMyRescueEventsFromRemoteRepository =
+            GetAllMyRescueEventsFromRemoteRepository(fireStoreRemoteRescueEventRepository)
+
+        val getAllRescueEventsFromLocalRepository =
+            GetAllRescueEventsFromLocalRepository(localRescueEventRepository)
+
+        val deleteAllMyRescueEventsFromRemoteRepository =
+            DeleteAllMyRescueEventsFromRemoteRepository(
+                authRepository,
+                fireStoreRemoteRescueEventRepository,
+                realtimeDatabaseRemoteNonHumanAnimalRepository,
+                deleteNonHumanAnimalUtil,
+                log
+            )
+
+        val deleteAllMyRescueEventsFromLocalRepository =
+            DeleteAllMyRescueEventsFromLocalRepository(
+                localRescueEventRepository,
+                checkNonHumanAnimalUtil,
+                localNonHumanAnimalRepository,
+                log
+            )
 
         val getAllMyFosterHomesFromRemoteRepository =
             GetAllMyFosterHomesFromRemoteRepository(fireStoreRemoteFosterHomeRepository)
@@ -114,7 +149,9 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
             GetAllNonHumanAnimalsFromRemoteRepository(realtimeDatabaseRemoteNonHumanAnimalRepository)
 
         val deleteAllNonHumanAnimalsFromRemoteRepository =
-            DeleteAllNonHumanAnimalsFromRemoteRepository(realtimeDatabaseRemoteNonHumanAnimalRepository)
+            DeleteAllNonHumanAnimalsFromRemoteRepository(
+                realtimeDatabaseRemoteNonHumanAnimalRepository
+            )
 
         val deleteAllNonHumanAnimalsFromLocalRepository =
             DeleteAllNonHumanAnimalsFromLocalRepository(localNonHumanAnimalRepository)
@@ -159,6 +196,10 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
 
         return DeleteAccountViewmodel(
             observeAuthStateInAuthDataSource,
+            getAllMyRescueEventsFromRemoteRepository,
+            getAllRescueEventsFromLocalRepository,
+            deleteAllMyRescueEventsFromRemoteRepository,
+            deleteAllMyRescueEventsFromLocalRepository,
             getAllMyFosterHomesFromRemoteRepository,
             getAllFosterHomesFromLocalRepository,
             deleteAllMyFosterHomesFromRemoteRepository,
@@ -186,6 +227,12 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
     fun `given a registered user_when that user deletes their account using their password_then their account is deleted`() =
         runTest {
             val deleteAccountViewmodel = getDeleteAccountViewmodel(
+                fireStoreRemoteRescueEventRepository = FakeFireStoreRemoteRescueEventRepository(
+                    mutableListOf(rescueEvent.toData())
+                ),
+                localRescueEventRepository = FakeLocalRescueEventRepository(
+                    mutableListOf(rescueEventWithAllNeedsAndNonHumanAnimalData)
+                ),
                 fireStoreRemoteFosterHomeRepository = FakeFireStoreRemoteFosterHomeRepository(
                     mutableListOf(fosterHome.toData())
                 ),
@@ -201,6 +248,10 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                         localCache.toEntity(),
                         localCache.copy(
                             cachedObjectId = nonHumanAnimal.id,
+                            section = Section.NON_HUMAN_ANIMALS
+                        ).toEntity(),
+                        localCache.copy(
+                            cachedObjectId = nonHumanAnimal.id + "second",
                             section = Section.NON_HUMAN_ANIMALS
                         ).toEntity()
                     )
@@ -222,6 +273,123 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                             "${nonHumanAnimal.id}.webp"
                         ),
                         Pair(
+                            "${Section.NON_HUMAN_ANIMALS.path}/${user.uid}",
+                            "${nonHumanAnimal.id + "second"}.webp"
+                        ),
+                        Pair(
+                            "${Section.FOSTER_HOMES.path}/${user.uid}",
+                            "${fosterHome.id}.webp"
+                        ),
+                        Pair(
+                            "${Section.RESCUE_EVENTS.path}/${user.uid}",
+                            "${rescueEvent.id}.webp"
+                        )
+                    ),
+                    localDatasourceList = mutableListOf(
+                        Pair(
+                            "local_path",
+                            user.image
+                        ),
+                        Pair(
+                            "local_path",
+                            nonHumanAnimal.imageUrl
+                        ),
+                        Pair(
+                            "local_path",
+                            nonHumanAnimal.copy(id = nonHumanAnimal.id + "second").imageUrl
+                        ),
+                        Pair(
+                            "local_path",
+                            fosterHome.imageUrl
+                        ),
+                        Pair(
+                            "local_path",
+                            rescueEvent.imageUrl
+                        )
+                    )
+                ),
+                realtimeDatabaseRemoteNonHumanAnimalRepository = FakeRealtimeDatabaseRemoteNonHumanAnimalRepository(
+                    mutableListOf(
+                        nonHumanAnimal.toData(),
+                        nonHumanAnimal.copy(id = nonHumanAnimal.id + "second").toData(),
+                    )
+                ),
+                localNonHumanAnimalRepository = FakeLocalNonHumanAnimalRepository(
+                    mutableListOf(
+                        nonHumanAnimal.toEntity(),
+                        nonHumanAnimal.copy(id = nonHumanAnimal.id + "second").toEntity()
+                    )
+                ),
+                checkNonHumanAnimalUtil = FakeCheckNonHumanAnimalUtil(
+                    listOf(
+                        nonHumanAnimal,
+                        nonHumanAnimal.copy(id = nonHumanAnimal.id + "second")
+                    )
+                )
+            )
+            deleteAccountViewmodel.deleteAccount(userPwd)
+            deleteAccountViewmodel.deletionState.test {
+                assertTrue { awaitItem() is UiState.Idle }
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Success }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given a registered user_when that user deletes their account using their password but fails deleting a rescue event image in the remote repository_then the rescue event image is not deleted`() =
+        runTest {
+            val deleteAccountViewmodel = getDeleteAccountViewmodel(
+                fireStoreRemoteRescueEventRepository = FakeFireStoreRemoteRescueEventRepository(
+                    mutableListOf(rescueEvent.toData())
+                ),
+                localRescueEventRepository = FakeLocalRescueEventRepository(
+                    mutableListOf(rescueEventWithAllNeedsAndNonHumanAnimalData)
+                ),
+                fireStoreRemoteFosterHomeRepository = FakeFireStoreRemoteFosterHomeRepository(
+                    mutableListOf(fosterHome.toData())
+                ),
+                localFosterHomeRepository = FakeLocalFosterHomeRepository(
+                    mutableListOf(fosterHomeWithAllNonHumanAnimalData)
+                ),
+                realtimeDatabaseRemoteReviewRepository = FakeRealtimeDatabaseRemoteReviewRepository(
+                    mutableListOf(review.toData())
+                ),
+                localReviewRepository = FakeLocalReviewRepository(mutableListOf(review.toEntity())),
+                localCacheRepository = FakeLocalCacheRepository(
+                    mutableListOf(
+                        localCache.toEntity(),
+                        localCache.copy(
+                            cachedObjectId = nonHumanAnimal.id,
+                            section = Section.NON_HUMAN_ANIMALS
+                        ).toEntity(),
+                        localCache.copy(
+                            cachedObjectId = nonHumanAnimal.id + "second",
+                            section = Section.NON_HUMAN_ANIMALS
+                        ).toEntity()
+                    )
+                ),
+                authRepository = FakeAuthRepository(
+                    authUser = authUser,
+                    authEmail = user.email,
+                    authPassword = userPwd
+                ),
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
+                    mutableListOf(user.toData())
+                ),
+                localUserRepository = FakeLocalUserRepository(mutableListOf(user)),
+                storageRepository = FakeStorageRepository(
+                    remoteDatasourceList = mutableListOf(
+                        Pair("${Section.USERS.path}/${user.uid}", user.image),
+                        Pair(
+                            "${Section.NON_HUMAN_ANIMALS.path}/${user.uid}",
+                            "${nonHumanAnimal.id}.webp"
+                        ),
+                        Pair(
+                            "${Section.NON_HUMAN_ANIMALS.path}/${user.uid}",
+                            "${nonHumanAnimal.id + "second"}.webp"
+                        ),
+                        Pair(
                             "${Section.FOSTER_HOMES.path}/${user.uid}",
                             "${fosterHome.id}.webp"
                         )
@@ -237,15 +405,35 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                         ),
                         Pair(
                             "local_path",
+                            nonHumanAnimal.copy(id = nonHumanAnimal.id + "second").imageUrl
+                        ),
+                        Pair(
+                            "local_path",
                             fosterHome.imageUrl
+                        ),
+                        Pair(
+                            "local_path",
+                            rescueEvent.imageUrl
                         )
                     )
                 ),
                 realtimeDatabaseRemoteNonHumanAnimalRepository = FakeRealtimeDatabaseRemoteNonHumanAnimalRepository(
-                    mutableListOf(nonHumanAnimal.toData())
+                    mutableListOf(
+                        nonHumanAnimal.toData(),
+                        nonHumanAnimal.copy(id = nonHumanAnimal.id + "second").toData(),
+                    )
                 ),
                 localNonHumanAnimalRepository = FakeLocalNonHumanAnimalRepository(
-                    mutableListOf(nonHumanAnimal.toEntity())
+                    mutableListOf(
+                        nonHumanAnimal.toEntity(),
+                        nonHumanAnimal.copy(id = nonHumanAnimal.id + "second").toEntity()
+                    )
+                ),
+                checkNonHumanAnimalUtil = FakeCheckNonHumanAnimalUtil(
+                    listOf(
+                        nonHumanAnimal,
+                        nonHumanAnimal.copy(id = nonHumanAnimal.id + "second")
+                    )
                 )
             )
             deleteAccountViewmodel.deleteAccount(userPwd)
@@ -253,6 +441,201 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Success }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given a registered user_when that user deletes their account using their password but fails deleting a rescue event image in the local repository_then the rescue event image is not deleted in local`() =
+        runTest {
+            val deleteAccountViewmodel = getDeleteAccountViewmodel(
+                fireStoreRemoteRescueEventRepository = FakeFireStoreRemoteRescueEventRepository(
+                    mutableListOf(rescueEvent.toData())
+                ),
+                localRescueEventRepository = FakeLocalRescueEventRepository(
+                    mutableListOf(rescueEventWithAllNeedsAndNonHumanAnimalData)
+                ),
+                fireStoreRemoteFosterHomeRepository = FakeFireStoreRemoteFosterHomeRepository(
+                    mutableListOf(fosterHome.toData())
+                ),
+                localFosterHomeRepository = FakeLocalFosterHomeRepository(
+                    mutableListOf(fosterHomeWithAllNonHumanAnimalData)
+                ),
+                realtimeDatabaseRemoteReviewRepository = FakeRealtimeDatabaseRemoteReviewRepository(
+                    mutableListOf(review.toData())
+                ),
+                localReviewRepository = FakeLocalReviewRepository(mutableListOf(review.toEntity())),
+                localCacheRepository = FakeLocalCacheRepository(
+                    mutableListOf(
+                        localCache.toEntity(),
+                        localCache.copy(
+                            cachedObjectId = nonHumanAnimal.id,
+                            section = Section.NON_HUMAN_ANIMALS
+                        ).toEntity(),
+                        localCache.copy(
+                            cachedObjectId = nonHumanAnimal.id + "second",
+                            section = Section.NON_HUMAN_ANIMALS
+                        ).toEntity()
+                    )
+                ),
+                authRepository = FakeAuthRepository(
+                    authUser = authUser,
+                    authEmail = user.email,
+                    authPassword = userPwd
+                ),
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
+                    mutableListOf(user.toData())
+                ),
+                localUserRepository = FakeLocalUserRepository(mutableListOf(user)),
+                storageRepository = FakeStorageRepository(
+                    remoteDatasourceList = mutableListOf(
+                        Pair("${Section.USERS.path}/${user.uid}", user.image),
+                        Pair(
+                            "${Section.NON_HUMAN_ANIMALS.path}/${user.uid}",
+                            "${nonHumanAnimal.id}.webp"
+                        ),
+                        Pair(
+                            "${Section.NON_HUMAN_ANIMALS.path}/${user.uid}",
+                            "${nonHumanAnimal.id + "second"}.webp"
+                        ),
+                        Pair(
+                            "${Section.FOSTER_HOMES.path}/${user.uid}",
+                            "${fosterHome.id}.webp"
+                        ),
+                        Pair(
+                            "${Section.RESCUE_EVENTS.path}/${user.uid}",
+                            "${rescueEvent.id}.webp"
+                        )
+                    ),
+                    localDatasourceList = mutableListOf(
+                        Pair(
+                            "local_path",
+                            user.image
+                        ),
+                        Pair(
+                            "local_path",
+                            nonHumanAnimal.imageUrl
+                        ),
+                        Pair(
+                            "local_path",
+                            nonHumanAnimal.copy(id = nonHumanAnimal.id + "second").imageUrl
+                        ),
+                        Pair(
+                            "local_path",
+                            fosterHome.imageUrl
+                        )
+                    )
+                ),
+                realtimeDatabaseRemoteNonHumanAnimalRepository = FakeRealtimeDatabaseRemoteNonHumanAnimalRepository(
+                    mutableListOf(
+                        nonHumanAnimal.toData(),
+                        nonHumanAnimal.copy(id = nonHumanAnimal.id + "second").toData(),
+                    )
+                ),
+                localNonHumanAnimalRepository = FakeLocalNonHumanAnimalRepository(
+                    mutableListOf(
+                        nonHumanAnimal.toEntity(),
+                        nonHumanAnimal.copy(id = nonHumanAnimal.id + "second").toEntity()
+                    )
+                ),
+                checkNonHumanAnimalUtil = FakeCheckNonHumanAnimalUtil(
+                    listOf(
+                        nonHumanAnimal,
+                        nonHumanAnimal.copy(id = nonHumanAnimal.id + "second")
+                    )
+                )
+            )
+            deleteAccountViewmodel.deleteAccount(userPwd)
+            deleteAccountViewmodel.deletionState.test {
+                assertTrue { awaitItem() is UiState.Idle }
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Success }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given a registered user_when that user deletes their account using their password but fails deleting rescue events in the local repository_then the data is not deleted in the local repository`() =
+        runTest {
+            val deleteAccountViewmodel = getDeleteAccountViewmodel(
+                fireStoreRemoteRescueEventRepository = FakeFireStoreRemoteRescueEventRepository(
+                    mutableListOf(rescueEvent.toData())
+                ),
+                localCacheRepository = FakeLocalCacheRepository(
+                    mutableListOf(
+                        localCache.copy(
+                            cachedObjectId = nonHumanAnimal.id,
+                            section = Section.NON_HUMAN_ANIMALS
+                        ).toEntity(),
+                        localCache.copy(
+                            cachedObjectId = nonHumanAnimal.id + "second",
+                            section = Section.NON_HUMAN_ANIMALS
+                        ).toEntity()
+                    )
+                ),
+                authRepository = FakeAuthRepository(
+                    authUser = authUser,
+                    authEmail = user.email,
+                    authPassword = userPwd
+                ),
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
+                    mutableListOf(user.toData())
+                ),
+                localUserRepository = FakeLocalUserRepository(mutableListOf(user)),
+                storageRepository = FakeStorageRepository(
+                    remoteDatasourceList = mutableListOf(
+                        Pair(
+                            "${Section.NON_HUMAN_ANIMALS.path}/${user.uid}",
+                            "${nonHumanAnimal.id}.webp"
+                        ),
+                        Pair(
+                            "${Section.NON_HUMAN_ANIMALS.path}/${user.uid}",
+                            "${nonHumanAnimal.id + "second"}.webp"
+                        ),
+                        Pair(
+                            "${Section.RESCUE_EVENTS.path}/${user.uid}",
+                            "${rescueEvent.id}.webp"
+                        )
+                    ),
+                    localDatasourceList = mutableListOf(
+                        Pair(
+                            "local_path",
+                            nonHumanAnimal.imageUrl
+                        ),
+                        Pair(
+                            "local_path",
+                            nonHumanAnimal.copy(id = nonHumanAnimal.id + "second").imageUrl
+                        ),
+                        Pair(
+                            "local_path",
+                            rescueEvent.imageUrl
+                        )
+                    )
+                ),
+                realtimeDatabaseRemoteNonHumanAnimalRepository = FakeRealtimeDatabaseRemoteNonHumanAnimalRepository(
+                    mutableListOf(
+                        nonHumanAnimal.toData(),
+                        nonHumanAnimal.copy(id = nonHumanAnimal.id + "second").toData(),
+                    )
+                ),
+                localNonHumanAnimalRepository = FakeLocalNonHumanAnimalRepository(
+                    mutableListOf(
+                        nonHumanAnimal.toEntity(),
+                        nonHumanAnimal.copy(id = nonHumanAnimal.id + "second").toEntity()
+                    )
+                ),
+                checkNonHumanAnimalUtil = FakeCheckNonHumanAnimalUtil(
+                    listOf(
+                        nonHumanAnimal,
+                        nonHumanAnimal.copy(id = nonHumanAnimal.id + "second")
+                    )
+                )
+            )
+            deleteAccountViewmodel.deleteAccount(userPwd)
+            deleteAccountViewmodel.deletionState.test {
+                assertTrue { awaitItem() is UiState.Idle }
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Error }
                 ensureAllEventsConsumed()
             }
         }

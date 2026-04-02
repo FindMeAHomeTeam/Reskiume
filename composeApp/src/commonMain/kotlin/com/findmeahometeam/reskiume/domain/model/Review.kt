@@ -5,7 +5,7 @@ import com.findmeahometeam.reskiume.data.remote.response.RemoteReview
 
 data class Review(
     val id: String = "",
-    val savedBy : String,
+    val savedBy : String = "",
     val timestamp: Long,
     val authorUid: String,
     val reviewedUid: String,

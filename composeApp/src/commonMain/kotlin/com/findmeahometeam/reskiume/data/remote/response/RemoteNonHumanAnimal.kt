@@ -37,7 +37,6 @@ data class RemoteNonHumanAnimal(
         return NonHumanAnimal(
             id = id ?: "",
             caregiverId = caregiverId ?: "",
-            savedBy = "",
             name = name ?: "",
             ageCategory = ageCategory ?: AgeCategory.UNSELECTED,
             description = description ?: "",

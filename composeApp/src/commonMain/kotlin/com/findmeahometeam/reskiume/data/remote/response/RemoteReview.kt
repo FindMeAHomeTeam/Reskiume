@@ -24,7 +24,6 @@ data class RemoteReview(
     fun toDomain(): Review {
         return Review(
             id = id ?: "",
-            savedBy = "",
             timestamp = timestamp ?: 0L,
             authorUid = authorUid ?: "",
             reviewedUid = reviewedUid ?: "",

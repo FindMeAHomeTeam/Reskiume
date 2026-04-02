@@ -10,6 +10,7 @@ import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.Review
 import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
+import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueEvent
 import com.findmeahometeam.reskiume.domain.usecases.authUser.DeleteUserFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.DeleteAllMyFosterHomesFromLocalRepository
@@ -23,6 +24,10 @@ import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.DeleteAllNonH
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.DeleteAllNonHumanAnimalsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.DeleteAllMyRescueEventsFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.DeleteAllMyRescueEventsFromRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetAllMyRescueEventsFromRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetAllRescueEventsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.DeleteReviewsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.DeleteReviewsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromRemoteRepository
@@ -41,6 +46,10 @@ import kotlinx.coroutines.launch
 
 class DeleteAccountViewmodel(
     observeAuthStateInAuthDataSource: ObserveAuthStateInAuthDataSource,
+    private val getAllMyRescueEventsFromRemoteRepository: GetAllMyRescueEventsFromRemoteRepository,
+    private val getAllRescueEventsFromLocalRepository: GetAllRescueEventsFromLocalRepository,
+    private val deleteAllMyRescueEventsFromRemoteRepository: DeleteAllMyRescueEventsFromRemoteRepository,
+    private val deleteAllMyRescueEventsFromLocalRepository: DeleteAllMyRescueEventsFromLocalRepository,
     private val getAllMyFosterHomesFromRemoteRepository: GetAllMyFosterHomesFromRemoteRepository,
     private val getAllFosterHomesFromLocalRepository: GetAllFosterHomesFromLocalRepository,
     private val deleteAllMyFosterHomesFromRemoteRepository: DeleteAllMyFosterHomesFromRemoteRepository,
@@ -70,15 +79,18 @@ class DeleteAccountViewmodel(
     fun deleteAccount(password: String) {
         getUserFromRemoteRepo { user ->
 
-            // TODO delete rescue events and chats first
+            // TODO delete chats first
 
-            manageFosterHomesDeletion(user.uid) {
+            manageRescueEventsDeletion(user.uid) {
 
-                manageNonHumanAnimalsDeletion(user.uid) {
+                manageFosterHomesDeletion(user.uid) {
 
-                    manageUserReviewsDeletion(user.uid) {
+                    manageNonHumanAnimalsDeletion(user.uid) {
 
-                        manageUserDeletion(user, password)
+                        manageUserReviewsDeletion(user.uid) {
+
+                            manageUserDeletion(user, password)
+                        }
                     }
                 }
             }
@@ -109,6 +121,145 @@ class DeleteAccountViewmodel(
                 )
             } else {
                 onSuccess(remoteUser)
+            }
+        }
+    }
+
+    private fun manageRescueEventsDeletion(uid: String, onComplete: () -> Unit) {
+
+        viewModelScope.launch {
+
+            val allMyRescueEvents: List<RescueEvent> =
+                getAllMyRescueEventsFromRemoteRepository(uid).first()
+
+            if (allMyRescueEvents.isEmpty()) {
+                onComplete()
+            } else {
+                deleteAllMyRescueEventImagesFromRemoteDataSource(allMyRescueEvents) {
+
+                    deleteAllRescueEventImagesFromLocalDataSource {
+
+                        deleteAllMyRescueEventsFromRemoteDataSource(uid) {
+
+                            deleteAllMyRescueEventsFromLocalDataSource(uid) {
+
+                                onComplete()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun deleteAllMyRescueEventImagesFromRemoteDataSource(
+        allMyRescueEvents: List<RescueEvent>,
+        onComplete: () -> Unit
+    ) {
+        viewModelScope.launch {
+
+            allMyRescueEvents.forEach { remoteRescueEvent ->
+
+                deleteImageFromRemoteDataSource(
+                    userUid = remoteRescueEvent.creatorId,
+                    extraId = remoteRescueEvent.id,
+                    section = Section.RESCUE_EVENTS,
+                    currentImage = remoteRescueEvent.imageUrl
+                ) { isDeleted ->
+
+                    if (isDeleted) {
+                        log.d(
+                            "DeleteAccountViewModel",
+                            "deleteAllMyRescueEventImagesFromRemoteDataSource: Image from the rescue event ${remoteRescueEvent.id} was deleted successfully in the remote data source"
+                        )
+                    } else {
+                        log.e(
+                            "DeleteAccountViewModel",
+                            "deleteAllMyRescueEventImagesFromRemoteDataSource: failed to delete the image from the rescue event ${remoteRescueEvent.id} in the remote data source"
+                        )
+                    }
+                }
+            }
+            onComplete()
+        }
+    }
+
+    private fun deleteAllRescueEventImagesFromLocalDataSource(onComplete: () -> Unit) {
+        viewModelScope.launch {
+
+            val allMyRescueEvents: List<RescueEvent> =
+                getAllRescueEventsFromLocalRepository().first()
+
+            allMyRescueEvents.forEach { localRescueEvent ->
+
+                deleteImageFromLocalDataSource(currentImagePath = localRescueEvent.imageUrl) { isDeleted ->
+
+                    if (isDeleted) {
+                        log.d(
+                            "DeleteAccountViewModel",
+                            "deleteAllRescueEventImagesFromLocalDataSource: Image from the rescue event ${localRescueEvent.id} was deleted successfully in the local data source"
+                        )
+                    } else {
+                        log.e(
+                            "DeleteAccountViewModel",
+                            "deleteAllRescueEventImagesFromLocalDataSource: failed to delete the image from the rescue event ${localRescueEvent.id} in the local data source"
+                        )
+                    }
+                }
+            }
+            onComplete()
+        }
+    }
+
+    private fun deleteAllMyRescueEventsFromRemoteDataSource(
+        uid: String,
+        onSuccess: () -> Unit
+    ) {
+        viewModelScope.launch {
+
+            deleteAllMyRescueEventsFromRemoteRepository(
+                uid,
+                viewModelScope
+            ) { databaseResult ->
+
+                if (databaseResult is DatabaseResult.Success) {
+                    log.d(
+                        "DeleteAccountViewmodel",
+                        "deleteAllMyRescueEventsFromRemoteDataSource: deleted rescue events from the owner id $uid from the remote repository"
+                    )
+                    onSuccess()
+                } else {
+                    log.e(
+                        "DeleteAccountViewmodel",
+                        "deleteAllMyRescueEventsFromRemoteDataSource: failed to delete rescue events from the owner id $uid from the remote repository: ${(databaseResult as DatabaseResult.Error).message}"
+                    )
+                    _deletionState.value = UiState.Error()
+                }
+            }
+        }
+    }
+
+    private fun deleteAllMyRescueEventsFromLocalDataSource(
+        uid: String,
+        onSuccess: () -> Unit
+    ) {
+        viewModelScope.launch {
+
+            deleteAllMyRescueEventsFromLocalRepository(uid, viewModelScope) { rowsDeleted ->
+
+                if (rowsDeleted > 0) {
+                    log.d(
+                        "DeleteAccountViewmodel",
+                        "deleteAllMyRescueEventsFromLocalDataSource: deleted $rowsDeleted rescue events from the creator $uid from the local repository"
+                    )
+                    onSuccess()
+                } else {
+                    log.e(
+                        "DeleteAccountViewmodel",
+                        "deleteAllMyRescueEventsFromLocalDataSource: failed to delete rescue events from the creator $uid from the local repository"
+                    )
+                    _deletionState.value = UiState.Error()
+                }
             }
         }
     }
@@ -238,13 +389,13 @@ class DeleteAccountViewmodel(
                 if (rowsDeleted > 0) {
                     log.d(
                         "DeleteAccountViewmodel",
-                        "deleteAllMyFosterHomesFromLocalDataSource: deleted $rowsDeleted foster homes from the caregiver $uid from the local repository"
+                        "deleteAllMyFosterHomesFromLocalDataSource: deleted $rowsDeleted foster homes from the owner $uid from the local repository"
                     )
                     onSuccess()
                 } else {
                     log.e(
                         "DeleteAccountViewmodel",
-                        "deleteAllMyFosterHomesFromLocalDataSource: failed to delete foster homes from the caregiver $uid from the local repository"
+                        "deleteAllMyFosterHomesFromLocalDataSource: failed to delete foster homes from the owner $uid from the local repository"
                     )
                     _deletionState.value = UiState.Error()
                 }

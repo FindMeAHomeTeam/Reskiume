@@ -49,6 +49,7 @@ import com.findmeahometeam.reskiume.ui.util.StringProvider
 import com.findmeahometeam.reskiume.ui.util.StringProviderImpl
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
+import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -61,7 +62,35 @@ val uiModule = module {
     viewModelOf(::CreateAccountViewmodel)
     viewModelOf(::LoginAccountViewmodel)
     viewModelOf(::ModifyAccountViewmodel)
-    viewModelOf(::DeleteAccountViewmodel)
+    viewModel {
+        DeleteAccountViewmodel(
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get()
+        )
+    }
     viewModelOf(::CheckReviewsViewmodel)
     singleOf(::CheckReviewsUtilImpl) bind CheckReviewsUtil::class
     singleOf(::CheckActivistUtilImpl) bind CheckActivistUtil::class

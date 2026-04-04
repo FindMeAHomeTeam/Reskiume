@@ -46,7 +46,6 @@
     <!-- Create account screen -->
     <string name="create_account_screen_create_account_title">Create an account</string>
     <string name="create_account_screen_add_photo_message">Add a photo</string>
-    <string name="create_account_screen_notification_area">Place to receive rescue event notifications</string>
     <string name="create_account_screen_from_gallery_message">Gallery</string>
     <string name="create_account_screen_from_camera_message">Camera</string>
     <string name="create_account_screen_delete_message">Delete</string>
@@ -56,6 +55,21 @@
     <string name="create_account_screen_create_account_button">Create account</string>
     <string name="create_account_screen_already_have_an_account">Already have an account? Log in</string>
     <string name="create_account_screen_log_in">Log in</string>
+
+    <!-- Manage notification permission -->
+    <string name="manage_notification_permission_title">Notification permission</string>
+    <string name="manage_notification_permission_message">Please grant notification permission so we can alert you when a new chat message arrives.</string>
+    <string name="manage_notification_permission_grant_permission_button">Grant permission</string>
+    <string name="manage_notification_permission_do_not_grant_permission_button">Later</string>
+    <string name="manage_notification_permission_go_to_settings_title">Go to settings</string>
+    <string name="manage_notification_permission_grant_in_settings_message">Notification permissions can be enabled in settings. Remember, it is important to notify you when a new message arrives.</string>
+    <string name="manage_notification_permission_open_settings_button">Open settings</string>
+
+    <!-- Manage notification area -->
+    <string name="manage_notification_area_enabled">Enabled</string>
+    <string name="manage_notification_area_disabled">Disabled</string>
+    <string name="manage_notification_area_get_rescue_events_notifications">Receive rescue events notifications near you</string>
+    <string name="manage_notification_area_notification_area">Notification area</string>
 
     <!-- Camera picker permission -->
     <string name="camera_picker_permission_title">Camera permission required</string>
@@ -266,7 +280,7 @@
     <!-- Manage location permission for a foster home and a rescue event -->
     <string name="manage_location_permission_title">Location permission</string>
     <string name="manage_location_permission_message_check_all">You can grant the location permission to display %1$ss near you. We will never track your location.</string>
-    <string name="manage_location_permission_message">You must grant location permission to access your %1$s's coarse location. Users can see the distance between nearby %1$ss using their current location. Furthermore, we will never track and reveal your location.</string>
+    <string name="manage_location_permission_message">Please, grant location permission to access your %1$s's coarse location. Users can see the distance between nearby %1$ss using their current location. Furthermore, we will never track and reveal your location.</string>
     <string name="manage_location_permission_grant_permission_button">Grant permission</string>
     <string name="manage_location_permission_do_not_grant_permission_button">Later</string>
     <string name="manage_location_permission_go_to_settings_title">Go to settings</string>

@@ -42,7 +42,7 @@ fun RmCountryAndCitySelectors(
     })
     val countryItems: List<Pair<Country, String>> by placeUtil.allCountryItems()
         .collectAsState(initial = emptyList())
-    var isCityVisible: Boolean by rememberSaveable { mutableStateOf(selectedCity != City.UNSELECTED) }
+    var isCityVisible: Boolean by rememberSaveable { mutableStateOf(selectedCountry != Country.UNSELECTED) }
     val cityFieldState = rememberTextFieldState(if (selectedCity == City.UNSELECTED) {
         ""
     } else {

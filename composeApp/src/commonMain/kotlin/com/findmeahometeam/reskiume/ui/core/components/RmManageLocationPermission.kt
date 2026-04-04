@@ -56,8 +56,7 @@ fun RmManageLocationPermission(
             denyMessage = stringResource(Res.string.manage_location_permission_do_not_grant_permission_button),
         ),
         managePermissionState = permissionState,
-        updateManagePermissionState = onUpdatePermissionState,
-        onPermissionGranted = {}
+        updateManagePermissionState = onUpdatePermissionState
     )
 
     if (permissionState == ManagePermissionState.PERMISSION_GRANTED) {

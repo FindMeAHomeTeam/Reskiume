@@ -20,11 +20,10 @@ fun RmManagePermission(
     stringsForDialogToOpenSettings: StringsForDialog,
     managePermissionState: ManagePermissionState,
     updateManagePermissionState: (managePermissionState: ManagePermissionState) -> Unit,
-    onPermissionGranted: () -> Unit
 ) {
 
     when (managePermissionState) {
-        ManagePermissionState.IDLE -> {}
+        ManagePermissionState.IDLE, ManagePermissionState.PERMISSION_GRANTED -> {}
         ManagePermissionState.CHECK_PERMISSION -> {
 
             RetrievePermissionStateEffect(
@@ -112,7 +111,6 @@ fun RmManagePermission(
                 }
             }
         }
-        ManagePermissionState.PERMISSION_GRANTED -> onPermissionGranted()
     }
 }
 

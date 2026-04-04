@@ -49,4 +49,6 @@ iosApp/Pods/*
 *.json
 *.jks
 *.plist
-
+functions/
+.agents/
+.firebaserc

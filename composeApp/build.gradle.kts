@@ -52,6 +52,7 @@ kotlin {
             implementation(libs.firebase.crashlytics.ndk)
             implementation(libs.firebase.analytics)
             implementation(libs.firebase.storage)
+            implementation(libs.firebase.messaging)
             implementation(libs.ktor.client.android)
         }
         androidUnitTest.dependencies {
@@ -95,6 +96,7 @@ kotlin {
 
             implementation(libs.moko.permissions.compose)
             implementation(libs.moko.permissions.location)
+            implementation(libs.moko.permissions.notifications)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

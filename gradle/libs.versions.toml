@@ -3,20 +3,20 @@ agp = "8.13.2"
 android-compileSdk = "36"
 android-minSdk = "24"
 android-targetSdk = "36"
-androidx-activity = "1.12.4"
-androidx-lifecycle = "2.9.6"
+androidx-activity = "1.13.0"
+androidx-lifecycle = "2.10.0"
 coil = "3.3.0" #Needs a new kotlin version
-componentsResources = "1.10.1"
+componentsResources = "1.10.3"
 composeHotReload = "1.0.0"
-composeMultiplatform = "1.10.1"
+composeMultiplatform = "1.10.3"
 coroutines = "1.10.2"
 crashlyticsPlugin = "3.0.6"
-firebase-bom = "34.10.0"
-foundation = "1.10.1"
+firebase-bom = "34.11.0"
+foundation = "1.10.3"
 googleServices = "4.4.4"
 imagepickerkmp = "1.0.28-beta3" #Camera bounds broken in new versions
 junit = "4.13.2"
-koin-bom = "4.1.1"
+koin-bom = "4.1.1" #Needs a new kotlin version
 konnectivity = "0.1-alpha01"
 kotlin = "2.2.20"
 kotlinxDatetime = "0.7.1-0.6.x-compat"
@@ -30,12 +30,12 @@ nativecoroutines = "1.0.0-ALPHA-47" #Needs a new kotlin version
 navigation = "2.9.2"
 paging = "3.4.0-beta01" #Problems with iOS
 room = "2.8.2" #Needs a new kotlin version
-runtime = "1.10.1"
+runtime = "1.10.3"
 sqlite = "2.6.1" #Needs a new kotlin version
 turbine = "1.2.1"
-ui = "1.10.1"
-uiTooling = "1.10.1"
-uiToolingPreview = "1.10.1"
+ui = "1.10.3"
+uiTooling = "1.10.3"
+uiToolingPreview = "1.10.3"
 
 [libraries]
 #core
@@ -102,6 +102,7 @@ konnectivity = { module = "com.plusmobileapps:konnectivity", version.ref = "konn
 #moko-permissions
 moko-permissions-compose = { module = "dev.icerock.moko:permissions-compose", version.ref = "moko-permissions" }
 moko-permissions-location = { module = "dev.icerock.moko:permissions-location", version.ref = "moko-permissions" }
+moko-permissions-notifications = { module = "dev.icerock.moko:permissions-notifications", version.ref = "moko-permissions" }
 
 #firebase
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
@@ -112,6 +113,7 @@ firebase-config = { module = "com.google.firebase:firebase-config" }
 firebase-crashlytics-ndk = { module = "com.google.firebase:firebase-crashlytics-ndk" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-storage = { module = "com.google.firebase:firebase-storage" }
+firebase-messaging = { module = "com.google.firebase:firebase-messaging" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

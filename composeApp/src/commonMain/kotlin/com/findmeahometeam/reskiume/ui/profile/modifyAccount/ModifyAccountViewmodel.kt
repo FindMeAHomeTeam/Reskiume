@@ -188,7 +188,7 @@ class ModifyAccountViewmodel(
 
     private fun deleteCurrentImageFromLocalDataSource(user: User, onSuccess: () -> Unit) {
         viewModelScope.launch {
-            val previousUserData: User = getUserFromLocalDataSource(user.uid)!!
+            val previousUserData: User = getUserFromLocalDataSource(user.uid).first()!!
 
             deleteImageFromLocalDataSource(currentImagePath = previousUserData.image) { isDeleted ->
 
@@ -264,8 +264,8 @@ class ModifyAccountViewmodel(
     ) {
         viewModelScope.launch {
 
-            modifyUserInLocalDataSource(user) { rowsModified: Int ->
-                if (rowsModified > 0) {
+            modifyUserInLocalDataSource(user) { isUpdated ->
+                if (isUpdated) {
                     log.d(
                         "ModifyAccountViewmodel",
                         "saveUserChangesInLocalDataSource: User ${user.uid} updated successfully in the local data source"
@@ -299,7 +299,7 @@ class ModifyAccountViewmodel(
     ) {
         viewModelScope.launch {
             val authUser: AuthUser = authUserState.first()!!
-            val user: User = getUserFromLocalDataSource(authUser.uid)!!
+            val user: User = getUserFromLocalDataSource(authUser.uid).first()!!
 
             modifyCacheInLocalRepository(
                 LocalCache(

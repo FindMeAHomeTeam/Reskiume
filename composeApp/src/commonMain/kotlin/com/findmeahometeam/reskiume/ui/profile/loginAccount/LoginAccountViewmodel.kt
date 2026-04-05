@@ -6,7 +6,7 @@ import com.findmeahometeam.reskiume.data.remote.response.AuthResult
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.model.User
+import com.findmeahometeam.reskiume.domain.model.user.User
 import com.findmeahometeam.reskiume.domain.usecases.authUser.SignInWithEmailAndPasswordFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
@@ -18,6 +18,7 @@ import com.findmeahometeam.reskiume.ui.core.components.UiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
@@ -60,18 +61,18 @@ class LoginAccountViewmodel(
                     getUserFromRemoteDataSourceAndSaveItsAvatarIfNeeded(authUser.uid) { collectedUser: User ->
 
                         viewModelScope.launch {
-                            insertUserInLocalDataSource(collectedUser) { rowId: Long ->
+                            insertUserInLocalDataSource(collectedUser) { isSuccess ->
 
-                                if (rowId > 0) {
+                                if (isSuccess) {
                                     log.d(
                                         "LoginAccountViewmodel",
-                                        "updateLocalUser: Inserted user with uid ${collectedUser.uid} into local data source."
+                                        "updateLocalUser: Inserted user with uid ${collectedUser.uid} into the local data source."
                                     )
                                     _state.value = UiState.Success(Unit)
                                 } else {
                                     log.e(
                                         "LoginAccountViewmodel",
-                                        "updateLocalUser: Failed to insert user with uid ${collectedUser.uid} into local data source."
+                                        "updateLocalUser: Failed to insert user with uid ${collectedUser.uid} into the local data source."
                                     )
                                     _state.value = UiState.Error()
                                 }
@@ -88,7 +89,7 @@ class LoginAccountViewmodel(
                 },
                 onVerifyCacheIsRecent = {
 
-                    val user = getUserFromLocalDataSource(authUser.uid)!!
+                    val user = getUserFromLocalDataSource(authUser.uid).first()!!
                     modifyUserInLocalRepo(user.copy(isLoggedIn = true))
                     log.d(
                         "LoginAccountViewmodel",
@@ -104,9 +105,9 @@ class LoginAccountViewmodel(
     private fun modifyUserInLocalRepo(collectedUser: User) {
         viewModelScope.launch {
 
-            modifyUserInLocalDataSource(collectedUser) { rowsModified: Int ->
+            modifyUserInLocalDataSource(collectedUser) { isUpdated ->
 
-                if (rowsModified > 0) {
+                if (isUpdated) {
                     log.d(
                         "LoginAccountViewmodel",
                         "modifyUserInLocalRepo: Modified user with uid ${collectedUser.uid} in the local data source."
@@ -143,10 +144,12 @@ class LoginAccountViewmodel(
                     extraId = "",
                     section = Section.USERS
                 )
-                onSavedAvatar(collectedUser.copy(
-                    image = localImagePath.ifBlank { collectedUser.image },
-                    isLoggedIn = true
-                ))
+                onSavedAvatar(
+                    collectedUser.copy(
+                        image = localImagePath.ifBlank { collectedUser.image },
+                        isLoggedIn = true
+                    )
+                )
             } else {
                 log.d(
                     "LoginAccountViewmodel",

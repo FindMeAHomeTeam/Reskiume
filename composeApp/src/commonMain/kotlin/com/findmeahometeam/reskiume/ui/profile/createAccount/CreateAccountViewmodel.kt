@@ -243,8 +243,8 @@ class CreateAccountViewmodel(
         onError: () -> Unit
     ) {
         viewModelScope.launch {
-            insertUserInLocalDataSource(user) { rowId ->
-                if (rowId > 0) {
+            insertUserInLocalDataSource(user) { isSuccess ->
+                if (isSuccess) {
                     log.d(
                         "CreateAccountViewmodel",
                         "insertUserInLocalRepo: User ${user.uid} created successfully in the local repository"

@@ -87,7 +87,7 @@ class CheckAllRescueEventsViewmodel(
 
     val authState: Flow<AuthUser?> = observeAuthStateInAuthDataSource().map { authUser ->
 
-        val user = if (authUser != null) getUserFromLocalDataSource(authUser.uid) else null
+        val user = if (authUser != null) getUserFromLocalDataSource(authUser.uid).firstOrNull() else null
 
         if (user == null || !user.isLoggedIn) {
             myUid = " "

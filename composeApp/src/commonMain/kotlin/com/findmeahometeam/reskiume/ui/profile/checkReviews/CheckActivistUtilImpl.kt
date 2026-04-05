@@ -45,7 +45,7 @@ class CheckActivistUtilImpl(
                     .firstOrNull()
             },
             onVerifyCacheIsRecent = {
-                getUserFromLocalDataSource(activistUid)
+                getUserFromLocalDataSource(activistUid).firstOrNull()
             }
         )
         return user?.copy(
@@ -77,7 +77,7 @@ class CheckActivistUtilImpl(
                 } else {
                     log.d(
                         "CheckActivistUtil",
-                        "User ${activist.uid} has no avatar image to save locally."
+                        "saveImageAndInsertUserInLocalRepository: User ${activist.uid} has no avatar image to save locally."
                     )
                     insertUserInLocalRepository(activist)
 
@@ -88,17 +88,17 @@ class CheckActivistUtilImpl(
 
     private suspend fun insertUserInLocalRepository(user: User) {
 
-        insertUserInLocalDataSource(user) { rowId ->
+        insertUserInLocalDataSource(user) { isSuccess ->
 
-            if (rowId > 0) {
+            if (isSuccess) {
                 log.d(
                     "CheckActivistUtil",
-                    "User ${user.uid} added to local database"
+                    "insertUserInLocalRepository: User ${user.uid} added to local database"
                 )
             } else {
                 log.e(
                     "CheckActivistUtil",
-                    "Error adding user ${user.uid} to local database"
+                    "insertUserInLocalRepository: Error adding user ${user.uid} to local database"
                 )
             }
         }
@@ -124,7 +124,7 @@ class CheckActivistUtilImpl(
                 } else {
                     log.d(
                         "CheckActivistUtil",
-                        "User ${activist.uid} has no avatar image to save locally."
+                        "saveImageAndModifyUserInLocalRepository: User ${activist.uid} has no avatar image to save locally."
                     )
                     modifyUserInLocalRepository(activist)
                     activist
@@ -134,17 +134,17 @@ class CheckActivistUtilImpl(
 
     private suspend fun modifyUserInLocalRepository(user: User) {
 
-        modifyUserInLocalDataSource(user) { rowsUpdated: Int ->
+        modifyUserInLocalDataSource(user) { isUpdated: Boolean ->
 
-            if (rowsUpdated > 0) {
+            if (isUpdated) {
                 log.d(
                     "CheckActivistUtil",
-                    "Modified user with uid ${user.uid} into local data source."
+                    "modifyUserInLocalRepository: Modified user with uid ${user.uid} into local data source."
                 )
             } else {
                 log.e(
                     "CheckActivistUtil",
-                    "Failed to modify user with uid ${user.uid} in local data source."
+                    "modifyUserInLocalRepository: Failed to modify user with uid ${user.uid} in local data source."
                 )
             }
         }

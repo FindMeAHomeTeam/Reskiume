@@ -14,7 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.findmeahometeam.reskiume.domain.model.User
+import com.findmeahometeam.reskiume.domain.model.user.User
 import com.findmeahometeam.reskiume.ui.core.primaryGreen
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource

@@ -1,7 +1,7 @@
 package com.findmeahometeam.reskiume.domain.usecases.user
 
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
-import com.findmeahometeam.reskiume.domain.model.User
+import com.findmeahometeam.reskiume.domain.model.user.User
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
 
 class InsertUserInRemoteDataSource(private val repository: RealtimeDatabaseRemoteUserRepository) {

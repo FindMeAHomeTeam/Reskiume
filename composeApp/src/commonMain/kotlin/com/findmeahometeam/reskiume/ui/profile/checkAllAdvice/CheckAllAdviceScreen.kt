@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.domain.model.Advice
-import com.findmeahometeam.reskiume.domain.model.User
+import com.findmeahometeam.reskiume.domain.model.user.User
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.components.RmDialog
 import com.findmeahometeam.reskiume.ui.core.components.RmDisplaySingleChoiceSegmentedButtonRow

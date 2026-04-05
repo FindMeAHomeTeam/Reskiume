@@ -8,7 +8,7 @@ import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.Review
-import com.findmeahometeam.reskiume.domain.model.User
+import com.findmeahometeam.reskiume.domain.model.user.User
 import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueEvent
 import com.findmeahometeam.reskiume.domain.usecases.authUser.DeleteUserFromAuthDataSource
@@ -667,7 +667,7 @@ class DeleteAccountViewmodel(
     private fun deleteAllUserAvatarsFromLocalDataSource(onComplete: () -> Unit) {
         viewModelScope.launch {
 
-            val allUsers: List<User> = getAllUsersFromLocalDataSource()
+            val allUsers: List<User> = getAllUsersFromLocalDataSource().first()
             allUsers.forEach { user ->
 
                 if (user.image.isNotBlank()) {

@@ -1,6 +1,6 @@
 package com.findmeahometeam.reskiume.ui.integrationTests.fakes
 
-import com.findmeahometeam.reskiume.domain.model.User
+import com.findmeahometeam.reskiume.domain.model.user.User
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckActivistUtil
 import com.findmeahometeam.reskiume.user
 

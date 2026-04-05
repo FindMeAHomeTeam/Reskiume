@@ -1,7 +1,7 @@
 package com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser
 
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
-import com.findmeahometeam.reskiume.data.remote.response.RemoteUser
+import com.findmeahometeam.reskiume.data.remote.response.remoterUser.RemoteUser
 
 interface RealtimeDatabaseRemoteUserRepositoryForIosDelegate {
     suspend fun insertRemoteUser(remoteUser: RemoteUser, onInsertRemoteUser: (result: DatabaseResult) -> Unit)

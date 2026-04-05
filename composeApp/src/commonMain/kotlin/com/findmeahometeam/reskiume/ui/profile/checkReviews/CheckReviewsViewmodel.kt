@@ -2,7 +2,7 @@ package com.findmeahometeam.reskiume.ui.profile.checkReviews
 
 import androidx.lifecycle.ViewModel
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
-import com.findmeahometeam.reskiume.domain.model.User
+import com.findmeahometeam.reskiume.domain.model.user.User
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckReviews
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider

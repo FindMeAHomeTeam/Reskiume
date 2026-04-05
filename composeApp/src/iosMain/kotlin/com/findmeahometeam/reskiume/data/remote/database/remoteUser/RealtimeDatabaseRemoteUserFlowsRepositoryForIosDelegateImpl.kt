@@ -1,6 +1,6 @@
 package com.findmeahometeam.reskiume.data.remote.database.remoteUser
 
-import com.findmeahometeam.reskiume.data.remote.response.RemoteUser
+import com.findmeahometeam.reskiume.data.remote.response.remoterUser.RemoteUser
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserFlowsRepositoryForIosDelegate
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow

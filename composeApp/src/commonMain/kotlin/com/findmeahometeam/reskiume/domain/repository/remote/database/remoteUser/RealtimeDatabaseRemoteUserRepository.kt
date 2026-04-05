@@ -1,7 +1,7 @@
 package com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser
 
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
-import com.findmeahometeam.reskiume.data.remote.response.RemoteUser
+import com.findmeahometeam.reskiume.data.remote.response.remoterUser.RemoteUser
 import kotlinx.coroutines.flow.Flow
 
 interface RealtimeDatabaseRemoteUserRepository {

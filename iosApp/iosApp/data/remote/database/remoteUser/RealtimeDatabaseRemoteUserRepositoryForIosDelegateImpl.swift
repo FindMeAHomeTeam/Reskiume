@@ -28,23 +28,16 @@ class RealtimeDatabaseRemoteUserRepositoryForIosDelegateImpl: RealtimeDatabaseRe
                     if userUid != "" {
                         database.reference().child(Section.users.path).child(userUid).observeSingleEvent (of: .value, with: { snapshot in
                             let nSDictionary: NSDictionary? = snapshot.value as? NSDictionary
-                            
-                            let receiveRescueNotificationsAny = nSDictionary?["receiveRescueNotifications"]
-
-                            // Support NSNumber, DarwinBoolean, or Bool
-                            let receiveRescueNotificationsBool: Bool? =
-                                (receiveRescueNotificationsAny as? NSNumber)?.boolValue ??
-                                (receiveRescueNotificationsAny as? DarwinBoolean)?.boolValue ??
-                                (receiveRescueNotificationsAny as? Bool)
 
                             let remoteUser: RemoteUser = RemoteUser(
                                 uid: nSDictionary?["uid"] as? String ?? "",
                                 username: nSDictionary?["username"] as? String ?? "",
                                 description: nSDictionary?["description"] as? String ?? "",
                                 image: nSDictionary?["image"] as? String ?? "",
-                                country: nSDictionary?["country"] as? String ?? "",
-                                city: nSDictionary?["city"] as? String ?? "",
-                                receiveRescueNotifications: KotlinBoolean(value: receiveRescueNotificationsBool ?? false)
+                                countryForRescueEventNotifications: nSDictionary?["countryForRescueEventNotifications"] as? String ?? "",
+                                cityForRescueEventNotifications: nSDictionary?["cityForRescueEventNotifications"] as? String ?? "",
+                                fcmToken: nSDictionary?["fcmToken"] as? String ?? "",
+                                subscriptions: nSDictionary?["subscriptions"] as? [RemoteSubscription] ?? []
                             )
                             realtimeDatabaseRemoteUserFlowsRepositoryForIosDelegate.updateRealtimeDatabaseRemoteUserRepositoryForIosDelegate(delegate: remoteUser)
                             
@@ -74,10 +67,21 @@ class RealtimeDatabaseRemoteUserRepositoryForIosDelegateImpl: RealtimeDatabaseRe
             "username": remoteUser.username!,
             "description": remoteUser.description_!,
             "image": remoteUser.image!,
-            "country": remoteUser.country!,
-            "city": remoteUser.city!,
-            "receiveRescueNotifications": remoteUser.receiveRescueNotifications?.boolValue == true
+            "countryForRescueEventNotifications": remoteUser.countryForRescueEventNotifications!,
+            "cityForRescueEventNotifications": remoteUser.cityForRescueEventNotifications!,
+            "fcmToken": remoteUser.fcmToken!,
+            "subscriptions": remoteSubscriptionForUserTodictArray(from: remoteUser.subscriptions!)
         ]
+    }
+    
+    private func remoteSubscriptionForUserTodictArray(from items: [RemoteSubscription]?) -> [[String: Any]] {
+        (items ?? []).map {
+            [
+                "subscriptionId": $0.subscriptionId ?? "",
+                "uid": $0.uid ?? "",
+                "topic": $0.topic ?? ""
+            ]
+        }
     }
     
     func insertRemoteUser(remoteUser: RemoteUser, onInsertRemoteUser: @escaping (DatabaseResult) -> Void) async {

@@ -16,15 +16,17 @@ import com.findmeahometeam.reskiume.data.database.entity.LocalCacheEntity
 import com.findmeahometeam.reskiume.data.database.entity.NonHumanAnimalEntity
 import com.findmeahometeam.reskiume.data.database.entity.fosterHome.ResidentNonHumanAnimalIdEntityForFosterHome
 import com.findmeahometeam.reskiume.data.database.entity.ReviewEntity
-import com.findmeahometeam.reskiume.data.database.entity.UserEntity
+import com.findmeahometeam.reskiume.data.database.entity.user.UserEntity
 import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.NeedToCoverEntityForRescueEvent
 import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.NonHumanAnimalToRescueEntityForRescueEvent
 import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.RescueEventEntity
+import com.findmeahometeam.reskiume.data.database.entity.user.SubscriptionEntityForUser
 
 @Database(
     entities = [
         LocalCacheEntity::class,
         UserEntity::class,
+        SubscriptionEntityForUser::class,
         ReviewEntity::class,
         NonHumanAnimalEntity::class,
         FosterHomeEntity::class,

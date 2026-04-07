@@ -1,18 +1,17 @@
 package com.findmeahometeam.reskiume.ui.home
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.user.User
-import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.ui.core.components.UiState
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 
 class HomeViewmodel(
     observeAuthStateInAuthDataSource: ObserveAuthStateInAuthDataSource,
@@ -20,29 +19,29 @@ class HomeViewmodel(
     private val getUserFromLocalDataSource: GetUserFromLocalDataSource
 ) : ViewModel() {
 
-    val state: StateFlow<UiState<Unit>> = observeAuthStateInAuthDataSource().map { authUser: AuthUser? ->
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val state: Flow<UiState<Unit>> = observeAuthStateInAuthDataSource().flatMapConcat { authUser: AuthUser? ->
         if (authUser?.uid == null) {
             log.d("HomeViewmodel", "User not logged in")
-            UiState.Idle()
+            flowOf(UiState.Idle())
         } else {
-            val user: User? = getUserFromLocalDataSource(authUser.uid).firstOrNull()
-            when {
-                user == null -> {
-                    log.e("HomeViewmodel", "User ${authUser.uid} not found")
-                    UiState.Idle()
-                }
-                !user.isLoggedIn -> {
-                    log.e("HomeViewmodel", "User ${authUser.uid} is not logged in")
-                    UiState.Idle()
-                }
-                else -> {
-                    UiState.Success(Unit)
+            getUserFromLocalDataSource(authUser.uid).map { user: User? ->
+                when {
+                    user == null -> {
+                        log.e("HomeViewmodel", "User ${authUser.uid} not found")
+                        UiState.Idle()
+                    }
+
+                    !user.isLoggedIn -> {
+                        log.d("HomeViewmodel", "User ${authUser.uid} is not logged in")
+                        UiState.Idle()
+                    }
+
+                    else -> {
+                        UiState.Success(Unit)
+                    }
                 }
             }
         }
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = UiState.Idle()
-    )
+    }
 }

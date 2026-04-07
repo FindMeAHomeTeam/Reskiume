@@ -26,7 +26,7 @@ interface UserDao {
     @Query("DELETE FROM UserEntity WHERE uid = :uid OR savedBy = :uid OR savedBy = ' ' OR savedBy = '' ")
     suspend fun deleteUsers(uid: String): Int
 
-    @Query("DELETE FROM SubscriptionEntityForUser WHERE uid = :subscriptionId ")
+    @Query("DELETE FROM SubscriptionEntityForUser WHERE subscriptionId = :subscriptionId ")
     suspend fun deleteSubscription(subscriptionId: String): Int
 
     @Transaction

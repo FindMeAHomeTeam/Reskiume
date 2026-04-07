@@ -11,12 +11,12 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -37,9 +37,11 @@ import org.koin.compose.viewmodel.koinViewModel
 fun HomeScreen(mainNavHostController: NavHostController) {
 
     val homeViewmodel: HomeViewmodel = koinViewModel<HomeViewmodel>()
-    val authState: UiState<Unit> by homeViewmodel.state.collectAsState()
+    val authState: UiState<Unit> by homeViewmodel.state.collectAsStateWithLifecycle(
+        initialValue = UiState.Idle()
+    )
 
-    val displayChats = authState == UiState.Success(Unit)
+    val displayChats = authState is UiState.Success
     val bottomNavHostController: NavHostController = rememberNavController()
     val items: List<BottomBarItem> = listOf(
         BottomBarItem.FosterHomes(),

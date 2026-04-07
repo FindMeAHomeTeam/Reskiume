@@ -37,11 +37,11 @@ import org.koin.compose.viewmodel.koinViewModel
 fun HomeScreen(mainNavHostController: NavHostController) {
 
     val homeViewmodel: HomeViewmodel = koinViewModel<HomeViewmodel>()
-    val authState: UiState<Unit> by homeViewmodel.state.collectAsStateWithLifecycle(
+    val userState: UiState<Unit> by homeViewmodel.userState.collectAsStateWithLifecycle(
         initialValue = UiState.Idle()
     )
 
-    val displayChats = authState is UiState.Success
+    val displayChats = userState is UiState.Success
     val bottomNavHostController: NavHostController = rememberNavController()
     val items: List<BottomBarItem> = listOf(
         BottomBarItem.FosterHomes(),

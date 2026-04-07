@@ -20,7 +20,7 @@ class HomeViewmodel(
 ) : ViewModel() {
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val state: Flow<UiState<Unit>> = observeAuthStateInAuthDataSource().flatMapConcat { authUser: AuthUser? ->
+    val userState: Flow<UiState<Unit>> = observeAuthStateInAuthDataSource().flatMapConcat { authUser: AuthUser? ->
         if (authUser?.uid == null) {
             log.d("HomeViewmodel", "User not logged in")
             flowOf(UiState.Idle())
@@ -28,12 +28,12 @@ class HomeViewmodel(
             getUserFromLocalDataSource(authUser.uid).map { user: User? ->
                 when {
                     user == null -> {
-                        log.e("HomeViewmodel", "User ${authUser.uid} not found")
+                        log.d("HomeViewmodel", "userState: User ${authUser.uid} not found")
                         UiState.Idle()
                     }
 
                     !user.isLoggedIn -> {
-                        log.d("HomeViewmodel", "User ${authUser.uid} is not logged in")
+                        log.d("HomeViewmodel", "userState: User ${authUser.uid} is not logged in")
                         UiState.Idle()
                     }
 

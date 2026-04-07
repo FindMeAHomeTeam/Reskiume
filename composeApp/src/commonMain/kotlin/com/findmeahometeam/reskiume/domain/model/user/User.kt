@@ -14,7 +14,6 @@ data class User(
     val isLoggedIn: Boolean,
     val countryForRescueEventNotifications: String,
     val cityForRescueEventNotifications: String,
-    val fcmToken: String = "",
     val subscriptions: List<Subscription> = emptyList()
 ) {
     fun toEntity(): UserEntity {
@@ -27,7 +26,6 @@ data class User(
             isLoggedIn = isLoggedIn,
             countryForRescueEventNotifications = countryForRescueEventNotifications,
             cityForRescueEventNotifications = cityForRescueEventNotifications,
-            fcmToken = fcmToken
         )
     }
 
@@ -39,7 +37,6 @@ data class User(
             image = image,
             countryForRescueEventNotifications = countryForRescueEventNotifications,
             cityForRescueEventNotifications = cityForRescueEventNotifications,
-            fcmToken = fcmToken,
             subscriptions = subscriptions.map { it.toData() }
         )
     }

@@ -9,7 +9,6 @@ data class RemoteUser(
     val image: String? = "",
     val countryForRescueEventNotifications: String? = "",
     val cityForRescueEventNotifications: String? = "",
-    val fcmToken: String? = "",
     val subscriptions: List<RemoteSubscription>? = emptyList()
 ) {
     fun toMap(): Map<String, Any?> {
@@ -20,7 +19,6 @@ data class RemoteUser(
             "image" to image,
             "countryForRescueEventNotifications" to countryForRescueEventNotifications,
             "cityForRescueEventNotifications" to cityForRescueEventNotifications,
-            "fcmToken" to fcmToken,
             "subscriptions" to subscriptions
         )
     }
@@ -34,7 +32,6 @@ data class RemoteUser(
             isLoggedIn = false,
             countryForRescueEventNotifications = countryForRescueEventNotifications ?: "",
             cityForRescueEventNotifications = cityForRescueEventNotifications ?: "",
-            fcmToken = fcmToken ?: "",
             subscriptions = subscriptions?.map { it.toDomain() } ?: emptyList()
         )
     }

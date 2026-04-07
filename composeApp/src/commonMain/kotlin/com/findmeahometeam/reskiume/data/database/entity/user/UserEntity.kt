@@ -16,8 +16,7 @@ data class UserEntity(
     val image: String,
     val isLoggedIn: Boolean,
     val countryForRescueEventNotifications: String,
-    val cityForRescueEventNotifications: String,
-    val fcmToken: String
+    val cityForRescueEventNotifications: String
 ) {
     fun toDomain(
         subscriptions: List<Subscription>
@@ -31,7 +30,6 @@ data class UserEntity(
             isLoggedIn = isLoggedIn,
             countryForRescueEventNotifications = countryForRescueEventNotifications,
             cityForRescueEventNotifications = cityForRescueEventNotifications,
-            fcmToken = fcmToken,
             subscriptions = subscriptions
         )
     }

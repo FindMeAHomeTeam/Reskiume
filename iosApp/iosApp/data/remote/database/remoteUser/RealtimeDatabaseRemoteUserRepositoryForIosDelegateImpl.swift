@@ -29,6 +29,30 @@ class RealtimeDatabaseRemoteUserRepositoryForIosDelegateImpl: RealtimeDatabaseRe
                         database.reference().child(Section.users.path).child(userUid).observeSingleEvent (of: .value, with: { snapshot in
                             let nSDictionary: NSDictionary? = snapshot.value as? NSDictionary
 
+                            let parsedSubscriptions: [RemoteSubscription]
+
+                            if let subsArray = nSDictionary?["subscriptions"] as? [[String: Any]] {
+                                // Handled as Array
+                                parsedSubscriptions = subsArray.map { dict in
+                                    RemoteSubscription(
+                                        subscriptionId: dict["subscriptionId"] as? String ?? "",
+                                        uid: dict["uid"] as? String ?? "",
+                                        topic: dict["topic"] as? String ?? ""
+                                    )
+                                }
+                            } else if let subsDict = nSDictionary?["subscriptions"] as? [String: [String: Any]] {
+                                // Handled as Dictionary (when indices lose sequential order)
+                                parsedSubscriptions = subsDict.values.map { dict in
+                                    RemoteSubscription(
+                                        subscriptionId: dict["subscriptionId"] as? String ?? "",
+                                        uid: dict["uid"] as? String ?? "",
+                                        topic: dict["topic"] as? String ?? ""
+                                    )
+                                }
+                            } else {
+                                parsedSubscriptions = []
+                            }
+
                             let remoteUser: RemoteUser = RemoteUser(
                                 uid: nSDictionary?["uid"] as? String ?? "",
                                 username: nSDictionary?["username"] as? String ?? "",
@@ -36,8 +60,7 @@ class RealtimeDatabaseRemoteUserRepositoryForIosDelegateImpl: RealtimeDatabaseRe
                                 image: nSDictionary?["image"] as? String ?? "",
                                 countryForRescueEventNotifications: nSDictionary?["countryForRescueEventNotifications"] as? String ?? "",
                                 cityForRescueEventNotifications: nSDictionary?["cityForRescueEventNotifications"] as? String ?? "",
-                                fcmToken: nSDictionary?["fcmToken"] as? String ?? "",
-                                subscriptions: nSDictionary?["subscriptions"] as? [RemoteSubscription] ?? []
+                                subscriptions: parsedSubscriptions
                             )
                             realtimeDatabaseRemoteUserFlowsRepositoryForIosDelegate.updateRealtimeDatabaseRemoteUserRepositoryForIosDelegate(delegate: remoteUser)
                             
@@ -69,7 +92,6 @@ class RealtimeDatabaseRemoteUserRepositoryForIosDelegateImpl: RealtimeDatabaseRe
             "image": remoteUser.image!,
             "countryForRescueEventNotifications": remoteUser.countryForRescueEventNotifications!,
             "cityForRescueEventNotifications": remoteUser.cityForRescueEventNotifications!,
-            "fcmToken": remoteUser.fcmToken!,
             "subscriptions": remoteSubscriptionForUserTodictArray(from: remoteUser.subscriptions!)
         ]
     }

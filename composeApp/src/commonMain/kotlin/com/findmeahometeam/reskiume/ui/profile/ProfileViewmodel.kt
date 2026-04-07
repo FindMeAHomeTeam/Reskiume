@@ -7,8 +7,11 @@ import com.findmeahometeam.reskiume.domain.model.user.User
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
+import com.findmeahometeam.reskiume.ui.core.components.UiState
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 
 class ProfileViewmodel(
@@ -17,46 +20,44 @@ class ProfileViewmodel(
     private val getImagePathForFileNameFromLocalDataSource: GetImagePathForFileNameFromLocalDataSource,
     private val log: Log
 ) : ViewModel() {
-    val state: Flow<ProfileUiState> =
-        observeAuthStateInAuthDataSource().map { authUser: AuthUser? ->
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val userState: Flow<UiState<User>> =
+        observeAuthStateInAuthDataSource().flatMapConcat { authUser: AuthUser? ->
             if (authUser?.uid == null) {
-                ProfileUiState.Idle
+                flowOf(UiState.Idle())
             } else {
-                val user: User? = getUserFromLocalDataSource(authUser.uid).firstOrNull()
-                when {
-                    user == null -> {
-                        log.e(
-                            "ProfileViewmodel",
-                            "User ${authUser.uid} not found"
-                        )
-                        ProfileUiState.Error("")
-                    }
-                    !user.isLoggedIn -> {
-                        log.e(
-                            "ProfileViewmodel",
-                            "User ${authUser.uid} is not logged in"
-                        )
-                        ProfileUiState.Error("")
-                    }
-                    else -> {
-                        ProfileUiState.Success(
-                            user = user.copy(
-                                email = authUser.email,
-                                image = if (user.image.isBlank() || user.image == "null") {
-                                    ""
-                                } else {
-                                    getImagePathForFileNameFromLocalDataSource(user.image)
-                                },
+                getUserFromLocalDataSource(authUser.uid).map { user: User? ->
+                    when {
+                        user == null -> {
+                            log.d(
+                                "ProfileViewmodel",
+                                "userState: User ${authUser.uid} not found"
                             )
-                        )
+                            UiState.Idle()
+                        }
+
+                        !user.isLoggedIn -> {
+                            log.d(
+                                "ProfileViewmodel",
+                                "userState: User ${authUser.uid} is not logged in"
+                            )
+                            UiState.Idle()
+                        }
+
+                        else -> {
+                            UiState.Success(
+                                user.copy(
+                                    email = authUser.email,
+                                    image = if (user.image.isBlank() || user.image == "null") {
+                                        ""
+                                    } else {
+                                        getImagePathForFileNameFromLocalDataSource(user.image)
+                                    },
+                                )
+                            )
+                        }
                     }
                 }
             }
         }
-
-    sealed class ProfileUiState {
-        object Idle : ProfileUiState()
-        data class Success(val user: User) : ProfileUiState()
-        data class Error(val message: String) : ProfileUiState()
-    }
 }

@@ -28,7 +28,9 @@ import com.findmeahometeam.reskiume.ui.core.components.RmDialog
 import com.findmeahometeam.reskiume.ui.core.components.RmHeader
 import com.findmeahometeam.reskiume.ui.core.components.RmListAvatarType
 import com.findmeahometeam.reskiume.ui.core.components.RmListButtonItem
+import com.findmeahometeam.reskiume.ui.core.components.RmResultState
 import com.findmeahometeam.reskiume.ui.core.components.RmText
+import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.primaryBlue
 import com.findmeahometeam.reskiume.ui.core.primaryGreen
 import com.findmeahometeam.reskiume.ui.core.primaryRed
@@ -87,28 +89,14 @@ fun ProfileScreen(
     navigateToDeleteAccountScreen: () -> Unit
 ) {
     val profileViewmodel: ProfileViewmodel = koinViewModel<ProfileViewmodel>()
-    val profileUiState: ProfileViewmodel.ProfileUiState by profileViewmodel.state.collectAsState(
-        initial = ProfileViewmodel.ProfileUiState.Idle
+    val userState: UiState<User> by profileViewmodel.userState.collectAsState(
+        initial = UiState.Idle()
     )
     val giveFeedback: GiveFeedback = koinInject<GiveFeedback>()
     var user: User? by remember { mutableStateOf(null) }
     var displayNoEmailAppError: Boolean by remember { mutableStateOf(false) }
 
     val scrollState: ScrollState = rememberScrollState()
-
-    user = when (profileUiState) {
-        is ProfileViewmodel.ProfileUiState.Idle -> {
-            null
-        }
-
-        is ProfileViewmodel.ProfileUiState.Error -> {
-            null
-        }
-
-        is ProfileViewmodel.ProfileUiState.Success -> {
-            (profileUiState as ProfileViewmodel.ProfileUiState.Success).user
-        }
-    }
 
     Column(
         modifier = Modifier
@@ -118,201 +106,237 @@ fun ProfileScreen(
             .verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(Modifier.height(16.dp))
-        RmHeader(user)
+        RmResultState(
+            uiState = userState,
+            onIdle = {
+                RmHeader(user)
 
-        Spacer(Modifier.height(32.dp))
-        RmText(
-            modifier = Modifier.fillMaxWidth().padding(10.dp),
-            text = stringResource(Res.string.profile_screen_my_account_section),
-            textAlign = TextAlign.Start,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.ExtraBold
-        )
-        Spacer(modifier = Modifier.height(10.dp))
+                Spacer(Modifier.height(32.dp))
+                RmText(
+                    modifier = Modifier.fillMaxWidth().padding(10.dp),
+                    text = stringResource(Res.string.profile_screen_my_account_section),
+                    textAlign = TextAlign.Start,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.ExtraBold
+                )
 
-        // create account screen
-        if (user == null) {
-            RmListButtonItem(
-                title = stringResource(Res.string.profile_screen_personal_create_account_title),
-                description = stringResource(Res.string.profile_screen_personal_create_account_description),
-                containerColor = backgroundColor,
-                listAvatarType = RmListAvatarType.Icon(
-                    backgroundColor = tertiaryGreen,
-                    icon = Res.drawable.ic_user,
-                    iconColor = primaryGreen
-                ),
-                onClick = {
-                    navigateToCreateAccountScreen()
-                }
-            )
-        }
-        if (user != null) {
+                // Create account screen
+                Spacer(modifier = Modifier.height(10.dp))
+                RmListButtonItem(
+                    title = stringResource(Res.string.profile_screen_personal_create_account_title),
+                    description = stringResource(Res.string.profile_screen_personal_create_account_description),
+                    containerColor = backgroundColor,
+                    listAvatarType = RmListAvatarType.Icon(
+                        backgroundColor = tertiaryGreen,
+                        icon = Res.drawable.ic_user,
+                        iconColor = primaryGreen
+                    ),
+                    onClick = {
+                        navigateToCreateAccountScreen()
+                    }
+                )
 
-            // modify account screen
-            RmListButtonItem(
-                title = stringResource(Res.string.profile_screen_modify_account_title),
-                description = stringResource(Res.string.profile_screen_modify_account_description),
-                containerColor = backgroundColor,
-                listAvatarType = RmListAvatarType.Icon(
-                    backgroundColor = tertiaryGreen,
-                    icon = Res.drawable.ic_user,
-                    iconColor = primaryGreen
-                ),
-                onClick = {
-                    navigateToModifyAccountScreen()
-                }
-            )
+                Spacer(Modifier.height(32.dp))
+                RmText(
+                    modifier = Modifier.fillMaxWidth().padding(10.dp),
+                    text = stringResource(Res.string.profile_screen_my_activism_section),
+                    textAlign = TextAlign.Start,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.ExtraBold
+                )
 
-            // Check review screen
-            RmListButtonItem(
-                title = stringResource(Res.string.profile_screen_reviews_title),
-                description = stringResource(Res.string.profile_screen_reviews_description),
-                containerColor = backgroundColor,
-                listAvatarType = RmListAvatarType.Icon(
-                    backgroundColor = tertiaryGreen,
-                    icon = Res.drawable.ic_rating,
-                    iconColor = primaryGreen
-                ),
-                onClick = {
-                    navigateToCheckReviewsScreen(user?.uid ?: "")
-                }
-            )
-        }
+                // Advice screen
+                Spacer(modifier = Modifier.height(10.dp))
+                RmListButtonItem(
+                    title = stringResource(Res.string.profile_screen_get_advice_title),
+                    description = stringResource(Res.string.profile_screen_get_advice_description),
+                    containerColor = backgroundColor,
+                    listAvatarType = RmListAvatarType.Icon(
+                        backgroundColor = tertiaryGreen,
+                        icon = Res.drawable.ic_advice,
+                        iconColor = primaryGreen
+                    ),
+                    onClick = {
+                        navigateToCheckAllAdviceScreen()
+                    }
+                )
+            },
+            onSuccess = { user ->
 
-        Spacer(Modifier.height(32.dp))
-        RmText(
-            modifier = Modifier.fillMaxWidth().padding(10.dp),
-            text = stringResource(Res.string.profile_screen_my_activism_section),
-            textAlign = TextAlign.Start,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.ExtraBold
-        )
-        Spacer(modifier = Modifier.height(10.dp))
+                Spacer(Modifier.height(16.dp))
+                RmHeader(user)
 
-        if (user != null) {
+                Spacer(Modifier.height(16.dp))
+                RmText(
+                    modifier = Modifier.fillMaxWidth().padding(10.dp),
+                    text = stringResource(Res.string.profile_screen_my_account_section),
+                    textAlign = TextAlign.Start,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.ExtraBold
+                )
+                Spacer(modifier = Modifier.height(10.dp))
 
-            // Non-human animals screen
-            RmListButtonItem(
-                title = stringResource(Res.string.profile_screen_non_human_animals_title),
-                description = stringResource(Res.string.profile_screen_non_human_animals_description),
-                containerColor = backgroundColor,
-                listAvatarType = RmListAvatarType.Icon(
-                    backgroundColor = tertiaryGreen,
-                    icon = Res.drawable.ic_paw,
-                    iconColor = primaryGreen
-                ),
-                onClick = {
-                    navigateToCheckNonHumanAnimalsScreen(user!!.uid)
-                }
-            )
+                // Modify account screen
+                RmListButtonItem(
+                    title = stringResource(Res.string.profile_screen_modify_account_title),
+                    description = stringResource(Res.string.profile_screen_modify_account_description),
+                    containerColor = backgroundColor,
+                    listAvatarType = RmListAvatarType.Icon(
+                        backgroundColor = tertiaryGreen,
+                        icon = Res.drawable.ic_user,
+                        iconColor = primaryGreen
+                    ),
+                    onClick = {
+                        navigateToModifyAccountScreen()
+                    }
+                )
 
-            // Foster homes screen
-            RmListButtonItem(
-                title = stringResource(Res.string.profile_screen_my_foster_homes_title),
-                description = stringResource(Res.string.profile_screen_my_foster_homes_description),
-                containerColor = backgroundColor,
-                listAvatarType = RmListAvatarType.Icon(
-                    backgroundColor = tertiaryGreen,
-                    icon = Res.drawable.ic_foster_homes,
-                    iconColor = primaryGreen
-                ),
-                onClick = {
-                    navigateToCheckMyFosterHomesScreen(user!!.uid)
-                }
-            )
+                // Check review screen
+                RmListButtonItem(
+                    title = stringResource(Res.string.profile_screen_reviews_title),
+                    description = stringResource(Res.string.profile_screen_reviews_description),
+                    containerColor = backgroundColor,
+                    listAvatarType = RmListAvatarType.Icon(
+                        backgroundColor = tertiaryGreen,
+                        icon = Res.drawable.ic_rating,
+                        iconColor = primaryGreen
+                    ),
+                    onClick = {
+                        navigateToCheckReviewsScreen(user.uid)
+                    }
+                )
 
-            // Rescue events screen
-            RmListButtonItem(
-                title = stringResource(Res.string.profile_screen_my_rescue_events_title),
-                description = stringResource(Res.string.profile_screen_my_rescue_events_description),
-                containerColor = backgroundColor,
-                listAvatarType = RmListAvatarType.Icon(
-                    backgroundColor = tertiaryGreen,
-                    icon = Res.drawable.ic_rescue_events,
-                    iconColor = primaryGreen
-                ),
-                onClick = {
-                    navigateToCheckMyRescueEventsScreen(user!!.uid)
-                }
-            )
-        }
 
-        // Advice screen
-        RmListButtonItem(
-            title = stringResource(Res.string.profile_screen_get_advice_title),
-            description = stringResource(Res.string.profile_screen_get_advice_description),
-            containerColor = backgroundColor,
-            listAvatarType = RmListAvatarType.Icon(
-                backgroundColor = tertiaryGreen,
-                icon = Res.drawable.ic_advice,
-                iconColor = primaryGreen
-            ),
-            onClick = {
-                navigateToCheckAllAdviceScreen()
-            }
-        )
+                Spacer(Modifier.height(32.dp))
+                RmText(
+                    modifier = Modifier.fillMaxWidth().padding(10.dp),
+                    text = stringResource(Res.string.profile_screen_my_activism_section),
+                    textAlign = TextAlign.Start,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.ExtraBold
+                )
+                Spacer(modifier = Modifier.height(10.dp))
 
-        if (user != null) {
-            Spacer(Modifier.height(32.dp))
-            RmText(
-                modifier = Modifier.fillMaxWidth().padding(10.dp),
-                text = stringResource(Res.string.profile_screen_settings_section),
-                textAlign = TextAlign.Start,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.ExtraBold
-            )
-            Spacer(modifier = Modifier.height(10.dp))
+                // Non-human animals screen
+                RmListButtonItem(
+                    title = stringResource(Res.string.profile_screen_non_human_animals_title),
+                    description = stringResource(Res.string.profile_screen_non_human_animals_description),
+                    containerColor = backgroundColor,
+                    listAvatarType = RmListAvatarType.Icon(
+                        backgroundColor = tertiaryGreen,
+                        icon = Res.drawable.ic_paw,
+                        iconColor = primaryGreen
+                    ),
+                    onClick = {
+                        navigateToCheckNonHumanAnimalsScreen(user.uid)
+                    }
+                )
 
-            // Feedback screen
-            val feedbackSubject = stringResource(Res.string.give_feedback_subject)
-            val feedbackBody = stringResource(Res.string.give_feedback_body)
-            RmListButtonItem(
-                title = stringResource(Res.string.profile_screen_feedback_title),
-                description = stringResource(Res.string.profile_screen_feedback_description),
-                containerColor = backgroundColor,
-                listAvatarType = RmListAvatarType.Icon(
-                    backgroundColor = secondaryBlue,
-                    icon = Res.drawable.ic_feedback,
-                    iconColor = primaryBlue
-                ),
-                onClick = {
-                    giveFeedback.sendEmail(
-                        subject = feedbackSubject,
-                        body = feedbackBody,
-                        onError = {
-                            displayNoEmailAppError = true
-                        }
+                // Foster homes screen
+                RmListButtonItem(
+                    title = stringResource(Res.string.profile_screen_my_foster_homes_title),
+                    description = stringResource(Res.string.profile_screen_my_foster_homes_description),
+                    containerColor = backgroundColor,
+                    listAvatarType = RmListAvatarType.Icon(
+                        backgroundColor = tertiaryGreen,
+                        icon = Res.drawable.ic_foster_homes,
+                        iconColor = primaryGreen
+                    ),
+                    onClick = {
+                        navigateToCheckMyFosterHomesScreen(user.uid)
+                    }
+                )
+
+                // Rescue events screen
+                RmListButtonItem(
+                    title = stringResource(Res.string.profile_screen_my_rescue_events_title),
+                    description = stringResource(Res.string.profile_screen_my_rescue_events_description),
+                    containerColor = backgroundColor,
+                    listAvatarType = RmListAvatarType.Icon(
+                        backgroundColor = tertiaryGreen,
+                        icon = Res.drawable.ic_rescue_events,
+                        iconColor = primaryGreen
+                    ),
+                    onClick = {
+                        navigateToCheckMyRescueEventsScreen(user.uid)
+                    }
+                )
+
+                // Advice screen
+                RmListButtonItem(
+                    title = stringResource(Res.string.profile_screen_get_advice_title),
+                    description = stringResource(Res.string.profile_screen_get_advice_description),
+                    containerColor = backgroundColor,
+                    listAvatarType = RmListAvatarType.Icon(
+                        backgroundColor = tertiaryGreen,
+                        icon = Res.drawable.ic_advice,
+                        iconColor = primaryGreen
+                    ),
+                    onClick = {
+                        navigateToCheckAllAdviceScreen()
+                    }
+                )
+
+                Spacer(Modifier.height(32.dp))
+                RmText(
+                    modifier = Modifier.fillMaxWidth().padding(10.dp),
+                    text = stringResource(Res.string.profile_screen_settings_section),
+                    textAlign = TextAlign.Start,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.ExtraBold
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // Feedback screen
+                val feedbackSubject = stringResource(Res.string.give_feedback_subject)
+                val feedbackBody = stringResource(Res.string.give_feedback_body)
+                RmListButtonItem(
+                    title = stringResource(Res.string.profile_screen_feedback_title),
+                    description = stringResource(Res.string.profile_screen_feedback_description),
+                    containerColor = backgroundColor,
+                    listAvatarType = RmListAvatarType.Icon(
+                        backgroundColor = secondaryBlue,
+                        icon = Res.drawable.ic_feedback,
+                        iconColor = primaryBlue
+                    ),
+                    onClick = {
+                        giveFeedback.sendEmail(
+                            subject = feedbackSubject,
+                            body = feedbackBody,
+                            onError = {
+                                displayNoEmailAppError = true
+                            }
+                        )
+                    }
+                )
+                if (displayNoEmailAppError) {
+
+                    RmDialog(
+                        emoji = "✉️",
+                        title = stringResource(Res.string.dialog_no_email_app_dialog_title),
+                        message = stringResource(Res.string.dialog_no_email_app_dialog_message),
+                        allowMessage = stringResource(Res.string.dialog_no_email_app_dialog_ok_button),
+                        onClickAllow = { displayNoEmailAppError = false },
+                        onClickDeny = { displayNoEmailAppError = false }
                     )
                 }
-            )
-            if (displayNoEmailAppError) {
 
-                RmDialog(
-                    emoji = "✉️",
-                    title = stringResource(Res.string.dialog_no_email_app_dialog_title),
-                    message = stringResource(Res.string.dialog_no_email_app_dialog_message),
-                    allowMessage = stringResource(Res.string.dialog_no_email_app_dialog_ok_button),
-                    onClickAllow = { displayNoEmailAppError = false },
-                    onClickDeny = { displayNoEmailAppError = false }
+                // Delete account screen
+                RmListButtonItem(
+                    title = stringResource(Res.string.profile_screen_delete_account_title),
+                    description = stringResource(Res.string.profile_screen_delete_account_description),
+                    containerColor = backgroundColor,
+                    listAvatarType = RmListAvatarType.Icon(
+                        backgroundColor = secondaryRed,
+                        icon = Res.drawable.ic_delete,
+                        iconColor = primaryRed
+                    ),
+                    onClick = {
+                        navigateToDeleteAccountScreen()
+                    }
                 )
+                Spacer(modifier = Modifier.height(15.dp))
             }
-
-            // Delete account screen
-            RmListButtonItem(
-                title = stringResource(Res.string.profile_screen_delete_account_title),
-                description = stringResource(Res.string.profile_screen_delete_account_description),
-                containerColor = backgroundColor,
-                listAvatarType = RmListAvatarType.Icon(
-                    backgroundColor = secondaryRed,
-                    icon = Res.drawable.ic_delete,
-                    iconColor = primaryRed
-                ),
-                onClick = {
-                    navigateToDeleteAccountScreen()
-                }
-            )
-        }
-        Spacer(modifier = Modifier.height(15.dp))
+        )
     }
 }

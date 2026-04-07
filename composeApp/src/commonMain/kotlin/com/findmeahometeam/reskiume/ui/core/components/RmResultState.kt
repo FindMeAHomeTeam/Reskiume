@@ -33,6 +33,7 @@ fun <T> Flow<T?>.toUiState(): Flow<UiState<T>> = this.map {
 fun <T> RmResultState(
     uiState: UiState<T>,
     customErrorMessage: String = "",
+    onIdle: @Composable () -> Unit = {},
     onSuccess: @Composable (T) -> Unit
 ) {
     when (uiState) {
@@ -42,6 +43,7 @@ fun <T> RmResultState(
                 contentAlignment = Alignment.Center,
                 content = {}
             )
+            onIdle()
         }
 
         is UiState.Loading -> {

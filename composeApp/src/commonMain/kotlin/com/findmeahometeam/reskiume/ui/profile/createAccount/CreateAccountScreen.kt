@@ -20,17 +20,18 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.findmeahometeam.reskiume.domain.model.user.User
 import com.findmeahometeam.reskiume.domain.model.fosterHome.City
 import com.findmeahometeam.reskiume.domain.model.fosterHome.Country
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
+import com.findmeahometeam.reskiume.ui.core.components.ManagePermissionState
 import com.findmeahometeam.reskiume.ui.core.components.MaxCharacters
 import com.findmeahometeam.reskiume.ui.core.components.RmAddPhoto
 import com.findmeahometeam.reskiume.ui.core.components.RmButton
-import com.findmeahometeam.reskiume.ui.core.components.RmCountryAndCitySelectors
+import com.findmeahometeam.reskiume.ui.core.components.RmManageNotificationArea
+import com.findmeahometeam.reskiume.ui.core.components.RmManageNotificationPermission
 import com.findmeahometeam.reskiume.ui.core.components.RmPasswordTextField
 import com.findmeahometeam.reskiume.ui.core.components.RmResultState
 import com.findmeahometeam.reskiume.ui.core.components.RmScaffold
@@ -38,9 +39,7 @@ import com.findmeahometeam.reskiume.ui.core.components.RmText
 import com.findmeahometeam.reskiume.ui.core.components.RmTextField
 import com.findmeahometeam.reskiume.ui.core.components.RmTextLink
 import com.findmeahometeam.reskiume.ui.core.components.UiState
-import com.findmeahometeam.reskiume.ui.fosterHomes.checkAllFosterHomes.PlaceUtil
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import reskiume.composeapp.generated.resources.Res
 import reskiume.composeapp.generated.resources.create_account_screen_already_have_an_account
@@ -50,7 +49,6 @@ import reskiume.composeapp.generated.resources.create_account_screen_describe_yo
 import reskiume.composeapp.generated.resources.create_account_screen_email_field_label
 import reskiume.composeapp.generated.resources.create_account_screen_log_in
 import reskiume.composeapp.generated.resources.create_account_screen_name_field_label
-import reskiume.composeapp.generated.resources.create_account_screen_notification_area
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,27 +57,36 @@ fun CreateAccountScreen(onBackPressed: () -> Unit, navigateToLoginScreen: () -> 
     val createAccountViewmodel: CreateAccountViewmodel = koinViewModel<CreateAccountViewmodel>()
     val uiState: UiState<Unit> by createAccountViewmodel.state.collectAsState()
 
-    val placeUtil: PlaceUtil = koinInject<PlaceUtil>()
-
-    var selectedCountry: Country by rememberSaveable { mutableStateOf(Country.UNSELECTED) }
-    var selectedCity: City by rememberSaveable { mutableStateOf(City.UNSELECTED) }
+    var receiveRescueNotifications: Boolean by rememberSaveable { mutableStateOf(false) }
+    var countryForRescueEventNotifications: Country by rememberSaveable { mutableStateOf(Country.UNSELECTED) }
+    var cityForRescueEventNotifications: City by rememberSaveable { mutableStateOf(City.UNSELECTED) }
     var name: String by rememberSaveable { mutableStateOf("") }
     var description: String by rememberSaveable { mutableStateOf("") }
     var imageUri: String by rememberSaveable { mutableStateOf("") }
+    var permissionState: ManagePermissionState by rememberSaveable {
+        mutableStateOf(
+            ManagePermissionState.CHECK_PERMISSION
+        )
+    }
+    var notificationArea: String by rememberSaveable { mutableStateOf("") }
     var email: String by rememberSaveable { mutableStateOf("") }
     val emailRegexPattern =
         Regex("^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$")
     var pwd: String by rememberSaveable { mutableStateOf("") }
     val isLogInButtonEnabled by remember(
-        selectedCountry,
-        selectedCity,
+        countryForRescueEventNotifications,
+        cityForRescueEventNotifications,
         name,
         email,
         pwd
     ) {
         derivedStateOf {
-            selectedCountry != Country.UNSELECTED
-                    && selectedCity != City.UNSELECTED
+            if (receiveRescueNotifications) {
+                countryForRescueEventNotifications != Country.UNSELECTED
+                        && cityForRescueEventNotifications != City.UNSELECTED
+            } else {
+                true
+            }
                     && name.isNotBlank()
                     && email.isNotBlank()
                     && email.matches(emailRegexPattern)
@@ -102,24 +109,40 @@ fun CreateAccountScreen(onBackPressed: () -> Unit, navigateToLoginScreen: () -> 
                 imageUri = it
             }
 
-            Spacer(modifier = Modifier.height(15.dp))
-            RmText(
-                modifier = Modifier.fillMaxWidth().padding(10.dp),
-                text = stringResource(Res.string.create_account_screen_notification_area),
-                textAlign = TextAlign.Start,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.ExtraBold
-            )
-            RmCountryAndCitySelectors(
-                placeUtil = placeUtil,
-                selectedCountry = selectedCountry,
-                onSelectedCountry = {
-                    selectedCountry = it
-                },
-                onSelectedCity = {
-                    selectedCity = it
+            if (permissionState != ManagePermissionState.PERMISSION_GRANTED) {
+                RmManageNotificationPermission(permissionState = permissionState) {
+
+                    if (it == ManagePermissionState.IDLE) {
+                        onBackPressed()
+                    } else {
+                        permissionState = it
+                    }
                 }
-            )
+            }
+
+            Spacer(modifier = Modifier.height(15.dp))
+            RmManageNotificationArea(
+                receiveRescueNotifications = receiveRescueNotifications,
+                onUpdateReceiveRescueNotifications = { isChecked ->
+                    receiveRescueNotifications = isChecked
+                    if (!isChecked) {
+                        countryForRescueEventNotifications = Country.UNSELECTED
+                        cityForRescueEventNotifications = City.UNSELECTED
+                        notificationArea = ""
+                    }
+                },
+                countryForRescueEventNotifications = countryForRescueEventNotifications,
+                cityForRescueEventNotifications = cityForRescueEventNotifications,
+            ) { selectedCountry, selectedCity ->
+                countryForRescueEventNotifications = selectedCountry
+                cityForRescueEventNotifications = selectedCity
+                notificationArea =
+                    if (selectedCountry == Country.UNSELECTED || selectedCity == City.UNSELECTED) {
+                        ""
+                    } else {
+                        "${selectedCountry.name}${selectedCity.name}"
+                    }
+            }
 
             Spacer(modifier = Modifier.height(10.dp))
             RmTextField(
@@ -174,12 +197,12 @@ fun CreateAccountScreen(onBackPressed: () -> Unit, navigateToLoginScreen: () -> 
                             description = description,
                             email = email,
                             image = imageUri,
-                            country = selectedCountry.name,
-                            city = selectedCity.name,
-                            isLoggedIn = true,
-                            receiveRescueNotifications = true
+                            countryForRescueEventNotifications = countryForRescueEventNotifications.name,
+                            cityForRescueEventNotifications = cityForRescueEventNotifications.name,
+                            isLoggedIn = true
                         ),
-                        password = pwd
+                        password = pwd,
+                        notificationArea = if (receiveRescueNotifications) notificationArea else ""
                     )
                 })
 

@@ -47,6 +47,8 @@ import com.findmeahometeam.reskiume.ui.rescueEvents.modifyRescueEvent.DeleteResc
 import com.findmeahometeam.reskiume.ui.rescueEvents.modifyRescueEvent.ModifyRescueEventViewmodel
 import com.findmeahometeam.reskiume.ui.util.StringProvider
 import com.findmeahometeam.reskiume.ui.util.StringProviderImpl
+import com.findmeahometeam.reskiume.ui.util.fcm.SubscriptionManagerUtil
+import com.findmeahometeam.reskiume.ui.util.fcm.SubscriptionManagerUtilImpl
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModel
@@ -118,4 +120,5 @@ val uiModule = module {
     viewModelOf(::CheckAllRescueEventsViewmodel)
     viewModelOf(::CheckRescueEventViewmodel)
     singleOf(::CheckRescueEventUtilImpl) bind CheckRescueEventUtil::class
+    singleOf(::SubscriptionManagerUtilImpl) bind SubscriptionManagerUtil::class
 }

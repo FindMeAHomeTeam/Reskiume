@@ -4,13 +4,16 @@ import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.user.User
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
+import com.findmeahometeam.reskiume.domain.repository.util.fcm.FCMSubscriberRepository
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 
 class InsertUserInLocalDataSource(
     private val manageImagePath: ManageImagePath,
     private val localUserRepository: LocalUserRepository,
     private val authRepository: AuthRepository,
+    private val fCMSubscriberRepository: FCMSubscriberRepository,
     private val log: Log
 ) {
     suspend operator fun invoke(
@@ -27,8 +30,14 @@ class InsertUserInLocalDataSource(
             onInsertUser = { rowId ->
                 if (rowId > 0) {
 
-                    val isSuccess = insertAllSubscriptions(user)
-                    onInsertUser(isSuccess)
+                    if (user.subscriptions.isEmpty()) {
+                        onInsertUser(true)
+                    } else {
+                        insertAllSubscriptions(user) { isSuccess ->
+
+                            onInsertUser(isSuccess)
+                        }
+                    }
                 } else {
                     onInsertUser(false)
                 }
@@ -38,12 +47,14 @@ class InsertUserInLocalDataSource(
 
     private suspend fun getMyUid(): String = authRepository.authState.firstOrNull()?.uid ?: ""
 
-    private suspend fun insertAllSubscriptions(user: User): Boolean {
+    private suspend fun insertAllSubscriptions(
+        user: User,
+        onComplete: (isSuccess: Boolean) -> Unit
+    ) {
+        user.subscriptions.forEachIndexed { index, subscription ->
 
-        var isSuccess = true
-
-        user.subscriptions.forEach { subscription ->
-            if (isSuccess) {
+            val isSubscribed = fCMSubscriberRepository.subscribeToTopic(subscription.topic).first()
+            if (isSubscribed) {
 
                 localUserRepository.insertSubscription(
                     subscription.toEntity(),
@@ -53,17 +64,21 @@ class InsertUserInLocalDataSource(
                                 "InsertUserInLocalDataSource",
                                 "insertAllSubscriptions: inserted the subscription id ${subscription.subscriptionId} for the user ${subscription.uid} in the local data source"
                             )
+                            if (user.subscriptions.size == index + 1) {
+                                onComplete(true)
+                            }
                         } else {
                             log.e(
                                 "InsertUserInLocalDataSource",
                                 "insertAllSubscriptions: failed to insert the subscription id ${subscription.subscriptionId} for the user ${subscription.uid} in the local data source"
                             )
-                            isSuccess = false
+                            onComplete(false)
                         }
                     }
                 )
+            } else {
+                onComplete(false)
             }
         }
-        return isSuccess
     }
 }

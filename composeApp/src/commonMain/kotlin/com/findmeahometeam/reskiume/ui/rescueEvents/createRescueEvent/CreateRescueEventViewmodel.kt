@@ -15,11 +15,13 @@ import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.InsertRescueEven
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.util.location.GetLocationFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.ObserveIfLocationEnabledFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.RequestEnableLocationFromLocationRepository
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.util.StringProvider
+import com.findmeahometeam.reskiume.ui.util.fcm.SubscriptionManagerUtil
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -45,6 +47,8 @@ class CreateRescueEventViewmodel(
     private val insertRescueEventInRemoteRepository: InsertRescueEventInRemoteRepository,
     private val insertRescueEventInLocalRepository: InsertRescueEventInLocalRepository,
     private val insertCacheInLocalRepository: InsertCacheInLocalRepository,
+    private val getUserFromLocalDataSource: GetUserFromLocalDataSource,
+    private val subscriptionManagerUtil: SubscriptionManagerUtil,
     private val log: Log
 ) : ViewModel() {
 
@@ -103,7 +107,10 @@ class CreateRescueEventViewmodel(
                 ) {
                     createRescueEventInLocalDataSource(updatedRescueEvent) {
 
-                        createCacheForRescueEventInLocalDataSource(updatedRescueEvent)
+                        createCacheForRescueEventInLocalDataSource(updatedRescueEvent) {
+
+                            subscribeCreatorToTheirRescueEvent(updatedRescueEvent.id)
+                        }
                     }
                 }
             }
@@ -232,7 +239,10 @@ class CreateRescueEventViewmodel(
     }
 
     @OptIn(ExperimentalTime::class)
-    private fun createCacheForRescueEventInLocalDataSource(rescueEvent: RescueEvent) {
+    private fun createCacheForRescueEventInLocalDataSource(
+        rescueEvent: RescueEvent,
+        onComplete: () -> Unit
+    ) {
 
         viewModelScope.launch {
 
@@ -256,6 +266,18 @@ class CreateRescueEventViewmodel(
                         "createCacheForRescueEventInLocalDataSource: Error creating ${rescueEvent.id} in the local cache in section ${Section.RESCUE_EVENTS}"
                     )
                 }
+                onComplete()
+            }
+        }
+    }
+
+    private fun subscribeCreatorToTheirRescueEvent(rescueEventId: String) {
+        viewModelScope.launch {
+
+            val creatorId = observeAuthStateInAuthDataSource().first()!!.uid
+            val creator = getUserFromLocalDataSource(creatorId).first()!!
+            subscriptionManagerUtil.subscribeToTopic(creator,rescueEventId, viewModelScope) {
+
                 _saveChangesUiState.value = UiState.Success(Unit)
             }
         }

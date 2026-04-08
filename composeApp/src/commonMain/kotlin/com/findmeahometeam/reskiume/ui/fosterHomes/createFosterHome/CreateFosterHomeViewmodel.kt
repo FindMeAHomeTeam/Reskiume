@@ -15,11 +15,13 @@ import com.findmeahometeam.reskiume.domain.usecases.fosterHome.InsertFosterHomeI
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.util.location.GetLocationFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.ObserveIfLocationEnabledFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.RequestEnableLocationFromLocationRepository
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.util.StringProvider
+import com.findmeahometeam.reskiume.ui.util.fcm.SubscriptionManagerUtil
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -45,6 +47,8 @@ class CreateFosterHomeViewmodel(
     private val insertFosterHomeInRemoteRepository: InsertFosterHomeInRemoteRepository,
     private val insertFosterHomeInLocalRepository: InsertFosterHomeInLocalRepository,
     private val insertCacheInLocalRepository: InsertCacheInLocalRepository,
+    private val getUserFromLocalDataSource: GetUserFromLocalDataSource,
+    private val subscriptionManagerUtil: SubscriptionManagerUtil,
     private val log: Log
 ) : ViewModel() {
 
@@ -103,7 +107,10 @@ class CreateFosterHomeViewmodel(
                 ) {
                     createFosterHomeInLocalDataSource(updatedFosterHome) {
 
-                        createCacheForFosterHomeInLocalDataSource(updatedFosterHome)
+                        createCacheForFosterHomeInLocalDataSource(updatedFosterHome) {
+
+                            subscribeOwnerToTheirFosterHome(updatedFosterHome.id)
+                        }
                     }
                 }
             }
@@ -232,8 +239,10 @@ class CreateFosterHomeViewmodel(
     }
 
     @OptIn(ExperimentalTime::class)
-    private fun createCacheForFosterHomeInLocalDataSource(fosterHome: FosterHome) {
-
+    private fun createCacheForFosterHomeInLocalDataSource(
+        fosterHome: FosterHome,
+        onComplete: () -> Unit
+    ) {
         viewModelScope.launch {
 
             insertCacheInLocalRepository(
@@ -256,6 +265,18 @@ class CreateFosterHomeViewmodel(
                         "createCacheForFosterHomeInLocalDataSource: Error creating ${fosterHome.id} in the local cache in section ${Section.FOSTER_HOMES}"
                     )
                 }
+                onComplete()
+            }
+        }
+    }
+
+    private fun subscribeOwnerToTheirFosterHome(fosterHomeId: String) {
+        viewModelScope.launch {
+
+            val ownerId = observeAuthStateInAuthDataSource().first()!!.uid
+            val owner = getUserFromLocalDataSource(ownerId).first()!!
+            subscriptionManagerUtil.subscribeToTopic(owner, fosterHomeId, viewModelScope) {
+
                 _saveChangesUiState.value = UiState.Success(Unit)
             }
         }

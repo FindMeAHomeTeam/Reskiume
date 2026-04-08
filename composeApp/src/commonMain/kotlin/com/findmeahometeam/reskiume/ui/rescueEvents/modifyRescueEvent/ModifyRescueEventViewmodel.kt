@@ -9,6 +9,7 @@ import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.LocalCache
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueEvent
+import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
@@ -19,12 +20,14 @@ import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetRescueEventFr
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetRescueEventFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.ModifyRescueEventInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.ModifyRescueEventInRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.components.toUiState
 import com.findmeahometeam.reskiume.ui.core.navigation.ModifyRescueEvent
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
 import com.findmeahometeam.reskiume.ui.profile.checkAllMyRescueEvents.UiRescueEvent
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
+import com.findmeahometeam.reskiume.ui.util.fcm.SubscriptionManagerUtil
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -50,6 +53,9 @@ class ModifyRescueEventViewmodel(
     private val modifyRescueEventInLocalRepository: ModifyRescueEventInLocalRepository,
     private val modifyCacheInLocalRepository: ModifyCacheInLocalRepository,
     private val deleteRescueEventUtil: DeleteRescueEventUtil,
+    private val observeAuthStateInAuthDataSource: ObserveAuthStateInAuthDataSource,
+    private val getUserFromLocalDataSource: GetUserFromLocalDataSource,
+    private val subscriptionManagerUtil: SubscriptionManagerUtil,
     private val log: Log
 ) : ViewModel() {
 
@@ -362,8 +368,20 @@ class ModifyRescueEventViewmodel(
                 _manageChangesUiState.value = UiState.Error()
             },
             onComplete = {
-                _manageChangesUiState.value = UiState.Success(Unit)
+                unsubscribeCreatorToTheirRescueEvent(id)
             }
         )
+    }
+
+    private fun unsubscribeCreatorToTheirRescueEvent(rescueEventId: String) {
+        viewModelScope.launch {
+
+            val creatorId = observeAuthStateInAuthDataSource().first()!!.uid
+            val creator = getUserFromLocalDataSource(creatorId).first()!!
+            subscriptionManagerUtil.unsubscribeFromTopic(creator,rescueEventId, viewModelScope) {
+
+                _manageChangesUiState.value = UiState.Success(Unit)
+            }
+        }
     }
 }

@@ -9,6 +9,7 @@ import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.LocalCache
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
+import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetFosterHomeFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetFosterHomeFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.ModifyFosterHomeInLocalRepository
@@ -19,12 +20,14 @@ import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNam
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.components.toUiState
 import com.findmeahometeam.reskiume.ui.core.navigation.ModifyFosterHome
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
 import com.findmeahometeam.reskiume.ui.fosterHomes.checkAllFosterHomes.UiFosterHome
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
+import com.findmeahometeam.reskiume.ui.util.fcm.SubscriptionManagerUtil
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -50,6 +53,9 @@ class ModifyFosterHomeViewmodel(
     private val modifyFosterHomeInLocalRepository: ModifyFosterHomeInLocalRepository,
     private val modifyCacheInLocalRepository: ModifyCacheInLocalRepository,
     private val deleteFosterHomeUtil: DeleteFosterHomeUtil,
+    private val observeAuthStateInAuthDataSource: ObserveAuthStateInAuthDataSource,
+    private val getUserFromLocalDataSource: GetUserFromLocalDataSource,
+    private val subscriptionManagerUtil: SubscriptionManagerUtil,
     private val log: Log
 ) : ViewModel() {
 
@@ -367,8 +373,20 @@ class ModifyFosterHomeViewmodel(
                 _manageChangesUiState.value = UiState.Error()
             },
             onComplete = {
-                _manageChangesUiState.value = UiState.Success(Unit)
+                unsubscribeOwnerToTheirFosterHome(id)
             }
         )
+    }
+
+    private fun unsubscribeOwnerToTheirFosterHome(fosterHomeId: String) {
+        viewModelScope.launch {
+
+            val ownerId = observeAuthStateInAuthDataSource().first()!!.uid
+            val owner = getUserFromLocalDataSource(ownerId).first()!!
+            subscriptionManagerUtil.unsubscribeFromTopic(owner, fosterHomeId, viewModelScope) {
+
+                _manageChangesUiState.value = UiState.Success(Unit)
+            }
+        }
     }
 }

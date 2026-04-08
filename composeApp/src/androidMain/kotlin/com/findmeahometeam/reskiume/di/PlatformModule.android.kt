@@ -12,6 +12,8 @@ import com.findmeahometeam.reskiume.data.remote.storage.StorageRepositoryAndroid
 import com.findmeahometeam.reskiume.data.util.analytics.Analytics
 import com.findmeahometeam.reskiume.data.util.analytics.AnalyticsAndroidImpl
 import com.findmeahometeam.reskiume.data.util.fcm.FCMSubscriberRepositoryAndroidImpl
+import com.findmeahometeam.reskiume.data.util.fcm.MessagingService
+import com.findmeahometeam.reskiume.data.util.fcm.MessagingServiceViewModel
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.data.util.log.LogAndroidImpl
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
@@ -39,6 +41,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
+import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
@@ -61,4 +64,6 @@ actual val platformModule: Module = module {
     singleOf(::ShareServiceAndroidImpl) bind ShareService::class
     singleOf(::FireStoreRemoteRescueEventRepositoryAndroidImpl) bind FireStoreRemoteRescueEventRepository::class
     singleOf(::FCMSubscriberRepositoryAndroidImpl) bind FCMSubscriberRepository::class
+    singleOf(::MessagingService)
+    viewModelOf(::MessagingServiceViewModel)
 }

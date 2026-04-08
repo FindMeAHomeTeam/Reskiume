@@ -7,6 +7,7 @@ import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.LocalCache
+import com.findmeahometeam.reskiume.domain.model.user.Subscription
 import com.findmeahometeam.reskiume.domain.model.user.User
 import com.findmeahometeam.reskiume.domain.usecases.authUser.CreateUserWithEmailAndPasswordInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.DeleteUserFromAuthDataSource
@@ -40,65 +41,72 @@ class CreateAccountViewmodel(
 
     fun saveUserChanges(
         user: User,
-        password: String
+        password: String,
+        notificationArea: String
     ) {
         _state.value = UiState.Loading()
 
-        createAuthUserUsingEmailAndPwd(user, password) { updatedUser: User ->
+        createAuthUserUsingEmailAndPwd(user, password) { userWithUid: User ->
 
-            uploadImageToRemoteRepo(updatedUser) { updatedUserWithRemoteImage: User, imageDownloadUri: String ->
+            retrieveUserWithSubscriptionsIfAvailable(
+                notificationArea,
+                userWithUid
+            ) { updatedUser: User ->
 
-                saveUserToRemoteRepo(
-                    user = updatedUserWithRemoteImage,
-                    onSuccess = {
+                uploadImageToRemoteRepo(updatedUser) { updatedUserWithRemoteImage: User, imageDownloadUri: String ->
 
-                        insertUserInLocalRepo(
-                            user = updatedUser,
-                            onSuccess = {
+                    saveUserToRemoteRepo(
+                        user = updatedUserWithRemoteImage,
+                        onSuccess = {
 
-                                saveUserCacheLocally(updatedUser.uid)
-                            },
-                            onError = {
+                            insertUserInLocalRepo(
+                                user = updatedUser,
+                                onSuccess = {
 
-                                deleteAccountFromRemoteDataSource(
-                                    uid = updatedUserWithRemoteImage.uid,
-                                    onComplete = {
-                                        deleteImageFromRemoteRepo(
-                                            userUid = updatedUserWithRemoteImage.uid,
-                                            currentUserImage = imageDownloadUri
-                                        ) {
-                                            deleteAccountFromAuthDataSource(password)
+                                    saveUserCacheLocally(updatedUser.uid)
+                                },
+                                onError = {
+
+                                    deleteAccountFromRemoteDataSource(
+                                        uid = updatedUserWithRemoteImage.uid,
+                                        onComplete = {
+                                            deleteImageFromRemoteRepo(
+                                                userUid = updatedUserWithRemoteImage.uid,
+                                                currentUserImage = imageDownloadUri
+                                            ) {
+                                                deleteAccountFromAuthDataSource(password)
+                                            }
+                                        },
+                                        onError = { errorMessage ->
+
+                                            deleteImageFromRemoteRepo(
+                                                userUid = updatedUserWithRemoteImage.uid,
+                                                currentUserImage = imageDownloadUri
+                                            ) {
+                                                deleteAccountFromAuthDataSource(
+                                                    password = password,
+                                                    errorMessageFromDataSource = errorMessage
+                                                )
+                                            }
                                         }
-                                    },
-                                    onError = { errorMessage ->
+                                    )
+                                }
+                            )
+                        },
+                        onError = { errorMessage ->
 
-                                        deleteImageFromRemoteRepo(
-                                            userUid = updatedUserWithRemoteImage.uid,
-                                            currentUserImage = imageDownloadUri
-                                        ) {
-                                            deleteAccountFromAuthDataSource(
-                                                password = password,
-                                                errorMessageFromDataSource = errorMessage
-                                            )
-                                        }
-                                    }
+                            deleteImageFromRemoteRepo(
+                                userUid = updatedUserWithRemoteImage.uid,
+                                currentUserImage = imageDownloadUri
+                            ) {
+                                deleteAccountFromAuthDataSource(
+                                    password = password,
+                                    errorMessageFromDataSource = errorMessage
                                 )
                             }
-                        )
-                    },
-                    onError = { errorMessage ->
-
-                        deleteImageFromRemoteRepo(
-                            userUid = updatedUserWithRemoteImage.uid,
-                            currentUserImage = imageDownloadUri
-                        ) {
-                            deleteAccountFromAuthDataSource(
-                                password = password,
-                                errorMessageFromDataSource = errorMessage
-                            )
                         }
-                    }
-                )
+                    )
+                }
             }
         }
     }
@@ -128,6 +136,30 @@ class CreateAccountViewmodel(
             }
         }
     }
+
+    private fun retrieveUserWithSubscriptionsIfAvailable(
+        notificationArea: String,
+        user: User,
+        onComplete: (user: User) -> Unit
+    ) {
+        if (notificationArea.isBlank()) {
+            onComplete(user)
+        } else {
+            val subscription = createSubscription(user.uid, notificationArea)
+            onComplete(user.copy(subscriptions = listOf(subscription)))
+        }
+    }
+
+    @OptIn(ExperimentalTime::class)
+    private fun createSubscription(
+        uid: String,
+        topic: String
+    ): Subscription =
+        Subscription(
+            subscriptionId = Clock.System.now().epochSeconds.toString() + uid,
+            uid = uid,
+            topic = topic
+        )
 
     private fun uploadImageToRemoteRepo(
         user: User,

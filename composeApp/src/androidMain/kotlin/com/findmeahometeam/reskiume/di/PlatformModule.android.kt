@@ -11,6 +11,7 @@ import com.findmeahometeam.reskiume.data.remote.fireStore.rescueEvent.FireStoreR
 import com.findmeahometeam.reskiume.data.remote.storage.StorageRepositoryAndroidImpl
 import com.findmeahometeam.reskiume.data.util.analytics.Analytics
 import com.findmeahometeam.reskiume.data.util.analytics.AnalyticsAndroidImpl
+import com.findmeahometeam.reskiume.data.util.fcm.FCMSubscriberRepositoryAndroidImpl
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.data.util.log.LogAndroidImpl
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
@@ -20,6 +21,7 @@ import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteFosterHome.FireStoreRemoteFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteRescueEvent.FireStoreRemoteRescueEventRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
+import com.findmeahometeam.reskiume.domain.repository.util.fcm.FCMSubscriberRepository
 import com.findmeahometeam.reskiume.domain.repository.util.location.LocationRepository
 import com.findmeahometeam.reskiume.ui.fosterHomes.shareService.ShareService
 import com.findmeahometeam.reskiume.ui.fosterHomes.shareService.ShareServiceAndroidImpl
@@ -58,4 +60,5 @@ actual val platformModule: Module = module {
     singleOf(::LocationRepositoryAndroidImpl) bind LocationRepository::class
     singleOf(::ShareServiceAndroidImpl) bind ShareService::class
     singleOf(::FireStoreRemoteRescueEventRepositoryAndroidImpl) bind FireStoreRemoteRescueEventRepository::class
+    singleOf(::FCMSubscriberRepositoryAndroidImpl) bind FCMSubscriberRepository::class
 }

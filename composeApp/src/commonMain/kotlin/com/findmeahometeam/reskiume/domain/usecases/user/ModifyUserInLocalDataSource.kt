@@ -5,12 +5,14 @@ import com.findmeahometeam.reskiume.domain.model.user.Subscription
 import com.findmeahometeam.reskiume.domain.model.user.User
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
+import com.findmeahometeam.reskiume.domain.repository.util.fcm.FCMSubscriberRepository
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 
 class ModifyUserInLocalDataSource(
     private val manageImagePath: ManageImagePath,
+    private val fCMSubscriberRepository: FCMSubscriberRepository,
     private val localUserRepository: LocalUserRepository,
     private val authRepository: AuthRepository,
     private val log: Log
@@ -63,23 +65,30 @@ class ModifyUserInLocalDataSource(
                             it.subscriptionId == subscriptionToManage.subscriptionId
                         }.toEntity()
 
-                    localUserRepository.insertSubscription(
-                        subscriptionEntity,
-                        onInsertSubscription = { rowId ->
-                            if (rowId > 0) {
-                                log.d(
-                                    "ModifyUserInLocalDataSource",
-                                    "manageAllSubscriptions: inserted the subscription id ${subscriptionEntity.subscriptionId} for the user ${subscriptionEntity.uid} in the local data source"
-                                )
-                            } else {
-                                log.e(
-                                    "ModifyUserInLocalDataSource",
-                                    "manageAllSubscriptions: failed to insert the subscription id ${subscriptionEntity.subscriptionId} for the user ${subscriptionEntity.uid} in the local data source"
-                                )
-                                isSuccess = false
+                    val isSubscribed =
+                        fCMSubscriberRepository.subscribeToTopic(subscriptionEntity.topic).first()
+                    if (isSubscribed) {
+
+                        localUserRepository.insertSubscription(
+                            subscriptionEntity,
+                            onInsertSubscription = { rowId ->
+                                if (rowId > 0) {
+                                    log.d(
+                                        "ModifyUserInLocalDataSource",
+                                        "manageAllSubscriptions: inserted the subscription id ${subscriptionEntity.subscriptionId} for the user ${subscriptionEntity.uid} in the local data source"
+                                    )
+                                } else {
+                                    log.e(
+                                        "ModifyUserInLocalDataSource",
+                                        "manageAllSubscriptions: failed to insert the subscription id ${subscriptionEntity.subscriptionId} for the user ${subscriptionEntity.uid} in the local data source"
+                                    )
+                                    isSuccess = false
+                                }
                             }
-                        }
-                    )
+                        )
+                    } else {
+                        isSuccess = false
+                    }
                 } else {
 
                     val subscriptionEntity =
@@ -87,23 +96,31 @@ class ModifyUserInLocalDataSource(
                             it.subscriptionId == subscriptionToManage.subscriptionId
                         }
 
-                    localUserRepository.deleteSubscription(
-                        subscriptionEntity.subscriptionId,
-                        onDeletedSubscription = { rowsDeleted ->
-                            if (rowsDeleted > 0) {
-                                log.d(
-                                    "ModifyUserInLocalDataSource",
-                                    "manageAllSubscriptions: deleted the subscription id ${subscriptionEntity.subscriptionId} for the user ${subscriptionEntity.uid} in the local data source"
-                                )
-                            } else {
-                                log.e(
-                                    "ModifyUserInLocalDataSource",
-                                    "manageAllSubscriptions: failed to delete the subscription id ${subscriptionEntity.subscriptionId} for the user ${subscriptionEntity.uid} in the local data source"
-                                )
-                                isSuccess = false
+                    val isUnsubscribed =
+                        fCMSubscriberRepository.unsubscribeFromTopic(subscriptionEntity.topic)
+                            .first()
+                    if (isUnsubscribed) {
+
+                        localUserRepository.deleteSubscription(
+                            subscriptionEntity.subscriptionId,
+                            onDeletedSubscription = { rowsDeleted ->
+                                if (rowsDeleted > 0) {
+                                    log.d(
+                                        "ModifyUserInLocalDataSource",
+                                        "manageAllSubscriptions: deleted the subscription id ${subscriptionEntity.subscriptionId} for the user ${subscriptionEntity.uid} in the local data source"
+                                    )
+                                } else {
+                                    log.e(
+                                        "ModifyUserInLocalDataSource",
+                                        "manageAllSubscriptions: failed to delete the subscription id ${subscriptionEntity.subscriptionId} for the user ${subscriptionEntity.uid} in the local data source"
+                                    )
+                                    isSuccess = false
+                                }
                             }
-                        }
-                    )
+                        )
+                    } else {
+                        isSuccess = false
+                    }
                 }
             }
         }

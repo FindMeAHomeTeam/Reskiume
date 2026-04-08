@@ -8,9 +8,9 @@ import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.Review
-import com.findmeahometeam.reskiume.domain.model.user.User
 import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueEvent
+import com.findmeahometeam.reskiume.domain.model.user.User
 import com.findmeahometeam.reskiume.domain.usecases.authUser.DeleteUserFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.DeleteAllMyFosterHomesFromLocalRepository
@@ -35,6 +35,7 @@ import com.findmeahometeam.reskiume.domain.usecases.user.DeleteUserFromRemoteDat
 import com.findmeahometeam.reskiume.domain.usecases.user.DeleteUsersFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.user.GetAllUsersFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.util.fcm.UnsubscribeFromAllTopicsFromSubscriberRepository
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,6 +47,7 @@ import kotlinx.coroutines.launch
 
 class DeleteAccountViewmodel(
     observeAuthStateInAuthDataSource: ObserveAuthStateInAuthDataSource,
+    private val unsubscribeFromAllTopicsFromSubscriberRepository: UnsubscribeFromAllTopicsFromSubscriberRepository,
     private val getAllMyRescueEventsFromRemoteRepository: GetAllMyRescueEventsFromRemoteRepository,
     private val getAllRescueEventsFromLocalRepository: GetAllRescueEventsFromLocalRepository,
     private val deleteAllMyRescueEventsFromRemoteRepository: DeleteAllMyRescueEventsFromRemoteRepository,
@@ -78,6 +80,8 @@ class DeleteAccountViewmodel(
 
     fun deleteAccount(password: String) {
         getUserFromRemoteRepo { user ->
+
+            unsubscribeFromAllTopics(user)
 
             // TODO delete chats first
 
@@ -121,6 +125,15 @@ class DeleteAccountViewmodel(
                 )
             } else {
                 onSuccess(remoteUser)
+            }
+        }
+    }
+
+    private fun unsubscribeFromAllTopics(user: User) {
+        viewModelScope.launch {
+
+            if (user.subscriptions.isNotEmpty()) {
+                unsubscribeFromAllTopicsFromSubscriberRepository(user.subscriptions).first()
             }
         }
     }

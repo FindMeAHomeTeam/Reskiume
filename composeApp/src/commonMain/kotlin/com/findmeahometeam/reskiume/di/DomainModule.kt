@@ -78,7 +78,11 @@ import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromLocalRe
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.InsertReviewInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.InsertReviewInRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.user.DeleteSubscriptionFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.user.GetAllUsersFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.InsertSubscriptionInLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.util.fcm.SubscribeToAllTopicsFromSubscriberRepository
+import com.findmeahometeam.reskiume.domain.usecases.util.fcm.UnsubscribeFromAllTopicsFromSubscriberRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.ObserveIfLocationEnabledFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.GetLocationFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.RequestEnableLocationFromLocationRepository
@@ -177,11 +181,13 @@ val domainModule = module {
     factoryOf(::GetReviewsFromRemoteRepository)
 
     // user
+    factoryOf(::DeleteSubscriptionFromLocalDataSource)
     factoryOf(::DeleteUserFromRemoteDataSource)
     factoryOf(::DeleteUsersFromLocalDataSource)
     factoryOf(::GetUserFromLocalDataSource)
     factoryOf(::GetAllUsersFromLocalDataSource)
     factoryOf(::GetUserFromRemoteDataSource)
+    factoryOf(::InsertSubscriptionInLocalDataSource)
     factoryOf(::InsertUserInLocalDataSource)
     factoryOf(::InsertUserInRemoteDataSource)
     factoryOf(::ModifyUserInLocalDataSource)
@@ -192,4 +198,8 @@ val domainModule = module {
     factoryOf(::ObserveIfLocationEnabledFromLocationRepository)
     factoryOf(::RequestEnableLocationFromLocationRepository)
     factoryOf(::GetLocationFromLocationRepository)
+
+    // util
+    factoryOf(::SubscribeToAllTopicsFromSubscriberRepository)
+    factoryOf(::UnsubscribeFromAllTopicsFromSubscriberRepository)
 }

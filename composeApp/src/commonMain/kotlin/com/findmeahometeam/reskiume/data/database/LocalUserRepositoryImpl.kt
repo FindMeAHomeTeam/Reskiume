@@ -19,7 +19,7 @@ class LocalUserRepositoryImpl(
 
     override suspend fun insertSubscription(
         subscriptionEntityForUser: SubscriptionEntityForUser,
-        onInsertSubscription: (rowId: Long) -> Unit
+        onInsertSubscription: suspend (rowId: Long) -> Unit
     ) {
         onInsertSubscription(reskiumeDatabase.getUserDao().insertSubscription(subscriptionEntityForUser))
     }

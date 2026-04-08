@@ -10,7 +10,7 @@ interface LocalUserRepository {
 
     suspend fun insertSubscription(
         subscriptionEntityForUser: SubscriptionEntityForUser,
-        onInsertSubscription: (rowId: Long) -> Unit
+        onInsertSubscription: suspend (rowId: Long) -> Unit
     )
 
     suspend fun modifyUser(user: UserEntity, onModifyUser: suspend (rowsUpdated: Int) -> Unit)

@@ -15,6 +15,7 @@ import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSo
 import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInLocalDataSource
 import com.findmeahometeam.reskiume.ui.core.components.UiState
+import com.findmeahometeam.reskiume.ui.util.fcm.SubscriptionManagerUtil
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,6 +31,7 @@ class LoginAccountViewmodel(
     private val downloadImageToLocalDataSource: DownloadImageToLocalDataSource,
     private val insertUserInLocalDataSource: InsertUserInLocalDataSource,
     private val modifyUserInLocalDataSource: ModifyUserInLocalDataSource,
+    private val subscriptionManagerUtil: SubscriptionManagerUtil,
     private val log: Log
 ) : ViewModel() {
     private var _state: MutableStateFlow<UiState<Unit>> = MutableStateFlow(UiState.Idle())
@@ -95,8 +97,6 @@ class LoginAccountViewmodel(
                         "LoginAccountViewmodel",
                         "updateLocalUser: User with uid ${authUser.uid} is up-to-date in local data source."
                     )
-
-                    _state.value = UiState.Success(Unit)
                 }
             )
         }
@@ -112,7 +112,11 @@ class LoginAccountViewmodel(
                         "LoginAccountViewmodel",
                         "modifyUserInLocalRepo: Modified user with uid ${collectedUser.uid} in the local data source."
                     )
-                    _state.value = UiState.Success(Unit)
+                    viewModelScope.launch {
+
+                        subscriptionManagerUtil.subscribeToAllTopicsAfterLogin(collectedUser)
+                        _state.value = UiState.Success(Unit)
+                    }
                 } else {
                     log.e(
                         "LoginAccountViewmodel",

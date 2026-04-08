@@ -7,26 +7,31 @@ import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.LocalCache
+import com.findmeahometeam.reskiume.domain.model.user.Subscription
 import com.findmeahometeam.reskiume.domain.model.user.User
-import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
-import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ModifyUserEmailInAuthDataSource
-import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ModifyUserPasswordInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.SignOutFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInRemoteDataSource
 import com.findmeahometeam.reskiume.ui.core.components.UiState
+import com.findmeahometeam.reskiume.ui.util.fcm.SubscriptionManagerUtil
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -34,6 +39,7 @@ import kotlin.time.ExperimentalTime
 class ModifyAccountViewmodel(
     observeAuthStateInAuthDataSource: ObserveAuthStateInAuthDataSource,
     private val getUserFromLocalDataSource: GetUserFromLocalDataSource,
+    private val getImagePathForFileNameFromLocalDataSource: GetImagePathForFileNameFromLocalDataSource,
     private val getUserFromRemoteDataSource: GetUserFromRemoteDataSource,
     private val modifyUserEmailInAuthDataSource: ModifyUserEmailInAuthDataSource,
     private val modifyUserPasswordInAuthDataSource: ModifyUserPasswordInAuthDataSource,
@@ -44,6 +50,7 @@ class ModifyAccountViewmodel(
     private val modifyUserInLocalDataSource: ModifyUserInLocalDataSource,
     private val modifyCacheInLocalRepository: ModifyCacheInLocalRepository,
     private val signOutFromAuthDataSource: SignOutFromAuthDataSource,
+    private val subscriptionManagerUtil: SubscriptionManagerUtil,
     private val log: Log
 ) : ViewModel() {
 
@@ -52,47 +59,104 @@ class ModifyAccountViewmodel(
     private val _uiState: MutableStateFlow<UiState<Unit>> = MutableStateFlow(UiState.Idle())
     val uiState: StateFlow<UiState<Unit>> = _uiState.asStateFlow()
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val userState: Flow<UiState<User>> =
+        observeAuthStateInAuthDataSource().map { authUser: AuthUser? ->
+            if (authUser?.uid == null) {
+                UiState.Idle()
+            } else {
+                val user: User? = getUserFromLocalDataSource(authUser.uid).firstOrNull()
+                when {
+                    user == null -> {
+                        log.d(
+                            "ModifyAccountViewmodel",
+                            "userState: User ${authUser.uid} not found"
+                        )
+                        UiState.Idle()
+                    }
+
+                    !user.isLoggedIn -> {
+                        log.d(
+                            "ModifyAccountViewmodel",
+                            "userState: User ${authUser.uid} is not logged in"
+                        )
+                        UiState.Idle()
+                    }
+
+                    else -> {
+                        UiState.Success(
+                            user.copy(
+                                email = authUser.email,
+                                image = if (user.image.isBlank() || user.image == "null") {
+                                    ""
+                                } else {
+                                    getImagePathForFileNameFromLocalDataSource(user.image)
+                                },
+                            )
+                        )
+                    }
+                }
+            }
+        }
+
     fun saveUserChanges(
         isDifferentEmail: Boolean,
         isDifferentImage: Boolean,
         user: User,
         currentPassword: String,
-        newPassword: String = ""
+        updatedPassword: String = "",
+        shouldUpdateNotificationArea: Boolean,
+        previousNotificationArea: String,
+        updatedNotificationArea: String
     ) {
         viewModelScope.launch {
             _uiState.value = UiState.Loading()
 
-            updateUserEmailInAuthDataSource(isDifferentEmail, currentPassword, user.email) {
+            manageNotificationArea(
+                user,
+                shouldUpdateNotificationArea,
+                previousNotificationArea,
+                updatedNotificationArea
+            ) { updatedUser ->
 
-                updateUserPasswordInAuthDataSource(currentPassword, newPassword) {
+                updateUserEmailInAuthDataSource(
+                    isDifferentEmail,
+                    currentPassword,
+                    updatedUser.email
+                ) {
 
-                    if (isDifferentImage) {
-                        deleteCurrentImageFromRemoteDataSource(user) {
+                    updateUserPasswordInAuthDataSource(currentPassword, updatedPassword) {
 
-                            deleteCurrentImageFromLocalDataSource(user) {
+                        if (isDifferentImage) {
+                            deleteCurrentImageFromRemoteDataSource(updatedUser) {
 
-                                uploadNewImageToRemoteDataSource(user) { userWithPossibleImageDownloadUri: User ->
+                                deleteCurrentImageFromLocalDataSource(updatedUser) {
 
-                                    updateUserInRemoteDataSource(userWithPossibleImageDownloadUri) {
+                                    uploadNewImageToRemoteDataSource(updatedUser) { userWithPossibleImageDownloadUri: User ->
 
-                                        saveUserChangesInLocalDataSource(user) {
+                                        updateUserInRemoteDataSource(
+                                            userWithPossibleImageDownloadUri
+                                        ) {
 
-                                            _uiState.value = UiState.Success(Unit)
+                                            saveUserChangesInLocalDataSource(updatedUser) {
+
+                                                _uiState.value = UiState.Success(Unit)
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
-                    } else {
-                        val collectedUser: User =
-                            getUserFromRemoteDataSource(user.uid).firstOrNull()
-                                ?: return@updateUserPasswordInAuthDataSource
+                        } else {
+                            val collectedUser: User =
+                                getUserFromRemoteDataSource(updatedUser.uid).firstOrNull()
+                                    ?: return@updateUserPasswordInAuthDataSource
 
-                        updateUserInRemoteDataSource(user.copy(image = collectedUser.image)) {
+                            updateUserInRemoteDataSource(updatedUser.copy(image = collectedUser.image)) {
 
-                            saveUserChangesInLocalDataSource(user) {
+                                saveUserChangesInLocalDataSource(updatedUser) {
 
-                                _uiState.value = UiState.Success(Unit)
+                                    _uiState.value = UiState.Success(Unit)
+                                }
                             }
                         }
                     }
@@ -100,6 +164,48 @@ class ModifyAccountViewmodel(
             }
         }
     }
+
+    private suspend fun manageNotificationArea(
+        user: User,
+        shouldSubscribeNotificationArea: Boolean,
+        previousNotificationArea: String,
+        updatedNotificationArea: String,
+        onComplete: suspend (user: User) -> Unit
+    ) {
+        if (previousNotificationArea == updatedNotificationArea) {
+
+            onComplete(user)
+        } else {
+
+            var updatedUser = user
+
+            if (!previousNotificationArea.contains("UNSELECTED")) {
+
+                updatedUser =
+                    user.copy(subscriptions = user.subscriptions.filter { it.topic != previousNotificationArea })
+            }
+            if (shouldSubscribeNotificationArea) {
+
+                val subscription = createSubscription(updatedUser.uid, updatedNotificationArea)
+
+                updatedUser = updatedUser.copy(
+                    subscriptions = updatedUser.subscriptions + subscription
+                )
+            }
+            onComplete(updatedUser)
+        }
+    }
+
+    @OptIn(ExperimentalTime::class)
+    private fun createSubscription(
+        uid: String,
+        topic: String
+    ): Subscription =
+        Subscription(
+            subscriptionId = Clock.System.now().epochSeconds.toString() + uid,
+            uid = uid,
+            topic = topic
+        )
 
     private suspend fun updateUserEmailInAuthDataSource(
         isDifferentEmail: Boolean,
@@ -288,7 +394,11 @@ class ModifyAccountViewmodel(
 
             saveUserChangesInLocalDataSource(user.copy(isLoggedIn = false)) {
 
-                signOutFromAuthDataSource()
+                viewModelScope.launch {
+
+                    subscriptionManagerUtil.unsubscribeFromAllTopicsAfterLogOut(user)
+                    signOutFromAuthDataSource()
+                }
             }
         }
     }

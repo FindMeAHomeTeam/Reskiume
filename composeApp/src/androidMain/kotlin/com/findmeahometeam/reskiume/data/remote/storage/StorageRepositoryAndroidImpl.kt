@@ -26,18 +26,22 @@ class StorageRepositoryAndroidImpl(
                 .child(Section.USERS.path)
                 .child(uid)
                 .child("$uid.webp")
+
             Section.NON_HUMAN_ANIMALS -> storageRef
                 .child(Section.NON_HUMAN_ANIMALS.path)
                 .child(uid)
                 .child("$extraId.webp")
+
             Section.FOSTER_HOMES -> storageRef
                 .child(Section.FOSTER_HOMES.path)
                 .child(uid)
                 .child("$extraId.webp")
+
             Section.RESCUE_EVENTS -> storageRef
                 .child(Section.RESCUE_EVENTS.path)
                 .child(uid)
                 .child("$extraId.webp")
+
             else -> storageRef
                 .child(Section.USERS.path)
                 .child(uid)
@@ -79,8 +83,8 @@ class StorageRepositoryAndroidImpl(
         val imageRef: StorageReference = getStorageReference(section, userUid, extraId)
         val localFile = when (section) {
             Section.USERS -> File(context.filesDir, "$userUid.webp")
-            Section.NON_HUMAN_ANIMALS -> File(context.filesDir, "$extraId.webp")
-            Section.FOSTER_HOMES -> File(context.filesDir, "$extraId.webp")
+            Section.NON_HUMAN_ANIMALS,
+            Section.FOSTER_HOMES,
             Section.RESCUE_EVENTS -> File(context.filesDir, "$extraId.webp")
             else -> File(context.filesDir, "$userUid.webp")
         }
@@ -99,14 +103,15 @@ class StorageRepositoryAndroidImpl(
         currentImagePath: String,
         onImageDeleted: (isDeleted: Boolean) -> Unit
     ) {
-        val localFile = if (currentImagePath.contains("file:///")) {
-            val uri = currentImagePath.toUri()
-            File(uri.path ?: return onImageDeleted(false))
+        val uri = currentImagePath.toUri()
+        val filename = uri.lastPathSegment ?: return onImageDeleted(false)
+        val localFile = File(context.filesDir, filename)
+
+        if (localFile.exists()) {
+            onImageDeleted(localFile.delete())
         } else {
-            val filename = currentImagePath.split("/").last()
-            File(context.filesDir, filename)
+            onImageDeleted(false)
         }
-        onImageDeleted(localFile.delete())
     }
 
     override suspend fun deleteRemoteImage(

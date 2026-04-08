@@ -25,6 +25,8 @@ import com.findmeahometeam.reskiume.data.remote.storage.StorageRepositoryIosImpl
 import com.findmeahometeam.reskiume.data.util.analytics.Analytics
 import com.findmeahometeam.reskiume.data.util.analytics.AnalyticsForIosDelegateWrapperImpl
 import com.findmeahometeam.reskiume.data.util.analytics.AnalyticsIosImpl
+import com.findmeahometeam.reskiume.data.util.fcm.FCMSubscriberRepositoryForIosDelegateWrapperImpl
+import com.findmeahometeam.reskiume.data.util.fcm.FCMSubscriberRepositoryIosImpl
 import com.findmeahometeam.reskiume.data.util.log.CrashlyticsForIosDelegateWrapperImpl
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.data.util.log.LogIosImpl
@@ -49,6 +51,8 @@ import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteRes
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepositoryForIosDelegateWrapper
 import com.findmeahometeam.reskiume.domain.repository.util.analytics.AnalyticsForIosWrapper
+import com.findmeahometeam.reskiume.domain.repository.util.fcm.FCMSubscriberRepository
+import com.findmeahometeam.reskiume.domain.repository.util.fcm.FCMSubscriberRepositoryForIosDelegateWrapper
 import com.findmeahometeam.reskiume.domain.repository.util.location.LocationRepository
 import com.findmeahometeam.reskiume.domain.repository.util.log.CrashlyticsForIosWrapper
 import com.findmeahometeam.reskiume.ui.fosterHomes.shareService.ShareService
@@ -96,4 +100,6 @@ actual val platformModule: Module = module {
     singleOf(::FireStoreRemoteRescueEventRepositoryIosImpl) bind FireStoreRemoteRescueEventRepository::class
     singleOf(::FireStoreRemoteRescueEventFlowsRepositoryForIosDelegateImpl) bind FireStoreRemoteRescueEventFlowsRepositoryForIosDelegate::class
     singleOf(::FireStoreRemoteRescueEventRepositoryForIosDelegateWrapperImpl) bind FireStoreRemoteRescueEventRepositoryForIosDelegateWrapper::class
+    singleOf(::FCMSubscriberRepositoryIosImpl) bind FCMSubscriberRepository::class
+    singleOf(::FCMSubscriberRepositoryForIosDelegateWrapperImpl) bind FCMSubscriberRepositoryForIosDelegateWrapper::class
 }

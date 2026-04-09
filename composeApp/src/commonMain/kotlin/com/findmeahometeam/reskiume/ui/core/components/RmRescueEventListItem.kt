@@ -49,7 +49,7 @@ fun RmRescueEventListItem(
     Card(
         modifier = modifier,
         colors = CardDefaults.cardColors().copy(containerColor = containerColor),
-        onClick = onClick
+        onClick = rmDebouncer(onClick)
     ) {
         Row(
             modifier = Modifier.padding(16.dp),

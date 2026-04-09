@@ -36,7 +36,13 @@ fun RmListReviewItem(
     Card(
         enabled = isEnabled,
         colors = CardDefaults.cardColors().copy(containerColor = containerColor),
-        onClick = { onClick?.invoke() }
+        onClick = rmDebouncer(
+            if (onClick == null) {
+                {}
+            } else {
+                onClick
+            }
+        )
     ) {
         Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
             RmAvatar(listAvatarType)
@@ -78,4 +84,3 @@ fun RmListReviewItem(
         }
     }
 }
-

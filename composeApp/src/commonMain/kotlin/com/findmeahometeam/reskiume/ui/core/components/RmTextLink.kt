@@ -31,6 +31,7 @@ fun RmTextLink(
 ) {
     val startIndex = text.indexOf(textToLink)
     val endIndex = startIndex + textToLink.length
+    val debouncedOnClick: () -> Unit = rmDebouncer(onClick)
     val annotatedLinkString: AnnotatedString = buildAnnotatedString {
         append(text)
         addStyle(
@@ -48,7 +49,7 @@ fun RmTextLink(
                     )
                 ),
                 linkInteractionListener = {
-                    onClick()
+                    debouncedOnClick()
                 }),
             start = startIndex,
             end = endIndex

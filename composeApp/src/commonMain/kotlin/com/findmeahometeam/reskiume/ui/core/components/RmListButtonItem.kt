@@ -35,7 +35,7 @@ fun RmListButtonItem(
     Card(
         enabled = isEnabled,
         colors = CardDefaults.cardColors().copy(containerColor = containerColor),
-        onClick = { onClick() }
+        onClick = rmDebouncer(onClick)
     ) {
         Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
             RmAvatar(listAvatarType)
@@ -60,4 +60,3 @@ fun RmListButtonItem(
         }
     }
 }
-

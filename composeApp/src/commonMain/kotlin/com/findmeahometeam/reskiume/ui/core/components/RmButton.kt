@@ -37,7 +37,7 @@ fun RmButton(
                 containerColor = containerColor,
                 disabledContainerColor = disabledContainerColor
             ),
-        onClick = onClick
+        onClick = rmDebouncer(onClick)
     ) {
         RmText(
             modifier = Modifier.fillMaxWidth(),

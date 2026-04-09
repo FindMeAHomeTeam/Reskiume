@@ -43,6 +43,6 @@ fun RmExtendedFloatingActionButton(
         },
         containerColor = primaryGreen,
         expanded = expanded,
-        onClick = onClick
+        onClick = rmDebouncer(onClick)
     )
 }

@@ -40,15 +40,16 @@ import com.findmeahometeam.reskiume.domain.model.Gender
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalListSaver
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
-import com.findmeahometeam.reskiume.domain.model.user.User
 import com.findmeahometeam.reskiume.domain.model.fosterHome.AcceptedNonHumanAnimalForFosterHome
 import com.findmeahometeam.reskiume.domain.model.fosterHome.City
 import com.findmeahometeam.reskiume.domain.model.fosterHome.Country
 import com.findmeahometeam.reskiume.domain.model.fosterHome.toStringResource
 import com.findmeahometeam.reskiume.domain.model.toEmoji
 import com.findmeahometeam.reskiume.domain.model.toStringResource
+import com.findmeahometeam.reskiume.domain.model.user.User
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.backgroundColorForItems
+import com.findmeahometeam.reskiume.ui.core.components.ManagePermissionState
 import com.findmeahometeam.reskiume.ui.core.components.RmButton
 import com.findmeahometeam.reskiume.ui.core.components.RmImage
 import com.findmeahometeam.reskiume.ui.core.components.RmListAvatarType
@@ -66,6 +67,7 @@ import com.findmeahometeam.reskiume.ui.core.primaryGreen
 import com.findmeahometeam.reskiume.ui.core.textColor
 import com.findmeahometeam.reskiume.ui.fosterHomes.checkAllFosterHomes.UiFosterHome
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.UiReview
+import com.findmeahometeam.reskiume.ui.rescueEvents.checkRescueEvent.ManageNotificationPermissionToStartChat
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -279,7 +281,7 @@ fun CheckFosterHomeScreen(
                     DisplayReviews(allUserUiReviewsState, onReviewClick)
                 }
 
-                if(checkFosterHomeViewmodel.canIStartTheChat()) {
+                if (checkFosterHomeViewmodel.canIStartTheChat()) {
 
                     Spacer(modifier = Modifier.height(8.dp))
                     HorizontalDivider(
@@ -532,6 +534,11 @@ fun DisplayChatToOwner(
             emptyList()
         )
     }
+    var isStartChatClicked: Boolean by rememberSaveable { mutableStateOf(false) }
+    var notificationPermissionState: ManagePermissionState by rememberSaveable {
+        mutableStateOf(ManagePermissionState.CHECK_PERMISSION)
+    }
+
     RmNonHumanAnimalListCreator(
         title = stringResource(Res.string.check_foster_home_screen_add_non_human_animals_to_foster_title),
         allAvailableNonHumanAnimals = allAvailableNonHumanAnimals,
@@ -546,9 +553,25 @@ fun DisplayChatToOwner(
         text = stringResource(Res.string.check_foster_home_screen_start_chat_button),
         enabled = allSelectedNonHumanAnimalsToFoster.isNotEmpty()
     ) {
-        onContactFosterHome(
-            fosterHomeId,
-            allSelectedNonHumanAnimalsToFoster.map { it.id }
+        isStartChatClicked = true
+    }
+
+    if (isStartChatClicked) {
+
+        ManageNotificationPermissionToStartChat(
+            notificationPermissionState = notificationPermissionState,
+            onUpdateNotificationPermissionState = {
+                notificationPermissionState = it
+                if (it == ManagePermissionState.CHECK_PERMISSION) {
+                    isStartChatClicked = false
+                }
+            },
+            onNotificationPermissionGranted = {
+                onContactFosterHome(
+                    fosterHomeId,
+                    allSelectedNonHumanAnimalsToFoster.map { it.id }
+                )
+            }
         )
     }
 }

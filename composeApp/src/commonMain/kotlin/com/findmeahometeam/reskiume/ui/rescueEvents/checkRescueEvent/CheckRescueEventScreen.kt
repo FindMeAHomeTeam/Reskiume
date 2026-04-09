@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,8 +47,10 @@ import com.findmeahometeam.reskiume.domain.model.toEmoji
 import com.findmeahometeam.reskiume.domain.model.toStringResource
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.backgroundColorForItems
+import com.findmeahometeam.reskiume.ui.core.components.ManagePermissionState
 import com.findmeahometeam.reskiume.ui.core.components.RmButton
 import com.findmeahometeam.reskiume.ui.core.components.RmImage
+import com.findmeahometeam.reskiume.ui.core.components.RmManageNotificationPermission
 import com.findmeahometeam.reskiume.ui.core.components.RmReport
 import com.findmeahometeam.reskiume.ui.core.components.RmResultState
 import com.findmeahometeam.reskiume.ui.core.components.RmScaffold
@@ -95,6 +98,10 @@ fun CheckRescueEventScreen(
     )
 
     var isShareButtonClicked: Boolean by remember { mutableStateOf(false) }
+    var isStartChatClicked: Boolean by rememberSaveable { mutableStateOf(false) }
+    var notificationPermissionState: ManagePermissionState by rememberSaveable {
+        mutableStateOf(ManagePermissionState.CHECK_PERMISSION)
+    }
 
     val scrollState = rememberScrollState()
 
@@ -252,9 +259,25 @@ fun CheckRescueEventScreen(
                             modifier = Modifier.fillMaxWidth(),
                             text = stringResource(Res.string.check_rescue_event_screen_start_chat_button),
                         ) {
-                            onContactRescueEvent(
-                                uiRescueEvent.rescueEvent.id,
-                                uiRescueEvent.allUiNonHumanAnimalsToRescue.map { it.id }
+                            isStartChatClicked = true
+                        }
+
+                        if (isStartChatClicked) {
+
+                            ManageNotificationPermissionToStartChat(
+                                notificationPermissionState = notificationPermissionState,
+                                onUpdateNotificationPermissionState = {
+                                    notificationPermissionState = it
+                                    if (it == ManagePermissionState.CHECK_PERMISSION) {
+                                        isStartChatClicked = false
+                                    }
+                                },
+                                onNotificationPermissionGranted = {
+                                    onContactRescueEvent(
+                                        uiRescueEvent.rescueEvent.id,
+                                        uiRescueEvent.allUiNonHumanAnimalsToRescue.map { it.id }
+                                    )
+                                }
                             )
                         }
                     } else {
@@ -285,7 +308,7 @@ fun DisplayShareService(
     rescueEventCreatorId: String,
     rescueEventId: String
 ) {
-    val nonHumanAnimalsToRescueText = if(allNonHumanAnimalsToRescue.size == 1) {
+    val nonHumanAnimalsToRescueText = if (allNonHumanAnimalsToRescue.size == 1) {
         "${allNonHumanAnimalsToRescue[0].nonHumanAnimalType.toEmoji()} ${allNonHumanAnimalsToRescue[0].name}"
     } else {
         stringResource(
@@ -403,6 +426,35 @@ private fun NonHumanAnimalToRescueList(allNonHumanAnimalsToRescue: List<NonHuman
             }
             if (index < allNonHumanAnimalsToRescue.size - 1) {
                 Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
+    }
+}
+
+@Composable
+fun ManageNotificationPermissionToStartChat(
+    notificationPermissionState: ManagePermissionState,
+    onUpdateNotificationPermissionState: (ManagePermissionState) -> Unit,
+    onNotificationPermissionGranted: () -> Unit
+) {
+    if (notificationPermissionState == ManagePermissionState.PERMISSION_GRANTED) {
+
+        onNotificationPermissionGranted()
+    } else {
+        RmManageNotificationPermission(permissionState = notificationPermissionState) { permissionState ->
+
+            when (permissionState) {
+                ManagePermissionState.PERMISSION_GRANTED -> {
+                    onNotificationPermissionGranted()
+                }
+
+                ManagePermissionState.IDLE -> {
+                    onUpdateNotificationPermissionState(ManagePermissionState.CHECK_PERMISSION)
+                }
+
+                else -> {
+                    onUpdateNotificationPermissionState(permissionState)
+                }
             }
         }
     }

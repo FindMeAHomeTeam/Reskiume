@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
+import com.findmeahometeam.reskiume.domain.model.user.User
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromLocalRepository
@@ -40,6 +41,8 @@ class CheckFosterHomeViewmodel(
 
     private var myUid = ""
 
+    private var myUser: User? = null
+
     val fosterHomeFlow: Flow<UiState<UiFosterHome>> =
         checkFosterHomeUtil.getFosterHomeFlow(
             fosterHomeId,
@@ -51,6 +54,7 @@ class CheckFosterHomeViewmodel(
                 return@map null
             }
             myUid = observeAuthStateInAuthDataSource().firstOrNull()?.uid ?: " "
+            updateMyUserData()
 
             val owner = checkActivistUtil.getUser(
                 activistUid = fosterHome.ownerId,
@@ -80,6 +84,18 @@ class CheckFosterHomeViewmodel(
             }
         }.toUiState()
 
+    private suspend fun updateMyUserData() {
+        if (myUid.isNotBlank()) {
+            myUser = checkActivistUtil.getUser(
+                activistUid = myUid,
+                myUserUid = myUid
+            )
+            if (myUser?.isLoggedIn == false) {
+                myUid = " "
+            }
+        }
+    }
+
     val allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow: Flow<List<NonHumanAnimal>> =
         getAllNonHumanAnimalsFromLocalRepository().map {
             it.mapNotNull { nonHumanAnimal ->
@@ -94,7 +110,7 @@ class CheckFosterHomeViewmodel(
     val reviewListFlowState: Flow<UiState<List<UiReview>>> =
         checkReviewsUtil.getReviewListFlow(ownerId).toUiState()
 
-    fun isLoggedIn(): Boolean = myUid.isNotBlank()
+    fun isLoggedIn(): Boolean = myUser?.isLoggedIn == true
 
     fun canIStartTheChat(): Boolean = myUid != ownerId
 }

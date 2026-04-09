@@ -3,6 +3,7 @@ package com.findmeahometeam.reskiume.ui.rescueEvents.checkRescueEvent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueEvent
+import com.findmeahometeam.reskiume.domain.model.user.User
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
 import com.findmeahometeam.reskiume.ui.core.components.UiState
@@ -33,6 +34,8 @@ class CheckRescueEventViewmodel(
 
     private var myUid = ""
 
+    private var myUser: User? = null
+
     val rescueEventFlow: Flow<UiState<UiRescueEvent>> =
         checkRescueEventUtil.getRescueEventFlow(
             rescueEventId,
@@ -44,6 +47,7 @@ class CheckRescueEventViewmodel(
                 return@map null
             }
             myUid = observeAuthStateInAuthDataSource().firstOrNull()?.uid ?: " "
+            updateMyUserData()
 
             val creator = checkActivistUtil.getUser(
                 activistUid = rescueEvent.creatorId,
@@ -73,7 +77,19 @@ class CheckRescueEventViewmodel(
             }
         }.toUiState()
 
-    fun isLoggedIn(): Boolean = myUid.isNotBlank()
+    private suspend fun updateMyUserData() {
+        if (myUid.isNotBlank()) {
+            myUser = checkActivistUtil.getUser(
+                activistUid = myUid,
+                myUserUid = myUid
+            )
+            if (myUser?.isLoggedIn == false) {
+                myUid = " "
+            }
+        }
+    }
+
+    fun isLoggedIn(): Boolean = myUser?.isLoggedIn == true
 
     fun canIStartTheChat(): Boolean = myUid != creatorId
 }

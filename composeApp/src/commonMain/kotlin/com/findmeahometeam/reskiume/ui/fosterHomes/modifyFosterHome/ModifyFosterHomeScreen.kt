@@ -30,6 +30,7 @@ import com.findmeahometeam.reskiume.domain.model.fosterHome.Country
 import com.findmeahometeam.reskiume.domain.model.fosterHome.ResidentNonHumanAnimalForFosterHome
 import com.findmeahometeam.reskiume.domain.model.fosterHome.toStringResource
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
+import com.findmeahometeam.reskiume.ui.core.components.ManagePermissionState
 import com.findmeahometeam.reskiume.ui.core.components.MaxCharacters
 import com.findmeahometeam.reskiume.ui.core.components.RmAcceptedNonHumanAnimalListCreator
 import com.findmeahometeam.reskiume.ui.core.components.RmAddPhoto
@@ -37,6 +38,7 @@ import com.findmeahometeam.reskiume.ui.core.components.RmButton
 import com.findmeahometeam.reskiume.ui.core.components.RmDialog
 import com.findmeahometeam.reskiume.ui.core.components.RmListAvatarType
 import com.findmeahometeam.reskiume.ui.core.components.RmListSwitchItem
+import com.findmeahometeam.reskiume.ui.core.components.RmManageNotificationPermission
 import com.findmeahometeam.reskiume.ui.core.components.RmNonHumanAnimalListCreator
 import com.findmeahometeam.reskiume.ui.core.components.RmResultState
 import com.findmeahometeam.reskiume.ui.core.components.RmScaffold
@@ -84,6 +86,9 @@ fun ModifyFosterHomeScreen(
     )
     val manageChangesUiState: UiState<Unit> by modifyFosterHomeViewmodel.manageChangesUiState.collectAsState()
 
+    var notificationPermissionState: ManagePermissionState by rememberSaveable {
+        mutableStateOf(ManagePermissionState.CHECK_PERMISSION)
+    }
     val scrollState = rememberScrollState()
 
     RmScaffold(
@@ -172,6 +177,15 @@ fun ModifyFosterHomeScreen(
                                 || allResidentUiNonHumanAnimals != uiFosterHome.allResidentUiNonHumanAnimals
                                 || isAvailable != uiFosterHome.fosterHome.available)
                     }
+                }
+
+                if (notificationPermissionState != ManagePermissionState.PERMISSION_GRANTED) {
+                    RmManageNotificationPermission(
+                        permissionState = notificationPermissionState,
+                        onUpdatePermissionState = {
+                            notificationPermissionState = it
+                        }
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))

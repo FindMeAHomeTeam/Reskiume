@@ -30,10 +30,12 @@ import com.findmeahometeam.reskiume.domain.model.rescueEvent.NeedToCover
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.NeedToCoverListSaver
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.NonHumanAnimalToRescue
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
+import com.findmeahometeam.reskiume.ui.core.components.ManagePermissionState
 import com.findmeahometeam.reskiume.ui.core.components.MaxCharacters
 import com.findmeahometeam.reskiume.ui.core.components.RmAddPhoto
 import com.findmeahometeam.reskiume.ui.core.components.RmButton
 import com.findmeahometeam.reskiume.ui.core.components.RmDialog
+import com.findmeahometeam.reskiume.ui.core.components.RmManageNotificationPermission
 import com.findmeahometeam.reskiume.ui.core.components.RmNeedToCoverListCreator
 import com.findmeahometeam.reskiume.ui.core.components.RmNonHumanAnimalListCreator
 import com.findmeahometeam.reskiume.ui.core.components.RmResultState
@@ -72,6 +74,9 @@ fun ModifyRescueEventScreen(
     )
     val manageChangesUiState: UiState<Unit> by modifyRescueEventViewmodel.manageChangesUiState.collectAsState()
 
+    var notificationPermissionState: ManagePermissionState by rememberSaveable {
+        mutableStateOf(ManagePermissionState.CHECK_PERMISSION)
+    }
     val scrollState = rememberScrollState()
 
     RmScaffold(
@@ -146,6 +151,15 @@ fun ModifyRescueEventScreen(
                                 || allNeedsToCover != uiRescueEvent.rescueEvent.allNeedsToCover
                                 || allUiNonHumanAnimalsToRescue != uiRescueEvent.allUiNonHumanAnimalsToRescue)
                     }
+                }
+
+                if (notificationPermissionState != ManagePermissionState.PERMISSION_GRANTED) {
+                    RmManageNotificationPermission(
+                        permissionState = notificationPermissionState,
+                        onUpdatePermissionState = {
+                            notificationPermissionState = it
+                        }
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))

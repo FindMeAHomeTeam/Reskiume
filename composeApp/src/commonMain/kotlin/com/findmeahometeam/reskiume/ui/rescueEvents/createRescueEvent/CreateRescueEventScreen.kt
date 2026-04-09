@@ -38,6 +38,7 @@ import com.findmeahometeam.reskiume.ui.core.components.RmAddPhoto
 import com.findmeahometeam.reskiume.ui.core.components.RmButton
 import com.findmeahometeam.reskiume.ui.core.components.RmCountryAndCitySelectors
 import com.findmeahometeam.reskiume.ui.core.components.RmManageLocationPermission
+import com.findmeahometeam.reskiume.ui.core.components.RmManageNotificationPermission
 import com.findmeahometeam.reskiume.ui.core.components.RmNeedToCoverListCreator
 import com.findmeahometeam.reskiume.ui.core.components.RmNonHumanAnimalListCreator
 import com.findmeahometeam.reskiume.ui.core.components.RmResultState
@@ -86,7 +87,10 @@ fun CreateRescueEventScreen(
     var selectedCountry: Country by rememberSaveable { mutableStateOf(Country.UNSELECTED) }
     var selectedCity: City by rememberSaveable { mutableStateOf(City.UNSELECTED) }
 
-    var permissionState: ManagePermissionState by rememberSaveable {
+    var locationPermissionState: ManagePermissionState by rememberSaveable {
+        mutableStateOf(ManagePermissionState.CHECK_PERMISSION)
+    }
+    var notificationPermissionState: ManagePermissionState by rememberSaveable {
         mutableStateOf(ManagePermissionState.CHECK_PERMISSION)
     }
     val isLocationEnabledState: State<Boolean> =
@@ -100,7 +104,8 @@ fun CreateRescueEventScreen(
         allNeedsToCover,
         selectedCountry,
         selectedCity,
-        permissionState,
+        locationPermissionState,
+        notificationPermissionState,
         isLocationEnabledState
     ) {
         derivedStateOf {
@@ -111,7 +116,8 @@ fun CreateRescueEventScreen(
                     && allNeedsToCover.isNotEmpty()
                     && selectedCountry != Country.UNSELECTED
                     && selectedCity != City.UNSELECTED
-                    && permissionState == ManagePermissionState.PERMISSION_GRANTED
+                    && locationPermissionState == ManagePermissionState.PERMISSION_GRANTED
+                    && notificationPermissionState == ManagePermissionState.PERMISSION_GRANTED
                     && isLocationEnabledState.value
         }
     }
@@ -158,7 +164,7 @@ fun CreateRescueEventScreen(
                     Res.string.manage_location_permission_message,
                     stringResource(Res.string.rescue_event)
                 ),
-                permissionState = permissionState,
+                permissionState = locationPermissionState,
                 isLocationEnabledState = isLocationEnabledState,
                 onRequestEnableLocation = {
                     createRescueEventViewmodel.requestEnableLocation()
@@ -171,10 +177,22 @@ fun CreateRescueEventScreen(
                     if (it == ManagePermissionState.IDLE) {
                         onBackPressed()
                     } else {
-                        permissionState = it
+                        locationPermissionState = it
                     }
                 }
             )
+            if (locationPermissionState == ManagePermissionState.PERMISSION_GRANTED && notificationPermissionState != ManagePermissionState.PERMISSION_GRANTED) {
+                RmManageNotificationPermission(
+                    permissionState = notificationPermissionState,
+                    onUpdatePermissionState = {
+                        if (it == ManagePermissionState.IDLE) {
+                            onBackPressed()
+                        } else {
+                            notificationPermissionState = it
+                        }
+                    }
+                )
+            }
 
             Spacer(modifier = Modifier.height(8.dp))
             RmTextField(

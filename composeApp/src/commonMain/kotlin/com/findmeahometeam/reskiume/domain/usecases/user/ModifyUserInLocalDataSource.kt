@@ -21,18 +21,23 @@ class ModifyUserInLocalDataSource(
         updatedUser: User,
         onModifyUser: (isUpdated: Boolean) -> Unit
     ) {
+        val myUid = getMyUid()
         val imageFileName = manageImagePath.getFileNameFromLocalImagePath(updatedUser.image)
 
         localUserRepository.modifyUser(
             updatedUser.copy(
-                savedBy = getMyUid(),
+                savedBy = myUid,
                 image = imageFileName
             ).toEntity(),
             onModifyUser = { rowsUpdated ->
                 if (rowsUpdated > 0) {
 
-                    val isSuccess = manageAllSubscriptions(updatedUser)
-                    onModifyUser(isSuccess)
+                    if (updatedUser.uid != myUid) {
+                        onModifyUser(true)
+                    } else {
+                        val isSuccess = manageAllSubscriptions(updatedUser)
+                        onModifyUser(isSuccess)
+                    }
                 } else {
                     onModifyUser(false)
                 }

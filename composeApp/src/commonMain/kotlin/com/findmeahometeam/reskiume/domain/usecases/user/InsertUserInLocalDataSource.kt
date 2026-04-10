@@ -10,9 +10,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 
 class InsertUserInLocalDataSource(
+    private val authRepository: AuthRepository,
     private val manageImagePath: ManageImagePath,
     private val localUserRepository: LocalUserRepository,
-    private val authRepository: AuthRepository,
     private val fCMSubscriberRepository: FCMSubscriberRepository,
     private val log: Log
 ) {
@@ -20,17 +20,18 @@ class InsertUserInLocalDataSource(
         user: User,
         onInsertUser: (isSuccess: Boolean) -> Unit
     ) {
+        val myUid = getMyUid()
         val imageFileName = manageImagePath.getFileNameFromLocalImagePath(user.image)
 
         localUserRepository.insertUser(
             user.copy(
-                savedBy = getMyUid(),
+                savedBy = myUid,
                 image = imageFileName
             ).toEntity(),
             onInsertUser = { rowId ->
                 if (rowId > 0) {
 
-                    if (user.subscriptions.isEmpty()) {
+                    if (user.uid != myUid || user.subscriptions.isEmpty()) {
                         onInsertUser(true)
                     } else {
                         insertAllSubscriptions(user) { isSuccess ->

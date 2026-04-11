@@ -11,6 +11,7 @@ import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInA
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.home.HomeViewmodel
 import com.findmeahometeam.reskiume.user
+import com.findmeahometeam.reskiume.userWithAllSubscriptionData
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
@@ -24,8 +25,8 @@ import kotlin.test.assertTrue
 class HomeViewmodelTest : CoroutineTestDispatcher() {
 
     private val localUserRepository: LocalUserRepository = mock {
-        everySuspend { getUser(user.uid) } returns user
-        everySuspend { getUser("wrongUid") } returns null
+        everySuspend { getUser(user.uid) } returns flowOf(userWithAllSubscriptionData)
+        everySuspend { getUser("wrongUid") } returns flowOf(null)
     }
     private val log: Log = mock {
         every { d(any(), any()) } returns Unit
@@ -49,9 +50,9 @@ class HomeViewmodelTest : CoroutineTestDispatcher() {
             val authRepository: AuthRepository = mock {
                 everySuspend { authState } returns (flowOf(authUser))
             }
-            getHomeViewmodel(authRepository).state.test {
-                assertTrue { awaitItem() is UiState.Idle }
+            getHomeViewmodel(authRepository).userState.test {
                 assertTrue { awaitItem() is UiState.Success }
+                awaitComplete()
                 ensureAllEventsConsumed()
             }
         }
@@ -62,8 +63,9 @@ class HomeViewmodelTest : CoroutineTestDispatcher() {
             val authRepository: AuthRepository = mock {
                 everySuspend { authState } returns (flowOf(authUser.copy(uid = "wrongUid")))
             }
-            getHomeViewmodel(authRepository).state.test {
+            getHomeViewmodel(authRepository).userState.test {
                 assertTrue { awaitItem() is UiState.Idle }
+                awaitComplete()
                 ensureAllEventsConsumed()
             }
         }
@@ -74,8 +76,9 @@ class HomeViewmodelTest : CoroutineTestDispatcher() {
             val authRepository: AuthRepository = mock {
                 every { authState } returns flowOf(null)
             }
-            getHomeViewmodel(authRepository).state.test {
+            getHomeViewmodel(authRepository).userState.test {
                 assertTrue { awaitItem() is UiState.Idle }
+                awaitComplete()
                 ensureAllEventsConsumed()
             }
         }

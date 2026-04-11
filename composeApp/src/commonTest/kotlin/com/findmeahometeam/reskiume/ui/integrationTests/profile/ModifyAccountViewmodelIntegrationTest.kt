@@ -10,31 +10,37 @@ import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
-import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
-import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.repository.util.fcm.FCMSubscriberRepository
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ModifyUserEmailInAuthDataSource
-import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ModifyUserPasswordInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.SignOutFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInRemoteDataSource
 import com.findmeahometeam.reskiume.localCache
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeAuthRepository
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeFCMSubscriberRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalCacheRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalUserRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLog
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeManageImagePath
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeRealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeStorageRepository
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeSubscriptionManagerUtil
 import com.findmeahometeam.reskiume.ui.profile.modifyAccount.ModifyAccountViewmodel
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
+import com.findmeahometeam.reskiume.ui.util.fcm.SubscriptionManagerUtil
 import com.findmeahometeam.reskiume.user
 import com.findmeahometeam.reskiume.userPwd
+import com.findmeahometeam.reskiume.userWithAllSubscriptionData
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -52,7 +58,9 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
         realtimeDatabaseRemoteUserRepository: RealtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(),
         storageRepository: StorageRepository = FakeStorageRepository(),
         manageImagePath: ManageImagePath = FakeManageImagePath(),
-        localCacheRepository: LocalCacheRepository = FakeLocalCacheRepository()
+        localCacheRepository: LocalCacheRepository = FakeLocalCacheRepository(),
+        fCMSubscriberRepository: FCMSubscriberRepository = FakeFCMSubscriberRepository(),
+        subscriptionManagerUtil: SubscriptionManagerUtil = FakeSubscriptionManagerUtil()
     ): ModifyAccountViewmodel {
 
         val observeAuthStateInAuthDataSource =
@@ -60,6 +68,9 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
 
         val getUserFromLocalDataSource =
             GetUserFromLocalDataSource(localUserRepository)
+
+        val getImagePathForFileNameFromLocalDataSource =
+            GetImagePathForFileNameFromLocalDataSource(manageImagePath)
 
         val getUserFromRemoteDataSource =
             GetUserFromRemoteDataSource(realtimeDatabaseRemoteUserRepository)
@@ -83,7 +94,13 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
             ModifyUserInRemoteDataSource(realtimeDatabaseRemoteUserRepository)
 
         val modifyUserInLocalDataSource =
-            ModifyUserInLocalDataSource(manageImagePath, localUserRepository, authRepository)
+            ModifyUserInLocalDataSource(
+                manageImagePath,
+                fCMSubscriberRepository,
+                localUserRepository,
+                authRepository,
+                log
+            )
 
         val modifyCacheInLocalRepository =
             ModifyCacheInLocalRepository(localCacheRepository)
@@ -94,6 +111,7 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
         return ModifyAccountViewmodel(
             observeAuthStateInAuthDataSource,
             getUserFromLocalDataSource,
+            getImagePathForFileNameFromLocalDataSource,
             getUserFromRemoteDataSource,
             modifyUserEmailInAuthDataSource,
             modifyUserPasswordInAuthDataSource,
@@ -104,12 +122,13 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
             modifyUserInLocalDataSource,
             modifyCacheInLocalRepository,
             signOutFromAuthDataSource,
+            subscriptionManagerUtil,
             log
         )
     }
 
     @Test
-    fun `given a registered user_when that user modifies their account_then the account is updated`() =
+    fun `given a registered user_when that user modifies their account_then the account is updated with its new rescue event subscription`() =
         runTest {
             val modifyAccountViewmodel = getModifyAccountViewmodel(
                 authRepository = FakeAuthRepository(
@@ -131,14 +150,174 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                         )
                     )
                 ),
-                localUserRepository = FakeLocalUserRepository(mutableListOf(user))
+                localUserRepository = FakeLocalUserRepository(
+                    mutableListOf(
+                        userWithAllSubscriptionData
+                    )
+                ),
+                fCMSubscriberRepository = FakeFCMSubscriberRepository(
+                    user.subscriptions.toMutableList()
+                )
             )
             modifyAccountViewmodel.saveUserChanges(
                 isDifferentEmail = true,
                 isDifferentImage = true,
                 user = user,
                 currentPassword = userPwd,
-                newPassword = "123456"
+                updatedPassword = "123456",
+                shouldUpdateNotificationArea = true,
+                previousNotificationArea = user.subscriptions[0].topic,
+                updatedNotificationArea = "SPAINSEVILLE"
+            )
+            modifyAccountViewmodel.uiState.test {
+                assertTrue { awaitItem() is UiState.Idle }
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Success }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given a registered user_when that user modifies their account without changing the rescue event subscription_then the account is updated`() =
+        runTest {
+            val modifyAccountViewmodel = getModifyAccountViewmodel(
+                authRepository = FakeAuthRepository(
+                    authUser = authUser,
+                    authEmail = user.email,
+                    authPassword = userPwd
+                ),
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
+                    mutableListOf(user.toData())
+                ),
+                storageRepository = FakeStorageRepository(
+                    remoteDatasourceList = mutableListOf(
+                        Pair("${Section.USERS.path}/${user.uid}", user.image)
+                    ),
+                    localDatasourceList = mutableListOf(
+                        Pair(
+                            "local_path",
+                            user.image
+                        )
+                    )
+                ),
+                localUserRepository = FakeLocalUserRepository(
+                    mutableListOf(
+                        userWithAllSubscriptionData
+                    )
+                ),
+                fCMSubscriberRepository = FakeFCMSubscriberRepository(
+                    user.subscriptions.toMutableList()
+                )
+            )
+            modifyAccountViewmodel.saveUserChanges(
+                isDifferentEmail = true,
+                isDifferentImage = true,
+                user = user,
+                currentPassword = userPwd,
+                updatedPassword = "123456",
+                shouldUpdateNotificationArea = true,
+                previousNotificationArea = user.subscriptions[0].topic,
+                updatedNotificationArea = user.subscriptions[0].topic
+            )
+            modifyAccountViewmodel.uiState.test {
+                assertTrue { awaitItem() is UiState.Idle }
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Success }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given a registered user_when that user modifies their account deleting the current rescue event subscription_then the account is updated`() =
+        runTest {
+            val modifyAccountViewmodel = getModifyAccountViewmodel(
+                authRepository = FakeAuthRepository(
+                    authUser = authUser,
+                    authEmail = user.email,
+                    authPassword = userPwd
+                ),
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
+                    mutableListOf(user.toData())
+                ),
+                storageRepository = FakeStorageRepository(
+                    remoteDatasourceList = mutableListOf(
+                        Pair("${Section.USERS.path}/${user.uid}", user.image)
+                    ),
+                    localDatasourceList = mutableListOf(
+                        Pair(
+                            "local_path",
+                            user.image
+                        )
+                    )
+                ),
+                localUserRepository = FakeLocalUserRepository(
+                    mutableListOf(
+                        userWithAllSubscriptionData
+                    )
+                ),
+                fCMSubscriberRepository = FakeFCMSubscriberRepository(
+                    user.subscriptions.toMutableList()
+                )
+            )
+            modifyAccountViewmodel.saveUserChanges(
+                isDifferentEmail = true,
+                isDifferentImage = true,
+                user = user,
+                currentPassword = userPwd,
+                updatedPassword = "123456",
+                shouldUpdateNotificationArea = false,
+                previousNotificationArea = user.subscriptions[0].topic,
+                updatedNotificationArea = "UNSELECTEDUNSELECTED"
+            )
+            modifyAccountViewmodel.uiState.test {
+                assertTrue { awaitItem() is UiState.Idle }
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Success }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given a registered user_when that user modifies their account updating the current rescue event subscription_then the account is updated`() =
+        runTest {
+            val modifyAccountViewmodel = getModifyAccountViewmodel(
+                authRepository = FakeAuthRepository(
+                    authUser = authUser,
+                    authEmail = user.email,
+                    authPassword = userPwd
+                ),
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
+                    mutableListOf(user.toData())
+                ),
+                storageRepository = FakeStorageRepository(
+                    remoteDatasourceList = mutableListOf(
+                        Pair("${Section.USERS.path}/${user.uid}", user.image)
+                    ),
+                    localDatasourceList = mutableListOf(
+                        Pair(
+                            "local_path",
+                            user.image
+                        )
+                    )
+                ),
+                localUserRepository = FakeLocalUserRepository(
+                    mutableListOf(
+                        userWithAllSubscriptionData
+                    )
+                ),
+                fCMSubscriberRepository = FakeFCMSubscriberRepository(
+                    mutableListOf(user.subscriptions[0])
+                )
+            )
+            modifyAccountViewmodel.saveUserChanges(
+                isDifferentEmail = true,
+                isDifferentImage = true,
+                user = user,
+                currentPassword = userPwd,
+                updatedPassword = "123456",
+                shouldUpdateNotificationArea = true,
+                previousNotificationArea = user.subscriptions[0].topic,
+                updatedNotificationArea = "SPAINSEVILLE"
             )
             modifyAccountViewmodel.uiState.test {
                 assertTrue { awaitItem() is UiState.Idle }
@@ -157,7 +336,10 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 isDifferentImage = true,
                 user = user,
                 currentPassword = userPwd,
-                newPassword = "123456"
+                updatedPassword = "123456",
+                shouldUpdateNotificationArea = false,
+                previousNotificationArea = user.subscriptions[0].topic,
+                updatedNotificationArea = user.subscriptions[0].topic
             )
             modifyAccountViewmodel.uiState.test {
                 assertTrue { awaitItem() is UiState.Idle }
@@ -176,7 +358,10 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 isDifferentImage = true,
                 user = user,
                 currentPassword = userPwd,
-                newPassword = "123456"
+                updatedPassword = "123456",
+                shouldUpdateNotificationArea = false,
+                previousNotificationArea = user.subscriptions[0].topic,
+                updatedNotificationArea = user.subscriptions[0].topic
             )
             modifyAccountViewmodel.uiState.test {
                 assertTrue { awaitItem() is UiState.Idle }
@@ -204,7 +389,10 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 isDifferentImage = true,
                 user = user,
                 currentPassword = userPwd,
-                newPassword = "123456"
+                updatedPassword = "123456",
+                shouldUpdateNotificationArea = false,
+                previousNotificationArea = user.subscriptions[0].topic,
+                updatedNotificationArea = user.subscriptions[0].topic
             )
             modifyAccountViewmodel.uiState.test {
                 assertTrue { awaitItem() is UiState.Idle }
@@ -231,14 +419,21 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                         Pair("${Section.USERS.path}/${user.uid}", user.image)
                     )
                 ),
-                localUserRepository = FakeLocalUserRepository(mutableListOf(user))
+                localUserRepository = FakeLocalUserRepository(
+                    mutableListOf(
+                        userWithAllSubscriptionData
+                    )
+                )
             )
             modifyAccountViewmodel.saveUserChanges(
                 isDifferentEmail = true,
                 isDifferentImage = true,
                 user = user,
                 currentPassword = userPwd,
-                newPassword = "123456"
+                updatedPassword = "123456",
+                shouldUpdateNotificationArea = false,
+                previousNotificationArea = user.subscriptions[0].topic,
+                updatedNotificationArea = user.subscriptions[0].topic
             )
             modifyAccountViewmodel.uiState.test {
                 assertTrue { awaitItem() is UiState.Idle }
@@ -261,14 +456,21 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
                     mutableListOf(user.toData())
                 ),
-                localUserRepository = FakeLocalUserRepository(mutableListOf(user))
+                localUserRepository = FakeLocalUserRepository(
+                    mutableListOf(
+                        userWithAllSubscriptionData
+                    )
+                )
             )
             modifyAccountViewmodel.saveUserChanges(
                 isDifferentEmail = true,
                 isDifferentImage = false,
                 user = user,
                 currentPassword = userPwd,
-                newPassword = "123456"
+                updatedPassword = "123456",
+                shouldUpdateNotificationArea = false,
+                previousNotificationArea = user.subscriptions[0].topic,
+                updatedNotificationArea = user.subscriptions[0].topic
             )
             modifyAccountViewmodel.uiState.test {
                 assertTrue { awaitItem() is UiState.Idle }
@@ -295,7 +497,10 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 isDifferentEmail = false,
                 isDifferentImage = false,
                 user = user,
-                currentPassword = userPwd
+                currentPassword = userPwd,
+                shouldUpdateNotificationArea = false,
+                previousNotificationArea = user.subscriptions[0].topic,
+                updatedNotificationArea = user.subscriptions[0].topic
             )
             modifyAccountViewmodel.uiState.test {
                 assertTrue { awaitItem() is UiState.Idle }
@@ -322,7 +527,7 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     authPassword = userPwd
                 ),
                 localUserRepository = FakeLocalUserRepository(
-                    mutableListOf(user)
+                    mutableListOf(userWithAllSubscriptionData)
                 ),
                 localCacheRepository = fakeLocalCacheRepository
             )

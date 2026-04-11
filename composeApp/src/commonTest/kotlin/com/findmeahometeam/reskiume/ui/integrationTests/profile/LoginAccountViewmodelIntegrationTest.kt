@@ -10,6 +10,7 @@ import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
+import com.findmeahometeam.reskiume.domain.repository.util.fcm.FCMSubscriberRepository
 import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInLocalDataSource
@@ -20,6 +21,7 @@ import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSou
 import com.findmeahometeam.reskiume.localCache
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeAuthRepository
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeFCMSubscriberRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeKonnectivity
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalCacheRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalUserRepository
@@ -27,10 +29,13 @@ import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLog
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeManageImagePath
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeRealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeStorageRepository
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeSubscriptionManagerUtil
 import com.findmeahometeam.reskiume.ui.profile.loginAccount.LoginAccountViewmodel
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
+import com.findmeahometeam.reskiume.ui.util.fcm.SubscriptionManagerUtil
 import com.findmeahometeam.reskiume.user
 import com.findmeahometeam.reskiume.userPwd
+import com.findmeahometeam.reskiume.userWithAllSubscriptionData
 import com.plusmobileapps.konnectivity.Konnectivity
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -46,7 +51,9 @@ class LoginAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
         realtimeDatabaseRemoteUserRepository: RealtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(),
         storageRepository: StorageRepository = FakeStorageRepository(),
         manageImagePath: ManageImagePath = FakeManageImagePath(),
-        konnectivity: Konnectivity = FakeKonnectivity()
+        konnectivity: Konnectivity = FakeKonnectivity(),
+        subscriptionManagerUtil: SubscriptionManagerUtil = FakeSubscriptionManagerUtil(),
+        fCMSubscriberRepository: FCMSubscriberRepository = FakeFCMSubscriberRepository()
     ): LoginAccountViewmodel {
 
         val signInWithEmailAndPasswordFromAuthDataSource =
@@ -65,10 +72,22 @@ class LoginAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
             DownloadImageToLocalDataSource(storageRepository)
 
         val insertUserInLocalDataSource =
-            InsertUserInLocalDataSource(manageImagePath, localUserRepository, authRepository)
+            InsertUserInLocalDataSource(
+                authRepository,
+                manageImagePath,
+                localUserRepository,
+                fCMSubscriberRepository,
+                log
+            )
 
         val modifyUserInLocalDataSource =
-            ModifyUserInLocalDataSource(manageImagePath, localUserRepository, authRepository)
+            ModifyUserInLocalDataSource(
+                manageImagePath,
+                fCMSubscriberRepository,
+                localUserRepository,
+                authRepository,
+                log
+            )
 
         val log: Log = FakeLog()
 
@@ -80,6 +99,7 @@ class LoginAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
             downloadImageToLocalDataSource,
             insertUserInLocalDataSource,
             modifyUserInLocalDataSource,
+            subscriptionManagerUtil,
             log
         )
     }
@@ -134,7 +154,11 @@ class LoginAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                         localCache.copy(section = Section.USERS, timestamp = 123L).toEntity()
                     )
                 ),
-                localUserRepository = FakeLocalUserRepository(mutableListOf(user)),
+                localUserRepository = FakeLocalUserRepository(
+                    mutableListOf(
+                        userWithAllSubscriptionData
+                    )
+                ),
                 realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
                     mutableListOf(user.toData())
                 )
@@ -162,7 +186,11 @@ class LoginAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                         localCache.copy(section = Section.USERS).toEntity()
                     )
                 ),
-                localUserRepository = FakeLocalUserRepository(mutableListOf(user)),
+                localUserRepository = FakeLocalUserRepository(
+                    mutableListOf(
+                        userWithAllSubscriptionData
+                    )
+                ),
                 realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
                     mutableListOf(user.toData())
                 )

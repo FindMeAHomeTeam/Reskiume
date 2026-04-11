@@ -5,7 +5,7 @@ import com.findmeahometeam.reskiume.CoroutineTestDispatcher
 import com.findmeahometeam.reskiume.authUser
 import com.findmeahometeam.reskiume.data.database.entity.LocalCacheEntity
 import com.findmeahometeam.reskiume.data.remote.response.AuthResult
-import com.findmeahometeam.reskiume.data.remote.response.RemoteUser
+import com.findmeahometeam.reskiume.data.remote.response.remoterUser.RemoteUser
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.LocalCache
@@ -14,6 +14,7 @@ import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
+import com.findmeahometeam.reskiume.domain.repository.util.fcm.FCMSubscriberRepository
 import com.findmeahometeam.reskiume.domain.usecases.authUser.SignInWithEmailAndPasswordFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
@@ -25,8 +26,10 @@ import com.findmeahometeam.reskiume.localCache
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.profile.loginAccount.LoginAccountViewmodel
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
+import com.findmeahometeam.reskiume.ui.util.fcm.SubscriptionManagerUtil
 import com.findmeahometeam.reskiume.user
 import com.findmeahometeam.reskiume.userPwd
+import com.findmeahometeam.reskiume.userWithAllSubscriptionData
 import com.plusmobileapps.konnectivity.Konnectivity
 import com.plusmobileapps.konnectivity.NetworkConnection
 import dev.mokkery.answering.calls
@@ -50,22 +53,26 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
 
     private val onModifyLocalCache = Capture.slot<(rowsUpdated: Int) -> Unit>()
 
-    private val onInsertUserInLocal = Capture.slot<(Long) -> Unit>()
+    private val onInsertUserInLocal = Capture.slot<suspend (rowId: Long) -> Unit>()
 
-    private val onModifyUserInLocal = Capture.slot<(Int) -> Unit>()
+    private val onInsertUserSubscriptionInLocal = Capture.slot<suspend (rowId: Long) -> Unit>()
+
+    private val onModifyUserInLocal = Capture.slot<suspend (rowsUpdated: Int) -> Unit>()
 
     private val onSaveImageToLocal = Capture.slot<(String) -> Unit>()
 
     private fun getLoginAccountViewmodel(
         signInWithEmailAndPasswordResult: AuthResult = AuthResult.Success(authUser),
         cacheArg: LocalCache = localCache.copy(section = Section.USERS),
-        getLocalCacheEntityReturn: LocalCacheEntity? = localCache.copy(section = Section.USERS).toEntity(),
+        getLocalCacheEntityReturn: LocalCacheEntity? = localCache.copy(section = Section.USERS)
+            .toEntity(),
         rowIdInsertedCacheArg: Long = 1L,
         rowsUpdatedCacheArg: Int = 1,
         rowIdInsertedUserArg: Long = 1L,
+        rowIdOfInsertingUserSubscriptionArg: Long = 1L,
         rowsUpdatedUserArg: Int = 1,
         remoteUserResult: RemoteUser? = user.toData(),
-        absolutePathArg: String = user.image,
+        userImageArg: String = user.image,
     ): LoginAccountViewmodel {
         val authRepository: AuthRepository = mock {
 
@@ -109,11 +116,21 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
 
             everySuspend {
                 getUser(user.uid)
-            } returns user
+            } returns flowOf(userWithAllSubscriptionData)
 
             everySuspend { insertUser(any(), capture(onInsertUserInLocal)) } calls {
                 onInsertUserInLocal.get().invoke(rowIdInsertedUserArg)
             }
+
+            everySuspend {
+                insertSubscription(
+                    user.subscriptions[0].toEntity(),
+                    capture(onInsertUserSubscriptionInLocal)
+                )
+            } calls {
+                onInsertUserSubscriptionInLocal.get().invoke(rowIdOfInsertingUserSubscriptionArg)
+            }
+
             everySuspend { modifyUser(any(), capture(onModifyUserInLocal)) } calls {
                 onModifyUserInLocal.get().invoke(rowsUpdatedUserArg)
             }
@@ -140,7 +157,7 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
                     Section.USERS,
                     capture(onSaveImageToLocal)
                 )
-            } calls { onSaveImageToLocal.get().invoke(absolutePathArg) }
+            } calls { onSaveImageToLocal.get().invoke(userImageArg) }
         }
 
         val log: Log = mock {
@@ -153,6 +170,17 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
             every { currentNetworkConnection } returns NetworkConnection.WIFI
             every { isConnectedState } returns MutableStateFlow(true)
             every { currentNetworkConnectionState } returns MutableStateFlow(NetworkConnection.WIFI)
+        }
+
+        val fCMSubscriberRepository: FCMSubscriberRepository = mock {
+            everySuspend { subscribeToTopic(user.subscriptions[0].topic) } returns flowOf(true)
+        }
+
+        val subscriptionManagerUtil: SubscriptionManagerUtil = mock {
+
+            everySuspend {
+                subscribeToAllTopicsAfterLogin(any())
+            } returns Unit
         }
 
         val signInWithEmailAndPasswordFromAuthDataSource =
@@ -171,11 +199,22 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
             DownloadImageToLocalDataSource(storageRepository)
 
         val insertUserInLocalDataSource =
-            InsertUserInLocalDataSource(manageImagePath, localUserRepository, authRepository)
+            InsertUserInLocalDataSource(
+                authRepository,
+                manageImagePath,
+                localUserRepository,
+                fCMSubscriberRepository,
+                log
+            )
 
         val modifyUserInLocalDataSource =
-            ModifyUserInLocalDataSource(manageImagePath, localUserRepository, authRepository)
-
+            ModifyUserInLocalDataSource(
+                manageImagePath,
+                fCMSubscriberRepository,
+                localUserRepository,
+                authRepository,
+                log
+            )
 
         return LoginAccountViewmodel(
             signInWithEmailAndPasswordFromAuthDataSource,
@@ -185,6 +224,7 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
             downloadImageToLocalDataSource,
             insertUserInLocalDataSource,
             modifyUserInLocalDataSource,
+            subscriptionManagerUtil,
             log
         )
     }
@@ -255,8 +295,11 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
         runTest {
 
             val loginAccountViewmodel = getLoginAccountViewmodel(
-                getLocalCacheEntityReturn = localCache.copy(section = Section.USERS, timestamp = 123L).toEntity(),
-                absolutePathArg = ""
+                getLocalCacheEntityReturn = localCache.copy(
+                    section = Section.USERS,
+                    timestamp = 123L
+                ).toEntity(),
+                userImageArg = ""
             )
             loginAccountViewmodel.signInUsingEmail(user.email!!, userPwd)
             loginAccountViewmodel.state.test {
@@ -273,7 +316,10 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
 
             val loginAccountViewmodel = getLoginAccountViewmodel(
                 remoteUserResult = user.copy(image = "").toData(),
-                getLocalCacheEntityReturn = localCache.copy(section = Section.USERS, timestamp = 123L).toEntity()
+                getLocalCacheEntityReturn = localCache.copy(
+                    section = Section.USERS,
+                    timestamp = 123L
+                ).toEntity()
             )
             loginAccountViewmodel.signInUsingEmail(user.email!!, userPwd)
             loginAccountViewmodel.state.test {
@@ -290,7 +336,10 @@ class LoginAccountViewmodelTest : CoroutineTestDispatcher() {
 
             val loginAccountViewmodel = getLoginAccountViewmodel(
                 remoteUserResult = user.toData(),
-                getLocalCacheEntityReturn = localCache.copy(section = Section.USERS, timestamp = 123L).toEntity(),
+                getLocalCacheEntityReturn = localCache.copy(
+                    section = Section.USERS,
+                    timestamp = 123L
+                ).toEntity(),
                 rowsUpdatedUserArg = 0
             )
             loginAccountViewmodel.signInUsingEmail(user.email!!, userPwd)

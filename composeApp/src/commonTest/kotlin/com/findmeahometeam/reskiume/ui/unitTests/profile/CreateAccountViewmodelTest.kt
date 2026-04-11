@@ -12,6 +12,7 @@ import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
+import com.findmeahometeam.reskiume.domain.repository.util.fcm.FCMSubscriberRepository
 import com.findmeahometeam.reskiume.domain.usecases.authUser.CreateUserWithEmailAndPasswordInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.DeleteUserFromAuthDataSource
@@ -54,7 +55,9 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
 
     private val onSuccessRemoteUser = Capture.slot<(DatabaseResult) -> Unit>()
 
-    private val onInsertUserInLocal = Capture.slot<(Long) -> Unit>()
+    private val onInsertUserInLocal = Capture.slot<suspend (Long) -> Unit>()
+
+    private val onInsertUserSubscriptionInLocal = Capture.slot<suspend (rowId: Long) -> Unit>()
 
     private val log: Log = mock {
         every { d(any(), any()) } calls { println(it) }
@@ -69,7 +72,8 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
         rowIdInsertedCacheArg: Long = 1L,
         insertRemoteUserArg: DatabaseResult = DatabaseResult.Success,
         deleteRemoteUserArg: DatabaseResult = DatabaseResult.Success,
-        onInsertUserArg: Long = 1L
+        onInsertUserArg: Long = 1L,
+        rowIdOfInsertingUserSubscriptionArg: Long = 1L
     ): CreateAccountViewmodel {
         val authRepository: AuthRepository = mock {
 
@@ -87,6 +91,10 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
             everySuspend { deleteUser(any(), capture(onDeleteUserFromAuth)) } calls {
                 onDeleteUserFromAuth.get().invoke(onDeleteUserErrorArg)
             }
+        }
+
+        val fCMSubscriberRepository: FCMSubscriberRepository = mock {
+            everySuspend { subscribeToTopic(user.subscriptions[0].topic) } returns flowOf(true)
         }
 
         val storageRepository: StorageRepository = mock {
@@ -139,6 +147,15 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
             everySuspend { insertUser(any(), capture(onInsertUserInLocal)) } calls {
                 onInsertUserInLocal.get().invoke(onInsertUserArg)
             }
+
+            everySuspend {
+                insertSubscription(
+                    any(),
+                    capture(onInsertUserSubscriptionInLocal)
+                )
+            } calls {
+                onInsertUserSubscriptionInLocal.get().invoke(rowIdOfInsertingUserSubscriptionArg)
+            }
         }
 
         val manageImagePath: ManageImagePath = mock {
@@ -161,7 +178,13 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
             InsertCacheInLocalRepository(localCacheRepository)
 
         val insertUserInLocalDataSource =
-            InsertUserInLocalDataSource(manageImagePath, localUserRepository, authRepository)
+            InsertUserInLocalDataSource(
+                authRepository,
+                manageImagePath,
+                localUserRepository,
+                fCMSubscriberRepository,
+                log
+            )
 
         val deleteUserFromAuthDataSource =
             DeleteUserFromAuthDataSource(authRepository)
@@ -189,7 +212,7 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
     fun `given an unregistered user_when that user creates an account using email_then the account is created`() =
         runTest {
             val createAccountViewmodel = getCreateAccountViewmodel()
-            createAccountViewmodel.saveUserChanges(user, userPwd)
+            createAccountViewmodel.saveUserChanges(user, userPwd, user.subscriptions[0].topic)
             createAccountViewmodel.state.test {
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Success }
@@ -209,7 +232,7 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
             val createAccountViewmodel = getCreateAccountViewmodel(
                 createUserWithEmailAndPasswordResult = AuthResult.Error("error"),
             )
-            createAccountViewmodel.saveUserChanges(user, userPwd)
+            createAccountViewmodel.saveUserChanges(user, userPwd, user.subscriptions[0].topic)
             createAccountViewmodel.state.test {
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Error }
@@ -224,12 +247,30 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
         }
 
     @Test
+    fun `given an unregistered user_when that user creates an account using email without a subscription_then the account is created`() =
+        runTest {
+            val createAccountViewmodel = getCreateAccountViewmodel()
+            createAccountViewmodel.saveUserChanges(user, userPwd, "")
+            createAccountViewmodel.state.test {
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Success }
+                ensureAllEventsConsumed()
+            }
+            verify {
+                log.d(
+                    "CreateAccountViewmodel",
+                    "saveUserCacheLocally: user ${user.uid} added to the local cache in section ${Section.USERS}"
+                )
+            }
+        }
+
+    @Test
     fun `given an unregistered user_when that user creates an account using email but there is an error deleting the user avatar in the remote data source_then the account is created`() =
         runTest {
             val createAccountViewmodel = getCreateAccountViewmodel(
                 onImageUploadedArg = ""
             )
-            createAccountViewmodel.saveUserChanges(user, userPwd)
+            createAccountViewmodel.saveUserChanges(user, userPwd, user.subscriptions[0].topic)
             createAccountViewmodel.state.test {
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Success }
@@ -249,7 +290,7 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
             val createAccountViewmodel = getCreateAccountViewmodel(
                 insertRemoteUserArg = DatabaseResult.Error("error")
             )
-            createAccountViewmodel.saveUserChanges(user, userPwd)
+            createAccountViewmodel.saveUserChanges(user, userPwd, user.subscriptions[0].topic)
             createAccountViewmodel.state.test {
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Error }
@@ -270,7 +311,7 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
                 insertRemoteUserArg = DatabaseResult.Error("error"),
                 onDeleteUserErrorArg = "error"
             )
-            createAccountViewmodel.saveUserChanges(user, userPwd)
+            createAccountViewmodel.saveUserChanges(user, userPwd, user.subscriptions[0].topic)
             createAccountViewmodel.state.test {
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Error }
@@ -294,7 +335,7 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
             val createAccountViewmodel = getCreateAccountViewmodel(
                 onInsertUserArg = 0
             )
-            createAccountViewmodel.saveUserChanges(user, userPwd)
+            createAccountViewmodel.saveUserChanges(user, userPwd, user.subscriptions[0].topic)
             createAccountViewmodel.state.test {
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Error }
@@ -315,7 +356,7 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
                 onInsertUserArg = 0,
                 deleteRemoteUserArg = DatabaseResult.Error("error")
             )
-            createAccountViewmodel.saveUserChanges(user, userPwd)
+            createAccountViewmodel.saveUserChanges(user, userPwd, user.subscriptions[0].topic)
             createAccountViewmodel.state.test {
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Error }
@@ -340,7 +381,7 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
             val createAccountViewmodel = getCreateAccountViewmodel(
                 rowIdInsertedCacheArg = 0
             )
-            createAccountViewmodel.saveUserChanges(user, userPwd)
+            createAccountViewmodel.saveUserChanges(user, userPwd, user.subscriptions[0].topic)
 
             createAccountViewmodel.state.test {
                 assertTrue { awaitItem() is UiState.Loading }

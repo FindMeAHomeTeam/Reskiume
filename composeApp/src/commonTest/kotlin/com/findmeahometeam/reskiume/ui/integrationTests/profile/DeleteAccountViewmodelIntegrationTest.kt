@@ -18,6 +18,7 @@ import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteFosterHome.FireStoreRemoteFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteRescueEvent.FireStoreRemoteRescueEventRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
+import com.findmeahometeam.reskiume.domain.repository.util.fcm.FCMSubscriberRepository
 import com.findmeahometeam.reskiume.domain.usecases.authUser.DeleteUserFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.DeleteAllMyFosterHomesFromLocalRepository
@@ -42,6 +43,7 @@ import com.findmeahometeam.reskiume.domain.usecases.user.DeleteUserFromRemoteDat
 import com.findmeahometeam.reskiume.domain.usecases.user.DeleteUsersFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.user.GetAllUsersFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.util.fcm.UnsubscribeFromAllTopicsFromSubscriberRepository
 import com.findmeahometeam.reskiume.fosterHome
 import com.findmeahometeam.reskiume.fosterHomeWithAllNonHumanAnimalData
 import com.findmeahometeam.reskiume.localCache
@@ -53,6 +55,7 @@ import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeAuthRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeCheckNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeDeleteNonHumanAnimalUtil
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeFCMSubscriberRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeFireStoreRemoteFosterHomeRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeFireStoreRemoteRescueEventRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalCacheRepository
@@ -71,6 +74,7 @@ import com.findmeahometeam.reskiume.ui.profile.deleteAccount.DeleteAccountViewmo
 import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.DeleteNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.user
 import com.findmeahometeam.reskiume.userPwd
+import com.findmeahometeam.reskiume.userWithAllSubscriptionData
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertTrue
@@ -79,6 +83,7 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
 
     private fun getDeleteAccountViewmodel(
         authRepository: AuthRepository = FakeAuthRepository(),
+        fcmSubscriberRepository: FCMSubscriberRepository = FakeFCMSubscriberRepository(),
         fireStoreRemoteRescueEventRepository: FireStoreRemoteRescueEventRepository = FakeFireStoreRemoteRescueEventRepository(),
         localRescueEventRepository: LocalRescueEventRepository = FakeLocalRescueEventRepository(),
         fireStoreRemoteFosterHomeRepository: FireStoreRemoteFosterHomeRepository = FakeFireStoreRemoteFosterHomeRepository(),
@@ -98,6 +103,9 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
 
         val observeAuthStateInAuthDataSource =
             ObserveAuthStateInAuthDataSource(authRepository)
+
+        val unsubscribeFromAllTopicsFromSubscriberRepository =
+            UnsubscribeFromAllTopicsFromSubscriberRepository(fcmSubscriberRepository)
 
         val getAllMyRescueEventsFromRemoteRepository =
             GetAllMyRescueEventsFromRemoteRepository(fireStoreRemoteRescueEventRepository)
@@ -196,6 +204,7 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
 
         return DeleteAccountViewmodel(
             observeAuthStateInAuthDataSource,
+            unsubscribeFromAllTopicsFromSubscriberRepository,
             getAllMyRescueEventsFromRemoteRepository,
             getAllRescueEventsFromLocalRepository,
             deleteAllMyRescueEventsFromRemoteRepository,
@@ -264,7 +273,11 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
                     mutableListOf(user.toData())
                 ),
-                localUserRepository = FakeLocalUserRepository(mutableListOf(user)),
+                localUserRepository = FakeLocalUserRepository(
+                    mutableListOf(
+                        userWithAllSubscriptionData
+                    )
+                ),
                 storageRepository = FakeStorageRepository(
                     remoteDatasourceList = mutableListOf(
                         Pair("${Section.USERS.path}/${user.uid}", user.image),
@@ -377,7 +390,11 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
                     mutableListOf(user.toData())
                 ),
-                localUserRepository = FakeLocalUserRepository(mutableListOf(user)),
+                localUserRepository = FakeLocalUserRepository(
+                    mutableListOf(
+                        userWithAllSubscriptionData
+                    )
+                ),
                 storageRepository = FakeStorageRepository(
                     remoteDatasourceList = mutableListOf(
                         Pair("${Section.USERS.path}/${user.uid}", user.image),
@@ -486,7 +503,11 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
                     mutableListOf(user.toData())
                 ),
-                localUserRepository = FakeLocalUserRepository(mutableListOf(user)),
+                localUserRepository = FakeLocalUserRepository(
+                    mutableListOf(
+                        userWithAllSubscriptionData
+                    )
+                ),
                 storageRepository = FakeStorageRepository(
                     remoteDatasourceList = mutableListOf(
                         Pair("${Section.USERS.path}/${user.uid}", user.image),
@@ -581,7 +602,11 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
                     mutableListOf(user.toData())
                 ),
-                localUserRepository = FakeLocalUserRepository(mutableListOf(user)),
+                localUserRepository = FakeLocalUserRepository(
+                    mutableListOf(
+                        userWithAllSubscriptionData
+                    )
+                ),
                 storageRepository = FakeStorageRepository(
                     remoteDatasourceList = mutableListOf(
                         Pair(
@@ -671,7 +696,11 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
                     mutableListOf(user.toData())
                 ),
-                localUserRepository = FakeLocalUserRepository(mutableListOf(user)),
+                localUserRepository = FakeLocalUserRepository(
+                    mutableListOf(
+                        userWithAllSubscriptionData
+                    )
+                ),
                 storageRepository = FakeStorageRepository(
                     remoteDatasourceList = mutableListOf(
                         Pair("${Section.USERS.path}/${user.uid}", user.image),
@@ -742,7 +771,11 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
                     mutableListOf(user.toData())
                 ),
-                localUserRepository = FakeLocalUserRepository(mutableListOf(user)),
+                localUserRepository = FakeLocalUserRepository(
+                    mutableListOf(
+                        userWithAllSubscriptionData
+                    )
+                ),
                 storageRepository = FakeStorageRepository(
                     remoteDatasourceList = mutableListOf(
                         Pair("${Section.USERS.path}/${user.uid}", user.image),
@@ -810,7 +843,11 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
                     mutableListOf(user.toData())
                 ),
-                localUserRepository = FakeLocalUserRepository(mutableListOf(user)),
+                localUserRepository = FakeLocalUserRepository(
+                    mutableListOf(
+                        userWithAllSubscriptionData
+                    )
+                ),
                 storageRepository = FakeStorageRepository(
                     remoteDatasourceList = mutableListOf(
                         Pair("${Section.USERS.path}/${user.uid}", user.image),
@@ -879,7 +916,11 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
                     mutableListOf(user.toData())
                 ),
-                localUserRepository = FakeLocalUserRepository(mutableListOf(user)),
+                localUserRepository = FakeLocalUserRepository(
+                    mutableListOf(
+                        userWithAllSubscriptionData
+                    )
+                ),
                 storageRepository = FakeStorageRepository(
                     remoteDatasourceList = mutableListOf(
                         Pair("${Section.USERS.path}/${user.uid}", user.image),
@@ -936,7 +977,11 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
                     mutableListOf(user.toData())
                 ),
-                localUserRepository = FakeLocalUserRepository(mutableListOf(user)),
+                localUserRepository = FakeLocalUserRepository(
+                    mutableListOf(
+                        userWithAllSubscriptionData
+                    )
+                ),
                 storageRepository = FakeStorageRepository(
                     remoteDatasourceList = mutableListOf(
                         Pair("${Section.USERS.path}/${user.uid}", user.image),
@@ -989,7 +1034,11 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
                     mutableListOf(user.toData())
                 ),
-                localUserRepository = FakeLocalUserRepository(mutableListOf(user)),
+                localUserRepository = FakeLocalUserRepository(
+                    mutableListOf(
+                        userWithAllSubscriptionData
+                    )
+                ),
                 storageRepository = FakeStorageRepository(
                     remoteDatasourceList = mutableListOf(
                         Pair(
@@ -1030,7 +1079,11 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
                     mutableListOf(user.toData())
                 ),
-                localUserRepository = FakeLocalUserRepository(mutableListOf(user)),
+                localUserRepository = FakeLocalUserRepository(
+                    mutableListOf(
+                        userWithAllSubscriptionData
+                    )
+                ),
                 storageRepository = FakeStorageRepository(
                     remoteDatasourceList = mutableListOf(
                         Pair("${Section.USERS.path}/${user.uid}", user.image)

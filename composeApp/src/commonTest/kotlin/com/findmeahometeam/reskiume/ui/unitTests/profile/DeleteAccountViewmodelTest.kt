@@ -3,16 +3,15 @@ package com.findmeahometeam.reskiume.ui.unitTests.profile
 import app.cash.turbine.test
 import com.findmeahometeam.reskiume.CoroutineTestDispatcher
 import com.findmeahometeam.reskiume.authUser
-import com.findmeahometeam.reskiume.data.database.entity.UserEntity
 import com.findmeahometeam.reskiume.data.database.entity.fosterHome.FosterHomeWithAllNonHumanAnimalData
+import com.findmeahometeam.reskiume.data.database.entity.user.UserWithAllSubscriptionData
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
-import com.findmeahometeam.reskiume.data.remote.response.RemoteUser
 import com.findmeahometeam.reskiume.data.remote.response.fosterHome.RemoteFosterHome
+import com.findmeahometeam.reskiume.data.remote.response.remoterUser.RemoteUser
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.Review
-import com.findmeahometeam.reskiume.domain.model.User
 import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
@@ -26,6 +25,7 @@ import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteFosterHome.FireStoreRemoteFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteRescueEvent.FireStoreRemoteRescueEventRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
+import com.findmeahometeam.reskiume.domain.repository.util.fcm.FCMSubscriberRepository
 import com.findmeahometeam.reskiume.domain.usecases.authUser.DeleteUserFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.DeleteAllMyFosterHomesFromLocalRepository
@@ -50,6 +50,7 @@ import com.findmeahometeam.reskiume.domain.usecases.user.DeleteUserFromRemoteDat
 import com.findmeahometeam.reskiume.domain.usecases.user.DeleteUsersFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.user.GetAllUsersFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.util.fcm.UnsubscribeFromAllTopicsFromSubscriberRepository
 import com.findmeahometeam.reskiume.fosterHome
 import com.findmeahometeam.reskiume.fosterHomeWithAllNonHumanAnimalData
 import com.findmeahometeam.reskiume.nonHumanAnimal
@@ -62,6 +63,7 @@ import com.findmeahometeam.reskiume.ui.profile.deleteAccount.DeleteAccountViewmo
 import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.DeleteNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.user
 import com.findmeahometeam.reskiume.userPwd
+import com.findmeahometeam.reskiume.userWithAllSubscriptionData
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -73,6 +75,7 @@ import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
 import dev.mokkery.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -141,6 +144,7 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
         databaseResultOfDeletingAllRemoteRescueEventsArg: DatabaseResult = DatabaseResult.Success,
         rowsDeletedOfAllMyRescueEventsArg: Int = 1,
         deleteUserFromAuthErrorArg: String = "",
+        unsubscribeFromAllTopicsReturn: Flow<Boolean> = flowOf(true),
         myRemoteFosterHomesResult: List<RemoteFosterHome?> = listOf(fosterHome.toData()),
         databaseResultOfDeletingAllRemoteFosterHomesArg: DatabaseResult = DatabaseResult.Success,
         localFosterHomesResult: List<FosterHomeWithAllNonHumanAnimalData> = listOf(
@@ -151,8 +155,12 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
         databaseResultOfModifyingSecondNonHumanAnimalArg: DatabaseResult = DatabaseResult.Success,
         rowsUpdatedOfModifyingNonHumanAnimalsArg: Int = 1,
         rowsUpdatedOfModifyingSecondNonHumanAnimalsArg: Int = 1,
-        getUserResult: User = user,
-        getAllUsersResult: List<UserEntity> = listOf(user.toEntity()),
+        getUserResult: Flow<UserWithAllSubscriptionData> = flowOf(userWithAllSubscriptionData),
+        getAllUsersResult: Flow<List<UserWithAllSubscriptionData>> = flowOf(
+            listOf(
+                userWithAllSubscriptionData
+            )
+        ),
         deleteUserFromLocalArg: Int = 1,
         remoteUserResult: RemoteUser? = user.toData(),
         databaseResultAfterDeletingAllRemoteNonHumanAnimalArg: DatabaseResult = DatabaseResult.Success,
@@ -181,6 +189,11 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
             }
         }
 
+        val fcmSubscriberRepository: FCMSubscriberRepository = mock {
+
+            everySuspend { unsubscribeFromAllTopics(user.subscriptions) } returns unsubscribeFromAllTopicsReturn
+        }
+
         val fireStoreRemoteRescueEventRepository: FireStoreRemoteRescueEventRepository = mock {
 
             every {
@@ -195,7 +208,8 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
                     capture(onDeleteAllMyRescueEventsFromRemote)
                 )
             } calls {
-                onDeleteAllMyRescueEventsFromRemote.get().invoke(databaseResultOfDeletingAllRemoteRescueEventsArg)
+                onDeleteAllMyRescueEventsFromRemote.get()
+                    .invoke(databaseResultOfDeletingAllRemoteRescueEventsArg)
             }
         }
 
@@ -394,7 +408,8 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
                     capture(onRescueEventImageDeletedFromRemote)
                 )
             } calls {
-                onRescueEventImageDeletedFromRemote.get().invoke(flagOfDeletingRemoteRescueEventImageArg)
+                onRescueEventImageDeletedFromRemote.get()
+                    .invoke(flagOfDeletingRemoteRescueEventImageArg)
             }
 
             every {
@@ -447,7 +462,10 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
                 } returns flowOf(nonHumanAnimal.toData())
 
                 every {
-                    getRemoteNonHumanAnimal(nonHumanAnimal.id + "second", nonHumanAnimal.caregiverId)
+                    getRemoteNonHumanAnimal(
+                        nonHumanAnimal.id + "second",
+                        nonHumanAnimal.caregiverId
+                    )
                 } returns flowOf(nonHumanAnimal.copy(id = nonHumanAnimal.id + "second").toData())
 
                 everySuspend {
@@ -502,7 +520,8 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
                     capture(onModifySecondNonHumanAnimalInLocal)
                 )
             } calls {
-                onModifySecondNonHumanAnimalInLocal.get().invoke(rowsUpdatedOfModifyingSecondNonHumanAnimalsArg)
+                onModifySecondNonHumanAnimalInLocal.get()
+                    .invoke(rowsUpdatedOfModifyingSecondNonHumanAnimalsArg)
             }
 
             everySuspend {
@@ -517,6 +536,9 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
 
         val observeAuthStateInAuthDataSource =
             ObserveAuthStateInAuthDataSource(authRepository)
+
+        val unsubscribeFromAllTopicsFromSubscriberRepository =
+            UnsubscribeFromAllTopicsFromSubscriberRepository(fcmSubscriberRepository)
 
         val getAllMyRescueEventsFromRemoteRepository =
             GetAllMyRescueEventsFromRemoteRepository(fireStoreRemoteRescueEventRepository)
@@ -613,6 +635,7 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
 
         return DeleteAccountViewmodel(
             observeAuthStateInAuthDataSource,
+            unsubscribeFromAllTopicsFromSubscriberRepository,
             getAllMyRescueEventsFromRemoteRepository,
             getAllRescueEventsFromLocalRepository,
             deleteAllMyRescueEventsFromRemoteRepository,
@@ -1068,7 +1091,11 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
     fun `given a registered user_when that user deletes their account using their password but there is an error deleting their account on local and auth repositories_then the app displays an error`() =
         runTest {
             val deleteAccountViewmodel = getDeleteAccountViewmodel(
-                getUserResult = user.copy(image = ""),
+                getUserResult = flowOf(
+                    userWithAllSubscriptionData.copy(
+                        userEntity = user.copy(image = "").toEntity()
+                    )
+                ),
                 deleteUserFromAuthErrorArg = "error",
                 deleteUserFromLocalArg = 0
             )

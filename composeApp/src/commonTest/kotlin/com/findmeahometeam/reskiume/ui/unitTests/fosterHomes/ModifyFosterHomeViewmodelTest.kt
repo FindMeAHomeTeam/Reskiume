@@ -10,14 +10,15 @@ import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.remote.response.fosterHome.RemoteFosterHome
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.Gender
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
 import com.findmeahometeam.reskiume.domain.model.fosterHome.AcceptedNonHumanAnimalForFosterHome
 import com.findmeahometeam.reskiume.domain.model.fosterHome.ResidentNonHumanAnimalForFosterHome
 import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteFosterHome.FireStoreRemoteFosterHomeRepository
@@ -33,6 +34,7 @@ import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNam
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.fosterHome
 import com.findmeahometeam.reskiume.fosterHomeWithAllNonHumanAnimalData
 import com.findmeahometeam.reskiume.localCache
@@ -46,7 +48,9 @@ import com.findmeahometeam.reskiume.ui.fosterHomes.modifyFosterHome.ModifyFoster
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.DeleteNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
+import com.findmeahometeam.reskiume.ui.util.fcm.SubscriptionManagerUtil
 import com.findmeahometeam.reskiume.user
+import com.findmeahometeam.reskiume.userWithAllSubscriptionData
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -57,8 +61,10 @@ import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
 import dev.mokkery.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -101,6 +107,8 @@ class ModifyFosterHomeViewmodelTest : CoroutineTestDispatcher() {
     private val modifyNonHumanAnimalInLocalRepository = Capture.slot<(rowsUpdated: Int) -> Unit>()
 
     private val onCompletedDeleteFosterHome = Capture.slot<() -> Unit>()
+
+    private val onUnsubscribeFosterHome = Capture.slot<() -> Unit>()
 
     private val log: Log = mock {
         every { d(any(), any()) } calls { println(it) }
@@ -165,6 +173,10 @@ class ModifyFosterHomeViewmodelTest : CoroutineTestDispatcher() {
             } calls {
                 onDeleteLocalCacheEntity.get().invoke(numberOfRowsDeletedInLocalDatasourceArg)
             }
+        }
+
+        val localUserRepository: LocalUserRepository = mock {
+            every { getUser(authUser.uid) } returns flowOf(userWithAllSubscriptionData)
         }
 
         val fireStoreRemoteFosterHomeRepository: FireStoreRemoteFosterHomeRepository = mock {
@@ -433,6 +445,18 @@ class ModifyFosterHomeViewmodelTest : CoroutineTestDispatcher() {
             } calls { onCompletedDeleteFosterHome.get().invoke() }
         }
 
+        val subscriptionManagerUtil: SubscriptionManagerUtil  = mock {
+
+            everySuspend {
+                unsubscribeFromTopic(
+                    user.copy(email = null),
+                    fosterHome.id,
+                    any(),
+                    capture(onUnsubscribeFosterHome)
+                )
+            } calls { onUnsubscribeFosterHome.get().invoke() }
+        }
+
         val getFosterHomeFromLocalRepository =
             GetFosterHomeFromLocalRepository(localFosterHomeRepository)
 
@@ -479,6 +503,9 @@ class ModifyFosterHomeViewmodelTest : CoroutineTestDispatcher() {
         val modifyCacheInLocalRepository =
             ModifyCacheInLocalRepository(localCacheRepository)
 
+        val getUserFromLocalDataSource =
+            GetUserFromLocalDataSource(localUserRepository)
+
         return ModifyFosterHomeViewmodel(
             saveStateHandleProvider,
             getFosterHomeFromLocalRepository,
@@ -493,6 +520,9 @@ class ModifyFosterHomeViewmodelTest : CoroutineTestDispatcher() {
             modifyFosterHomeInLocalRepository,
             modifyCacheInLocalRepository,
             deleteFosterHomeUtil,
+            observeAuthStateInAuthDataSource,
+            getUserFromLocalDataSource,
+            subscriptionManagerUtil,
             log
         )
     }
@@ -834,12 +864,15 @@ class ModifyFosterHomeViewmodelTest : CoroutineTestDispatcher() {
             }
         }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `given my foster home to modify_when I click to delete my foster home_then the foster home is deleted`() =
+    fun `given my foster home to modify_when I click to delete my foster home_then the foster home is deleted and unsubscribed from the user subscriptions`() =
         runTest {
             val modifyFosterHomeViewmodel = getModifyFosterHomeViewmodel()
 
             modifyFosterHomeViewmodel.deleteFosterHome(fosterHome.id, fosterHome.ownerId)
+
+            runCurrent()
 
             modifyFosterHomeViewmodel.manageChangesUiState.test {
                 assertTrue { awaitItem() is UiState.Success }

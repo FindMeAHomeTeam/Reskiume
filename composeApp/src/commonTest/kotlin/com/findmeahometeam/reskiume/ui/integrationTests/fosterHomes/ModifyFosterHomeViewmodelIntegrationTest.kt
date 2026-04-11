@@ -12,6 +12,7 @@ import com.findmeahometeam.reskiume.domain.model.fosterHome.ResidentNonHumanAnim
 import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteFosterHome.FireStoreRemoteFosterHomeRepository
@@ -27,6 +28,7 @@ import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNam
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.fosterHome
 import com.findmeahometeam.reskiume.fosterHomeWithAllNonHumanAnimalData
 import com.findmeahometeam.reskiume.localCache
@@ -45,16 +47,22 @@ import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeFireStoreRemot
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalCacheRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalFosterHomeRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalNonHumanAnimalRepository
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalUserRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLog
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeManageImagePath
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeRealtimeDatabaseRemoteNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeSaveStateHandleProvider
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeStorageRepository
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeSubscriptionManagerUtil
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.DeleteNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
+import com.findmeahometeam.reskiume.ui.util.fcm.SubscriptionManagerUtil
 import com.findmeahometeam.reskiume.user
 import com.findmeahometeam.reskiume.userPwd
+import com.findmeahometeam.reskiume.userWithAllSubscriptionData
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -81,6 +89,10 @@ class ModifyFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
         localNonHumanAnimalRepository: LocalNonHumanAnimalRepository = FakeLocalNonHumanAnimalRepository(),
         manageImagePath: ManageImagePath = FakeManageImagePath(),
         deleteFosterHomeUtil: DeleteFosterHomeUtil = FakeDeleteFosterHomeUtil(),
+        localUserRepository: LocalUserRepository = FakeLocalUserRepository(
+            mutableListOf(userWithAllSubscriptionData)
+        ),
+        subscriptionManagerUtil: SubscriptionManagerUtil = FakeSubscriptionManagerUtil(),
         log: Log = FakeLog()
     ): ModifyFosterHomeViewmodel {
 
@@ -130,6 +142,9 @@ class ModifyFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
         val modifyCacheInLocalRepository =
             ModifyCacheInLocalRepository(localCacheRepository)
 
+        val getUserFromLocalDataSource =
+            GetUserFromLocalDataSource(localUserRepository)
+
         return ModifyFosterHomeViewmodel(
             saveStateHandleProvider,
             getFosterHomeFromLocalRepository,
@@ -144,6 +159,9 @@ class ModifyFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
             modifyFosterHomeInLocalRepository,
             modifyCacheInLocalRepository,
             deleteFosterHomeUtil,
+            observeAuthStateInAuthDataSource,
+            getUserFromLocalDataSource,
+            subscriptionManagerUtil,
             log
         )
     }
@@ -449,12 +467,15 @@ class ModifyFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
             }
         }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `given my foster home to modify_when I click to delete my foster home_then the foster home is deleted`() =
+    fun `given my foster home to modify_when I click to delete my foster home_then the foster home is deleted and unsubscribed from the user subscriptions`() =
         runTest {
             val modifyFosterHomeViewmodel = getModifyFosterHomeViewmodel()
 
             modifyFosterHomeViewmodel.deleteFosterHome(fosterHome.id, fosterHome.ownerId)
+
+            runCurrent()
 
             modifyFosterHomeViewmodel.manageChangesUiState.test {
                 assertTrue { awaitItem() is UiState.Success }

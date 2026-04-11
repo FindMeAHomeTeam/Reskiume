@@ -13,6 +13,7 @@ import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteReview.RealtimeDatabaseRemoteReviewRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
+import com.findmeahometeam.reskiume.domain.repository.util.fcm.FCMSubscriberRepository
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
@@ -29,6 +30,7 @@ import com.findmeahometeam.reskiume.review
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckReviews
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeAuthRepository
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeFCMSubscriberRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeKonnectivity
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalCacheRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalReviewRepository
@@ -45,6 +47,7 @@ import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsViewmode
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.findmeahometeam.reskiume.uiReview
 import com.findmeahometeam.reskiume.userPwd
+import com.findmeahometeam.reskiume.userWithAllSubscriptionData
 import com.plusmobileapps.konnectivity.Konnectivity
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -64,7 +67,8 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
         realtimeDatabaseRemoteUserRepository: RealtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(),
         storageRepository: StorageRepository = FakeStorageRepository(),
         konnectivity: Konnectivity = FakeKonnectivity(),
-        manageImagePath: ManageImagePath = FakeManageImagePath()
+        manageImagePath: ManageImagePath = FakeManageImagePath(),
+        fcmSubscriberRepository: FCMSubscriberRepository = FakeFCMSubscriberRepository()
     ): CheckReviewsViewmodel {
 
         val observeAuthStateInAuthDataSource =
@@ -92,10 +96,22 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
             DownloadImageToLocalDataSource(storageRepository)
 
         val insertUserInLocalDataSource =
-            InsertUserInLocalDataSource(manageImagePath, localUserRepository, authRepository)
+            InsertUserInLocalDataSource(
+                authRepository,
+                manageImagePath,
+                localUserRepository,
+                fcmSubscriberRepository,
+                log
+            )
 
         val modifyUserInLocalDataSource =
-            ModifyUserInLocalDataSource(manageImagePath, localUserRepository, authRepository)
+            ModifyUserInLocalDataSource(
+                manageImagePath,
+                fcmSubscriberRepository,
+                localUserRepository,
+                authRepository,
+                log
+            )
 
         val getImagePathForFileNameFromLocalDataSource =
             GetImagePathForFileNameFromLocalDataSource(manageImagePath)
@@ -172,7 +188,13 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
                     remoteUserList = mutableListOf(author.copy(image = "").toData())
                 ),
-                localUserRepository = FakeLocalUserRepository(mutableListOf(author.copy(image = "")))
+                localUserRepository = FakeLocalUserRepository(
+                    mutableListOf(
+                        userWithAllSubscriptionData.copy(
+                            userEntity = author.copy(image = "").toEntity()
+                        )
+                    )
+                )
             ).getUserDataIfNotMine().test {
                 assertEquals(author.copy(image = "", savedBy = "", email = null), awaitItem())
                 awaitComplete()
@@ -192,7 +214,11 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
                     remoteUserList = mutableListOf(author.toData())
                 ),
-                localUserRepository = FakeLocalUserRepository(mutableListOf(author)),
+                localUserRepository = FakeLocalUserRepository(
+                    mutableListOf(
+                        userWithAllSubscriptionData.copy(userEntity = author.toEntity())
+                    )
+                ),
                 localCacheRepository = FakeLocalCacheRepository(
                     localCacheList = mutableListOf(
                         localCache.copy(
@@ -247,7 +273,12 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     authPassword = userPwd
                 ),
                 localUserRepository = FakeLocalUserRepository(
-                    localUserList = mutableListOf(author)
+                    localUserWithAllSubscriptionDataList = mutableListOf(
+                        userWithAllSubscriptionData.copy(
+                            userEntity = author.toEntity(),
+                            allSubscriptions = emptyList()
+                        )
+                    )
                 ),
                 localCacheRepository = FakeLocalCacheRepository(
                     localCacheList = mutableListOf(
@@ -258,7 +289,7 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     )
                 )
             ).getUserDataIfNotMine().test {
-                assertEquals(author, awaitItem())
+                assertEquals(author.copy(email = null), awaitItem())
                 awaitComplete()
             }
         }
@@ -287,7 +318,11 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     )
                 ),
                 localUserRepository = FakeLocalUserRepository(
-                    localUserList = mutableListOf(author)
+                    localUserWithAllSubscriptionDataList = mutableListOf(
+                        userWithAllSubscriptionData.copy(
+                            userEntity = author.toEntity()
+                        )
+                    )
                 )
             ).reviewListFlow.test {
                 val actualUiReviewList = awaitItem()
@@ -331,7 +366,11 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     )
                 ),
                 localUserRepository = FakeLocalUserRepository(
-                    localUserList = mutableListOf(author)
+                    localUserWithAllSubscriptionDataList = mutableListOf(
+                        userWithAllSubscriptionData.copy(
+                            userEntity = author.toEntity()
+                        )
+                    )
                 )
             ).reviewListFlow.test {
                 val actualUiReviewList = awaitItem()
@@ -372,7 +411,11 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     )
                 ),
                 localUserRepository = FakeLocalUserRepository(
-                    localUserList = mutableListOf(author)
+                    localUserWithAllSubscriptionDataList = mutableListOf(
+                        userWithAllSubscriptionData.copy(
+                            userEntity = author.toEntity()
+                        )
+                    )
                 )
             ).reviewListFlow.test {
                 val actualUiReviewList = awaitItem()

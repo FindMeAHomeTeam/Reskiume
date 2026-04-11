@@ -8,7 +8,7 @@ import com.findmeahometeam.reskiume.data.database.entity.LocalCacheEntity
 import com.findmeahometeam.reskiume.data.database.entity.ReviewEntity
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.remote.response.RemoteReview
-import com.findmeahometeam.reskiume.data.remote.response.RemoteUser
+import com.findmeahometeam.reskiume.data.remote.response.remoterUser.RemoteUser
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
@@ -18,6 +18,7 @@ import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteReview.RealtimeDatabaseRemoteReviewRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
+import com.findmeahometeam.reskiume.domain.repository.util.fcm.FCMSubscriberRepository
 import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInLocalDataSource
@@ -39,6 +40,7 @@ import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsViewmode
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.findmeahometeam.reskiume.uiReview
 import com.findmeahometeam.reskiume.user
+import com.findmeahometeam.reskiume.userWithAllSubscriptionData
 import com.plusmobileapps.konnectivity.Konnectivity
 import com.plusmobileapps.konnectivity.NetworkConnection
 import dev.mokkery.answering.calls
@@ -68,9 +70,9 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
 
     private val onInsertReview = Capture.slot<(rowId: Long) -> Unit>()
 
-    private val onInsertUserInLocal = Capture.slot<(rowId: Long) -> Unit>()
+    private val onInsertUserInLocal = Capture.slot< suspend (rowId: Long) -> Unit>()
 
-    private val onModifyUserInLocal = Capture.slot<(rowsUpdated: Int) -> Unit>()
+    private val onModifyUserInLocal = Capture.slot< suspend (rowsUpdated: Int) -> Unit>()
 
     private val onSaveImageToLocal = Capture.slot<(imagePath: String) -> Unit>()
 
@@ -116,6 +118,8 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
         val authRepository: AuthRepository = mock {
             everySuspend { authState } returns (flowOf(authStateReturn))
         }
+
+        val fCMSubscriberRepository: FCMSubscriberRepository = mock {}
 
         val localCacheRepository: LocalCacheRepository = mock {
             everySuspend {
@@ -178,7 +182,12 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
         val localUserRepository: LocalUserRepository = mock {
             everySuspend {
                 getUser(author.uid)
-            } returns author
+            } returns flowOf(
+                userWithAllSubscriptionData.copy(
+                    userEntity = author.toEntity(),
+                    allSubscriptions = emptyList()
+                )
+            )
 
             everySuspend { insertUser(any(), capture(onInsertUserInLocal)) } calls {
                 onInsertUserInLocal.get().invoke(rowIdInsertedUserArg)
@@ -256,10 +265,22 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
             DownloadImageToLocalDataSource(storageRepository)
 
         val insertUserInLocalDataSource =
-            InsertUserInLocalDataSource(manageImagePath, localUserRepository, authRepository)
+            InsertUserInLocalDataSource(
+                authRepository,
+                manageImagePath,
+                localUserRepository,
+                fCMSubscriberRepository,
+                log
+            )
 
         val modifyUserInLocalDataSource =
-            ModifyUserInLocalDataSource(manageImagePath, localUserRepository, authRepository)
+            ModifyUserInLocalDataSource(
+                manageImagePath,
+                fCMSubscriberRepository,
+                localUserRepository,
+                authRepository,
+                log
+            )
 
         val getImagePathForFileNameFromLocalDataSource =
             GetImagePathForFileNameFromLocalDataSource(manageImagePath)
@@ -310,7 +331,10 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
                 authStateReturn = null,
                 getAuthorLocalCacheEntityReturn = null
             ).getUserDataIfNotMine().test {
-                assertEquals(author.copy(savedBy = "", email = null, image = user.image), awaitItem())
+                assertEquals(
+                    author.copy(savedBy = "", email = null, image = user.image),
+                    awaitItem()
+                )
                 awaitComplete()
             }
         }
@@ -336,7 +360,7 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
             verify {
                 log.e(
                     "CheckActivistUtil",
-                    "Error adding user ${author.uid} to local database"
+                    "insertUserInLocalRepository: Error adding user ${author.uid} to local database"
                 )
             }
         }
@@ -348,9 +372,16 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
                 uidArg = author.uid,
                 authStateReturn = null,
                 getAuthorLocalCacheEntityReturn =
-                localCache.copy(cachedObjectId = author.uid, section = Section.USERS, timestamp = 123L).toEntity()
+                    localCache.copy(
+                        cachedObjectId = author.uid,
+                        section = Section.USERS,
+                        timestamp = 123L
+                    ).toEntity()
             ).getUserDataIfNotMine().test {
-                assertEquals(author.copy(savedBy = "", email = null, image = user.image), awaitItem())
+                assertEquals(
+                    author.copy(savedBy = "", email = null, image = user.image),
+                    awaitItem()
+                )
                 awaitComplete()
             }
         }
@@ -363,7 +394,11 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
                 uidArg = author.uid,
                 authStateReturn = null,
                 getAuthorLocalCacheEntityReturn =
-                    localCache.copy(cachedObjectId = author.uid, section = Section.USERS, timestamp = 123L).toEntity(),
+                    localCache.copy(
+                        cachedObjectId = author.uid,
+                        section = Section.USERS,
+                        timestamp = 123L
+                    ).toEntity(),
                 getRemoteAuthorReturn = flowOf(author.copy(image = "").toData()),
                 rowsUpdatedUserArg = 0,
                 absolutePathAuthorArg = ""
@@ -377,7 +412,7 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
             verify {
                 log.e(
                     "CheckActivistUtil",
-                    "Failed to modify user with uid ${author.uid} in local data source."
+                    "modifyUserInLocalRepository: Failed to modify user with uid ${author.uid} in local data source."
                 )
             }
         }
@@ -389,7 +424,7 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
                 uidArg = author.uid,
                 authStateReturn = null,
             ).getUserDataIfNotMine().test {
-                assertEquals(author, awaitItem())
+                assertEquals(author.copy(email = null), awaitItem())
                 awaitComplete()
             }
         }

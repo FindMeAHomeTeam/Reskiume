@@ -5,7 +5,7 @@ import com.findmeahometeam.reskiume.CoroutineTestDispatcher
 import com.findmeahometeam.reskiume.authUser
 import com.findmeahometeam.reskiume.data.database.entity.LocalCacheEntity
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
-import com.findmeahometeam.reskiume.data.remote.response.RemoteUser
+import com.findmeahometeam.reskiume.data.remote.response.remoterUser.RemoteUser
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.Advice
@@ -14,6 +14,7 @@ import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
+import com.findmeahometeam.reskiume.domain.repository.util.fcm.FCMSubscriberRepository
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
@@ -33,6 +34,7 @@ import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckActivistUtilImp
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.findmeahometeam.reskiume.ui.util.StringProvider
 import com.findmeahometeam.reskiume.user
+import com.findmeahometeam.reskiume.userWithAllSubscriptionData
 import com.plusmobileapps.konnectivity.Konnectivity
 import com.plusmobileapps.konnectivity.NetworkConnection
 import dev.mokkery.answering.calls
@@ -140,11 +142,11 @@ class CheckAllAdviceViewmodelTest : CoroutineTestDispatcher() {
         val localUserRepository: LocalUserRepository = mock {
             everySuspend {
                 getUser(user.uid)
-            } returns user
+            } returns flowOf(userWithAllSubscriptionData)
 
             everySuspend {
                 getUser("wrongId")
-            } returns null
+            } returns flowOf(null)
 
             everySuspend { insertUser(any(), capture(onInsertUserInLocal)) } calls {
                 onInsertUserInLocal.get().invoke(rowIdInsertedUserArg)
@@ -153,6 +155,8 @@ class CheckAllAdviceViewmodelTest : CoroutineTestDispatcher() {
                 onModifyUserInLocal.get().invoke(rowsUpdatedUserArg)
             }
         }
+
+        val fCMSubscriberRepository: FCMSubscriberRepository = mock {}
 
         val storageRepository: StorageRepository = mock {
 
@@ -186,10 +190,22 @@ class CheckAllAdviceViewmodelTest : CoroutineTestDispatcher() {
             DownloadImageToLocalDataSource(storageRepository)
 
         val insertUserInLocalDataSource =
-            InsertUserInLocalDataSource(manageImagePath, localUserRepository, authRepository)
+            InsertUserInLocalDataSource(
+                authRepository,
+                manageImagePath,
+                localUserRepository,
+                fCMSubscriberRepository,
+                log
+            )
 
         val modifyUserInLocalDataSource =
-            ModifyUserInLocalDataSource(manageImagePath, localUserRepository, authRepository)
+            ModifyUserInLocalDataSource(
+                manageImagePath,
+                fCMSubscriberRepository,
+                localUserRepository,
+                authRepository,
+                log
+            )
 
         val getImagePathForFileNameFromLocalDataSource =
             GetImagePathForFileNameFromLocalDataSource(manageImagePath)
@@ -325,7 +341,7 @@ class CheckAllAdviceViewmodelTest : CoroutineTestDispatcher() {
                 authStateReturn = null
             )
             checkAllAdviceViewmodel.retrieveAdviceAuthor(user.uid) { actualUser ->
-                assertEquals(user, actualUser)
+                assertEquals(user.copy(email = null), actualUser)
             }
         }
 

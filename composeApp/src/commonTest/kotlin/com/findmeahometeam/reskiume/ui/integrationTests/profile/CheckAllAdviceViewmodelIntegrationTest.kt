@@ -10,6 +10,7 @@ import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
+import com.findmeahometeam.reskiume.domain.repository.util.fcm.FCMSubscriberRepository
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
@@ -20,6 +21,7 @@ import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInLocalDataSo
 import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInLocalDataSource
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeAuthRepository
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeFCMSubscriberRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeKonnectivity
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalCacheRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalUserRepository
@@ -38,6 +40,7 @@ import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.findmeahometeam.reskiume.ui.util.StringProvider
 import com.findmeahometeam.reskiume.user
 import com.findmeahometeam.reskiume.userPwd
+import com.findmeahometeam.reskiume.userWithAllSubscriptionData
 import com.plusmobileapps.konnectivity.Konnectivity
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runCurrent
@@ -61,7 +64,8 @@ class CheckAllAdviceViewmodelIntegrationTest : CoroutineTestDispatcher() {
         localUserRepository: LocalUserRepository = FakeLocalUserRepository(),
         storageRepository: StorageRepository = FakeStorageRepository(),
         stringProvider: StringProvider = FakeStringProvider("I found a non-human animal in the street. What can I do?"),
-        manageImagePath: ManageImagePath = FakeManageImagePath()
+        manageImagePath: ManageImagePath = FakeManageImagePath(),
+        fCMSubscriberRepository: FCMSubscriberRepository = FakeFCMSubscriberRepository()
     ): CheckAllAdviceViewmodel {
 
         val observeAuthStateInAuthDataSource =
@@ -80,10 +84,22 @@ class CheckAllAdviceViewmodelIntegrationTest : CoroutineTestDispatcher() {
             DownloadImageToLocalDataSource(storageRepository)
 
         val insertUserInLocalDataSource =
-            InsertUserInLocalDataSource(manageImagePath, localUserRepository, authRepository)
+            InsertUserInLocalDataSource(
+                authRepository,
+                manageImagePath,
+                localUserRepository,
+                fCMSubscriberRepository,
+                log
+            )
 
         val modifyUserInLocalDataSource =
-            ModifyUserInLocalDataSource(manageImagePath, localUserRepository, authRepository)
+            ModifyUserInLocalDataSource(
+                manageImagePath,
+                fCMSubscriberRepository,
+                localUserRepository,
+                authRepository,
+                log
+            )
 
         val getImagePathForFileNameFromLocalDataSource =
             GetImagePathForFileNameFromLocalDataSource(manageImagePath)
@@ -214,14 +230,20 @@ class CheckAllAdviceViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
                     mutableListOf(user.toData())
                 ),
-                localUserRepository = FakeLocalUserRepository(mutableListOf(user))
+                localUserRepository = FakeLocalUserRepository(
+                    mutableListOf(
+                        userWithAllSubscriptionData
+                    )
+                )
             )
             checkAllAdviceViewmodel.retrieveAdviceAuthor(user.uid) { actualUser ->
-                assertEquals(user.copy(
-                    savedBy = "",
-                    email = null,
-                    isLoggedIn = false
-                ), actualUser)
+                assertEquals(
+                    user.copy(
+                        savedBy = "",
+                        email = null,
+                        isLoggedIn = false
+                    ), actualUser
+                )
             }
         }
 

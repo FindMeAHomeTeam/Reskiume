@@ -11,6 +11,7 @@ import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalRescueEventRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteRescueEvent.FireStoreRemoteRescueEventRepository
@@ -22,6 +23,7 @@ import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLoca
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.InsertRescueEventInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.InsertRescueEventInRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.util.location.GetLocationFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.ObserveIfLocationEnabledFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.RequestEnableLocationFromLocationRepository
@@ -33,7 +35,9 @@ import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.DeleteNonHum
 import com.findmeahometeam.reskiume.ui.rescueEvents.createRescueEvent.CreateRescueEventViewmodel
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.findmeahometeam.reskiume.ui.util.StringProvider
+import com.findmeahometeam.reskiume.ui.util.fcm.SubscriptionManagerUtil
 import com.findmeahometeam.reskiume.user
+import com.findmeahometeam.reskiume.userWithAllSubscriptionData
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -57,6 +61,8 @@ class CreateRescueEventsViewmodelTest : CoroutineTestDispatcher() {
     private val onRequestEnableLocation = Capture.slot<(isEnabled: Boolean) -> Unit>()
 
     private val onInsertLocalCacheEntity = Capture.slot<(rowId: Long) -> Unit>()
+
+    private val onSubscribeRescueEvent = Capture.slot<() -> Unit>()
 
     private val onUploadImageToRemoteForRescueEvent = Capture.slot<(imagePath: String) -> Unit>()
 
@@ -214,15 +220,7 @@ class CreateRescueEventsViewmodelTest : CoroutineTestDispatcher() {
             everySuspend {
 
                 insertRemoteRescueEvent(
-                    rescueEvent.copy(
-                        id = createdRescueEventId,
-                        allNeedsToCover = rescueEvent.allNeedsToCover.map {
-                            it.copy(rescueEventId = createdRescueEventId)
-                        },
-                        allNonHumanAnimalsToRescue = rescueEvent.allNonHumanAnimalsToRescue.map {
-                            it.copy(rescueEventId = createdRescueEventId)
-                        }
-                    ).toData(),
+                    any(),
                     capture(onInsertRemoteRescueEvent)
                 )
             } calls {
@@ -342,10 +340,7 @@ class CreateRescueEventsViewmodelTest : CoroutineTestDispatcher() {
 
             everySuspend {
                 insertRescueEvent(
-                    rescueEvent.copy(
-                        id = createdRescueEventId,
-                        savedBy = authUser.uid
-                    ).toEntity(),
+                    any(),
                     capture(onInsertRescueEvent)
                 )
             } calls {
@@ -409,6 +404,22 @@ class CreateRescueEventsViewmodelTest : CoroutineTestDispatcher() {
             } returns flowOf(nonHumanAnimal.copy(id = nonHumanAnimal.id + "second"))
         }
 
+        val localUserRepository: LocalUserRepository = mock {
+            everySuspend { getUser(user.uid) } returns flowOf(userWithAllSubscriptionData)
+        }
+
+        val subscriptionManagerUtil: SubscriptionManagerUtil = mock {
+
+            everySuspend {
+                subscribeToTopic(
+                    user.copy(email = null),
+                    any(),
+                    any(),
+                    capture(onSubscribeRescueEvent)
+                )
+            } calls { onSubscribeRescueEvent.get().invoke() }
+        }
+
         val getAllNonHumanAnimalsFromLocalRepository =
             GetAllNonHumanAnimalsFromLocalRepository(localNonHumanAnimalRepository)
 
@@ -455,6 +466,9 @@ class CreateRescueEventsViewmodelTest : CoroutineTestDispatcher() {
         val insertCacheInLocalRepository =
             InsertCacheInLocalRepository(localCacheRepository)
 
+        val getUserFromLocalDataSource =
+            GetUserFromLocalDataSource(localUserRepository)
+
         return CreateRescueEventViewmodel(
             getAllNonHumanAnimalsFromLocalRepository,
             observeIfLocationEnabledFromLocationRepository,
@@ -466,6 +480,8 @@ class CreateRescueEventsViewmodelTest : CoroutineTestDispatcher() {
             insertRescueEventInRemoteRepository,
             insertRescueEventInLocalRepository,
             insertCacheInLocalRepository,
+            getUserFromLocalDataSource,
+            subscriptionManagerUtil,
             log
         )
     }
@@ -480,7 +496,7 @@ class CreateRescueEventsViewmodelTest : CoroutineTestDispatcher() {
         }
 
     @Test
-    fun `given my rescue event to create_when I add non human animals to rescue and needs to cover with my rescue event location_then I click to create my rescue event`() =
+    fun `given my rescue event to create_when I add non human animals to rescue and needs to cover with my rescue event location_then I click to create my rescue event and subscribe it to my subscriptions`() =
         runTest {
             val createRescueEventViewmodel = getCreateRescueEventViewmodel()
 
@@ -510,7 +526,7 @@ class CreateRescueEventsViewmodelTest : CoroutineTestDispatcher() {
         }
 
     @Test
-    fun `given my rescue event to create_when I add my rescue event data but there is no rescue event image_then the rescue event is created`() =
+    fun `given my rescue event to create_when I add my rescue event data but there is no rescue event image_then the rescue event is created and subscribed to my subscriptions`() =
         runTest {
             val createRescueEventViewmodel = getCreateRescueEventViewmodel()
 
@@ -581,7 +597,7 @@ class CreateRescueEventsViewmodelTest : CoroutineTestDispatcher() {
         }
 
     @Test
-    fun `given my rescue event to create_when I add my rescue event data but fails inserting the rescue event cache_then the rescue event is created`() =
+    fun `given my rescue event to create_when I add my rescue event data but fails inserting the rescue event cache_then the rescue event is created and subscribed to my subscriptions`() =
         runTest {
             val createRescueEventViewmodel = getCreateRescueEventViewmodel(
                 localCacheCreatedInLocalDatasourceArg = 0

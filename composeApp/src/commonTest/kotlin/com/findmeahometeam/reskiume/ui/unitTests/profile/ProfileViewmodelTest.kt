@@ -9,10 +9,11 @@ import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
+import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.profile.ProfileViewmodel
-import com.findmeahometeam.reskiume.ui.profile.ProfileViewmodel.ProfileUiState
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.findmeahometeam.reskiume.user
+import com.findmeahometeam.reskiume.userWithAllSubscriptionData
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -29,8 +30,9 @@ import kotlin.test.assertTrue
 class ProfileViewmodelTest : CoroutineTestDispatcher() {
 
     private val localUserRepository: LocalUserRepository = mock {
-        everySuspend { getUser(user.uid) } returns user
-        everySuspend { getUser("wrongUid") } returns null
+        everySuspend { getUser(user.uid) } returns flowOf(userWithAllSubscriptionData)
+        
+        everySuspend { getUser("wrongUid") } returns flowOf(null)
     }
 
     val manageImagePath: ManageImagePath = mock {
@@ -63,8 +65,8 @@ class ProfileViewmodelTest : CoroutineTestDispatcher() {
             val authRepository: AuthRepository = mock {
                 everySuspend { authState } returns (flowOf(authUser))
             }
-            getProfileViewmodel(authRepository).state.test {
-                assertEquals(ProfileUiState.Success(user), awaitItem())
+            getProfileViewmodel(authRepository).userState.test {
+                assertEquals(UiState.Success(user), awaitItem())
                 awaitComplete()
             }
         }
@@ -75,17 +77,14 @@ class ProfileViewmodelTest : CoroutineTestDispatcher() {
             val authRepository: AuthRepository = mock {
                 everySuspend { authState } returns (flowOf(authUser.copy(uid = "wrongUid")))
             }
-            getProfileViewmodel(authRepository).state.test {
-                assertEquals(
-                    ProfileUiState.Error(""),
-                    awaitItem()
-                )
+            getProfileViewmodel(authRepository).userState.test {
+                assertTrue { awaitItem() is UiState.Idle }
                 awaitComplete()
             }
             verify {
-                log.e(
+                log.d(
                     "ProfileViewmodel",
-                    "User wrongUid not found"
+                    "userState: User wrongUid not found"
                 )
             }
         }
@@ -96,8 +95,8 @@ class ProfileViewmodelTest : CoroutineTestDispatcher() {
             val authRepository: AuthRepository = mock {
                 every { authState } returns flowOf(null)
             }
-            getProfileViewmodel(authRepository).state.test {
-                assertTrue { awaitItem() is ProfileUiState.Idle }
+            getProfileViewmodel(authRepository).userState.test {
+                assertTrue { awaitItem() is UiState.Idle }
                 awaitComplete()
             }
         }

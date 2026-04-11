@@ -11,6 +11,7 @@ import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteFosterHome.FireStoreRemoteFosterHomeRepository
@@ -22,6 +23,7 @@ import com.findmeahometeam.reskiume.domain.usecases.fosterHome.InsertFosterHomeI
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.util.location.GetLocationFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.ObserveIfLocationEnabledFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.RequestEnableLocationFromLocationRepository
@@ -33,7 +35,9 @@ import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHuman
 import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.DeleteNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.findmeahometeam.reskiume.ui.util.StringProvider
+import com.findmeahometeam.reskiume.ui.util.fcm.SubscriptionManagerUtil
 import com.findmeahometeam.reskiume.user
+import com.findmeahometeam.reskiume.userWithAllSubscriptionData
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -77,6 +81,8 @@ class CreateFosterHomeViewmodelTest : CoroutineTestDispatcher() {
     private val onInsertFosterHomeWithoutImage = Capture.slot<suspend (rowId: Long) -> Unit>()
 
     private val modifyNonHumanAnimalInLocalRepository = Capture.slot<(rowsUpdated: Int) -> Unit>()
+
+    private val onSubscribeFosterHome = Capture.slot<() -> Unit>()
 
     private val log: Log = mock {
         every { d(any(), any()) } calls { println(it) }
@@ -312,6 +318,13 @@ class CreateFosterHomeViewmodelTest : CoroutineTestDispatcher() {
             } calls { onInsertLocalCacheEntity.get().invoke(localCacheCreatedInLocalDatasourceArg) }
         }
 
+        val localUserRepository: LocalUserRepository = mock {
+
+            everySuspend {
+                getUser(authUser.uid)
+            } returns flowOf(userWithAllSubscriptionData)
+        }
+
         val manageImagePath: ManageImagePath = mock {
 
             every { getImagePathForFileName(nonHumanAnimal.imageUrl) } returns nonHumanAnimal.imageUrl
@@ -334,6 +347,18 @@ class CreateFosterHomeViewmodelTest : CoroutineTestDispatcher() {
                     any()
                 )
             } returns flowOf(nonHumanAnimal)
+        }
+
+        val subscriptionManagerUtil: SubscriptionManagerUtil = mock {
+
+            everySuspend {
+                subscribeToTopic(
+                    user.copy(email = null),
+                    any(),
+                    any(),
+                    capture(onSubscribeFosterHome)
+                )
+            } calls { onSubscribeFosterHome.get().invoke() }
         }
 
         val getAllNonHumanAnimalsFromLocalRepository =
@@ -382,6 +407,9 @@ class CreateFosterHomeViewmodelTest : CoroutineTestDispatcher() {
         val insertCacheInLocalRepository =
             InsertCacheInLocalRepository(localCacheRepository)
 
+        val getUserFromLocalDataSource =
+            GetUserFromLocalDataSource(localUserRepository)
+
         return CreateFosterHomeViewmodel(
             getAllNonHumanAnimalsFromLocalRepository,
             observeIfLocationEnabledFromLocationRepository,
@@ -393,6 +421,8 @@ class CreateFosterHomeViewmodelTest : CoroutineTestDispatcher() {
             insertFosterHomeInRemoteRepository,
             insertFosterHomeInLocalRepository,
             insertCacheInLocalRepository,
+            getUserFromLocalDataSource,
+            subscriptionManagerUtil,
             log
         )
     }
@@ -407,7 +437,7 @@ class CreateFosterHomeViewmodelTest : CoroutineTestDispatcher() {
         }
 
     @Test
-    fun `given my foster home to create_when I add accepted and resident non human animals with my foster home location_then I click to create my foster home`() =
+    fun `given my foster home to create_when I add accepted and resident non human animals with my foster home location_then I click to create my foster home and subscribe it to my subscriptions`() =
         runTest {
             val createFosterHomeViewmodel = getCreateFosterHomeViewmodel()
 
@@ -437,7 +467,7 @@ class CreateFosterHomeViewmodelTest : CoroutineTestDispatcher() {
         }
 
     @Test
-    fun `given my foster home to create_when I add my foster home data but there is no foster home image_then the foster home is created`() =
+    fun `given my foster home to create_when I add my foster home data but there is no foster home image_then the foster home is created and subscribed to my subscriptions`() =
         runTest {
             val createFosterHomeViewmodel = getCreateFosterHomeViewmodel()
 
@@ -508,7 +538,7 @@ class CreateFosterHomeViewmodelTest : CoroutineTestDispatcher() {
         }
 
     @Test
-    fun `given my foster home to create_when I add my foster home data but fails inserting the foster home cache_then the foster home is created`() =
+    fun `given my foster home to create_when I add my foster home data but fails inserting the foster home cache_then the foster home is created and subscribed to my subscriptions`() =
         runTest {
             val createFosterHomeViewmodel = getCreateFosterHomeViewmodel(
                 localCacheCreatedInLocalDatasourceArg = 0

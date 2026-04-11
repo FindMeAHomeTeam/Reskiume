@@ -8,6 +8,7 @@ import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteFosterHome.FireStoreRemoteFosterHomeRepository
@@ -19,6 +20,7 @@ import com.findmeahometeam.reskiume.domain.usecases.fosterHome.InsertFosterHomeI
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.util.location.GetLocationFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.ObserveIfLocationEnabledFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.RequestEnableLocationFromLocationRepository
@@ -35,18 +37,22 @@ import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeFireStoreRemot
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalCacheRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalFosterHomeRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalNonHumanAnimalRepository
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalUserRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocationRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLog
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeManageImagePath
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeRealtimeDatabaseRemoteNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeStorageRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeStringProvider
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeSubscriptionManagerUtil
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.DeleteNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.findmeahometeam.reskiume.ui.util.StringProvider
+import com.findmeahometeam.reskiume.ui.util.fcm.SubscriptionManagerUtil
 import com.findmeahometeam.reskiume.user
 import com.findmeahometeam.reskiume.userPwd
+import com.findmeahometeam.reskiume.userWithAllSubscriptionData
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -81,6 +87,12 @@ class CreateFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
         manageImagePath: ManageImagePath = FakeManageImagePath(),
         checkNonHumanAnimalUtil: CheckNonHumanAnimalUtil = FakeCheckNonHumanAnimalUtil(),
         stringProvider: StringProvider = FakeStringProvider("Text to display"),
+        localUserRepository: LocalUserRepository = FakeLocalUserRepository(
+            mutableListOf(
+                userWithAllSubscriptionData
+            )
+        ),
+        subscriptionManagerUtil: SubscriptionManagerUtil = FakeSubscriptionManagerUtil(),
         log: Log = FakeLog()
     ): CreateFosterHomeViewmodel {
 
@@ -124,6 +136,9 @@ class CreateFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
         val insertCacheInLocalRepository =
             InsertCacheInLocalRepository(localCacheRepository)
 
+        val getUserFromLocalDataSource =
+            GetUserFromLocalDataSource(localUserRepository)
+
         return CreateFosterHomeViewmodel(
             getAllNonHumanAnimalsFromLocalRepository,
             observeIfLocationEnabledFromLocationRepository,
@@ -135,6 +150,8 @@ class CreateFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
             insertFosterHomeInRemoteRepository,
             insertFosterHomeInLocalRepository,
             insertCacheInLocalRepository,
+            getUserFromLocalDataSource,
+            subscriptionManagerUtil,
             log
         )
     }
@@ -155,7 +172,7 @@ class CreateFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
         }
 
     @Test
-    fun `given my foster home to create_when I add accepted and resident non human animals with my foster home location_then I click to create my foster home`() =
+    fun `given my foster home to create_when I add accepted and resident non human animals with my foster home location_then I click to create my foster home and subscribed to my subscriptions`() =
         runTest {
             val createFosterHomeViewmodel = getCreateFosterHomeViewmodel(
                 realtimeDatabaseRemoteNonHumanAnimalRepository = FakeRealtimeDatabaseRemoteNonHumanAnimalRepository(
@@ -192,7 +209,7 @@ class CreateFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
         }
 
     @Test
-    fun `given my foster home to create_when I add my foster home data but there is no foster home image_then the foster home is created`() =
+    fun `given my foster home to create_when I add my foster home data but there is no foster home image_then the foster home is created and subscribed to my subscriptions`() =
         runTest {
             val createFosterHomeViewmodel = getCreateFosterHomeViewmodel(
                 realtimeDatabaseRemoteNonHumanAnimalRepository = FakeRealtimeDatabaseRemoteNonHumanAnimalRepository(
@@ -268,7 +285,7 @@ class CreateFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
         }
 
     @Test
-    fun `given my foster home to create_when I add my foster home data but fails inserting the foster home cache_then the foster home is created`() =
+    fun `given my foster home to create_when I add my foster home data but fails inserting the foster home cache_then the foster home is created and subscribed to my subscriptions`() =
         runTest {
             val createFosterHomeViewmodel = getCreateFosterHomeViewmodel(
                 realtimeDatabaseRemoteNonHumanAnimalRepository = FakeRealtimeDatabaseRemoteNonHumanAnimalRepository(

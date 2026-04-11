@@ -49,6 +49,7 @@ import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHuman
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.findmeahometeam.reskiume.ui.util.StringProvider
 import com.findmeahometeam.reskiume.user
+import com.findmeahometeam.reskiume.userWithAllSubscriptionData
 import com.plusmobileapps.konnectivity.Konnectivity
 import com.plusmobileapps.konnectivity.NetworkConnection
 import dev.mokkery.answering.calls
@@ -170,7 +171,7 @@ class CheckAllFosterHomesViewmodelTest : CoroutineTestDispatcher() {
         val localUserRepository: LocalUserRepository = mock {
             everySuspend {
                 getUser(user.uid)
-            } returns user
+            } returns flowOf(userWithAllSubscriptionData)
         }
 
         val localCacheRepository: LocalCacheRepository = mock {

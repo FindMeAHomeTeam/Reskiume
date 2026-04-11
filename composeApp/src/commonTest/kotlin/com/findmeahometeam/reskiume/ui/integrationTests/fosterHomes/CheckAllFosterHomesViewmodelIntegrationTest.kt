@@ -60,6 +60,7 @@ import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.findmeahometeam.reskiume.ui.util.StringProvider
 import com.findmeahometeam.reskiume.user
 import com.findmeahometeam.reskiume.userPwd
+import com.findmeahometeam.reskiume.userWithAllSubscriptionData
 import com.plusmobileapps.konnectivity.Konnectivity
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -75,7 +76,7 @@ class CheckAllFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() {
             authPassword = userPwd
         ),
         localUserRepository: LocalUserRepository = FakeLocalUserRepository(
-            mutableListOf(user)
+            mutableListOf(userWithAllSubscriptionData)
         ),
         localCacheRepository: LocalCacheRepository = FakeLocalCacheRepository(),
         fireStoreRemoteFosterHomeRepository: FireStoreRemoteFosterHomeRepository = FakeFireStoreRemoteFosterHomeRepository(),
@@ -321,23 +322,25 @@ class CheckAllFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() {
         runTest {
             val checkAllFosterHomesViewmodel = getCheckAllFosterHomesViewmodel(
                 fireStoreRemoteFosterHomeRepository = FakeFireStoreRemoteFosterHomeRepository(
-                    remoteFosterHomeList = mutableListOf(fosterHome.copy(
-                        allResidentNonHumanAnimals = fosterHome.allResidentNonHumanAnimals + listOf(
-                            fosterHome.allResidentNonHumanAnimals[0].copy(
-                                nonHumanAnimalId = nonHumanAnimal.id + "other"
-                            )
-                        ),
-                        allAcceptedNonHumanAnimals = fosterHome.allAcceptedNonHumanAnimals + listOf(
-                            fosterHome.allAcceptedNonHumanAnimals[0].copy(
-                                acceptedNonHumanAnimalId = "${NonHumanAnimalType.FISH.name}${Gender.FEMALE.name}4",
-                                acceptedNonHumanAnimalType = NonHumanAnimalType.FISH
+                    remoteFosterHomeList = mutableListOf(
+                        fosterHome.copy(
+                            allResidentNonHumanAnimals = fosterHome.allResidentNonHumanAnimals + listOf(
+                                fosterHome.allResidentNonHumanAnimals[0].copy(
+                                    nonHumanAnimalId = nonHumanAnimal.id + "other"
+                                )
                             ),
-                            fosterHome.allAcceptedNonHumanAnimals[1].copy(
-                                acceptedNonHumanAnimalId = "${NonHumanAnimalType.BIRD.name}${Gender.MALE.name}5",
-                                acceptedNonHumanAnimalType = NonHumanAnimalType.BIRD
+                            allAcceptedNonHumanAnimals = fosterHome.allAcceptedNonHumanAnimals + listOf(
+                                fosterHome.allAcceptedNonHumanAnimals[0].copy(
+                                    acceptedNonHumanAnimalId = "${NonHumanAnimalType.FISH.name}${Gender.FEMALE.name}4",
+                                    acceptedNonHumanAnimalType = NonHumanAnimalType.FISH
+                                ),
+                                fosterHome.allAcceptedNonHumanAnimals[1].copy(
+                                    acceptedNonHumanAnimalId = "${NonHumanAnimalType.BIRD.name}${Gender.MALE.name}5",
+                                    acceptedNonHumanAnimalType = NonHumanAnimalType.BIRD
+                                )
                             )
-                        )
-                    ).toData())
+                        ).toData()
+                    )
                 ),
                 localFosterHomeRepository = FakeLocalFosterHomeRepository(
                     localFosterHomeWithAllNonHumanAnimalDataList = mutableListOf(
@@ -390,7 +393,10 @@ class CheckAllFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() {
                                         )
                                     )
                                 ),
-                                listOf(nonHumanAnimal, nonHumanAnimal.copy(id = nonHumanAnimal.id + "other"))
+                                listOf(
+                                    nonHumanAnimal,
+                                    nonHumanAnimal.copy(id = nonHumanAnimal.id + "other")
+                                )
                             )
                         )
                     ),
@@ -405,24 +411,26 @@ class CheckAllFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() {
         runTest {
             val checkAllFosterHomesViewmodel = getCheckAllFosterHomesViewmodel(
                 fireStoreRemoteFosterHomeRepository = FakeFireStoreRemoteFosterHomeRepository(
-                    remoteFosterHomeList = mutableListOf(fosterHome.copy(
-                        imageUrl = "",
-                        allResidentNonHumanAnimals = fosterHome.allResidentNonHumanAnimals + listOf(
-                            fosterHome.allResidentNonHumanAnimals[0].copy(
-                                nonHumanAnimalId = nonHumanAnimal.id + "other"
-                            )
-                        ),
-                        allAcceptedNonHumanAnimals = fosterHome.allAcceptedNonHumanAnimals + listOf(
-                            fosterHome.allAcceptedNonHumanAnimals[0].copy(
-                                acceptedNonHumanAnimalId = "${NonHumanAnimalType.FISH.name}${Gender.FEMALE.name}4",
-                                acceptedNonHumanAnimalType = NonHumanAnimalType.FISH
+                    remoteFosterHomeList = mutableListOf(
+                        fosterHome.copy(
+                            imageUrl = "",
+                            allResidentNonHumanAnimals = fosterHome.allResidentNonHumanAnimals + listOf(
+                                fosterHome.allResidentNonHumanAnimals[0].copy(
+                                    nonHumanAnimalId = nonHumanAnimal.id + "other"
+                                )
                             ),
-                            fosterHome.allAcceptedNonHumanAnimals[1].copy(
-                                acceptedNonHumanAnimalId = "${NonHumanAnimalType.BIRD.name}${Gender.MALE.name}5",
-                                acceptedNonHumanAnimalType = NonHumanAnimalType.BIRD
+                            allAcceptedNonHumanAnimals = fosterHome.allAcceptedNonHumanAnimals + listOf(
+                                fosterHome.allAcceptedNonHumanAnimals[0].copy(
+                                    acceptedNonHumanAnimalId = "${NonHumanAnimalType.FISH.name}${Gender.FEMALE.name}4",
+                                    acceptedNonHumanAnimalType = NonHumanAnimalType.FISH
+                                ),
+                                fosterHome.allAcceptedNonHumanAnimals[1].copy(
+                                    acceptedNonHumanAnimalId = "${NonHumanAnimalType.BIRD.name}${Gender.MALE.name}5",
+                                    acceptedNonHumanAnimalType = NonHumanAnimalType.BIRD
+                                )
                             )
-                        )
-                    ).toData())
+                        ).toData()
+                    )
                 ),
                 localFosterHomeRepository = FakeLocalFosterHomeRepository(
                     localFosterHomeWithAllNonHumanAnimalDataList = mutableListOf(
@@ -590,23 +598,25 @@ class CheckAllFosterHomesViewmodelIntegrationTest : CoroutineTestDispatcher() {
         runTest {
             val checkAllFosterHomesViewmodel = getCheckAllFosterHomesViewmodel(
                 fireStoreRemoteFosterHomeRepository = FakeFireStoreRemoteFosterHomeRepository(
-                    remoteFosterHomeList = mutableListOf(fosterHome.copy(
-                        allResidentNonHumanAnimals = fosterHome.allResidentNonHumanAnimals + listOf(
-                            fosterHome.allResidentNonHumanAnimals[0].copy(
-                                nonHumanAnimalId = nonHumanAnimal.id + "other"
-                            )
-                        ),
-                        allAcceptedNonHumanAnimals = fosterHome.allAcceptedNonHumanAnimals + listOf(
-                            fosterHome.allAcceptedNonHumanAnimals[0].copy(
-                                acceptedNonHumanAnimalId = "${NonHumanAnimalType.FISH.name}${Gender.FEMALE.name}4",
-                                acceptedNonHumanAnimalType = NonHumanAnimalType.FISH
+                    remoteFosterHomeList = mutableListOf(
+                        fosterHome.copy(
+                            allResidentNonHumanAnimals = fosterHome.allResidentNonHumanAnimals + listOf(
+                                fosterHome.allResidentNonHumanAnimals[0].copy(
+                                    nonHumanAnimalId = nonHumanAnimal.id + "other"
+                                )
                             ),
-                            fosterHome.allAcceptedNonHumanAnimals[1].copy(
-                                acceptedNonHumanAnimalId = "${NonHumanAnimalType.BIRD.name}${Gender.MALE.name}5",
-                                acceptedNonHumanAnimalType = NonHumanAnimalType.BIRD
+                            allAcceptedNonHumanAnimals = fosterHome.allAcceptedNonHumanAnimals + listOf(
+                                fosterHome.allAcceptedNonHumanAnimals[0].copy(
+                                    acceptedNonHumanAnimalId = "${NonHumanAnimalType.FISH.name}${Gender.FEMALE.name}4",
+                                    acceptedNonHumanAnimalType = NonHumanAnimalType.FISH
+                                ),
+                                fosterHome.allAcceptedNonHumanAnimals[1].copy(
+                                    acceptedNonHumanAnimalId = "${NonHumanAnimalType.BIRD.name}${Gender.MALE.name}5",
+                                    acceptedNonHumanAnimalType = NonHumanAnimalType.BIRD
+                                )
                             )
-                        )
-                    ).toData())
+                        ).toData()
+                    )
                 ),
                 localFosterHomeRepository = FakeLocalFosterHomeRepository(
                     localFosterHomeWithAllNonHumanAnimalDataList = mutableListOf(

@@ -2,6 +2,7 @@ package com.findmeahometeam.reskiume
 
 import com.findmeahometeam.reskiume.data.database.entity.fosterHome.FosterHomeWithAllNonHumanAnimalData
 import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.RescueEventWithAllNeedsAndNonHumanAnimalData
+import com.findmeahometeam.reskiume.data.database.entity.user.UserWithAllSubscriptionData
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
@@ -11,7 +12,7 @@ import com.findmeahometeam.reskiume.domain.model.LocalCache
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
 import com.findmeahometeam.reskiume.domain.model.Review
-import com.findmeahometeam.reskiume.domain.model.User
+import com.findmeahometeam.reskiume.domain.model.user.User
 import com.findmeahometeam.reskiume.domain.model.fosterHome.AcceptedNonHumanAnimalForFosterHome
 import com.findmeahometeam.reskiume.domain.model.fosterHome.City
 import com.findmeahometeam.reskiume.domain.model.fosterHome.Country
@@ -21,6 +22,7 @@ import com.findmeahometeam.reskiume.domain.model.rescueEvent.NeedToCover
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.NonHumanAnimalToRescue
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueEvent
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueNeed
+import com.findmeahometeam.reskiume.domain.model.user.Subscription
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.UiReview
 
 // Mocked user data for testing
@@ -33,9 +35,20 @@ val user = User(
     email = "juan@email.com",
     image = "userUid123.webp",
     isLoggedIn = true,
-    country = Country.SPAIN.name,
-    city = City.CORDOBA.name,
-    receiveRescueNotifications = true
+    countryForRescueEventNotifications = Country.SPAIN.name,
+    cityForRescueEventNotifications = City.CORDOBA.name,
+    subscriptions = listOf(
+        Subscription(
+            subscriptionId = "subscriptionId123",
+            uid = "userUid123",
+            topic = "SPAINCORDOBA"
+        )
+    )
+)
+
+val userWithAllSubscriptionData = UserWithAllSubscriptionData(
+    userEntity = user.toEntity(),
+    allSubscriptions = user.subscriptions.map { it.toEntity() }
 )
 
 const val userPwd: String = "myPwd123"
@@ -71,9 +84,9 @@ val author = User(
     email = "patry@email.com",
     image = "PatryUid123.webp",
     isLoggedIn = false,
-    country = Country.SPAIN.name,
-    city = City.CORDOBA.name,
-    receiveRescueNotifications = true
+    countryForRescueEventNotifications = Country.SPAIN.name,
+    cityForRescueEventNotifications = City.CORDOBA.name,
+    subscriptions = emptyList()
 )
 
 val review = Review(

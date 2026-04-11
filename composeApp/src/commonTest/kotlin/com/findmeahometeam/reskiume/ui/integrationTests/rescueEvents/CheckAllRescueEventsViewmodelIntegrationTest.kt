@@ -58,6 +58,7 @@ import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.findmeahometeam.reskiume.ui.util.StringProvider
 import com.findmeahometeam.reskiume.user
 import com.findmeahometeam.reskiume.userPwd
+import com.findmeahometeam.reskiume.userWithAllSubscriptionData
 import com.plusmobileapps.konnectivity.Konnectivity
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -73,7 +74,7 @@ class CheckAllRescueEventsViewmodelIntegrationTest : CoroutineTestDispatcher() {
             authPassword = userPwd
         ),
         localUserRepository: LocalUserRepository = FakeLocalUserRepository(
-            mutableListOf(user)
+            mutableListOf(userWithAllSubscriptionData)
         ),
         localCacheRepository: LocalCacheRepository = FakeLocalCacheRepository(),
         fireStoreRemoteRescueEventRepository: FireStoreRemoteRescueEventRepository = FakeFireStoreRemoteRescueEventRepository(),

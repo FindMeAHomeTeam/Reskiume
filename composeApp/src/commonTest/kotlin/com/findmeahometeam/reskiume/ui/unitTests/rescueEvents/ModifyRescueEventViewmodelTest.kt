@@ -17,10 +17,12 @@ import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueNeed
 import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalRescueEventRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteRescueEvent.FireStoreRemoteRescueEventRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
+import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
@@ -31,6 +33,7 @@ import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetRescueEventFr
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetRescueEventFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.ModifyRescueEventInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.ModifyRescueEventInRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.localCache
 import com.findmeahometeam.reskiume.nonHumanAnimal
 import com.findmeahometeam.reskiume.rescueEvent
@@ -44,7 +47,9 @@ import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.DeleteNonHum
 import com.findmeahometeam.reskiume.ui.rescueEvents.modifyRescueEvent.DeleteRescueEventUtil
 import com.findmeahometeam.reskiume.ui.rescueEvents.modifyRescueEvent.ModifyRescueEventViewmodel
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
+import com.findmeahometeam.reskiume.ui.util.fcm.SubscriptionManagerUtil
 import com.findmeahometeam.reskiume.user
+import com.findmeahometeam.reskiume.userWithAllSubscriptionData
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -55,8 +60,10 @@ import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
 import dev.mokkery.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -104,6 +111,8 @@ class ModifyRescueEventViewmodelTest : CoroutineTestDispatcher() {
 
     private val onCompletedDeleteRescueEvent = Capture.slot<() -> Unit>()
 
+    private val onUnsubscribeRescueEvent = Capture.slot<() -> Unit>()
+
     private val log: Log = mock {
         every { d(any(), any()) } calls { println(it) }
         every { e(any(), any()) } calls { println(it) }
@@ -144,6 +153,10 @@ class ModifyRescueEventViewmodelTest : CoroutineTestDispatcher() {
 
         val authRepository: AuthRepository = mock {
             every { authState } returns (flowOf(authStateReturn))
+        }
+
+        val localUserRepository: LocalUserRepository = mock {
+            every { getUser(authUser.uid) } returns flowOf(userWithAllSubscriptionData)
         }
 
         val localCacheRepository: LocalCacheRepository = mock {
@@ -449,6 +462,18 @@ class ModifyRescueEventViewmodelTest : CoroutineTestDispatcher() {
             } calls { onCompletedDeleteRescueEvent.get().invoke() }
         }
 
+        val subscriptionManagerUtil: SubscriptionManagerUtil  = mock {
+
+            everySuspend {
+                unsubscribeFromTopic(
+                    user.copy(email = null),
+                    rescueEvent.id,
+                    any(),
+                    capture(onUnsubscribeRescueEvent)
+                )
+            } calls { onUnsubscribeRescueEvent.get().invoke() }
+        }
+
         val getRescueEventFromLocalRepository =
             GetRescueEventFromLocalRepository(localRescueEventRepository)
 
@@ -492,6 +517,12 @@ class ModifyRescueEventViewmodelTest : CoroutineTestDispatcher() {
         val modifyCacheInLocalRepository =
             ModifyCacheInLocalRepository(localCacheRepository)
 
+        val observeAuthStateInAuthDataSource =
+            ObserveAuthStateInAuthDataSource(authRepository)
+
+        val getUserFromLocalDataSource =
+            GetUserFromLocalDataSource(localUserRepository)
+
         return ModifyRescueEventViewmodel(
             saveStateHandleProvider,
             getRescueEventFromLocalRepository,
@@ -506,6 +537,9 @@ class ModifyRescueEventViewmodelTest : CoroutineTestDispatcher() {
             modifyRescueEventInLocalRepository,
             modifyCacheInLocalRepository,
             deleteRescueEventUtil,
+            observeAuthStateInAuthDataSource,
+            getUserFromLocalDataSource,
+            subscriptionManagerUtil,
             log
         )
     }
@@ -853,12 +887,15 @@ class ModifyRescueEventViewmodelTest : CoroutineTestDispatcher() {
             }
         }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `given my rescue event to modify_when I click to delete my rescue event_then the rescue event is deleted`() =
+    fun `given my rescue event to modify_when I click to delete my rescue event_then the rescue event is deleted and unsubscribed from the user subscriptions`() =
         runTest {
             val modifyRescueEventViewmodel = getModifyRescueEventViewmodel()
 
             modifyRescueEventViewmodel.deleteRescueEvent(rescueEvent.id, rescueEvent.creatorId)
+
+            runCurrent()
 
             modifyRescueEventViewmodel.manageChangesUiState.test {
                 assertTrue { awaitItem() is UiState.Success }

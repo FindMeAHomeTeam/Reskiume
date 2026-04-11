@@ -11,10 +11,12 @@ import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueNeed
 import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalRescueEventRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteRescueEvent.FireStoreRemoteRescueEventRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
+import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
@@ -25,6 +27,7 @@ import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetRescueEventFr
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetRescueEventFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.ModifyRescueEventInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.ModifyRescueEventInRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.localCache
 import com.findmeahometeam.reskiume.nonHumanAnimal
 import com.findmeahometeam.reskiume.rescueEvent
@@ -40,19 +43,25 @@ import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeFireStoreRemot
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalCacheRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalRescueEventRepository
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalUserRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLog
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeManageImagePath
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeRealtimeDatabaseRemoteNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeSaveStateHandleProvider
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeStorageRepository
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeSubscriptionManagerUtil
 import com.findmeahometeam.reskiume.ui.profile.checkAllMyRescueEvents.UiRescueEvent
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.DeleteNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.rescueEvents.modifyRescueEvent.DeleteRescueEventUtil
 import com.findmeahometeam.reskiume.ui.rescueEvents.modifyRescueEvent.ModifyRescueEventViewmodel
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
+import com.findmeahometeam.reskiume.ui.util.fcm.SubscriptionManagerUtil
 import com.findmeahometeam.reskiume.user
 import com.findmeahometeam.reskiume.userPwd
+import com.findmeahometeam.reskiume.userWithAllSubscriptionData
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -89,6 +98,10 @@ class ModifyRescueEventViewmodelIntegrationTest : CoroutineTestDispatcher() {
         ),
         manageImagePath: ManageImagePath = FakeManageImagePath(),
         deleteRescueEventUtil: DeleteRescueEventUtil = FakeDeleteRescueEventUtil(),
+        localUserRepository: LocalUserRepository = FakeLocalUserRepository(
+            mutableListOf(userWithAllSubscriptionData)
+        ),
+        subscriptionManagerUtil: SubscriptionManagerUtil = FakeSubscriptionManagerUtil(),
         log: Log = FakeLog()
     ): ModifyRescueEventViewmodel {
 
@@ -135,6 +148,12 @@ class ModifyRescueEventViewmodelIntegrationTest : CoroutineTestDispatcher() {
         val modifyCacheInLocalRepository =
             ModifyCacheInLocalRepository(localCacheRepository)
 
+        val observeAuthStateInAuthDataSource =
+            ObserveAuthStateInAuthDataSource(authRepository)
+
+        val getUserFromLocalDataSource =
+            GetUserFromLocalDataSource(localUserRepository)
+
         return ModifyRescueEventViewmodel(
             saveStateHandleProvider,
             getRescueEventFromLocalRepository,
@@ -149,6 +168,9 @@ class ModifyRescueEventViewmodelIntegrationTest : CoroutineTestDispatcher() {
             modifyRescueEventInLocalRepository,
             modifyCacheInLocalRepository,
             deleteRescueEventUtil,
+            observeAuthStateInAuthDataSource,
+            getUserFromLocalDataSource,
+            subscriptionManagerUtil,
             log
         )
     }
@@ -455,12 +477,15 @@ class ModifyRescueEventViewmodelIntegrationTest : CoroutineTestDispatcher() {
             }
         }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `given my rescue event to modify_when I click to delete my rescue event_then the rescue event is deleted`() =
+    fun `given my rescue event to modify_when I click to delete my rescue event_then the rescue event is deleted and unsubscribed from the user subscriptions`() =
         runTest {
             val modifyRescueEventViewmodel = getModifyRescueEventViewmodel()
 
             modifyRescueEventViewmodel.deleteRescueEvent(rescueEvent.id, rescueEvent.creatorId)
+
+            runCurrent()
 
             modifyRescueEventViewmodel.manageChangesUiState.test {
                 assertTrue { awaitItem() is UiState.Success }

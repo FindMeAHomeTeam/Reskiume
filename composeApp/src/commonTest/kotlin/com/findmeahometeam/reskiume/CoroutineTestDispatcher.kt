@@ -16,7 +16,7 @@ open class CoroutineTestDispatcher() {
     }
 
     @AfterTest
-    fun tearDown() {
+    open fun tearDown() {
         Dispatchers.resetMain()
     }
 }

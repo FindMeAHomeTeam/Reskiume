@@ -18,9 +18,10 @@ class ManageImagePathImpl(
             localImagePath
         } else {
             val uri = localImagePath.toUri()
-            val filename = uri.lastPathSegment ?: return localImagePath
-            val cachedFile = File(context.cacheDir, filename)
-            if (cachedFile.exists()) {
+            val cachedFile = File(uri.path ?: return localImagePath)
+            if (localImagePath.contains("file:///") && cachedFile.exists()) {
+
+                val filename = uri.lastPathSegment ?: return localImagePath
                 val permanentFile = File(context.filesDir, filename)
                 cachedFile.copyTo(permanentFile, overwrite = true)
                 cachedFile.delete()

@@ -4,8 +4,8 @@ import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 
 class FakeStorageRepository(
-    private val remoteDatasourceList: MutableList<Pair<String, String>> = mutableListOf(),
-    private val localDatasourceList: MutableList<Pair<String, String>> = mutableListOf()
+    val remoteDatasourceList: MutableList<Pair<String, String>> = mutableListOf(),
+    val localDatasourceList: MutableList<Pair<String, String>> = mutableListOf()
 ) : StorageRepository {
 
     override fun uploadImage(

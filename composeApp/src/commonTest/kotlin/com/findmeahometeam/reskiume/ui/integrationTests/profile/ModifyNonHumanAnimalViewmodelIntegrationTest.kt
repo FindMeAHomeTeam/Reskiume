@@ -527,4 +527,23 @@ class ModifyNonHumanAnimalViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 ensureAllEventsConsumed()
             }
         }
+
+    @Test
+    fun `given an image to discard_when the user clicks on the delete button_then the image is discarded`() =
+        runTest {
+            val storageRepository = FakeStorageRepository(
+                localDatasourceList = mutableListOf(
+                    Pair(
+                        "local_path",
+                        nonHumanAnimal.imageUrl
+                    )
+                )
+            )
+            val modifyNonHumanAnimalViewmodel = getModifyNonHumanAnimalViewmodel(
+                storageRepository = storageRepository
+            )
+            modifyNonHumanAnimalViewmodel.deleteLocalImage(nonHumanAnimal.imageUrl)
+
+            assertTrue { storageRepository.localDatasourceList.isEmpty() }
+        }
 }

@@ -482,4 +482,23 @@ class ModifyFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 ensureAllEventsConsumed()
             }
         }
+
+    @Test
+    fun `given an image to discard_when the user clicks on the delete button_then the image is discarded`() =
+        runTest {
+            val storageRepository = FakeStorageRepository(
+                localDatasourceList = mutableListOf(
+                    Pair(
+                        "local_path",
+                        fosterHome.imageUrl
+                    )
+                )
+            )
+            val modifyFosterHomeViewmodel = getModifyFosterHomeViewmodel(
+                storageRepository = storageRepository
+            )
+            modifyFosterHomeViewmodel.deleteLocalImage(fosterHome.imageUrl)
+
+            assertTrue { storageRepository.localDatasourceList.isEmpty() }
+        }
 }

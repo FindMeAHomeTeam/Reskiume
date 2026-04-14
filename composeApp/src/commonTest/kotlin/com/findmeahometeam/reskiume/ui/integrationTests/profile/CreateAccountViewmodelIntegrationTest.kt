@@ -12,6 +12,7 @@ import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepo
 import com.findmeahometeam.reskiume.domain.repository.util.fcm.FCMSubscriberRepository
 import com.findmeahometeam.reskiume.domain.usecases.authUser.CreateUserWithEmailAndPasswordInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.DeleteUserFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
@@ -79,6 +80,9 @@ class CreateAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
         val deleteImageFromRemoteDataSource =
             DeleteImageFromRemoteDataSource(storageRepository)
 
+        val deleteImageFromLocalDataSource =
+            DeleteImageFromLocalDataSource(storageRepository)
+
         val log: Log = FakeLog()
 
         return CreateAccountViewmodel(
@@ -90,6 +94,7 @@ class CreateAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
             deleteUserFromAuthDataSource,
             deleteUserFromRemoteDataSource,
             deleteImageFromRemoteDataSource,
+            deleteImageFromLocalDataSource,
             log
         )
     }
@@ -168,5 +173,24 @@ class CreateAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 assertTrue { awaitItem() is UiState.Error }
                 ensureAllEventsConsumed()
             }
+        }
+
+    @Test
+    fun `given an image to discard_when the user clicks on the delete button_then the image is discarded`() =
+        runTest {
+            val storageRepository = FakeStorageRepository(
+                localDatasourceList = mutableListOf(
+                    Pair(
+                        "local_path",
+                        user.image
+                    )
+                )
+            )
+            val createAccountViewmodel = getCreateAccountViewmodel(
+                storageRepository = storageRepository
+            )
+            createAccountViewmodel.deleteLocalImage(user.image)
+
+            assertTrue { storageRepository.localDatasourceList.isEmpty() }
         }
 }

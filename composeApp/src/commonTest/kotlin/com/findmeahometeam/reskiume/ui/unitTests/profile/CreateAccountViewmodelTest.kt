@@ -16,6 +16,7 @@ import com.findmeahometeam.reskiume.domain.repository.util.fcm.FCMSubscriberRepo
 import com.findmeahometeam.reskiume.domain.usecases.authUser.CreateUserWithEmailAndPasswordInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.DeleteUserFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.user.DeleteUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInRemoteDataSource
@@ -51,6 +52,8 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
 
     private val onImageDeletedFromRemote = Capture.slot<(Boolean) -> Unit>()
 
+    private val onImageDeletedFromLocal = Capture.slot<(Boolean) -> Unit>()
+
     private val onInsertLocalCache = Capture.slot<(rowId: Long) -> Unit>()
 
     private val onSuccessRemoteUser = Capture.slot<(DatabaseResult) -> Unit>()
@@ -68,7 +71,8 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
         createUserWithEmailAndPasswordResult: AuthResult = AuthResult.Success(authUser),
         onDeleteUserErrorArg: String = "",
         onImageUploadedArg: String = user.image,
-        onImageDeletedArg: Boolean = true,
+        onImageDeletedFromRemoteArg: Boolean = true,
+        onImageDeletedFromLocalArg: Boolean = true,
         rowIdInsertedCacheArg: Long = 1L,
         insertRemoteUserArg: DatabaseResult = DatabaseResult.Success,
         deleteRemoteUserArg: DatabaseResult = DatabaseResult.Success,
@@ -115,7 +119,14 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
                     any(),
                     capture(onImageDeletedFromRemote)
                 )
-            } calls { onImageDeletedFromRemote.get().invoke(onImageDeletedArg) }
+            } calls { onImageDeletedFromRemote.get().invoke(onImageDeletedFromRemoteArg) }
+
+            every {
+                deleteLocalImage(
+                    user.image,
+                    capture(onImageDeletedFromLocal)
+                )
+            } calls { onImageDeletedFromLocal.get().invoke(onImageDeletedFromLocalArg) }
         }
 
         val localCacheRepository: LocalCacheRepository = mock {
@@ -195,6 +206,9 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
         val deleteImageFromRemoteDataSource =
             DeleteImageFromRemoteDataSource(storageRepository)
 
+        val deleteImageFromLocalDataSource =
+            DeleteImageFromLocalDataSource(storageRepository)
+
         return CreateAccountViewmodel(
             createUserWithEmailAndPasswordInAuthDataSource,
             insertUserInRemoteDataSource,
@@ -204,6 +218,7 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
             deleteUserFromAuthDataSource,
             deleteUserFromRemoteDataSource,
             deleteImageFromRemoteDataSource,
+            deleteImageFromLocalDataSource,
             log
         )
     }
@@ -393,6 +408,36 @@ class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
                 log.e(
                     "CreateAccountViewmodel",
                     "saveUserCacheLocally: Error adding the user ${user.uid} to the local cache in section ${Section.USERS}"
+                )
+            }
+        }
+
+    @Test
+    fun `given an image to discard_when the user clicks on the delete button_then the image is discarded`() =
+        runTest {
+            val createAccountViewmodel = getCreateAccountViewmodel()
+            createAccountViewmodel.deleteLocalImage(user.image)
+
+            verify {
+                log.d(
+                    "CreateAccountViewModel",
+                    "deleteLocalImage: the image ${user.image} was deleted successfully in the local data source"
+                )
+            }
+        }
+
+    @Test
+    fun `given an image to discard_when the user clicks on the delete button but the deletion fails_then the image is not discarded`() =
+        runTest {
+            val createAccountViewmodel = getCreateAccountViewmodel(
+                onImageDeletedFromLocalArg = false
+            )
+            createAccountViewmodel.deleteLocalImage(user.image)
+
+            verify {
+                log.e(
+                    "CreateAccountViewModel",
+                    "deleteLocalImage: failed to delete the image ${user.image} in the local data source"
                 )
             }
         }

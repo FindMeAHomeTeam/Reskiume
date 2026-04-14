@@ -540,4 +540,23 @@ class ModifyAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
 
             assertNotEquals(localCache.toEntity(), actualFakeLocalCacheEntity)
         }
+
+    @Test
+    fun `given an image to discard_when the user clicks on the delete button_then the image is discarded`() =
+        runTest {
+            val storageRepository = FakeStorageRepository(
+                localDatasourceList = mutableListOf(
+                    Pair(
+                        "local_path",
+                        user.image
+                    )
+                )
+            )
+            val modifyAccountViewmodel = getModifyAccountViewmodel(
+                storageRepository = storageRepository
+            )
+            modifyAccountViewmodel.deleteLocalImage(user.image)
+
+            assertTrue { storageRepository.localDatasourceList.isEmpty() }
+        }
 }

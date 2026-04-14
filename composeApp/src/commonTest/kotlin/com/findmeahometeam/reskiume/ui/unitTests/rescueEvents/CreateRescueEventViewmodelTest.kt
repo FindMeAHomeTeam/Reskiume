@@ -18,6 +18,7 @@ import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteRes
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.repository.util.location.LocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromLocalRepository
@@ -56,7 +57,7 @@ import kotlin.test.assertTrue
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
-class CreateRescueEventsViewmodelTest : CoroutineTestDispatcher() {
+class CreateRescueEventViewmodelTest : CoroutineTestDispatcher() {
 
     private val onRequestEnableLocation = Capture.slot<(isEnabled: Boolean) -> Unit>()
 
@@ -65,6 +66,8 @@ class CreateRescueEventsViewmodelTest : CoroutineTestDispatcher() {
     private val onSubscribeRescueEvent = Capture.slot<() -> Unit>()
 
     private val onUploadImageToRemoteForRescueEvent = Capture.slot<(imagePath: String) -> Unit>()
+
+    private val onImageDeletedFromLocalForRescueEvent = Capture.slot<(isDeleted: Boolean) -> Unit>()
 
     private val onInsertRemoteRescueEvent = Capture.slot<(DatabaseResult) -> Unit>()
 
@@ -108,6 +111,7 @@ class CreateRescueEventsViewmodelTest : CoroutineTestDispatcher() {
         databaseResultOfModifyingNonHumanAnimalInRemoteRepositoryArg: DatabaseResult = DatabaseResult.Success,
         databaseResultOfModifyingSecondNonHumanAnimalInRemoteRepositoryArg: DatabaseResult = DatabaseResult.Success,
         imagePathToUploadToRemoteForRescueEvent: String = rescueEvent.imageUrl,
+        isLocalImageDeletedFlagForRescueEvent: Boolean = true,
         insertedRowIdOfNeedToCoverForRescueEventInLocalArg: Long = 1L,
         insertedRowIdOfSecondNeedToCoverForRescueEventInLocalArg: Long = 1L,
         insertedRowIdOfNonHumanAnimalToRescueForRescueEventInLocalArg: Long = 1L,
@@ -183,6 +187,16 @@ class CreateRescueEventsViewmodelTest : CoroutineTestDispatcher() {
             } calls {
                 onUploadImageToRemoteForRescueEvent.get()
                     .invoke(imagePathToUploadToRemoteForRescueEvent)
+            }
+
+            every {
+                deleteLocalImage(
+                    rescueEvent.imageUrl,
+                    capture(onImageDeletedFromLocalForRescueEvent)
+                )
+            } calls {
+                onImageDeletedFromLocalForRescueEvent.get()
+                    .invoke(isLocalImageDeletedFlagForRescueEvent)
             }
         }
 
@@ -469,6 +483,9 @@ class CreateRescueEventsViewmodelTest : CoroutineTestDispatcher() {
         val getUserFromLocalDataSource =
             GetUserFromLocalDataSource(localUserRepository)
 
+        val deleteImageFromLocalDataSource =
+            DeleteImageFromLocalDataSource(storageRepository)
+
         return CreateRescueEventViewmodel(
             getAllNonHumanAnimalsFromLocalRepository,
             observeIfLocationEnabledFromLocationRepository,
@@ -482,6 +499,7 @@ class CreateRescueEventsViewmodelTest : CoroutineTestDispatcher() {
             insertCacheInLocalRepository,
             getUserFromLocalDataSource,
             subscriptionManagerUtil,
+            deleteImageFromLocalDataSource,
             log
         )
     }
@@ -616,6 +634,36 @@ class CreateRescueEventsViewmodelTest : CoroutineTestDispatcher() {
                 log.e(
                     "CreateRescueEventViewmodel",
                     "createCacheForRescueEventInLocalDataSource: Error creating $createdRescueEventId in the local cache in section ${Section.RESCUE_EVENTS}"
+                )
+            }
+        }
+
+    @Test
+    fun `given an image to discard_when the user clicks on the delete button_then the image is discarded`() =
+        runTest {
+            val createAccountViewmodel = getCreateRescueEventViewmodel()
+            createAccountViewmodel.deleteLocalImage(rescueEvent.imageUrl)
+
+            verify {
+                log.d(
+                    "CreateRescueEventViewmodel",
+                    "deleteLocalImage: the image ${rescueEvent.imageUrl} was deleted successfully in the local data source"
+                )
+            }
+        }
+
+    @Test
+    fun `given an image to discard_when the user clicks on the delete button but the deletion fails_then the image is not discarded`() =
+        runTest {
+            val createAccountViewmodel = getCreateRescueEventViewmodel(
+                isLocalImageDeletedFlagForRescueEvent = false
+            )
+            createAccountViewmodel.deleteLocalImage(rescueEvent.imageUrl)
+
+            verify {
+                log.e(
+                    "CreateRescueEventViewmodel",
+                    "deleteLocalImage: failed to delete the image ${rescueEvent.imageUrl} in the local data source"
                 )
             }
         }

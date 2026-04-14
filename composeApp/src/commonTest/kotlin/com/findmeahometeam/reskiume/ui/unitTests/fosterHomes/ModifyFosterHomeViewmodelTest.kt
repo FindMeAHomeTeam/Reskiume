@@ -128,7 +128,7 @@ class ModifyFosterHomeViewmodelTest : CoroutineTestDispatcher() {
         databaseResultOfModifyingFosterHomesInRemoteRepositoryArg: DatabaseResult = DatabaseResult.Success,
         databaseResultOfModifyingNonHumanAnimalInRemoteRepositoryArg: DatabaseResult = DatabaseResult.Success,
         isRemoteImageDeletedFlagForFosterHome: Boolean = true,
-        isLocalImageDeletedFlagForFosterHome: Boolean = true,
+        flagOfLocalImageDeletedArg: Boolean = true,
         imagePathToUploadToRemoteForFosterHome: String = fosterHome.imageUrl,
         insertedAcceptedNonHumanAnimalForFosterHomeInLocalRowIdArg: Long = 1L,
         insertedAcceptedSecondNonHumanAnimalForFosterHomeInLocalRowIdArg: Long = 1L,
@@ -283,7 +283,7 @@ class ModifyFosterHomeViewmodelTest : CoroutineTestDispatcher() {
                 )
             } calls {
                 onImageDeletedFromLocalForFosterHome.get()
-                    .invoke(isLocalImageDeletedFlagForFosterHome)
+                    .invoke(flagOfLocalImageDeletedArg)
             }
 
             every {
@@ -659,7 +659,7 @@ class ModifyFosterHomeViewmodelTest : CoroutineTestDispatcher() {
     fun `given my foster home to modify_when I click to update my foster home but fails deleting the local foster home image_then the app retrieves an error`() =
         runTest {
             val modifyFosterHomeViewmodel = getModifyFosterHomeViewmodel(
-                isLocalImageDeletedFlagForFosterHome = false
+                flagOfLocalImageDeletedArg = false
             )
 
             modifyFosterHomeViewmodel.saveFosterHomeChanges(true, fosterHome)
@@ -877,6 +877,36 @@ class ModifyFosterHomeViewmodelTest : CoroutineTestDispatcher() {
             modifyFosterHomeViewmodel.manageChangesUiState.test {
                 assertTrue { awaitItem() is UiState.Success }
                 ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given an image to discard_when the user clicks on the delete button_then the image is discarded`() =
+        runTest {
+            val modifyFosterHomeViewmodel = getModifyFosterHomeViewmodel()
+            modifyFosterHomeViewmodel.deleteLocalImage(fosterHome.imageUrl)
+
+            verify {
+                log.d(
+                    "ModifyFosterHomeViewModel",
+                    "deleteLocalImage: the image ${fosterHome.imageUrl} was deleted successfully in the local data source"
+                )
+            }
+        }
+
+    @Test
+    fun `given an image to discard_when the user clicks on the delete button but the deletion fails_then the image is not discarded`() =
+        runTest {
+            val modifyFosterHomeViewmodel = getModifyFosterHomeViewmodel(
+                flagOfLocalImageDeletedArg = false
+            )
+            modifyFosterHomeViewmodel.deleteLocalImage(fosterHome.imageUrl)
+
+            verify {
+                log.e(
+                    "ModifyFosterHomeViewModel",
+                    "deleteLocalImage: failed to delete the image ${fosterHome.imageUrl} in the local data source"
+                )
             }
         }
 }

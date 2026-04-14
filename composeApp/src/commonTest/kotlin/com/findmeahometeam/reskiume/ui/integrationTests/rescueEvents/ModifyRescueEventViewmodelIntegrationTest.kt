@@ -492,4 +492,23 @@ class ModifyRescueEventViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 ensureAllEventsConsumed()
             }
         }
+
+    @Test
+    fun `given an image to discard_when the user clicks on the delete button_then the image is discarded`() =
+        runTest {
+            val storageRepository = FakeStorageRepository(
+                localDatasourceList = mutableListOf(
+                    Pair(
+                        "local_path",
+                        rescueEvent.imageUrl
+                    )
+                )
+            )
+            val modifyRescueEventViewmodel = getModifyRescueEventViewmodel(
+                storageRepository = storageRepository
+            )
+            modifyRescueEventViewmodel.deleteLocalImage(rescueEvent.imageUrl)
+
+            assertTrue { storageRepository.localDatasourceList.isEmpty() }
+        }
 }

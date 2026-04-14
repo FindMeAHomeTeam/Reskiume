@@ -17,6 +17,7 @@ import com.findmeahometeam.reskiume.domain.repository.util.location.LocationRepo
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.InsertFosterHomeInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.InsertFosterHomeInRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromLocalRepository
@@ -139,6 +140,9 @@ class CreateFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
         val getUserFromLocalDataSource =
             GetUserFromLocalDataSource(localUserRepository)
 
+        val deleteImageFromLocalDataSource =
+            DeleteImageFromLocalDataSource(storageRepository)
+
         return CreateFosterHomeViewmodel(
             getAllNonHumanAnimalsFromLocalRepository,
             observeIfLocationEnabledFromLocationRepository,
@@ -152,6 +156,7 @@ class CreateFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
             insertCacheInLocalRepository,
             getUserFromLocalDataSource,
             subscriptionManagerUtil,
+            deleteImageFromLocalDataSource,
             log
         )
     }
@@ -313,5 +318,24 @@ class CreateFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 assertTrue { awaitItem() is UiState.Success }
                 ensureAllEventsConsumed()
             }
+        }
+
+    @Test
+    fun `given an image to discard_when the user clicks on the delete button_then the image is discarded`() =
+        runTest {
+            val storageRepository = FakeStorageRepository(
+                localDatasourceList = mutableListOf(
+                    Pair(
+                        "local_path",
+                        fosterHome.imageUrl
+                    )
+                )
+            )
+            val createFosterHomeViewmodel = getCreateFosterHomeViewmodel(
+                storageRepository = storageRepository
+            )
+            createFosterHomeViewmodel.deleteLocalImage(fosterHome.imageUrl)
+
+            assertTrue { storageRepository.localDatasourceList.isEmpty() }
         }
 }

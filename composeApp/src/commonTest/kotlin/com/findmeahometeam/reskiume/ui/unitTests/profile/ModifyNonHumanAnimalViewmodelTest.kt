@@ -723,4 +723,34 @@ class ModifyNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
                 )
             }
         }
+
+    @Test
+    fun `given an image to discard_when the user clicks on the delete button_then the image is discarded`() =
+        runTest {
+            val modifyNonHumanAnimalViewmodel = getModifyNonHumanAnimalViewmodel()
+            modifyNonHumanAnimalViewmodel.deleteLocalImage(nonHumanAnimal.imageUrl)
+
+            verify {
+                log.d(
+                    "ModifyNonHumanAnimalViewModel",
+                    "deleteLocalImage: the image ${nonHumanAnimal.imageUrl} was deleted successfully in the local data source"
+                )
+            }
+        }
+
+    @Test
+    fun `given an image to discard_when the user clicks on the delete button but the deletion fails_then the image is not discarded`() =
+        runTest {
+            val modifyNonHumanAnimalViewmodel = getModifyNonHumanAnimalViewmodel(
+                localImageDeletedArg = false
+            )
+            modifyNonHumanAnimalViewmodel.deleteLocalImage(nonHumanAnimal.imageUrl)
+
+            verify {
+                log.e(
+                    "ModifyNonHumanAnimalViewModel",
+                    "deleteLocalImage: failed to delete the image ${nonHumanAnimal.imageUrl} in the local data source"
+                )
+            }
+        }
 }

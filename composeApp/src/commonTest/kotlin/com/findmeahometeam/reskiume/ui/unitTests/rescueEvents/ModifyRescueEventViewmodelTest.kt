@@ -902,4 +902,34 @@ class ModifyRescueEventViewmodelTest : CoroutineTestDispatcher() {
                 ensureAllEventsConsumed()
             }
         }
+
+    @Test
+    fun `given an image to discard_when the user clicks on the delete button_then the image is discarded`() =
+        runTest {
+            val createAccountViewmodel = getModifyRescueEventViewmodel()
+            createAccountViewmodel.deleteLocalImage(rescueEvent.imageUrl)
+
+            verify {
+                log.d(
+                    "ModifyRescueEventViewModel",
+                    "deleteLocalImage: the image ${rescueEvent.imageUrl} was deleted successfully in the local data source"
+                )
+            }
+        }
+
+    @Test
+    fun `given an image to discard_when the user clicks on the delete button but the deletion fails_then the image is not discarded`() =
+        runTest {
+            val createAccountViewmodel = getModifyRescueEventViewmodel(
+                isLocalImageDeletedFlagForRescueEvent = false
+            )
+            createAccountViewmodel.deleteLocalImage(rescueEvent.imageUrl)
+
+            verify {
+                log.e(
+                    "ModifyRescueEventViewModel",
+                    "deleteLocalImage: failed to delete the image ${rescueEvent.imageUrl} in the local data source"
+                )
+            }
+        }
 }

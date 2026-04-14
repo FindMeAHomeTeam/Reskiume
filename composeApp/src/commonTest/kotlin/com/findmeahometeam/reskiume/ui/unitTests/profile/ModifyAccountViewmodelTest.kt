@@ -613,4 +613,34 @@ class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
                 )
             }
         }
+
+    @Test
+    fun `given an image to discard_when the user clicks on the delete button_then the image is discarded`() =
+        runTest {
+            val modifyAccountViewmodel = getModifyAccountViewmodel()
+            modifyAccountViewmodel.deleteLocalImage(user.image)
+
+            verify {
+                log.d(
+                    "ModifyAccountViewmodel",
+                    "deleteLocalImage: the image ${user.image} was deleted successfully in the local data source"
+                )
+            }
+        }
+
+    @Test
+    fun `given an image to discard_when the user clicks on the delete button but the deletion fails_then the image is not discarded`() =
+        runTest {
+            val modifyAccountViewmodel = getModifyAccountViewmodel(
+                onLocalImageDeletedArg = false
+            )
+            modifyAccountViewmodel.deleteLocalImage(user.image)
+
+            verify {
+                log.e(
+                    "ModifyAccountViewmodel",
+                    "deleteLocalImage: failed to delete the image ${user.image} in the local data source"
+                )
+            }
+        }
 }

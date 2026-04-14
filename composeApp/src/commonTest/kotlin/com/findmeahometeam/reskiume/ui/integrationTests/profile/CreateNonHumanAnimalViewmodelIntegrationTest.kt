@@ -10,6 +10,7 @@ import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.InsertNonHumanAnimalInLocalRepository
@@ -56,12 +57,16 @@ class CreateNonHumanAnimalViewmodelIntegrationTest : CoroutineTestDispatcher() {
         val insertCacheInLocalRepository =
             InsertCacheInLocalRepository(localCacheRepository)
 
+        val deleteImageFromLocalDataSource =
+            DeleteImageFromLocalDataSource(storageRepository)
+
         return CreateNonHumanAnimalViewmodel(
             observeAuthStateInAuthDataSource,
             uploadImageToRemoteDataSource,
             insertNonHumanAnimalInRemoteRepository,
             insertNonHumanAnimalInLocalRepository,
             insertCacheInLocalRepository,
+            deleteImageFromLocalDataSource,
             log
         )
     }
@@ -90,5 +95,24 @@ class CreateNonHumanAnimalViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 assertTrue { awaitItem() is UiState.Success }
                 ensureAllEventsConsumed()
             }
+        }
+
+    @Test
+    fun `given an image to discard_when the user clicks on the delete button_then the image is discarded`() =
+        runTest {
+            val storageRepository = FakeStorageRepository(
+                localDatasourceList = mutableListOf(
+                    Pair(
+                        "local_path",
+                        nonHumanAnimal.imageUrl
+                    )
+                )
+            )
+            val createNonHumanAnimalViewmodel = getCreateNonHumanAnimalViewmodel(
+                storageRepository = storageRepository
+            )
+            createNonHumanAnimalViewmodel.deleteLocalImage(nonHumanAnimal.imageUrl)
+
+            assertTrue { storageRepository.localDatasourceList.isEmpty() }
         }
 }

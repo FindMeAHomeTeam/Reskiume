@@ -15,6 +15,7 @@ import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteRes
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.repository.util.location.LocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.InsertRescueEventInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.InsertRescueEventInRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
@@ -139,6 +140,9 @@ class CreateRescueEventViewmodelIntegrationTest : CoroutineTestDispatcher() {
         val getUserFromLocalDataSource =
             GetUserFromLocalDataSource(localUserRepository)
 
+        val deleteImageFromLocalDataSource =
+            DeleteImageFromLocalDataSource(storageRepository)
+
         return CreateRescueEventViewmodel(
             getAllNonHumanAnimalsFromLocalRepository,
             observeIfLocationEnabledFromLocationRepository,
@@ -152,6 +156,7 @@ class CreateRescueEventViewmodelIntegrationTest : CoroutineTestDispatcher() {
             insertCacheInLocalRepository,
             getUserFromLocalDataSource,
             subscriptionManagerUtil,
+            deleteImageFromLocalDataSource,
             log
         )
     }
@@ -342,5 +347,24 @@ class CreateRescueEventViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 assertTrue { awaitItem() is UiState.Success }
                 ensureAllEventsConsumed()
             }
+        }
+
+    @Test
+    fun `given an image to discard_when the user clicks on the delete button_then the image is discarded`() =
+        runTest {
+            val storageRepository = FakeStorageRepository(
+                localDatasourceList = mutableListOf(
+                    Pair(
+                        "local_path",
+                        rescueEvent.imageUrl
+                    )
+                )
+            )
+            val createRescueEventViewmodel = getCreateRescueEventViewmodel(
+                storageRepository = storageRepository
+            )
+            createRescueEventViewmodel.deleteLocalImage(rescueEvent.imageUrl)
+
+            assertTrue { storageRepository.localDatasourceList.isEmpty() }
         }
 }

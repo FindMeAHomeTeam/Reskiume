@@ -12,6 +12,7 @@ import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.InsertNonHumanAnimalInLocalRepository
@@ -45,6 +46,8 @@ class CreateNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
 
     private val onUploadImageToLocal = Capture.slot<(imagePath: String) -> Unit>()
 
+    private val onImageDeletedFromLocal = Capture.slot<(isDeleted: Boolean) -> Unit>()
+
     private val onInsertNonHumanAnimalInLocal = Capture.slot<(rowId: Long) -> Unit>()
 
     private val onInsertNonHumanAnimalInRemote = Capture.slot<(result: DatabaseResult) -> Unit>()
@@ -60,6 +63,7 @@ class CreateNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
 
     private fun getCreateNonHumanAnimalViewmodel(
         databaseResultAfterCreatingRemoteNonHumanAnimalArg: DatabaseResult = DatabaseResult.Success,
+        flagOfLocalImageDeletedArg: Boolean = true,
         rowIdAfterCreatingLocalNonHumanAnimalArg: Long = 1L,
         rowIdAfterCreatingLocalCacheForNonHumanAnimalArg: Long = 1L
     ): CreateNonHumanAnimalViewmodel {
@@ -106,6 +110,13 @@ class CreateNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
                     capture(onUploadImageToLocal)
                 )
             } calls { onUploadImageToLocal.get().invoke(nonHumanAnimal.imageUrl) }
+
+            every {
+                deleteLocalImage(
+                    nonHumanAnimal.imageUrl,
+                    capture(onImageDeletedFromLocal)
+                )
+            } calls { onImageDeletedFromLocal.get().invoke(flagOfLocalImageDeletedArg) }
         }
 
         val localNonHumanAnimalRepository: LocalNonHumanAnimalRepository = mock {
@@ -154,12 +165,16 @@ class CreateNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
         val insertCacheInLocalRepository =
             InsertCacheInLocalRepository(localCacheRepository)
 
+        val deleteImageFromLocalDataSource =
+            DeleteImageFromLocalDataSource(storageRepository)
+
         return CreateNonHumanAnimalViewmodel(
             observeAuthStateInAuthDataSource,
             uploadImageToRemoteDataSource,
             insertNonHumanAnimalInRemoteRepository,
             insertNonHumanAnimalInLocalRepository,
             insertCacheInLocalRepository,
+            deleteImageFromLocalDataSource,
             log
         )
     }
@@ -241,6 +256,36 @@ class CreateNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
                 log.e(
                     "CreateNonHumanAnimalViewModel",
                     "Error creating $nonHumanAnimalId in local cache in section ${Section.NON_HUMAN_ANIMALS}"
+                )
+            }
+        }
+
+    @Test
+    fun `given an image to discard_when the user clicks on the delete button_then the image is discarded`() =
+        runTest {
+            val createNonHumanAnimalViewmodel = getCreateNonHumanAnimalViewmodel()
+            createNonHumanAnimalViewmodel.deleteLocalImage(nonHumanAnimal.imageUrl)
+
+            verify {
+                log.d(
+                    "CreateNonHumanAnimalViewModel",
+                    "deleteLocalImage: the image ${nonHumanAnimal.imageUrl} was deleted successfully in the local data source"
+                )
+            }
+        }
+
+    @Test
+    fun `given an image to discard_when the user clicks on the delete button but the deletion fails_then the image is not discarded`() =
+        runTest {
+            val createNonHumanAnimalViewmodel = getCreateNonHumanAnimalViewmodel(
+                flagOfLocalImageDeletedArg = false
+            )
+            createNonHumanAnimalViewmodel.deleteLocalImage(nonHumanAnimal.imageUrl)
+
+            verify {
+                log.e(
+                    "CreateNonHumanAnimalViewModel",
+                    "deleteLocalImage: failed to delete the image ${nonHumanAnimal.imageUrl} in the local data source"
                 )
             }
         }

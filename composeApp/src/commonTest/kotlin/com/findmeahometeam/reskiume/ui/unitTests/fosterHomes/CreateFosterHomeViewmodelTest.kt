@@ -20,6 +20,7 @@ import com.findmeahometeam.reskiume.domain.repository.util.location.LocationRepo
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.InsertFosterHomeInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.InsertFosterHomeInRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromLocalRepository
@@ -64,6 +65,8 @@ class CreateFosterHomeViewmodelTest : CoroutineTestDispatcher() {
 
     private val onUploadImageToRemoteForFosterHome = Capture.slot<(imagePath: String) -> Unit>()
 
+    private val onImageDeletedFromLocal = Capture.slot<(isDeleted: Boolean) -> Unit>()
+
     private val onInsertRemoteFosterHome = Capture.slot<(DatabaseResult) -> Unit>()
 
     private val onModifyRemoteNonHumanAnimal = Capture.slot<(DatabaseResult) -> Unit>()
@@ -99,6 +102,7 @@ class CreateFosterHomeViewmodelTest : CoroutineTestDispatcher() {
         databaseResultOfCreatingFosterHomesInRemoteRepoArg: DatabaseResult = DatabaseResult.Success,
         databaseResultOfModifyingNonHumanAnimalInRemoteRepositoryArg: DatabaseResult = DatabaseResult.Success,
         imagePathToUploadToRemoteForFosterHome: String = fosterHome.imageUrl,
+        flagOfLocalImageDeletedArg: Boolean = true,
         insertedAcceptedNonHumanAnimalForFosterHomeInLocalRowIdArg: Long = 1L,
         insertedAcceptedSecondNonHumanAnimalForFosterHomeInLocalRowIdArg: Long = 1L,
         insertedResidentNonHumanAnimalIdForFosterHomeInLocalRowIdArg: Long = 1L,
@@ -161,6 +165,13 @@ class CreateFosterHomeViewmodelTest : CoroutineTestDispatcher() {
                 onUploadImageToRemoteForFosterHome.get()
                     .invoke(imagePathToUploadToRemoteForFosterHome)
             }
+
+            every {
+                deleteLocalImage(
+                    fosterHome.imageUrl,
+                    capture(onImageDeletedFromLocal)
+                )
+            } calls { onImageDeletedFromLocal.get().invoke(flagOfLocalImageDeletedArg) }
         }
 
         val authRepository: AuthRepository = mock {
@@ -410,6 +421,9 @@ class CreateFosterHomeViewmodelTest : CoroutineTestDispatcher() {
         val getUserFromLocalDataSource =
             GetUserFromLocalDataSource(localUserRepository)
 
+        val deleteImageFromLocalDataSource =
+            DeleteImageFromLocalDataSource(storageRepository)
+
         return CreateFosterHomeViewmodel(
             getAllNonHumanAnimalsFromLocalRepository,
             observeIfLocationEnabledFromLocationRepository,
@@ -423,6 +437,7 @@ class CreateFosterHomeViewmodelTest : CoroutineTestDispatcher() {
             insertCacheInLocalRepository,
             getUserFromLocalDataSource,
             subscriptionManagerUtil,
+            deleteImageFromLocalDataSource,
             log
         )
     }
@@ -538,7 +553,7 @@ class CreateFosterHomeViewmodelTest : CoroutineTestDispatcher() {
         }
 
     @Test
-    fun `given my foster home to create_when I add my foster home data but fails inserting the foster home cache_then the foster home is created and subscribed to my subscriptions`() =
+    fun `given my foster home to create_when I add my FH data but fails inserting the FH cache_then the foster home is created and subscribed to my subscriptions`() =
         runTest {
             val createFosterHomeViewmodel = getCreateFosterHomeViewmodel(
                 localCacheCreatedInLocalDatasourceArg = 0
@@ -557,6 +572,36 @@ class CreateFosterHomeViewmodelTest : CoroutineTestDispatcher() {
                 log.e(
                     "CreateFosterHomeViewmodel",
                     "createCacheForFosterHomeInLocalDataSource: Error creating $createdFosterHomeId in the local cache in section ${Section.FOSTER_HOMES}"
+                )
+            }
+        }
+
+    @Test
+    fun `given an image to discard_when the user clicks on the delete button_then the image is discarded`() =
+        runTest {
+            val createFosterHomeViewmodel = getCreateFosterHomeViewmodel()
+            createFosterHomeViewmodel.deleteLocalImage(fosterHome.imageUrl)
+
+            verify {
+                log.d(
+                    "CreateFosterHomeViewModel",
+                    "deleteLocalImage: the image ${fosterHome.imageUrl} was deleted successfully in the local data source"
+                )
+            }
+        }
+
+    @Test
+    fun `given an image to discard_when the user clicks on the delete button but the deletion fails_then the image is not discarded`() =
+        runTest {
+            val createFosterHomeViewmodel = getCreateFosterHomeViewmodel(
+                flagOfLocalImageDeletedArg = false
+            )
+            createFosterHomeViewmodel.deleteLocalImage(fosterHome.imageUrl)
+
+            verify {
+                log.e(
+                    "CreateFosterHomeViewModel",
+                    "deleteLocalImage: failed to delete the image ${fosterHome.imageUrl} in the local data source"
                 )
             }
         }

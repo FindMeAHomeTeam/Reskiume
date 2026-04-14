@@ -23,6 +23,19 @@
 		91EF57D52EA261BF00614742 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 91EF57D42EA261BF00614742 /* FirebaseStorage */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		9130DD4B2F8BF548008D9BB5 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		9166FC292E8D7B700052ADBA /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		B63AB4ED2D8EB540ABEC54B3 /* Reskiume.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Reskiume.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -110,6 +123,7 @@
 				F87ED4660AB36CAD45A36A6F /* Resources */,
 				91F0E8222EB3BA4000CB158D /* ShellScript */,
 				554A81366BA44F2DB5FCB4F9 /* Kotzilla Dsym */,
+				9130DD4B2F8BF548008D9BB5 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
@@ -130,7 +144,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1620;
+				LastSwiftUpdateCheck = 1640;
 				LastUpgradeCheck = 1640;
 				TargetAttributes = {
 					877D6BAD6B28515511FF6292 = {
@@ -318,6 +332,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -455,6 +470,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;

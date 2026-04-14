@@ -1,0 +1,28 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "NOTIFICATION_RESCUE_EVENT_BODY" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get involved and save a life 🦸"
+          }
+        }
+      }
+    },
+    "NOTIFICATION_RESCUE_EVENT_TITLE" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New rescue event!"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

@@ -104,11 +104,17 @@ class StorageRepositoryAndroidImpl(
         onImageDeleted: (isDeleted: Boolean) -> Unit
     ) {
         val uri = currentImagePath.toUri()
-        val filename = uri.lastPathSegment ?: return onImageDeleted(false)
-        val localFile = File(context.filesDir, filename)
+
+        val localFile = if (currentImagePath.contains("file:///")) {
+            File(uri.path ?: return onImageDeleted(false))
+        } else {
+            val filename = uri.lastPathSegment ?: return onImageDeleted(false)
+            File(context.filesDir, filename)
+        }
 
         if (localFile.exists()) {
-            onImageDeleted(localFile.delete())
+            val isDeleted = localFile.delete()
+            onImageDeleted(isDeleted)
         } else {
             onImageDeleted(false)
         }

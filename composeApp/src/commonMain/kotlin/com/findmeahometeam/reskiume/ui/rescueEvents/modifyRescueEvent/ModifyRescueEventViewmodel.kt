@@ -384,4 +384,22 @@ class ModifyRescueEventViewmodel(
             }
         }
     }
+
+    fun deleteLocalImage(uriToDelete: String) {
+
+        deleteImageFromLocalDataSource(uriToDelete) { isDeleted ->
+
+            if (isDeleted) {
+                log.d(
+                    "ModifyRescueEventViewModel",
+                    "deleteLocalImage: the image $uriToDelete was deleted successfully in the local data source"
+                )
+            } else {
+                log.e(
+                    "ModifyRescueEventViewModel",
+                    "deleteLocalImage: failed to delete the image $uriToDelete in the local data source"
+                )
+            }
+        }
+    }
 }

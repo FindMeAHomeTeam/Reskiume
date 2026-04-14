@@ -312,4 +312,22 @@ class ModifyNonHumanAnimalViewmodel(
             }
         )
     }
+
+    fun deleteLocalImage(uriToDelete: String) {
+
+        deleteImageFromLocalDataSource(uriToDelete) { isDeleted ->
+
+            if (isDeleted) {
+                log.d(
+                    "ModifyNonHumanAnimalViewModel",
+                    "deleteLocalImage: the image $uriToDelete was deleted successfully in the local data source"
+                )
+            } else {
+                log.e(
+                    "ModifyNonHumanAnimalViewModel",
+                    "deleteLocalImage: failed to delete the image $uriToDelete in the local data source"
+                )
+            }
+        }
+    }
 }

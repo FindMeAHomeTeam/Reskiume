@@ -8,6 +8,7 @@ import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.LocalCache
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.InsertNonHumanAnimalInLocalRepository
@@ -27,6 +28,7 @@ class CreateNonHumanAnimalViewmodel(
     private val insertNonHumanAnimalInRemoteRepository: InsertNonHumanAnimalInRemoteRepository,
     private val insertNonHumanAnimalInLocalRepository: InsertNonHumanAnimalInLocalRepository,
     private val insertCacheInLocalRepository: InsertCacheInLocalRepository,
+    private val deleteImageFromLocalDataSource: DeleteImageFromLocalDataSource,
     private val log: Log
 ) : ViewModel() {
     private val _saveChangesUiState: MutableStateFlow<UiState<Unit>> =
@@ -167,6 +169,24 @@ class CreateNonHumanAnimalViewmodel(
                     )
                 }
                 _saveChangesUiState.value = UiState.Success(Unit)
+            }
+        }
+    }
+
+    fun deleteLocalImage(uriToDelete: String) {
+
+        deleteImageFromLocalDataSource(uriToDelete) { isDeleted ->
+
+            if (isDeleted) {
+                log.d(
+                    "CreateNonHumanAnimalViewModel",
+                    "deleteLocalImage: the image $uriToDelete was deleted successfully in the local data source"
+                )
+            } else {
+                log.e(
+                    "CreateNonHumanAnimalViewModel",
+                    "deleteLocalImage: failed to delete the image $uriToDelete in the local data source"
+                )
             }
         }
     }

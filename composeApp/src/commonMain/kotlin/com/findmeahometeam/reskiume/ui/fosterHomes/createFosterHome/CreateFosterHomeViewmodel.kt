@@ -12,6 +12,7 @@ import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.InsertFosterHomeInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.InsertFosterHomeInRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromLocalRepository
@@ -49,6 +50,7 @@ class CreateFosterHomeViewmodel(
     private val insertCacheInLocalRepository: InsertCacheInLocalRepository,
     private val getUserFromLocalDataSource: GetUserFromLocalDataSource,
     private val subscriptionManagerUtil: SubscriptionManagerUtil,
+    private val deleteImageFromLocalDataSource: DeleteImageFromLocalDataSource,
     private val log: Log
 ) : ViewModel() {
 
@@ -278,6 +280,24 @@ class CreateFosterHomeViewmodel(
             subscriptionManagerUtil.subscribeToTopic(owner, fosterHomeId, viewModelScope) {
 
                 _saveChangesUiState.value = UiState.Success(Unit)
+            }
+        }
+    }
+
+    fun deleteLocalImage(uriToDelete: String) {
+
+        deleteImageFromLocalDataSource(uriToDelete) { isDeleted ->
+
+            if (isDeleted) {
+                log.d(
+                    "CreateFosterHomeViewModel",
+                    "deleteLocalImage: the image $uriToDelete was deleted successfully in the local data source"
+                )
+            } else {
+                log.e(
+                    "CreateFosterHomeViewModel",
+                    "deleteLocalImage: failed to delete the image $uriToDelete in the local data source"
+                )
             }
         }
     }

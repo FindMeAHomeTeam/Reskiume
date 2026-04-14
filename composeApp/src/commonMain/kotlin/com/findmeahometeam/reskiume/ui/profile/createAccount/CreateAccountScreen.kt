@@ -105,9 +105,15 @@ fun CreateAccountScreen(onBackPressed: () -> Unit, navigateToLoginScreen: () -> 
                 .padding(horizontal = 16.dp).verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            RmAddPhoto(currentImageUri = imageUri) {
-                imageUri = it
-            }
+            RmAddPhoto(
+                currentImageUri = imageUri,
+                onUriRetrieved = {
+                    imageUri = it
+                },
+                onDeleteDiscardedImage = {
+                    createAccountViewmodel.deleteLocalImage(it)
+                }
+            )
 
             if (permissionState != ManagePermissionState.PERMISSION_GRANTED) {
                 RmManageNotificationPermission(permissionState = permissionState) {

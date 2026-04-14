@@ -103,9 +103,15 @@ fun CreateNonHumanAnimalScreen(
         ) {
 
             Spacer(modifier = Modifier.height(8.dp))
-            RmAddPhoto(currentImageUri = imageUrl) {
-                imageUrl = it
-            }
+            RmAddPhoto(
+                currentImageUri = imageUrl,
+                onUriRetrieved = {
+                    imageUrl = it
+                },
+                onDeleteDiscardedImage = {
+                    createNonHumanAnimalViewmodel.deleteLocalImage(it)
+                }
+            )
 
             Spacer(modifier = Modifier.height(8.dp))
             RmTextField(

@@ -143,9 +143,15 @@ fun CreateFosterHomeScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(8.dp))
-            RmAddPhoto(currentImageUri = imageUrl) {
-                imageUrl = it
-            }
+            RmAddPhoto(
+                currentImageUri = imageUrl,
+                onUriRetrieved = {
+                    imageUrl = it
+                },
+                onDeleteDiscardedImage = {
+                    createFosterHomeViewmodel.deleteLocalImage(it)
+                }
+            )
 
             Spacer(modifier = Modifier.height(8.dp))
             RmCountryAndCitySelectors(

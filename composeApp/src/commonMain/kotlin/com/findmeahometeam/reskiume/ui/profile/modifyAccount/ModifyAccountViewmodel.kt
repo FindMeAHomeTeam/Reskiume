@@ -435,4 +435,22 @@ class ModifyAccountViewmodel(
             }
         }
     }
+
+    fun deleteLocalImage(uriToDelete: String) {
+
+        deleteImageFromLocalDataSource(uriToDelete) { isDeleted ->
+
+            if (isDeleted) {
+                log.d(
+                    "ModifyAccountViewmodel",
+                    "deleteLocalImage: the image $uriToDelete was deleted successfully in the local data source"
+                )
+            } else {
+                log.e(
+                    "ModifyAccountViewmodel",
+                    "deleteLocalImage: failed to delete the image $uriToDelete in the local data source"
+                )
+            }
+        }
+    }
 }

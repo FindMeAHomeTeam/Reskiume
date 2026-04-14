@@ -11,6 +11,7 @@ import com.findmeahometeam.reskiume.domain.model.user.Subscription
 import com.findmeahometeam.reskiume.domain.model.user.User
 import com.findmeahometeam.reskiume.domain.usecases.authUser.CreateUserWithEmailAndPasswordInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.DeleteUserFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
@@ -34,6 +35,7 @@ class CreateAccountViewmodel(
     private val deleteUserFromAuthDataSource: DeleteUserFromAuthDataSource,
     private val deleteUserFromRemoteDataSource: DeleteUserFromRemoteDataSource,
     private val deleteImageFromRemoteDataSource: DeleteImageFromRemoteDataSource,
+    private val deleteImageFromLocalDataSource: DeleteImageFromLocalDataSource,
     private val log: Log
 ) : ViewModel() {
     private var _state: MutableStateFlow<UiState<Unit>> = MutableStateFlow(UiState.Idle())
@@ -341,6 +343,24 @@ class CreateAccountViewmodel(
                         "saveUserCacheLocally: Error adding the user $uid to the local cache in section ${Section.USERS}"
                     )
                 }
+            }
+        }
+    }
+
+    fun deleteLocalImage(uriToDelete: String) {
+
+        deleteImageFromLocalDataSource(uriToDelete) { isDeleted ->
+
+            if (isDeleted) {
+                log.d(
+                    "CreateAccountViewModel",
+                    "deleteLocalImage: the image $uriToDelete was deleted successfully in the local data source"
+                )
+            } else {
+                log.e(
+                    "CreateAccountViewModel",
+                    "deleteLocalImage: failed to delete the image $uriToDelete in the local data source"
+                )
             }
         }
     }

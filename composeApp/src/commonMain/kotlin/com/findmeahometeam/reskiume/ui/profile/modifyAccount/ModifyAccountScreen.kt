@@ -173,9 +173,15 @@ fun ModifyAccountScreen(onBackPressed: () -> Unit) {
                         }
                     }
 
-                    RmAddPhoto(currentImageUri = imageUri) {
-                        imageUri = it
-                    }
+                    RmAddPhoto(
+                        currentImageUri = imageUri,
+                        onUriRetrieved = {
+                            imageUri = it
+                        },
+                        onDeleteDiscardedImage = {
+                            modifyAccountViewmodel.deleteLocalImage(it)
+                        }
+                    )
 
                     if (permissionState != ManagePermissionState.PERMISSION_GRANTED) {
                         RmManageNotificationPermission(permissionState = permissionState) {

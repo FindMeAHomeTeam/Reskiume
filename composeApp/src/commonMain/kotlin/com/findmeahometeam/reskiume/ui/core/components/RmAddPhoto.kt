@@ -65,7 +65,8 @@ import reskiume.composeapp.generated.resources.ic_close
 fun RmAddPhoto(
     pickMultiplePhotosFromGallery: Boolean = false,
     currentImageUri: String = "",
-    onUriRetrieved: (String) -> Unit
+    onUriRetrieved: (String) -> Unit,
+    onDeleteDiscardedImage: (String) -> Unit
 ) {
 
     var showAddPhoto by remember { mutableStateOf(currentImageUri.isBlank()) }
@@ -137,6 +138,7 @@ fun RmAddPhoto(
                 showCamera = shouldShowCamera
                 if (uriProvided.isNotBlank()) {
                     showAddPhoto = false
+                    onDeleteDiscardedImage(uriProvided.replace("compressed_", "")) // delete the uncompressed file
                     uri = uriProvided
                     onUriRetrieved(uriProvided)
                 } else {
@@ -165,6 +167,9 @@ fun RmAddPhoto(
                             .padding(8.dp)
                             .clickable {
                                 showAddPhoto = true
+                                if (uri.contains("file:///")) {
+                                    onDeleteDiscardedImage(uri) // delete the discarded image if cached
+                                }
                                 uri = ""
                                 onUriRetrieved(uri)
                             },

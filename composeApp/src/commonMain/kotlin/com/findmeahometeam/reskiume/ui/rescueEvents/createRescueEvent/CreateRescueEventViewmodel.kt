@@ -10,6 +10,7 @@ import com.findmeahometeam.reskiume.domain.model.LocalCache
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueEvent
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.InsertRescueEventInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.InsertRescueEventInRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
@@ -49,6 +50,7 @@ class CreateRescueEventViewmodel(
     private val insertCacheInLocalRepository: InsertCacheInLocalRepository,
     private val getUserFromLocalDataSource: GetUserFromLocalDataSource,
     private val subscriptionManagerUtil: SubscriptionManagerUtil,
+    private val deleteImageFromLocalDataSource: DeleteImageFromLocalDataSource,
     private val log: Log
 ) : ViewModel() {
 
@@ -279,6 +281,24 @@ class CreateRescueEventViewmodel(
             subscriptionManagerUtil.subscribeToTopic(creator,rescueEventId, viewModelScope) {
 
                 _saveChangesUiState.value = UiState.Success(Unit)
+            }
+        }
+    }
+
+    fun deleteLocalImage(uriToDelete: String) {
+
+        deleteImageFromLocalDataSource(uriToDelete) { isDeleted ->
+
+            if (isDeleted) {
+                log.d(
+                    "CreateRescueEventViewmodel",
+                    "deleteLocalImage: the image $uriToDelete was deleted successfully in the local data source"
+                )
+            } else {
+                log.e(
+                    "CreateRescueEventViewmodel",
+                    "deleteLocalImage: failed to delete the image $uriToDelete in the local data source"
+                )
             }
         }
     }

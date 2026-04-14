@@ -5,6 +5,10 @@ import org.jetbrains.compose.resources.StringResource
 
 class FakeStringProvider(
     private val text: String = ""
-): StringProvider {
-    override suspend fun getStringResource(resource: StringResource): String = text
+) : StringProvider {
+
+    override suspend fun getStringResource(
+        resource: StringResource,
+        vararg formatArgs: Any
+    ): String = text
 }

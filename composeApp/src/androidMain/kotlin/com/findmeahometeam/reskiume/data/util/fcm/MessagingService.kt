@@ -11,8 +11,7 @@ import androidx.core.net.toUri
 import com.findmeahometeam.reskiume.MainActivity
 import com.findmeahometeam.reskiume.R
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.model.fosterHome.City
-import com.findmeahometeam.reskiume.domain.model.fosterHome.toStringResource
+import com.findmeahometeam.reskiume.ui.util.fcm.MessagingServiceViewModel
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import org.koin.android.ext.android.inject
@@ -25,6 +24,16 @@ class MessagingService() : FirebaseMessagingService() {
     private val messagingServiceViewModel: MessagingServiceViewModel by inject()
     private val log: Log by inject()
 
+    override fun onNewToken(token: String) {
+        super.onNewToken(token)
+        log.d("MessagingService", "onNewToken: $token")
+    }
+
+    override fun onDeletedMessages() {
+        super.onDeletedMessages()
+        log.d("MessagingService", "onDeletedMessages called")
+    }
+
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
 
@@ -33,45 +42,37 @@ class MessagingService() : FirebaseMessagingService() {
             if (activistId.isBlank()) {
                 log.d(
                     "MessagingService",
-                    "No activist ID found, skipping notification"
+                    "onMessageReceived: No activist ID found, skipping notification"
                 )
                 return@retrieveActivistId
             }
 
             val notificationType = message.data["notificationType"] ?: ""
-            val creatorId = message.data["creatorId"] ?: ""
 
-            if (notificationType == rescueEventsNotificationType && creatorId != activistId) {
+            if (notificationType == rescueEventsNotificationType) {
 
-                val cityStringResource = City.valueOf(message.data["city"]!!).toStringResource()
-
-                messagingServiceViewModel.retrieveStringResource(cityStringResource) { city ->
-
-                    val title =
-                        getString(R.string.notification_rescue_event_title, city.substring(5))
-                    val body = getString(R.string.notification_rescue_event_body)
-                    val deeplink = message.data["deeplink"] ?: ""
-
-                    sendNotification(
-                        title = title,
-                        body = body,
-                        deeplink = deeplink,
-                        channelId = rescueEventChannelId,
-                        channelName = getString(R.string.notification_rescue_event_channel)
+                val creatorId = message.data["creatorId"] ?: ""
+                if (creatorId == activistId) {
+                    log.d(
+                        "MessagingService",
+                        "onMessageReceived: Creator ID match with activist ID, skipping notification"
                     )
+                    return@retrieveActivistId
                 }
+                val title = getString(R.string.notification_rescue_event_title)
+                val body = getString(R.string.notification_rescue_event_body)
+                val deeplink = message.data["deeplink"] ?: ""
+                val channelName = getString(R.string.notification_rescue_event_channel)
+
+                sendNotification(
+                    title = title,
+                    body = body,
+                    deeplink = deeplink,
+                    channelId = rescueEventChannelId,
+                    channelName = channelName
+                )
             }
         }
-    }
-
-    override fun onDeletedMessages() {
-        super.onDeletedMessages()
-        log.d("MessagingService", "onDeletedMessages called")
-    }
-
-    override fun onNewToken(token: String) {
-        super.onNewToken(token)
-        log.d("MessagingService", "onNewToken: $token")
     }
 
     private fun sendNotification(

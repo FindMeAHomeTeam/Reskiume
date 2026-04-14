@@ -29,6 +29,9 @@
         android:roundIcon="@drawable/reskiume"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Material.Light.NoActionBar">
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="reskiume_channel_id"/>
         <activity
             android:name=".MainActivity"
             android:exported="true">

@@ -4,23 +4,29 @@ import androidx.room.ConstructedBy
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.RoomDatabaseConstructor
+import com.findmeahometeam.reskiume.data.database.dao.ChatDao
 import com.findmeahometeam.reskiume.data.database.dao.FosterHomeDao
 import com.findmeahometeam.reskiume.data.database.dao.LocalCacheDao
 import com.findmeahometeam.reskiume.data.database.dao.NonHumanAnimalDao
 import com.findmeahometeam.reskiume.data.database.dao.RescueEventDao
 import com.findmeahometeam.reskiume.data.database.dao.ReviewDao
 import com.findmeahometeam.reskiume.data.database.dao.UserDao
-import com.findmeahometeam.reskiume.data.database.entity.fosterHome.AcceptedNonHumanAnimalEntityForFosterHome
-import com.findmeahometeam.reskiume.data.database.entity.fosterHome.FosterHomeEntity
 import com.findmeahometeam.reskiume.data.database.entity.LocalCacheEntity
 import com.findmeahometeam.reskiume.data.database.entity.NonHumanAnimalEntity
-import com.findmeahometeam.reskiume.data.database.entity.fosterHome.ResidentNonHumanAnimalIdEntityForFosterHome
 import com.findmeahometeam.reskiume.data.database.entity.ReviewEntity
-import com.findmeahometeam.reskiume.data.database.entity.user.UserEntity
+import com.findmeahometeam.reskiume.data.database.entity.chat.ActivistInfoEntity
+import com.findmeahometeam.reskiume.data.database.entity.chat.BlockedUserInfoEntity
+import com.findmeahometeam.reskiume.data.database.entity.chat.ChatEntity
+import com.findmeahometeam.reskiume.data.database.entity.chat.ChatMessageEntity
+import com.findmeahometeam.reskiume.data.database.entity.chat.NonHumanAnimalInfoEntity
+import com.findmeahometeam.reskiume.data.database.entity.fosterHome.AcceptedNonHumanAnimalEntityForFosterHome
+import com.findmeahometeam.reskiume.data.database.entity.fosterHome.FosterHomeEntity
+import com.findmeahometeam.reskiume.data.database.entity.fosterHome.ResidentNonHumanAnimalIdEntityForFosterHome
 import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.NeedToCoverEntityForRescueEvent
 import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.NonHumanAnimalToRescueEntityForRescueEvent
 import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.RescueEventEntity
 import com.findmeahometeam.reskiume.data.database.entity.user.SubscriptionEntityForUser
+import com.findmeahometeam.reskiume.data.database.entity.user.UserEntity
 
 @Database(
     entities = [
@@ -34,7 +40,12 @@ import com.findmeahometeam.reskiume.data.database.entity.user.SubscriptionEntity
         ResidentNonHumanAnimalIdEntityForFosterHome::class,
         RescueEventEntity::class,
         NonHumanAnimalToRescueEntityForRescueEvent::class,
-        NeedToCoverEntityForRescueEvent::class
+        NeedToCoverEntityForRescueEvent::class,
+        ChatEntity::class,
+        ChatMessageEntity::class,
+        NonHumanAnimalInfoEntity::class,
+        ActivistInfoEntity::class,
+        BlockedUserInfoEntity::class
     ], version = 1
 )
 @ConstructedBy(ReskiumeConstructor::class)
@@ -45,6 +56,7 @@ abstract class ReskiumeDatabase : RoomDatabase() {
     abstract fun getNonHumanAnimalDao(): NonHumanAnimalDao
     abstract fun getFosterHomeDao(): FosterHomeDao
     abstract fun getRescueEventDao(): RescueEventDao
+    abstract fun getChatDao(): ChatDao
 }
 
 const val DATABASE_NAME = "reskiume_database.db"

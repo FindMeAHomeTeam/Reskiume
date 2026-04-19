@@ -1,6 +1,7 @@
 package com.findmeahometeam.reskiume.di
 
 import com.findmeahometeam.reskiume.data.database.LocalCacheRepositoryImpl
+import com.findmeahometeam.reskiume.data.database.LocalChatRepositoryImpl
 import com.findmeahometeam.reskiume.data.database.LocalFosterHomeRepositoryImpl
 import com.findmeahometeam.reskiume.data.database.LocalNonHumanAnimalRepositoryImpl
 import com.findmeahometeam.reskiume.data.database.LocalRescueEventRepositoryImpl
@@ -8,6 +9,7 @@ import com.findmeahometeam.reskiume.data.database.LocalReviewRepositoryImpl
 import com.findmeahometeam.reskiume.data.database.LocalUserRepositoryImpl
 import com.findmeahometeam.reskiume.data.util.translator.TranslatorImpl
 import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalChatRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalRescueEventRepository
@@ -26,4 +28,5 @@ val dataModule = module {
     singleOf(::LocalFosterHomeRepositoryImpl) bind LocalFosterHomeRepository::class
     singleOf(::LocalRescueEventRepositoryImpl) bind LocalRescueEventRepository::class
     singleOf(::TranslatorImpl) bind Translator::class
+    singleOf(::LocalChatRepositoryImpl) bind LocalChatRepository::class
 }

@@ -53,6 +53,7 @@ kotlin {
             implementation(libs.firebase.analytics)
             implementation(libs.firebase.storage)
             implementation(libs.firebase.messaging)
+            implementation(libs.firebase.functions)
             implementation(libs.ktor.client.android)
         }
         androidUnitTest.dependencies {

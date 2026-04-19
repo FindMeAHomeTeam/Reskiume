@@ -5,5 +5,7 @@ enum class Section(val path: String) {
     REVIEWS("reviews"),
     NON_HUMAN_ANIMALS("nonHumanAnimals"),
     FOSTER_HOMES("fosterHomes"),
-    RESCUE_EVENTS("rescueEvents")
+    RESCUE_EVENTS("rescueEvents"),
+    CHATS("chats"),
+    MESSAGES("messages")
 }

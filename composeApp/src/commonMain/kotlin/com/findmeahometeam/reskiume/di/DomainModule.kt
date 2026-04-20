@@ -18,6 +18,20 @@ import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInA
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.SignInWithEmailAndPasswordFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.SignOutFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.chat.DeleteAllMyChatsFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.DeleteAllMyChatsFromRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.DeleteMyChatFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.DeleteMyChatFromRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.GetAllMyChatsFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.GetAllMyChatsFromRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.GetChatFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.GetChatFromRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.InsertChatInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.InsertChatInRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.InsertChatMessageInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.InsertChatMessageInRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.ModifyChatInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.ModifyChatInRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.DeleteAllMyFosterHomesFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.DeleteAllMyFosterHomesFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.DeleteMyFosterHomeFromLocalRepository
@@ -104,6 +118,22 @@ val domainModule = module {
     factoryOf(::ObserveAuthStateInAuthDataSource)
     factoryOf(::SignInWithEmailAndPasswordFromAuthDataSource)
     factoryOf(::SignOutFromAuthDataSource)
+
+    // chat
+    factoryOf(::InsertChatInLocalRepository)
+    factoryOf(::InsertChatInRemoteRepository)
+    factoryOf(::InsertChatMessageInLocalRepository)
+    factoryOf(::InsertChatMessageInRemoteRepository)
+    factoryOf(::ModifyChatInLocalRepository)
+    factoryOf(::ModifyChatInRemoteRepository)
+    factoryOf(::DeleteMyChatFromLocalRepository)
+    factoryOf(::DeleteMyChatFromRemoteRepository)
+    factoryOf(::DeleteAllMyChatsFromLocalRepository)
+    factoryOf(::DeleteAllMyChatsFromRemoteRepository)
+    factoryOf(::GetChatFromLocalRepository)
+    factoryOf(::GetChatFromRemoteRepository)
+    factoryOf(::GetAllMyChatsFromLocalRepository)
+    factoryOf(::GetAllMyChatsFromRemoteRepository)
 
     // fosterHome
     factoryOf(::DeleteAllMyFosterHomesFromLocalRepository)

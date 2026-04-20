@@ -6,6 +6,7 @@ import com.findmeahometeam.reskiume.data.remote.auth.AuthRepositoryAndroidImpl
 import com.findmeahometeam.reskiume.data.remote.database.nonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepositoryAndroidImpl
 import com.findmeahometeam.reskiume.data.remote.database.remoteReview.RealtimeDatabaseRemoteReviewRepositoryAndroidImpl
 import com.findmeahometeam.reskiume.data.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepositoryAndroidImpl
+import com.findmeahometeam.reskiume.data.remote.fireStore.chat.FireStoreRemoteChatRepositoryAndroidImpl
 import com.findmeahometeam.reskiume.data.remote.fireStore.fosterHome.FireStoreRemoteFosterHomeRepositoryAndroidImpl
 import com.findmeahometeam.reskiume.data.remote.fireStore.rescueEvent.FireStoreRemoteRescueEventRepositoryAndroidImpl
 import com.findmeahometeam.reskiume.data.remote.storage.StorageRepositoryAndroidImpl
@@ -19,6 +20,7 @@ import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteReview.RealtimeDatabaseRemoteReviewRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.chat.FireStoreRemoteChatRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteFosterHome.FireStoreRemoteFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteRescueEvent.FireStoreRemoteRescueEventRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
@@ -36,6 +38,8 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.database
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
+import com.google.firebase.functions.FirebaseFunctions
+import com.google.firebase.functions.functions
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
 import org.koin.core.module.Module
@@ -63,4 +67,6 @@ actual val platformModule: Module = module {
     singleOf(::FireStoreRemoteRescueEventRepositoryAndroidImpl) bind FireStoreRemoteRescueEventRepository::class
     singleOf(::FCMSubscriberRepositoryAndroidImpl) bind FCMSubscriberRepository::class
     singleOf(::MessagingService)
+    single<FirebaseFunctions> { Firebase.functions }
+    singleOf(::FireStoreRemoteChatRepositoryAndroidImpl) bind FireStoreRemoteChatRepository::class
 }

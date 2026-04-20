@@ -17,7 +17,8 @@ data class ChatEntity(
     val rescueEventId: String,
     val savedBy: String,
     val chatHolderId: String,
-    val active: Boolean
+    val myUserIsConnected: Boolean,
+    val finished: Boolean
 ) {
     fun toDomain(
         allNonHumanAnimalsInfo: List<NonHumanAnimalInfo>,
@@ -35,7 +36,8 @@ data class ChatEntity(
             allActivistsInfo = allActivistsInfo,
             allBlockedUsersInfo = allBlockedUsersInfo,
             allChatMessages = allChatMessages,
-            active = active
+            myUserIsConnected = myUserIsConnected,
+            finished = finished
         )
     }
 }

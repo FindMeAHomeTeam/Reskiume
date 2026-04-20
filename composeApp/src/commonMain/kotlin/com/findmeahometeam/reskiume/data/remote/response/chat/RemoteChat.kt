@@ -12,7 +12,8 @@ data class RemoteChat(
     val chatHolderId: String? = "",
     val allNonHumanAnimalsInfo: List<RemoteNonHumanAnimalInfo>? = emptyList(),
     val allActivistsInfo: List<String>? = emptyList(),
-    val allBlockedUsersInfo: List<RemoteBlockedUserInfo>? = emptyList()
+    val allBlockedUsersInfo: List<RemoteBlockedUserInfo>? = emptyList(),
+    val finished: Boolean? = false
 ) {
     fun toMap(): Map<String, Any?> {
         return mapOf(
@@ -22,7 +23,8 @@ data class RemoteChat(
             "chatHolderId" to chatHolderId,
             "allNonHumanAnimalsInfo" to allNonHumanAnimalsInfo,
             "allActivistsInfo" to allActivistsInfo,
-            "allBlockedUsersInfo" to allBlockedUsersInfo
+            "allBlockedUsersInfo" to allBlockedUsersInfo,
+            "finished" to finished
         )
     }
 
@@ -47,7 +49,8 @@ data class RemoteChat(
             } ?: emptyList(),
             allBlockedUsersInfo = allBlockedUsersInfo?.map { it.toDomain() } ?: emptyList(),
             allChatMessages = allChatMessages.map { it.toDomain() },
-            active = false,
+            myUserIsConnected = false,
+            finished = finished ?: false
         )
     }
 }

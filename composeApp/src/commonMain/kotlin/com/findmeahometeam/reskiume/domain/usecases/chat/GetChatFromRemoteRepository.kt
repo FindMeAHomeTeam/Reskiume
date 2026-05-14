@@ -3,8 +3,7 @@ package com.findmeahometeam.reskiume.domain.usecases.chat
 import com.findmeahometeam.reskiume.domain.model.chat.Chat
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.chat.FireStoreRemoteChatRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.map
 
 class GetChatFromRemoteRepository(private val fireStoreRemoteChatRepository: FireStoreRemoteChatRepository) {
 
@@ -12,22 +11,17 @@ class GetChatFromRemoteRepository(private val fireStoreRemoteChatRepository: Fir
         id: String,
         myUid: String,
         lastTimestamp: Long = 0L
-    ): Flow<Chat> =
+    ): Flow<Chat?> =
         fireStoreRemoteChatRepository.getRemoteChat(id)
-            .mapNotNull { remoteChat ->
+            .map { remoteChat ->
 
                 if (remoteChat == null) {
-                    return@mapNotNull null
+                    return@map null
                 }
-
-                val allChatMessages = fireStoreRemoteChatRepository.getRemoteChatMessages(
-                    chatId = remoteChat.id!!,
-                    lastTimestamp = lastTimestamp
-                ).first()
 
                 remoteChat.toDomain(
                     myUid = myUid,
-                    allChatMessages = allChatMessages
+                    allChatMessages = emptyList()
                 )
             }
 }

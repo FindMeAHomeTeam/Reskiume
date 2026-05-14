@@ -3,6 +3,7 @@ package com.findmeahometeam.reskiume.ui.rescueEvents.modifyRescueEvent
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueEvent
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
@@ -29,36 +30,43 @@ class DeleteRescueEventUtilImpl(
     override fun deleteRescueEvent(
         id: String,
         creatorId: String,
+        nonHumanAnimalState: NonHumanAnimalState,
         coroutineScope: CoroutineScope,
-        onlyDeleteOnLocal: Boolean,
+        deleteOnLocal: Boolean,
+        deleteOnRemote: Boolean,
         onError: () -> Unit,
         onComplete: () -> Unit
     ) {
         deleteCurrentImageFromRemoteDataSource(
             creatorId,
             id,
-            onlyDeleteOnLocal,
+            deleteOnRemote,
             coroutineScope,
             onError
         ) {
             deleteCurrentImageFromLocalDataSource(
                 id,
+                deleteOnLocal,
                 coroutineScope,
                 onError
             ) {
                 deleteRescueEventFromRemoteDataSource(
                     id,
-                    onlyDeleteOnLocal,
+                    nonHumanAnimalState,
+                    deleteOnRemote,
                     coroutineScope,
                     onError
                 ) {
                     deleteRescueEventFromLocalDataSource(
                         id,
+                        nonHumanAnimalState,
+                        deleteOnLocal,
                         coroutineScope,
                         onError
                     ) {
                         deleteRescueEventCacheFromLocalDataSource(
                             id,
+                            deleteOnLocal,
                             onComplete
                         )
                     }
@@ -70,12 +78,12 @@ class DeleteRescueEventUtilImpl(
     private fun deleteCurrentImageFromRemoteDataSource(
         creatorId: String,
         rescueEventId: String,
-        onlyDeleteOnLocal: Boolean,
+        deleteOnRemote: Boolean,
         coroutineScope: CoroutineScope,
         onError: () -> Unit,
         onSuccess: () -> Unit
     ) {
-        if (onlyDeleteOnLocal) {
+        if (!deleteOnRemote) {
             onSuccess()
             return
         }
@@ -120,10 +128,15 @@ class DeleteRescueEventUtilImpl(
 
     private fun deleteCurrentImageFromLocalDataSource(
         rescueEventId: String,
+        deleteOnLocal: Boolean,
         coroutineScope: CoroutineScope,
         onError: () -> Unit,
         onSuccess: () -> Unit
     ) {
+        if (!deleteOnLocal) {
+            onSuccess()
+            return
+        }
         coroutineScope.launch {
 
             val localRescueEvent: RescueEvent? =
@@ -158,12 +171,13 @@ class DeleteRescueEventUtilImpl(
 
     private fun deleteRescueEventFromRemoteDataSource(
         id: String,
-        onlyDeleteOnLocal: Boolean,
+        nonHumanAnimalState: NonHumanAnimalState,
+        deleteOnRemote: Boolean,
         coroutineScope: CoroutineScope,
         onError: () -> Unit,
         onSuccess: () -> Unit
     ) {
-        if (onlyDeleteOnLocal) {
+        if (!deleteOnRemote) {
             onSuccess()
             return
         }
@@ -171,6 +185,7 @@ class DeleteRescueEventUtilImpl(
 
             deleteMyRescueEventFromRemoteRepository(
                 id,
+                nonHumanAnimalState,
                 coroutineScope
             ) { databaseResult: DatabaseResult ->
 
@@ -193,14 +208,21 @@ class DeleteRescueEventUtilImpl(
 
     private fun deleteRescueEventFromLocalDataSource(
         id: String,
+        nonHumanAnimalState: NonHumanAnimalState,
+        deleteOnLocal: Boolean,
         coroutineScope: CoroutineScope,
         onError: () -> Unit,
         onSuccess: suspend () -> Unit
     ) {
         coroutineScope.launch {
 
+            if (!deleteOnLocal) {
+                onSuccess()
+                return@launch
+            }
             deleteMyRescueEventFromLocalRepository(
                 id,
+                nonHumanAnimalState,
                 coroutineScope
             ) { rowsDeleted: Int ->
 
@@ -223,8 +245,13 @@ class DeleteRescueEventUtilImpl(
 
     private suspend fun deleteRescueEventCacheFromLocalDataSource(
         id: String,
+        deleteOnLocal: Boolean,
         onComplete: () -> Unit
     ) {
+        if (!deleteOnLocal) {
+            onComplete()
+            return
+        }
         deleteCacheFromLocalRepository(id) { rowsDeleted: Int ->
 
             if (rowsDeleted > 0) {

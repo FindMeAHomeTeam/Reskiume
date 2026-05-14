@@ -1,27 +1,18 @@
 package com.findmeahometeam.reskiume.di
 
 import com.findmeahometeam.reskiume.domain.usecases.authUser.CreateUserWithEmailAndPasswordInAuthDataSource
-import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
-import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.DeleteUserFromAuthDataSource
-import com.findmeahometeam.reskiume.domain.usecases.user.DeleteUsersFromLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.user.DeleteUserFromRemoteDataSource
-import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
-import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ModifyUserEmailInAuthDataSource
-import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ModifyUserPasswordInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
-import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.SignInWithEmailAndPasswordFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.SignOutFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.chat.DeleteAllMyChatsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.chat.DeleteAllMyChatsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.chat.DeleteMyChatFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.chat.DeleteMyChatFromRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.GetAllChatMessagesFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.GetAllChatMessagesFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.chat.GetAllMyChatsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.chat.GetAllMyChatsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.chat.GetChatFromLocalRepository
@@ -30,6 +21,8 @@ import com.findmeahometeam.reskiume.domain.usecases.chat.InsertChatInLocalReposi
 import com.findmeahometeam.reskiume.domain.usecases.chat.InsertChatInRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.chat.InsertChatMessageInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.chat.InsertChatMessageInRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.IsFosterHomeInChatInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.IsNonHumanAnimalInChatInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.chat.ModifyChatInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.chat.ModifyChatInRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.DeleteAllMyFosterHomesFromLocalRepository
@@ -49,6 +42,9 @@ import com.findmeahometeam.reskiume.domain.usecases.fosterHome.InsertFosterHomeI
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.InsertFosterHomeInRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.ModifyFosterHomeInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.ModifyFosterHomeInRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteAllCacheFromLocalRepository
@@ -93,12 +89,20 @@ import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromRemoteR
 import com.findmeahometeam.reskiume.domain.usecases.review.InsertReviewInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.InsertReviewInRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.user.DeleteSubscriptionFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.DeleteUserFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.DeleteUsersFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.user.GetAllUsersFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.user.InsertSubscriptionInLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.util.fcm.SubscribeToAllTopicsFromSubscriberRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.fcm.UnsubscribeFromAllTopicsFromSubscriberRepository
-import com.findmeahometeam.reskiume.domain.usecases.util.location.ObserveIfLocationEnabledFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.GetLocationFromLocationRepository
+import com.findmeahometeam.reskiume.domain.usecases.util.location.ObserveIfLocationEnabledFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.RequestEnableLocationFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.translator.TranslateMessage
 import com.plusmobileapps.konnectivity.Konnectivity
@@ -132,8 +136,12 @@ val domainModule = module {
     factoryOf(::DeleteAllMyChatsFromRemoteRepository)
     factoryOf(::GetChatFromLocalRepository)
     factoryOf(::GetChatFromRemoteRepository)
+    factoryOf(::GetAllChatMessagesFromLocalRepository)
+    factoryOf(::GetAllChatMessagesFromRemoteRepository)
     factoryOf(::GetAllMyChatsFromLocalRepository)
     factoryOf(::GetAllMyChatsFromRemoteRepository)
+    factoryOf(::IsNonHumanAnimalInChatInLocalRepository)
+    factoryOf(::IsFosterHomeInChatInLocalRepository)
 
     // fosterHome
     factoryOf(::DeleteAllMyFosterHomesFromLocalRepository)

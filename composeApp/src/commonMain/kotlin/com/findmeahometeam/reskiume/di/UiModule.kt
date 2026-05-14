@@ -1,5 +1,9 @@
 package com.findmeahometeam.reskiume.di
 
+import com.findmeahometeam.reskiume.ui.chats.checkAllMyChats.CheckAllMyChatsViewmodel
+import com.findmeahometeam.reskiume.ui.chats.checkAllMyChats.ManageChatUtil
+import com.findmeahometeam.reskiume.ui.chats.checkAllMyChats.ManageChatUtilImpl
+import com.findmeahometeam.reskiume.ui.chats.checkChat.CheckChatViewmodel
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProviderImpl
 import com.findmeahometeam.reskiume.ui.fosterHomes.checkAllFosterHomes.CheckAllFosterHomesViewmodel
@@ -124,4 +128,41 @@ val uiModule = module {
     singleOf(::CheckRescueEventUtilImpl) bind CheckRescueEventUtil::class
     singleOf(::SubscriptionManagerUtilImpl) bind SubscriptionManagerUtil::class
     viewModelOf(::MessagingServiceViewModel)
+    viewModelOf(::CheckAllMyChatsViewmodel)
+    viewModel {
+        CheckChatViewmodel(
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get()
+        )
+    }
+    singleOf(::ManageChatUtilImpl) bind ManageChatUtil::class
 }

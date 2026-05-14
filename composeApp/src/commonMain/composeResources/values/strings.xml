@@ -156,7 +156,7 @@
     <string name="modify_non_human_animal_screen_delete_non_human_animal_message">This action can not be undone</string>
     <string name="modify_non_human_animal_screen_save_non_human_animal_changes_button">Save %1$s's changes</string>
     <string name="modify_non_human_animal_screen_non_human_animal_in_foster_home_rescue_event_title">%1$s is in a %2$s</string>
-    <string name="modify_non_human_animal_screen_non_human_animal_in_foster_home_rescue_event_message">Please finish the process with %1$s from the %2$s first</string>
+    <string name="modify_non_human_animal_screen_non_human_animal_in_foster_home_rescue_event_message">Please finish the process with %1$s in the %2$s first</string>
     <string name="modify_non_human_animal_screen_non_human_animal_in_foster_home_ok_button">Ok</string>
 
     <!-- No human animal types -->
@@ -252,6 +252,9 @@
     <string name="modify_foster_home_screen_available_label">Available</string>
     <string name="modify_foster_home_screen_unavailable_label">Not available</string>
     <string name="modify_foster_home_availability_description">Update this foster home's availability to receive rehome requests</string>
+    <string name="modify_foster_home_screen_foster_home_started_title">This foster home has started</string>
+    <string name="modify_foster_home_screen_foster_home_started_message">Please finish its chat first before deleting the foster home</string>
+    <string name="modify_foster_home_screen_foster_home_started_ok_button">Ok</string>
     <string name="modify_foster_home_screen_warning_foster_home_with_residents_title">This foster home has %1$d residents</string>
     <string name="modify_foster_home_screen_warning_foster_home_with_residents_message">To delete this foster home you must first unregister all residents</string>
     <string name="modify_foster_home_screen_warning_foster_home_with_residents_ok_button">Ok</string>
@@ -276,6 +279,7 @@
     <!-- element types -->
     <string name="foster_home">foster home</string>
     <string name="rescue_event">rescue event</string>
+    <string name="chat">chat</string>
 
     <!-- Manage location permission for a foster home and a rescue event -->
     <string name="manage_location_permission_title">Location permission</string>
@@ -323,11 +327,14 @@
     <string name="check_foster_home_screen_no_account_button">Create an account</string>
     <string name="check_foster_home_screen_register_non_human_animal_to_talk_to_owner_label">Register first a non-human animal to foster and then talk to %1$s</string>
     <string name="check_foster_home_screen_register_non_human_animal_button">Register first a non-human animal</string>
+    <string name="check_foster_home_screen_register_other_non_human_animal_to_foster_label">Register other non-human animal to foster</string>
+    <string name="check_foster_home_screen_register_other_non_human_animal_button">Register other non-human animal</string>
     <string name="check_foster_home_screen_talk_to_owner_label">Talk to %1$s to foster a non-human animal</string>
+    <string name="check_foster_home_screen_keep_talking_to_owner_label">Keep talking to %1$s</string>
     <string name="check_foster_home_screen_start_chat_button">Start chat</string>
+    <string name="check_foster_home_screen_continue_chat_button">Come back to the chat</string>
     <string name="check_foster_home_screen_share_foster_home_title">Do you need to foster a non-human animal? The foster home %1$s can take care of: %2$s. Find it in the Reskiume app using the following link %3$s</string>
     <string name="check_foster_home_screen_add_non_human_animals_to_foster_title">Add non-human animals to foster</string>
-
 
     <!-- Check all my rescue events -->
     <string name="check_all_my_rescue_events_screen_title">Check my rescue events</string>
@@ -372,6 +379,9 @@
     <string name="modify_rescue_event_screen_delete_rescue_event_title">Do you want to delete %1$s?</string>
     <string name="modify_rescue_event_screen_delete_rescue_event_message">This action can not be undone</string>
     <string name="modify_rescue_event_screen_save_rescue_event_changes_button">Save %1$s's changes</string>
+    <string name="modify_rescue_event_screen_rescue_event_started_title">This rescue event has started</string>
+    <string name="modify_rescue_event_screen_rescue_event_started_message">Please finish its chat first before deleting the rescue event</string>
+    <string name="modify_rescue_event_screen_rescue_event_started_ok_button">Ok</string>
 
     <!-- Check all rescue events -->
     <string name="check_all_rescue_events_screen_title">Search rescue events by</string>
@@ -395,8 +405,61 @@
     <string name="check_rescue_event_screen_no_account_label">Create an account to join the rescue event %1$s</string>
     <string name="check_rescue_event_screen_no_account_button">Create an account</string>
     <string name="check_rescue_event_screen_join_the_rescue_event_label">Join the rescue event %1$s</string>
+    <string name="check_rescue_event_screen_come_back_to_the_rescue_event_label">Come back to the rescue event %1$s</string>
     <string name="check_rescue_event_screen_start_chat_button">Start chat</string>
+    <string name="check_rescue_event_screen_keep_chatting_button">Keep chatting</string>
     <string name="check_foster_home_screen_share_rescue_event_title">Join the rescue event %1$s to rescue %2$s. Find it in the Reskiume app using the following link %3$s</string>
+
+    <!-- Check all my chats -->
+    <string name="check_all_my_chats_screen_title">Chats</string>
+    <string name="check_all_my_chats_screen_no_chats">💬 You don't have any chat.</string>
+    <string name="check_all_my_chats_screen_chat_message_sent_just_now_timestamp">Just now</string>
+    <string name="check_all_my_chats_screen_chat_message_sent_minutes_ago_timestamp">%1$d minutes ago</string>
+    <string name="check_all_my_chats_screen_chat_message_sent_hours_ago_timestamp">%1$d hours ago</string>
+    <string name="check_all_my_chats_screen_chat_message_sent_days_ago_timestamp">%1$d days ago</string>
+
+    <!-- Check chat -->
+    <string name="check_chat_screen_no_messages">Be kind, respectful, and give good, truthful, and helpful answers. If the non-human animal is not with you, never reveal their exact location until you meet with each other.</string>
+    <string name="check_chat_screen_chat_message_date_today">Today</string>
+    <string name="check_chat_screen_chat_message_date_yesterday">Yesterday</string>
+    <string name="check_chat_screen_chat_message_date_monday">Monday</string>
+    <string name="check_chat_screen_chat_message_date_tuesday">Tuesday</string>
+    <string name="check_chat_screen_chat_message_date_wednesday">Wednesday</string>
+    <string name="check_chat_screen_chat_message_date_thursday">Thursday</string>
+    <string name="check_chat_screen_chat_message_date_friday">Friday</string>
+    <string name="check_chat_screen_chat_message_date_saturday">Saturday</string>
+    <string name="check_chat_screen_chat_message_date_sunday">Sunday</string>
+    <string name="check_chat_screen_write_a_message_description">Write a message...</string>
+    <string name="check_chat_screen_send_content_description">Send a message</string>
+    <string name="check_chat_screen_image_content_description">%1$s's image</string>
+    <string name="check_chat_screen_foster_action">foster</string>
+    <string name="check_chat_screen_rescue_action">rescue</string>
+    <string name="check_chat_screen_non_human_animal_name">to %1$s %2$s</string>
+    <string name="check_chat_screen_quantity_of_non_human_animals">to %1$s %2$d non-human animals</string>
+    <string name="check_chat_screen_more_options_content_description">More options</string>
+    <string name="check_chat_screen_leave_chat_option">Leave chat</string>
+    <string name="check_chat_screen_leave_review_chat_option">🎉 Leave chat and add a review</string>
+    <string name="check_chat_screen_leave_chat_message">Are you sure you want to leave the chat?</string>
+    <string name="check_chat_screen_yes_button">Yes</string>
+    <string name="check_chat_screen_no_button">No</string>
+    <string name="check_chat_screen_user_left_chat_message">%1$s left the chat</string>
+    <string name="check_chat_screen_check_all_activists_option">Check all activists</string>
+    <string name="check_chat_screen_decline_to_foster_button">❌ Decline</string>
+    <string name="check_chat_screen_foster_button">✅ Foster</string>
+    <string name="check_chat_screen_finish_foster_and_evaluate_button">🎉 Finish foster and evaluate</string>
+    <string name="check_chat_screen_finish_rescue_event_button">Finish rescue event</string>
+    <string name="check_chat_screen_finish_rescue_event_and_evaluate_button">🎉 Finish rescue event and evaluate</string>
+    <string name="check_chat_screen_some_non_human_animals">%1$s and %2$s</string>
+    <string name="check_chat_screen_about_non_human_animal">About %1$s</string>
+    <string name="check_chat_screen_need_to_be_rehomed">Do %1$s need to be rehomed?</string>
+    <string name="check_chat_screen_rescued_non_human_animal">Did you rescue %1$s?</string>
+    <string name="check_chat_screen_chat_finished">%1$s finished the chat</string>
+    <string name="check_chat_screen_accepted_foster">🎊 Awesome! %1$s accepted to foster %2$s</string>
+    <string name="check_chat_screen_title_after_clicking_decline_option">You are going to decline the foster</string>
+    <string name="check_chat_screen_title_after_clicking_accept_option">🎉 You are going to accept the foster</string>
+    <string name="check_chat_screen_title_after_clicking_finish_option">🥳 You are going to finish the %1$s and evaluate the activists</string>
+    <string name="check_chat_screen_title_after_clicking_finish_rescue_without_activist_option">You are going to finish the rescue</string>
+    <string name="check_chat_screen_message_after_clicking_option">Are you sure?</string>
 
     <!-- Share service -->
     <string name="share_service_install_title">You have no sharing app installed</string>
@@ -427,7 +490,7 @@
     <!-- Check advice -->
     <string name="check_advice_screen_title">Check advice</string>
     <string name="check_advice_screen_author">Advice author: %1$s</string>
-    <string name="check_advice_screen_author_image_content_description">Advice author image</string>
+    <string name="check_advice_screen_author_image_content_description">%1$s's image</string>
 
     <!-- Button -->
     <string name="button_please_wait">Please wait</string>

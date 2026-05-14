@@ -1,10 +1,13 @@
 package com.findmeahometeam.reskiume.ui.core.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -31,4 +34,17 @@ inline fun rmDebouncer(
         lastTimeClicked = now
     }
     return onClickLambda
+}
+
+/**
+ * The same as [Modifier.clickable] with support to debouncing.
+ */
+fun Modifier.debouncedClickable(
+    debounceTime: Long = 1000L,
+    onClick: () -> Unit
+): Modifier {
+    return this.composed {
+        val clickable = rmDebouncer(debounceTime = debounceTime, onClick = { onClick() })
+        this.clickable { clickable() }
+    }
 }

@@ -43,6 +43,7 @@ import com.findmeahometeam.reskiume.ui.core.components.UiState
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import reskiume.composeapp.generated.resources.Res
+import reskiume.composeapp.generated.resources.chat
 import reskiume.composeapp.generated.resources.foster_home
 import reskiume.composeapp.generated.resources.modify_non_human_animal_screen_delete_non_human_animal_button
 import reskiume.composeapp.generated.resources.modify_non_human_animal_screen_delete_non_human_animal_message
@@ -115,7 +116,7 @@ fun ModifyNonHumanAnimalScreen(
                 var ageCategory: AgeCategory by rememberSaveable { mutableStateOf(nonHumanAnimal.ageCategory) }
                 var description: String by rememberSaveable { mutableStateOf(nonHumanAnimal.description) }
                 var displayDeleteDialog: Boolean by rememberSaveable { mutableStateOf(false) }
-                var displayNonHumanAnimalInFosterHomeOrRescueEventDialog: Boolean by rememberSaveable {
+                var displayCanNotDeleteNonHumanAnimalDialog: Boolean by rememberSaveable {
                     mutableStateOf(
                         false
                     )
@@ -234,13 +235,19 @@ fun ModifyNonHumanAnimalScreen(
                     onClick = {
                         when(nonHumanAnimal.nonHumanAnimalState) {
                             NonHumanAnimalState.NEEDS_TO_BE_RESCUED -> {
-                                displayNonHumanAnimalInFosterHomeOrRescueEventDialog = true
+                                displayCanNotDeleteNonHumanAnimalDialog = true
                             }
                             NonHumanAnimalState.REHOMED -> {
-                                displayNonHumanAnimalInFosterHomeOrRescueEventDialog = true
+                                displayCanNotDeleteNonHumanAnimalDialog = true
                             }
                             else -> {
-                                displayDeleteDialog = true
+                                modifyNonHumanAnimalViewmodel.isUserChattingWithThisNonHumanAnimal(nonHumanAnimal.id) {
+                                    if (it) {
+                                        displayCanNotDeleteNonHumanAnimalDialog = true
+                                    } else {
+                                        displayDeleteDialog = true
+                                    }
+                                }
                             }
                         }
                     }
@@ -265,12 +272,12 @@ fun ModifyNonHumanAnimalScreen(
                         onClickDeny = { displayDeleteDialog = false }
                     )
                 }
-                if (displayNonHumanAnimalInFosterHomeOrRescueEventDialog) {
+                if (displayCanNotDeleteNonHumanAnimalDialog) {
 
                     val elementType = stringResource(when(nonHumanAnimal.nonHumanAnimalState) {
                         NonHumanAnimalState.REHOMED -> Res.string.foster_home
                         NonHumanAnimalState.NEEDS_TO_BE_RESCUED -> Res.string.rescue_event
-                        else -> Res.string.foster_home
+                        else -> Res.string.chat
                     })
                     RmDialog(
                         emoji = nonHumanAnimalType.toEmoji(),
@@ -286,9 +293,9 @@ fun ModifyNonHumanAnimalScreen(
                         ),
                         allowMessage = stringResource(Res.string.modify_non_human_animal_screen_non_human_animal_in_foster_home_ok_button),
                         onClickAllow = {
-                            displayNonHumanAnimalInFosterHomeOrRescueEventDialog = false
+                            displayCanNotDeleteNonHumanAnimalDialog = false
                         },
-                        onClickDeny = { displayNonHumanAnimalInFosterHomeOrRescueEventDialog = false }
+                        onClickDeny = { displayCanNotDeleteNonHumanAnimalDialog = false }
                     )
                 }
 

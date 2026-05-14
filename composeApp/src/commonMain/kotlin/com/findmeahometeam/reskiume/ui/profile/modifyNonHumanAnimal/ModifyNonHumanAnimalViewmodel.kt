@@ -7,6 +7,7 @@ import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.LocalCache
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
+import com.findmeahometeam.reskiume.domain.usecases.chat.IsNonHumanAnimalInChatInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
@@ -44,6 +45,7 @@ class ModifyNonHumanAnimalViewmodel(
     private val modifyNonHumanAnimalInRemoteRepository: ModifyNonHumanAnimalInRemoteRepository,
     private val modifyNonHumanAnimalInLocalRepository: ModifyNonHumanAnimalInLocalRepository,
     private val modifyCacheInLocalRepository: ModifyCacheInLocalRepository,
+    private val isNonHumanAnimalInChatInLocalRepository: IsNonHumanAnimalInChatInLocalRepository,
     private val log: Log
 ) : ViewModel() {
 
@@ -293,6 +295,17 @@ class ModifyNonHumanAnimalViewmodel(
                 }
                 _manageChangesUiState.value = UiState.Success(Unit)
             }
+        }
+    }
+
+    fun isUserChattingWithThisNonHumanAnimal(
+        nonHumanAnimalId: String,
+        onComplete: (Boolean) -> Unit,
+    ) {
+        viewModelScope.launch {
+
+            val result = isNonHumanAnimalInChatInLocalRepository(nonHumanAnimalId)
+            onComplete(result)
         }
     }
 

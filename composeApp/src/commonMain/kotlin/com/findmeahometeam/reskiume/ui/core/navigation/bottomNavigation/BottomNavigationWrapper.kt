@@ -4,10 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.findmeahometeam.reskiume.ui.chats.ChatsScreen
+import com.findmeahometeam.reskiume.ui.chats.checkAllMyChats.CheckAllMyChatsScreen
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckAllMyFosterHomes
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckAllMyNonHumanAnimals
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckAllMyRescueEvents
+import com.findmeahometeam.reskiume.ui.core.navigation.CheckChat
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckFosterHome
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckRescueEvent
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckReviews
@@ -59,8 +60,12 @@ fun BottomNavigationWrapper(
             )
         }
 
-        composable(route = Routes.CHATS.route) {
-            ChatsScreen()
+        composable(route = Routes.CHECK_ALL_MY_CHATS.route) {
+            CheckAllMyChatsScreen(
+                onCheckChat = { chatId: String, lastTimestamp: Long ->
+                    mainNavHostController.navigate(CheckChat(chatId, lastTimestamp))
+                }
+            )
         }
 
         composable(route = Routes.PROFILE.route) {

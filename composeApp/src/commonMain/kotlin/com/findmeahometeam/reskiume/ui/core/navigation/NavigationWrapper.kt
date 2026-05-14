@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
+import com.findmeahometeam.reskiume.ui.chats.checkChat.CheckChatScreen
 import com.findmeahometeam.reskiume.ui.fosterHomes.checkFosterHome.CheckFosterHomeScreen
 import com.findmeahometeam.reskiume.ui.fosterHomes.createFosterHome.CreateFosterHomeScreen
 import com.findmeahometeam.reskiume.ui.fosterHomes.modifyFosterHome.ModifyFosterHomeScreen
@@ -16,6 +17,7 @@ import com.findmeahometeam.reskiume.ui.profile.checkAllAdvice.CheckAllAdviceScre
 import com.findmeahometeam.reskiume.ui.profile.checkAllMyFosterHomes.CheckAllMyFosterHomesScreen
 import com.findmeahometeam.reskiume.ui.profile.checkAllMyRescueEvents.CheckAllMyRescueEventsScreen
 import com.findmeahometeam.reskiume.ui.profile.checkMyAllNonHumanAnimals.CheckAllMyNonHumanAnimalsScreen
+import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalScreen
 import com.findmeahometeam.reskiume.ui.profile.createAccount.CreateAccountScreen
 import com.findmeahometeam.reskiume.ui.profile.deleteAccount.DeleteAccountScreen
 import com.findmeahometeam.reskiume.ui.profile.loginAccount.LoginAccountScreen
@@ -72,8 +74,12 @@ fun NavigationWrapper() {
             )
         ) {
             CheckFosterHomeScreen(
-                onContactFosterHome = { fosterHomeId: String, nonHumanAnimalIds: List<String> ->
-                    // TODO
+                onContactFosterHome = { chatId: String, lastTimestamp: Long ->
+                    if (mainNavController.previousBackStackEntry?.destination?.route?.contains(CheckChat::class.simpleName!!) == true) {
+                        mainNavController.navigateUp()
+                    } else {
+                        mainNavController.navigate(CheckChat(chatId, lastTimestamp))
+                    }
                 },
                 onReviewClick = { uid ->
                     mainNavController.navigate(CheckReviews(uid))
@@ -123,8 +129,12 @@ fun NavigationWrapper() {
             )
         ) {
             CheckRescueEventScreen(
-                onContactRescueEvent = { rescueEventId: String, nonHumanAnimalIds: List<String> ->
-                    // TODO
+                onContactRescueEvent = { chatId: String, lastTimestamp: Long ->
+                    if (mainNavController.previousBackStackEntry?.destination?.route?.contains(CheckChat::class.simpleName!!) == true) {
+                        mainNavController.navigateUp()
+                    } else {
+                        mainNavController.navigate(CheckChat(chatId, lastTimestamp))
+                    }
                 },
                 onCreateAccount = {
                     mainNavController.navigate(Routes.CREATE_ACCOUNT.route)
@@ -182,8 +192,42 @@ fun NavigationWrapper() {
             ModifyNonHumanAnimalScreen(onBackPressed = { mainNavController.navigateUp() })
         }
 
+        composable<CheckNonHumanAnimal> {
+            CheckNonHumanAnimalScreen(onBackPressed = { mainNavController.navigateUp() })
+        }
+
         composable(route = Routes.CREATE_NON_HUMAN_ANIMAL.route) {
             CreateNonHumanAnimalScreen(onBackPressed = { mainNavController.navigateUp() })
+        }
+
+        composable<CheckChat>(
+            deepLinks = listOf(
+                navDeepLink {
+                    this.uriPattern = "$CHAT_DEEP_LINK/{chatId}/{lastTimestamp}"
+                }
+            )
+        ) {
+            CheckChatScreen(
+                onBackPressed = { mainNavController.navigateUp() },
+                onCheckDetails = { isFosterHome: Boolean, id: String, chatHolderId: String, chatId: String ->
+                    if (isFosterHome) {
+                        mainNavController.navigate(CheckFosterHome(id, chatHolderId, chatId))
+                    } else {
+                        mainNavController.navigate(CheckRescueEvent(id, chatHolderId))
+                    }
+                },
+                onCheckActivist = { uid: String ->
+                    mainNavController.navigate(CheckReviews(uid))
+                },
+                onCheckNonHumanAnimal = { nonHumanAnimalId: String, caregiverId: String ->
+                    mainNavController.navigate(CheckNonHumanAnimal(nonHumanAnimalId, caregiverId))
+                },
+                onAddReview = { allActivistsToReview ->
+
+                    // TODO
+                    mainNavController.navigateUp()
+                }
+            )
         }
 
         composable(route = Routes.CHECK_ALL_ADVICE.route) {

@@ -107,10 +107,10 @@ class SubscriptionManagerUtilImpl(
         coroutineScope: CoroutineScope,
         onComplete: () -> Unit
     ) {
+        val subscriptionToDelete =
+            user.subscriptions.find { it.topic == topicToUnsubscribe } ?: return onComplete()
         val allRemainingSubscriptions =
             user.subscriptions.filter { it.topic != topicToUnsubscribe }
-        val subscriptionToDelete =
-            user.subscriptions.find { it.topic == topicToUnsubscribe }!!
 
         val updatedUserWithSubscriptions =
             user.copy(subscriptions = allRemainingSubscriptions)

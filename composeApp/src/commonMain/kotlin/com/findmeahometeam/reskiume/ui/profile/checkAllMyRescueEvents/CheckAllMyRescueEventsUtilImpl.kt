@@ -143,9 +143,9 @@ class CheckAllMyRescueEventsUtilImpl(
         myUid: String
     ) {
         modifyRescueEventInLocalRepository(
-            updatedRescueEvent,
-            previousRescueEvent,
-            coroutineScope
+            updatedRescueEvent = updatedRescueEvent,
+            previousRescueEvent = previousRescueEvent,
+            coroutineScope = coroutineScope
         ) { isSuccess ->
             if (isSuccess) {
                 log.d(

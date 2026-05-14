@@ -2,7 +2,6 @@ package com.findmeahometeam.reskiume.domain.model.chat
 
 import com.findmeahometeam.reskiume.data.database.entity.chat.ChatEntity
 import com.findmeahometeam.reskiume.data.remote.response.chat.RemoteChat
-import com.findmeahometeam.reskiume.data.remote.response.chat.RemoteChatMessage
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -17,7 +16,10 @@ data class Chat(
     val allBlockedUsersInfo: List<BlockedUserInfo> = emptyList(),
     val allChatMessages: List<ChatMessage> = emptyList(),
     val myUserIsConnected: Boolean,
-    val finished: Boolean
+    val acceptedFoster: Boolean,
+    val finished: Boolean,
+    val addReview: Boolean,
+    val timestamp: Long
 ) {
     @OptIn(ExperimentalTime::class)
     private fun setId(): String =
@@ -31,7 +33,10 @@ data class Chat(
             savedBy = savedBy,
             chatHolderId = chatHolderId,
             myUserIsConnected = myUserIsConnected,
-            finished = finished
+            acceptedFoster = acceptedFoster,
+            finished = finished,
+            addReview = addReview,
+            timestamp = timestamp
         )
     }
 
@@ -44,11 +49,10 @@ data class Chat(
             allNonHumanAnimalsInfo = allNonHumanAnimalsInfo.map { it.toData() },
             allActivistsInfo = allActivistsInfo.map { it.uid },
             allBlockedUsersInfo = allBlockedUsersInfo.map { it.toData() },
-            finished = finished
+            acceptedFoster = acceptedFoster,
+            finished = finished,
+            addReview = addReview,
+            timestamp = timestamp
         )
-    }
-
-    fun toRemoteChatMessageList(): List<RemoteChatMessage> {
-        return allChatMessages.map { it.toData() }
     }
 }

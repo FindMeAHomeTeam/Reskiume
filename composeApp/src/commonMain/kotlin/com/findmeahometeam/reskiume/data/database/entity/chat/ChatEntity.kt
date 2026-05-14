@@ -18,7 +18,10 @@ data class ChatEntity(
     val savedBy: String,
     val chatHolderId: String,
     val myUserIsConnected: Boolean,
-    val finished: Boolean
+    val acceptedFoster: Boolean,
+    val finished: Boolean,
+    val addReview: Boolean,
+    val timestamp: Long
 ) {
     fun toDomain(
         allNonHumanAnimalsInfo: List<NonHumanAnimalInfo>,
@@ -37,7 +40,10 @@ data class ChatEntity(
             allBlockedUsersInfo = allBlockedUsersInfo,
             allChatMessages = allChatMessages,
             myUserIsConnected = myUserIsConnected,
-            finished = finished
+            acceptedFoster = acceptedFoster,
+            finished = finished,
+            addReview = addReview,
+            timestamp = timestamp
         )
     }
 }

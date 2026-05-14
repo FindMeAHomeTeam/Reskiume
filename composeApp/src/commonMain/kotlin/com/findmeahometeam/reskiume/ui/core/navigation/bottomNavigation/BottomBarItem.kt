@@ -54,7 +54,7 @@ sealed class BottomBarItem {
     ) : BottomBarItem()
 
     data class Chats(
-        override val route: String = Routes.CHATS.route,
+        override val route: String = Routes.CHECK_ALL_MY_CHATS.route,
         override val title: @Composable () -> String = { stringResource(Res.string.bottom_bar_item_chats) },
         override val icon: @Composable (() -> Unit) = {
             Icon(

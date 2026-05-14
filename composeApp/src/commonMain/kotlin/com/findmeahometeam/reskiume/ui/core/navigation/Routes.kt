@@ -6,7 +6,7 @@ enum class Routes(val route: String) {
     HOME_SCREEN("homeScreen"),
     CHECK_ALL_FOSTER_HOMES("checkAllFosterHomes"),
     CHECK_ALL_RESCUE_EVENTS("checkAllRescueEvents"),
-    CHATS("chats"),
+    CHECK_ALL_MY_CHATS("checkAllMyChats"),
     PROFILE("profile"),
     CREATE_ACCOUNT("createAccount"),
     LOGIN_ACCOUNT("loginAccount"),
@@ -21,6 +21,7 @@ enum class Routes(val route: String) {
 class CheckFosterHome(
     val fosterHomeId: String,
     val ownerId: String,
+    val chatId: String = ""
 )
 
 @Serializable
@@ -63,6 +64,12 @@ class CheckNonHumanAnimal(
 class ModifyNonHumanAnimal(
     val nonHumanAnimalId: String,
     val caregiverId: String
+)
+
+@Serializable
+class CheckChat(
+    val chatId: String,
+    val lastTimestamp: Long
 )
 
 @Serializable

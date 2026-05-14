@@ -7,10 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface FireStoreRemoteChatRepository {
 
-    fun insertRemoteChat(
-        remoteChat: RemoteChat,
-        remoteChatMessages: List<RemoteChatMessage>
-    ): Flow<DatabaseResult>
+    fun insertRemoteChat(remoteChat: RemoteChat): Flow<DatabaseResult>
 
     fun insertRemoteChatMessage(
         remoteChatMessage: RemoteChatMessage
@@ -32,5 +29,8 @@ interface FireStoreRemoteChatRepository {
         lastTimestamp: Long
     ): Flow<List<RemoteChatMessage>>
 
-    fun getAllMyRemoteChats(uid: String): Flow<List<RemoteChat>>
+    fun getAllMyRemoteChats(
+        uid: String,
+        lastChatTimestamp: Long
+    ): Flow<List<RemoteChat>>
 }

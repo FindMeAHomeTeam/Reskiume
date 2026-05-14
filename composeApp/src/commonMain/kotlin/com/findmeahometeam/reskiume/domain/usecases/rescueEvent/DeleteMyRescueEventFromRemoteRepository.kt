@@ -23,6 +23,7 @@ class DeleteMyRescueEventFromRemoteRepository(
 
     suspend operator fun invoke(
         id: String,
+        nonHumanAnimalState: NonHumanAnimalState,
         coroutineScope: CoroutineScope,
         onDeleteRemoteRescueEvent: (result: DatabaseResult) -> Unit
     ) {
@@ -30,6 +31,7 @@ class DeleteMyRescueEventFromRemoteRepository(
         val isSuccess = manageNonHumanAnimals(
             id,
             myUid,
+            nonHumanAnimalState,
             coroutineScope
         )
 
@@ -44,6 +46,7 @@ class DeleteMyRescueEventFromRemoteRepository(
     private suspend fun manageNonHumanAnimals(
         id: String,
         myUid: String,
+        nonHumanAnimalState: NonHumanAnimalState,
         coroutineScope: CoroutineScope
     ): Boolean {
         var isSuccess = true
@@ -82,19 +85,19 @@ class DeleteMyRescueEventFromRemoteRepository(
                 } else {
                     realtimeDatabaseRemoteNonHumanAnimalRepository.modifyRemoteNonHumanAnimal(
                         remoteNonHumanAnimal.copy(
-                            nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_REHOMED,
+                            nonHumanAnimalState = nonHumanAnimalState,
                             fosterHomeId = ""
                         )
                     ) { databaseResult ->
                         if (databaseResult is DatabaseResult.Success) {
                             log.d(
                                 "DeleteMyRescueEventFromRemoteRepository",
-                                "manageNonHumanAnimals: updated non human animal state ${NonHumanAnimalState.NEEDS_TO_BE_REHOMED} for the non human animal ${remoteNonHumanAnimal.id} in the remote data source"
+                                "manageNonHumanAnimals: updated non human animal state $nonHumanAnimalState for the non human animal ${remoteNonHumanAnimal.id} in the remote data source"
                             )
                         } else {
                             log.e(
                                 "DeleteMyRescueEventFromRemoteRepository",
-                                "manageNonHumanAnimals: failed to update the non human animal state ${NonHumanAnimalState.NEEDS_TO_BE_REHOMED} for the non human animal ${remoteNonHumanAnimal.id} in the remote data source"
+                                "manageNonHumanAnimals: failed to update the non human animal state $nonHumanAnimalState for the non human animal ${remoteNonHumanAnimal.id} in the remote data source"
                             )
                             isSuccess = false
                         }

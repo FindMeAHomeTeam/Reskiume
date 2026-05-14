@@ -23,6 +23,7 @@ class ModifyRescueEventInLocalRepository(
     private val log: Log
 ) {
     suspend operator fun invoke(
+        isNonHumanAnimalSaved: Boolean = false,
         updatedRescueEvent: RescueEvent,
         previousRescueEvent: RescueEvent,
         coroutineScope: CoroutineScope,
@@ -40,6 +41,7 @@ class ModifyRescueEventInLocalRepository(
                 if (rowsUpdated > 0) {
                     var isSuccess =
                         manageAllNonHumanAnimalsToRescue(
+                            isNonHumanAnimalSaved,
                             previousRescueEvent,
                             modifiedRescueEvent,
                             coroutineScope
@@ -59,6 +61,7 @@ class ModifyRescueEventInLocalRepository(
     private suspend fun getMyUid(): String = authRepository.authState.firstOrNull()?.uid ?: ""
 
     private suspend fun manageAllNonHumanAnimalsToRescue(
+        isNonHumanAnimalSaved: Boolean,
         previousRescueEvent: RescueEvent,
         updatedRescueEvent: RescueEvent,
         coroutineScope: CoroutineScope
@@ -172,7 +175,11 @@ class ModifyRescueEventInLocalRepository(
                         localNonHumanAnimalRepository.modifyNonHumanAnimal(
                             nonHumanAnimal
                                 .copy(
-                                    nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_REHOMED,
+                                    nonHumanAnimalState = if (isNonHumanAnimalSaved) {
+                                        NonHumanAnimalState.SAVED
+                                    } else {
+                                        NonHumanAnimalState.NEEDS_TO_BE_REHOMED
+                                    },
                                     fosterHomeId = ""
                                 )
                                 .toEntity()

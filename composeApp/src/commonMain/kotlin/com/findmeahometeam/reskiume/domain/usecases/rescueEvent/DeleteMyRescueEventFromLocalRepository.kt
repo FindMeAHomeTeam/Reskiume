@@ -18,11 +18,13 @@ class DeleteMyRescueEventFromLocalRepository(
 ) {
     suspend operator fun invoke(
         id: String,
+        nonHumanAnimalState: NonHumanAnimalState,
         coroutineScope: CoroutineScope,
         onDeleteRescueEvent: suspend (rowsDeleted: Int) -> Unit
     ) {
         val isSuccess = updateAdoptionStates(
             id,
+            nonHumanAnimalState,
             coroutineScope
         )
         if (isSuccess) {
@@ -32,6 +34,7 @@ class DeleteMyRescueEventFromLocalRepository(
 
     private suspend fun updateAdoptionStates(
         rescueEventId: String,
+        nonHumanAnimalState: NonHumanAnimalState,
         coroutineScope: CoroutineScope
     ): Boolean {
         var isSuccess = true
@@ -57,19 +60,19 @@ class DeleteMyRescueEventFromLocalRepository(
                 } else {
                     localNonHumanAnimalRepository.modifyNonHumanAnimal(
                         nonHumanAnimal.copy(
-                            nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_REHOMED,
+                            nonHumanAnimalState = nonHumanAnimalState,
                             fosterHomeId = ""
                         ).toEntity()
                     ) { rowsUpdated ->
                         if (rowsUpdated > 0) {
                             log.d(
                                 "DeleteMyRescueEventFromLocalRepository",
-                                "updateAdoptionStates: updated non human animal state ${NonHumanAnimalState.NEEDS_TO_BE_REHOMED} for the non human animal ${nonHumanAnimal.id} in the local data source"
+                                "updateAdoptionStates: updated non human animal state $nonHumanAnimalState for the non human animal ${nonHumanAnimal.id} in the local data source"
                             )
                         } else {
                             log.e(
                                 "DeleteMyRescueEventFromLocalRepository",
-                                "updateAdoptionStates: failed to update the non human animal state ${NonHumanAnimalState.NEEDS_TO_BE_REHOMED} for the non human animal ${nonHumanAnimal.id} in the local data source"
+                                "updateAdoptionStates: failed to update the non human animal state $nonHumanAnimalState for the non human animal ${nonHumanAnimal.id} in the local data source"
                             )
                             isSuccess = false
                         }

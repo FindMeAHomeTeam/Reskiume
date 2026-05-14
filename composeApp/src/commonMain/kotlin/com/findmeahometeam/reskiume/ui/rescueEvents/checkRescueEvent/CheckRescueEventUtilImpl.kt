@@ -190,9 +190,9 @@ class CheckRescueEventUtilImpl(
             getRescueEventFromLocalRepository(updatedRescueEvent.id).first()!!
 
         modifyRescueEventInLocalRepository(
-            updatedRescueEvent,
-            previousRescueEvent,
-            coroutineScope
+            updatedRescueEvent = updatedRescueEvent,
+            previousRescueEvent = previousRescueEvent,
+            coroutineScope = coroutineScope
         ) { isSuccess ->
             if (isSuccess) {
                 log.d(

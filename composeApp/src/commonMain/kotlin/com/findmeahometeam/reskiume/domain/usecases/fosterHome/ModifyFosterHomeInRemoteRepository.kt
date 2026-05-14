@@ -21,6 +21,7 @@ class ModifyFosterHomeInRemoteRepository(
     private val log: Log
 ) {
     suspend operator fun invoke(
+        isNonHumanAnimalSaved: Boolean = false,
         updatedFosterHome: FosterHome,
         previousFosterHome: FosterHome,
         coroutineScope: CoroutineScope,
@@ -29,6 +30,7 @@ class ModifyFosterHomeInRemoteRepository(
         val myUid = observeAuthStateInAuthDataSource().first()!!.uid
         val isSuccess =
             manageResidents(
+                isNonHumanAnimalSaved,
                 updatedFosterHome,
                 previousFosterHome,
                 myUid,
@@ -46,6 +48,7 @@ class ModifyFosterHomeInRemoteRepository(
     }
 
     private suspend fun manageResidents(
+        isNonHumanAnimalSaved: Boolean,
         updatedFosterHome: FosterHome,
         previousFosterHome: FosterHome,
         myUid: String,
@@ -78,6 +81,7 @@ class ModifyFosterHomeInRemoteRepository(
                     ).firstOrNull()
 
                 isSuccess = updateAdoptionState(
+                    isNonHumanAnimalSaved,
                     remoteResidentNonHumanAnimal,
                     updatedFosterHome.id,
                     containsResidentNonHumanAnimal
@@ -108,6 +112,7 @@ class ModifyFosterHomeInRemoteRepository(
     }
 
     private suspend fun updateAdoptionState(
+        isNonHumanAnimalSaved: Boolean,
         remoteResidentNonHumanAnimal: RemoteNonHumanAnimal?,
         fosterHomeId: String,
         containsResidentNonHumanAnimal: Boolean
@@ -123,10 +128,12 @@ class ModifyFosterHomeInRemoteRepository(
             realtimeDatabaseRemoteNonHumanAnimalRepository.modifyRemoteNonHumanAnimal(
                 remoteResidentNonHumanAnimal
                     .copy(
-                        nonHumanAnimalState = if (containsResidentNonHumanAnimal) {
-                            NonHumanAnimalState.REHOMED
-                        } else {
-                            NonHumanAnimalState.NEEDS_TO_BE_REHOMED
+                        nonHumanAnimalState = when {
+                            isNonHumanAnimalSaved -> NonHumanAnimalState.SAVED
+
+                            containsResidentNonHumanAnimal -> NonHumanAnimalState.REHOMED
+
+                            else -> NonHumanAnimalState.NEEDS_TO_BE_REHOMED
                         },
                         fosterHomeId = if (containsResidentNonHumanAnimal) {
                             fosterHomeId

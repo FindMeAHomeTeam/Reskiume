@@ -190,9 +190,9 @@ class CheckFosterHomeUtilImpl(
             getFosterHomeFromLocalRepository(updatedFosterHome.id).first()!!
 
         modifyFosterHomeInLocalRepository(
-            updatedFosterHome,
-            previousFosterHome,
-            coroutineScope
+            updatedFosterHome = updatedFosterHome,
+            previousFosterHome = previousFosterHome,
+            coroutineScope = coroutineScope
         ) { isSuccess ->
             if (isSuccess) {
                 log.d(

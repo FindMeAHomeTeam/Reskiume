@@ -10,6 +10,7 @@ import com.findmeahometeam.reskiume.domain.model.LocalCache
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueEvent
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.chat.IsNonHumanAnimalInChatInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.InsertRescueEventInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.InsertRescueEventInRemoteRepository
@@ -39,6 +40,7 @@ import kotlin.time.ExperimentalTime
 
 class CreateRescueEventViewmodel(
     getAllNonHumanAnimalsFromLocalRepository: GetAllNonHumanAnimalsFromLocalRepository,
+    private val isNonHumanAnimalInChatInLocalRepository: IsNonHumanAnimalInChatInLocalRepository,
     private val observeIfLocationEnabledFromLocationRepository: ObserveIfLocationEnabledFromLocationRepository,
     private val requestEnableLocationFromLocationRepository: RequestEnableLocationFromLocationRepository,
     private val getLocationFromLocationRepository: GetLocationFromLocationRepository,
@@ -57,7 +59,9 @@ class CreateRescueEventViewmodel(
     val allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow: Flow<List<NonHumanAnimal>> =
         getAllNonHumanAnimalsFromLocalRepository().map {
             it.mapNotNull { nonHumanAnimal ->
-                if (nonHumanAnimal.nonHumanAnimalState == NonHumanAnimalState.NEEDS_TO_BE_REHOMED) {
+                if (nonHumanAnimal.nonHumanAnimalState == NonHumanAnimalState.NEEDS_TO_BE_REHOMED
+                    && !isNonHumanAnimalInChatInLocalRepository(nonHumanAnimal.id)
+                ) {
                     nonHumanAnimal
                 } else {
                     null
@@ -278,7 +282,7 @@ class CreateRescueEventViewmodel(
 
             val creatorId = observeAuthStateInAuthDataSource().first()!!.uid
             val creator = getUserFromLocalDataSource(creatorId).first()!!
-            subscriptionManagerUtil.subscribeToTopic(creator,rescueEventId, viewModelScope) {
+            subscriptionManagerUtil.subscribeToTopic(creator, rescueEventId, viewModelScope) {
 
                 _saveChangesUiState.value = UiState.Success(Unit)
             }

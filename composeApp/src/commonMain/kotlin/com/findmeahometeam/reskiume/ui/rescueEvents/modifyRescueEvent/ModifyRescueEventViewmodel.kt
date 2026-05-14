@@ -88,7 +88,9 @@ class ModifyRescueEventViewmodel(
     val allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow: Flow<List<NonHumanAnimal>> =
         getAllNonHumanAnimalsFromLocalRepository().map {
             it.mapNotNull { nonHumanAnimal ->
-                if (nonHumanAnimal.nonHumanAnimalState == NonHumanAnimalState.NEEDS_TO_BE_REHOMED) {
+                if (nonHumanAnimal.nonHumanAnimalState == NonHumanAnimalState.NEEDS_TO_BE_REHOMED
+                    && !isNonHumanAnimalInChatInLocalRepository(nonHumanAnimal.id)
+                ) {
                     nonHumanAnimal
                 } else {
                     null

@@ -10,6 +10,7 @@ import com.findmeahometeam.reskiume.domain.model.LocalCache
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.chat.IsNonHumanAnimalInChatInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.InsertFosterHomeInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.InsertFosterHomeInRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
@@ -51,13 +52,16 @@ class CreateFosterHomeViewmodel(
     private val getUserFromLocalDataSource: GetUserFromLocalDataSource,
     private val subscriptionManagerUtil: SubscriptionManagerUtil,
     private val deleteImageFromLocalDataSource: DeleteImageFromLocalDataSource,
+    private val isNonHumanAnimalInChatInLocalRepository: IsNonHumanAnimalInChatInLocalRepository,
     private val log: Log
 ) : ViewModel() {
 
     val allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow: Flow<List<NonHumanAnimal>> =
         getAllNonHumanAnimalsFromLocalRepository().map {
             it.mapNotNull { nonHumanAnimal ->
-                if (nonHumanAnimal.nonHumanAnimalState == NonHumanAnimalState.NEEDS_TO_BE_REHOMED) {
+                if (nonHumanAnimal.nonHumanAnimalState == NonHumanAnimalState.NEEDS_TO_BE_REHOMED
+                    && !isNonHumanAnimalInChatInLocalRepository(nonHumanAnimal.id)
+                ) {
                     nonHumanAnimal
                 } else {
                     null

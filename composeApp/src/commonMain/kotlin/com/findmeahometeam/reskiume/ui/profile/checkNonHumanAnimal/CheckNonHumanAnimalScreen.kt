@@ -12,13 +12,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,9 +29,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.findmeahometeam.reskiume.domain.model.Gender
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.toEmoji
 import com.findmeahometeam.reskiume.domain.model.toStringResource
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
@@ -61,45 +62,47 @@ fun CheckNonHumanAnimalScreen(
     val checkNonHumanAnimalViewmodel: CheckNonHumanAnimalViewmodel =
         koinViewModel<CheckNonHumanAnimalViewmodel>()
 
-    val nonHumanAnimalState: UiState<NonHumanAnimal> by checkNonHumanAnimalViewmodel.nonHumanAnimalFlow.collectAsState(
-        initial = UiState.Loading()
-    )
+    val nonHumanAnimalState: UiState<NonHumanAnimal> by checkNonHumanAnimalViewmodel.nonHumanAnimalFlow.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
 
     RmScaffold(
-        title = stringResource(
-            Res.string.check_non_human_animal_screen_non_human_animal_profile_title,
-            if (nonHumanAnimalState is UiState.Success) (nonHumanAnimalState as UiState.Success<NonHumanAnimal>).data.name else ""
-        ),
+        title = if (nonHumanAnimalState is UiState.Success) {
+            stringResource(
+                Res.string.check_non_human_animal_screen_non_human_animal_profile_title,
+                (nonHumanAnimalState as UiState.Success<NonHumanAnimal>).data.name
+            )
+        } else {
+            ""
+        },
         onBackPressed = onBackPressed,
     ) { padding ->
 
-        RmResultState(nonHumanAnimalState) { nonHumanAnimal: NonHumanAnimal ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(backgroundColor)
+                .padding(padding)
+                .padding(horizontal = 16.dp)
+                .verticalScroll(scrollState),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            RmResultState(nonHumanAnimalState) { nonHumanAnimal: NonHumanAnimal ->
 
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(backgroundColor)
-                    .padding(padding)
-                    .padding(horizontal = 16.dp)
-                    .verticalScroll(scrollState),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Box {
                     RmImage(
+                        modifier = Modifier.height(300.dp).clip(RoundedCornerShape(15.dp)),
                         imagePath = nonHumanAnimal.imageUrl,
                         contentDescription =
                             stringResource(
                                 Res.string.check_non_human_animal_screen_non_human_animal_avatar_content_description,
                                 nonHumanAnimal.name
-                            ),
-                        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(15.dp))
+                            )
                     )
                     Box(
                         modifier = Modifier.wrapContentSize()
                             .background(
-                                color = when(nonHumanAnimal.nonHumanAnimalState) {
+                                color = when (nonHumanAnimal.nonHumanAnimalState) {
                                     NonHumanAnimalState.NEEDS_TO_BE_REHOMED -> tertiaryGreen
                                     NonHumanAnimalState.NEEDS_TO_BE_RESCUED -> secondaryGreen
                                     NonHumanAnimalState.REHOMED -> secondaryGreen
@@ -145,11 +148,13 @@ fun CheckNonHumanAnimalScreen(
                         verticalArrangement = Arrangement.Center
                     ) {
                         Column(
-                            modifier = Modifier.size(55.dp)
+                            modifier = Modifier
+                                .wrapContentWidth()
                                 .background(
                                     color = primaryGreen,
                                     shape = RoundedCornerShape(15.dp)
-                                ),
+                                )
+                                .padding(10.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center
                         ) {

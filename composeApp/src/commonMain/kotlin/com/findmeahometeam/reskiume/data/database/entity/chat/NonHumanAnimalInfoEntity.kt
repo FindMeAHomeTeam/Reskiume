@@ -20,16 +20,14 @@ import com.findmeahometeam.reskiume.domain.model.chat.NonHumanAnimalInfo
     ]
 )
 data class NonHumanAnimalInfoEntity(
-    @PrimaryKey val id: String,
+    @PrimaryKey val nonHumanAnimalId: String,
     val chatId: String,
-    val nonHumanAnimalId: String,
     val caregiverId: String
 ) {
     fun toDomain(): NonHumanAnimalInfo {
         return NonHumanAnimalInfo(
-            id = id,
-            chatId = chatId,
             nonHumanAnimalId = nonHumanAnimalId,
+            chatId = chatId,
             caregiverId = caregiverId
         )
     }

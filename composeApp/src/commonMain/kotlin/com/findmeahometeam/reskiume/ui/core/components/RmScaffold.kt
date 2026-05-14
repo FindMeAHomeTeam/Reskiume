@@ -29,6 +29,7 @@ import reskiume.composeapp.generated.resources.ic_back
 @Composable
 fun RmScaffold(
     title: String = "",
+    titleWithDescription: @Composable (() -> Unit)? = null,
     onBackPressed: (() -> Unit)? = null,
     displayTopBar: Boolean = true,
     topAppBarActions: @Composable (RowScope.() -> Unit)? = null,
@@ -42,30 +43,36 @@ fun RmScaffold(
             if (displayTopBar) {
                 TopAppBar(
                     title = {
-                        RmText(
-                            modifier = when {
-                                onBackPressed == null -> {
-                                    Modifier.fillMaxWidth().padding(end = 16.dp)
-                                }
+                        if (titleWithDescription == null) {
+                            RmText(
+                                modifier = when {
+                                    onBackPressed == null -> {
+                                        Modifier.fillMaxWidth().padding(end = 16.dp)
+                                    }
 
-                                topAppBarActions == null -> {
-                                    Modifier.fillMaxWidth().padding(end = 48.dp)
-                                }
+                                    topAppBarActions == null -> {
+                                        Modifier.fillMaxWidth().padding(end = 48.dp)
+                                    }
 
-                                else -> {
-                                    Modifier.fillMaxWidth()
-                                }
-                            },
-                            text = title,
-                            textAlign = TextAlign.Center,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp,
-                        )
+                                    else -> {
+                                        Modifier.fillMaxWidth()
+                                    }
+                                },
+                                text = title,
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp
+                            )
+                        } else {
+                            titleWithDescription()
+                        }
                     },
                     navigationIcon = {
                         if (onBackPressed != null) {
                             IconButton(
-                                modifier = Modifier.padding(start = 16.dp).size(32.dp),
+                                modifier = Modifier
+                                    .padding(start = 16.dp)
+                                    .size(32.dp),
                                 onClick = onBackPressed
                             ) {
                                 Icon(

@@ -13,6 +13,9 @@ import com.google.firebase.database.getValue
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.tasks.await
 
 class RealtimeDatabaseRemoteNonHumanAnimalRepositoryAndroidImpl(
     private val databaseRef: DatabaseReference,
@@ -117,37 +120,22 @@ class RealtimeDatabaseRemoteNonHumanAnimalRepositoryAndroidImpl(
         id: String,
         caregiverId: String
     ): Flow<RemoteNonHumanAnimal?> =
-        callbackFlow {
-            val nonHumanAnimalListener: ValueEventListener = object : ValueEventListener {
-
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-
-                    val remoteNonHumanAnimal: RemoteNonHumanAnimal? =
-                        dataSnapshot.getValue<RemoteNonHumanAnimal>()
-
-                    trySend(remoteNonHumanAnimal)
-                }
-
-                override fun onCancelled(databaseError: DatabaseError) {
-                    log.e(
-                        "RealtimeDatabaseRemoteNonHumanAnimalRepositoryAndroidImpl",
-                        "getRemoteNonHumanAnimal:onCancelled ${databaseError.toException()}"
-                    )
-                }
-            }
-            databaseRef
+        flow {
+            val dataSnapshot = databaseRef
                 .child(Section.NON_HUMAN_ANIMALS.path)
                 .child(caregiverId)
                 .child(id)
-                .addListenerForSingleValueEvent(nonHumanAnimalListener)
+                .get()
+                .await()
 
-            awaitClose {
-                databaseRef
-                    .child(Section.NON_HUMAN_ANIMALS.path)
-                    .child(caregiverId)
-                    .child(id)
-                    .removeEventListener(nonHumanAnimalListener)
-            }
+            val remoteNonHumanAnimal = dataSnapshot.getValue(RemoteNonHumanAnimal::class.java)
+            emit(remoteNonHumanAnimal)
+        }.catch { exception ->
+            log.e(
+                "RealtimeDatabaseRemoteNonHumanAnimalRepositoryAndroidImpl",
+                "getRemoteNonHumanAnimal: Error retrieving the remote non human animal $id: ${exception.message}"
+            )
+            emit(null)
         }
 
     override fun getAllRemoteNonHumanAnimals(caregiverId: String): Flow<List<RemoteNonHumanAnimal>> =

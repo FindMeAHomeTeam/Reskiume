@@ -55,6 +55,18 @@ interface ChatDao {
     fun getChat(id: String): Flow<ChatEntityWithAllData?>
 
     @Transaction
+    @Query("SELECT * FROM ChatMessageEntity WHERE chatId = :chatId ORDER BY timestamp ASC")
+    fun getAllMyChatMessages(chatId: String): Flow<List<ChatMessageEntity>>
+
+    @Transaction
     @Query("SELECT * FROM ChatEntity WHERE chatHolderId = :uid OR savedBy = :uid")
     fun getAllMyChats(uid: String): Flow<List<ChatEntityWithAllData>>
+
+    @Transaction
+    @Query("SELECT * FROM NonHumanAnimalInfoEntity WHERE nonHumanAnimalId = :nonHumanAnimalId")
+    suspend fun isNonHumanAnimalInChat(nonHumanAnimalId: String): NonHumanAnimalInfoEntity?
+
+    @Transaction
+    @Query("SELECT * FROM ChatEntity WHERE fosterHomeId = :fosterHomeId")
+    suspend fun isFosterHomeInChat(fosterHomeId: String): List<ChatEntityWithAllData>
 }

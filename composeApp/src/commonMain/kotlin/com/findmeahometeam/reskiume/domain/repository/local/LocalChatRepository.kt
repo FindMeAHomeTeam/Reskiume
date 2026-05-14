@@ -67,5 +67,11 @@ interface LocalChatRepository {
 
     fun getChat(id: String): Flow<ChatEntityWithAllData?>
 
+    fun getAllMyChatMessages(chatId: String): Flow<List<ChatMessageEntity>>
+
     fun getAllMyChats(uid: String): Flow<List<ChatEntityWithAllData>>
+
+    suspend fun isNonHumanAnimalInChat(nonHumanAnimalId: String): Boolean
+
+    suspend fun isFosterHomeChat(fosterHomeId: String): Boolean
 }

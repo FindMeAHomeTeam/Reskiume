@@ -33,14 +33,18 @@ class LocalChatRepositoryImpl(
         activistInfoEntity: ActivistInfoEntity,
         onInsertActivistInfoEntity: (rowId: Long) -> Unit
     ) {
-        onInsertActivistInfoEntity(reskiumeDatabase.getChatDao().insertActivistInfoEntity(activistInfoEntity))
+        onInsertActivistInfoEntity(
+            reskiumeDatabase.getChatDao().insertActivistInfoEntity(activistInfoEntity)
+        )
     }
 
     override suspend fun insertBlockedUserInfoEntity(
         blockedUserInfoEntity: BlockedUserInfoEntity,
         onInsertBlockedUserInfoEntity: (rowId: Long) -> Unit
     ) {
-        onInsertBlockedUserInfoEntity(reskiumeDatabase.getChatDao().insertBlockedUserInfoEntity(blockedUserInfoEntity))
+        onInsertBlockedUserInfoEntity(
+            reskiumeDatabase.getChatDao().insertBlockedUserInfoEntity(blockedUserInfoEntity)
+        )
     }
 
     override suspend fun insertChatMessageEntity(
@@ -88,7 +92,9 @@ class LocalChatRepositoryImpl(
         uid: String,
         onDeleteBlockedUserInfoEntity: (rowsDeleted: Int) -> Unit
     ) {
-        onDeleteBlockedUserInfoEntity(reskiumeDatabase.getChatDao().deleteBlockedUserInfoEntity(uid))
+        onDeleteBlockedUserInfoEntity(
+            reskiumeDatabase.getChatDao().deleteBlockedUserInfoEntity(uid)
+        )
     }
 
     override suspend fun deleteAllMyChats(
@@ -101,6 +107,15 @@ class LocalChatRepositoryImpl(
     override fun getChat(id: String): Flow<ChatEntityWithAllData?> =
         reskiumeDatabase.getChatDao().getChat(id)
 
+    override fun getAllMyChatMessages(chatId: String): Flow<List<ChatMessageEntity>> =
+        reskiumeDatabase.getChatDao().getAllMyChatMessages(chatId)
+
     override fun getAllMyChats(uid: String): Flow<List<ChatEntityWithAllData>> =
         reskiumeDatabase.getChatDao().getAllMyChats(uid)
+
+    override suspend fun isNonHumanAnimalInChat(nonHumanAnimalId: String): Boolean =
+        reskiumeDatabase.getChatDao().isNonHumanAnimalInChat(nonHumanAnimalId) != null
+
+    override suspend fun isFosterHomeChat(fosterHomeId: String): Boolean =
+        reskiumeDatabase.getChatDao().isFosterHomeInChat(fosterHomeId).isNotEmpty()
 }

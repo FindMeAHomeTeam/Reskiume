@@ -4,18 +4,23 @@ import com.findmeahometeam.reskiume.data.database.entity.chat.ChatEntityWithAllD
 import com.findmeahometeam.reskiume.domain.model.chat.Chat
 import com.findmeahometeam.reskiume.domain.repository.local.LocalChatRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 
 class GetChatFromLocalRepository(private val localChatRepository: LocalChatRepository) {
 
-    operator fun invoke(uid: String): Flow<Chat?> =
-        localChatRepository.getChat(uid).map { chatEntityWithAllData: ChatEntityWithAllData? ->
+    operator fun invoke(id: String): Flow<Chat?> =
+        if (id.isEmpty()) {
+            flowOf(null)
+        } else {
+            localChatRepository.getChat(id).map { chatEntityWithAllData: ChatEntityWithAllData? ->
 
-            chatEntityWithAllData?.chatEntity?.toDomain(
-                allNonHumanAnimalsInfo = chatEntityWithAllData.allNonHumanAnimalsInfo.map { it.toDomain() },
-                allActivistsInfo = chatEntityWithAllData.allActivistsInfo.map { it.toDomain() },
-                allBlockedUsersInfo = chatEntityWithAllData.allBlockedUsersInfo.map { it.toDomain() },
-                allChatMessages = chatEntityWithAllData.allChatMessages.map { it.toDomain() }
-            )
+                chatEntityWithAllData?.chatEntity?.toDomain(
+                    allNonHumanAnimalsInfo = chatEntityWithAllData.allNonHumanAnimalsInfo.map { it.toDomain() },
+                    allActivistsInfo = chatEntityWithAllData.allActivistsInfo.map { it.toDomain() },
+                    allBlockedUsersInfo = chatEntityWithAllData.allBlockedUsersInfo.map { it.toDomain() },
+                    allChatMessages = chatEntityWithAllData.allChatMessages.map { it.toDomain() }
+                )
+            }
         }
 }

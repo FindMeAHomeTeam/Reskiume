@@ -10,6 +10,7 @@ import com.findmeahometeam.reskiume.domain.model.LocalCache
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueEvent
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.chat.IsNonHumanAnimalInChatInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
@@ -45,6 +46,7 @@ class ModifyRescueEventViewmodel(
     private val getImagePathForFileNameFromLocalDataSource: GetImagePathForFileNameFromLocalDataSource,
     private val checkNonHumanAnimalUtil: CheckNonHumanAnimalUtil,
     getAllNonHumanAnimalsFromLocalRepository: GetAllNonHumanAnimalsFromLocalRepository,
+    private val isNonHumanAnimalInChatInLocalRepository: IsNonHumanAnimalInChatInLocalRepository,
     private val getRescueEventFromRemoteRepository: GetRescueEventFromRemoteRepository,
     private val deleteImageFromRemoteDataSource: DeleteImageFromRemoteDataSource,
     private val deleteImageFromLocalDataSource: DeleteImageFromLocalDataSource,
@@ -306,9 +308,9 @@ class ModifyRescueEventViewmodel(
                 getRescueEventFromLocalRepository(updatedRescueEvent.id).first()!!
 
             modifyRescueEventInLocalRepository(
-                updatedRescueEvent,
-                previousRescueEvent,
-                viewModelScope
+                updatedRescueEvent = updatedRescueEvent,
+                previousRescueEvent = previousRescueEvent,
+                coroutineScope = viewModelScope
             ) { isUpdated: Boolean ->
 
                 if (isUpdated) {
@@ -365,13 +367,16 @@ class ModifyRescueEventViewmodel(
         deleteRescueEventUtil.deleteRescueEvent(
             id = id,
             creatorId = creatorId,
+            nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_REHOMED,
             coroutineScope = viewModelScope,
+            deleteOnLocal = true,
+            deleteOnRemote = true,
             onError = {
                 _manageChangesUiState.value = UiState.Error()
             },
             onComplete = {
                 unsubscribeCreatorToTheirRescueEvent(id)
-            }
+            },
         )
     }
 
@@ -380,8 +385,11 @@ class ModifyRescueEventViewmodel(
 
             val creatorId = observeAuthStateInAuthDataSource().first()!!.uid
             val creator = getUserFromLocalDataSource(creatorId).first()!!
-            subscriptionManagerUtil.unsubscribeFromTopic(creator,rescueEventId, viewModelScope) {
-
+            subscriptionManagerUtil.unsubscribeFromTopic(
+                user = creator,
+                topicToUnsubscribe = rescueEventId,
+                coroutineScope = viewModelScope
+            ) {
                 _manageChangesUiState.value = UiState.Success(Unit)
             }
         }
@@ -402,6 +410,23 @@ class ModifyRescueEventViewmodel(
                     "deleteLocalImage: failed to delete the image $uriToDelete in the local data source"
                 )
             }
+        }
+    }
+
+    fun isUserChattingWithTheseNonHumanAnimal(
+        nonHumanAnimalIds: List<String>,
+        onComplete: (Boolean) -> Unit,
+    ) {
+        viewModelScope.launch {
+
+            var isChatting = false
+            nonHumanAnimalIds.forEach {
+
+                if (!isChatting) {
+                    isChatting = isNonHumanAnimalInChatInLocalRepository(it)
+                }
+            }
+            onComplete(isChatting)
         }
     }
 }

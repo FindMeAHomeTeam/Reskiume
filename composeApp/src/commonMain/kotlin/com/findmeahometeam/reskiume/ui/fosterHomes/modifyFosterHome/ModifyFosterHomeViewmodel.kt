@@ -5,11 +5,13 @@ import androidx.lifecycle.viewModelScope
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.LocalCache
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.chat.IsFosterHomeInChatInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.IsNonHumanAnimalInChatInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetFosterHomeFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetFosterHomeFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.ModifyFosterHomeInLocalRepository
@@ -45,6 +47,7 @@ class ModifyFosterHomeViewmodel(
     private val getImagePathForFileNameFromLocalDataSource: GetImagePathForFileNameFromLocalDataSource,
     private val checkNonHumanAnimalUtil: CheckNonHumanAnimalUtil,
     getAllNonHumanAnimalsFromLocalRepository: GetAllNonHumanAnimalsFromLocalRepository,
+    private val isNonHumanAnimalInChatInLocalRepository: IsNonHumanAnimalInChatInLocalRepository,
     private val getFosterHomeFromRemoteRepository: GetFosterHomeFromRemoteRepository,
     private val deleteImageFromRemoteDataSource: DeleteImageFromRemoteDataSource,
     private val deleteImageFromLocalDataSource: DeleteImageFromLocalDataSource,
@@ -56,6 +59,7 @@ class ModifyFosterHomeViewmodel(
     private val observeAuthStateInAuthDataSource: ObserveAuthStateInAuthDataSource,
     private val getUserFromLocalDataSource: GetUserFromLocalDataSource,
     private val subscriptionManagerUtil: SubscriptionManagerUtil,
+    private val isFosterHomeInChatInLocalRepository: IsFosterHomeInChatInLocalRepository,
     private val log: Log
 ) : ViewModel() {
 
@@ -279,9 +283,9 @@ class ModifyFosterHomeViewmodel(
                 getFosterHomeFromLocalRepository(updatedFosterHome.id).first()!!
 
             modifyFosterHomeInRemoteRepository(
-                updatedFosterHome,
-                previousFosterHome,
-                viewModelScope
+                updatedFosterHome = updatedFosterHome,
+                previousFosterHome = previousFosterHome,
+                coroutineScope = viewModelScope
             ) { result ->
 
                 if (result is DatabaseResult.Success) {
@@ -311,9 +315,9 @@ class ModifyFosterHomeViewmodel(
                 getFosterHomeFromLocalRepository(updatedFosterHome.id).first()!!
 
             modifyFosterHomeInLocalRepository(
-                updatedFosterHome,
-                previousFosterHome,
-                viewModelScope
+                updatedFosterHome = updatedFosterHome,
+                previousFosterHome = previousFosterHome,
+                coroutineScope = viewModelScope
             ) { isUpdated: Boolean ->
 
                 if (isUpdated) {
@@ -407,6 +411,16 @@ class ModifyFosterHomeViewmodel(
                     "deleteLocalImage: failed to delete the image $uriToDelete in the local data source"
                 )
             }
+        }
+    }
+
+    fun isFosterHomeCreatorChatting(
+        fosterHomeId: String,
+        onResult: (Boolean) -> Unit
+    ) {
+        viewModelScope.launch {
+            val isChatting = isFosterHomeInChatInLocalRepository(fosterHomeId)
+            onResult(isChatting)
         }
     }
 }

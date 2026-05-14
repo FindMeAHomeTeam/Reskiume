@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -54,6 +55,9 @@ import reskiume.composeapp.generated.resources.modify_rescue_event_screen_delete
 import reskiume.composeapp.generated.resources.modify_rescue_event_screen_delete_rescue_event_title
 import reskiume.composeapp.generated.resources.modify_rescue_event_screen_dismiss_delete_rescue_event_button
 import reskiume.composeapp.generated.resources.modify_rescue_event_screen_rescue_event_description
+import reskiume.composeapp.generated.resources.modify_rescue_event_screen_rescue_event_started_message
+import reskiume.composeapp.generated.resources.modify_rescue_event_screen_rescue_event_started_ok_button
+import reskiume.composeapp.generated.resources.modify_rescue_event_screen_rescue_event_started_title
 import reskiume.composeapp.generated.resources.modify_rescue_event_screen_rescue_event_title
 import reskiume.composeapp.generated.resources.modify_rescue_event_screen_save_rescue_event_changes_button
 import reskiume.composeapp.generated.resources.modify_rescue_event_screen_title
@@ -128,6 +132,12 @@ fun ModifyRescueEventScreen(
                 ) {
                     mutableStateOf(
                         uiRescueEvent.allUiNonHumanAnimalsToRescue
+                    )
+                }
+                var isRescueEventCreatorChatting: Boolean by rememberSaveable { mutableStateOf(false) }
+                var displayCanNotDeleteRescueEventDialog: Boolean by rememberSaveable {
+                    mutableStateOf(
+                        false
                     )
                 }
                 var displayDeleteDialog: Boolean by rememberSaveable { mutableStateOf(false) }
@@ -205,13 +215,24 @@ fun ModifyRescueEventScreen(
                     allNeedsToCover = it
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
-                RmNonHumanAnimalListCreator(
-                    title = stringResource(Res.string.non_human_animal_list_creator_save_title),
-                    allAvailableNonHumanAnimals = allAvailableNonHumanAnimals,
-                    allExistentNonHumanAnimals = allUiNonHumanAnimalsToRescue
-                ) {
-                    allUiNonHumanAnimalsToRescue = it
+                LaunchedEffect(Unit) {
+                    modifyRescueEventViewmodel.isUserChattingWithTheseNonHumanAnimal(
+                        nonHumanAnimalIds = uiRescueEvent.allUiNonHumanAnimalsToRescue.map { it.id }
+                    ) {
+                        isRescueEventCreatorChatting = it
+                    }
+                }
+
+                if (!isRescueEventCreatorChatting) {
+
+                    Spacer(modifier = Modifier.height(16.dp))
+                    RmNonHumanAnimalListCreator(
+                        title = stringResource(Res.string.non_human_animal_list_creator_save_title),
+                        allAvailableNonHumanAnimals = allAvailableNonHumanAnimals,
+                        allExistentNonHumanAnimals = allUiNonHumanAnimalsToRescue
+                    ) {
+                        allUiNonHumanAnimalsToRescue = it
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -222,9 +243,25 @@ fun ModifyRescueEventScreen(
                     ),
                     textToLink = stringResource(Res.string.modify_rescue_event_screen_delete_rescue_event_button),
                     onClick = {
-                        displayDeleteDialog = true
+                        if (isRescueEventCreatorChatting) {
+                            displayCanNotDeleteRescueEventDialog = true
+                        } else {
+                            displayDeleteDialog = true
+                        }
                     }
                 )
+                if (displayCanNotDeleteRescueEventDialog) {
+                    RmDialog(
+                        emoji = "⚠️",
+                        title = stringResource(Res.string.modify_rescue_event_screen_rescue_event_started_title),
+                        message = stringResource(Res.string.modify_rescue_event_screen_rescue_event_started_message),
+                        allowMessage = stringResource(Res.string.modify_rescue_event_screen_rescue_event_started_ok_button),
+                        onClickAllow = {
+                            displayCanNotDeleteRescueEventDialog = false
+                        },
+                        onClickDeny = { displayCanNotDeleteRescueEventDialog = false }
+                    )
+                }
                 if (displayDeleteDialog) {
                     RmDialog(
                         emoji = "🗑️",

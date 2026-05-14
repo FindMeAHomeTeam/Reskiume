@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -62,6 +63,9 @@ import reskiume.composeapp.generated.resources.modify_foster_home_screen_delete_
 import reskiume.composeapp.generated.resources.modify_foster_home_screen_dismiss_delete_foster_home_button
 import reskiume.composeapp.generated.resources.modify_foster_home_screen_foster_home_conditions
 import reskiume.composeapp.generated.resources.modify_foster_home_screen_foster_home_description
+import reskiume.composeapp.generated.resources.modify_foster_home_screen_foster_home_started_message
+import reskiume.composeapp.generated.resources.modify_foster_home_screen_foster_home_started_ok_button
+import reskiume.composeapp.generated.resources.modify_foster_home_screen_foster_home_started_title
 import reskiume.composeapp.generated.resources.modify_foster_home_screen_foster_home_title
 import reskiume.composeapp.generated.resources.modify_foster_home_screen_save_foster_home_changes_button
 import reskiume.composeapp.generated.resources.modify_foster_home_screen_title
@@ -146,7 +150,13 @@ fun ModifyFosterHomeScreen(
                         uiFosterHome.allResidentUiNonHumanAnimals
                     )
                 }
+                var isFosterHomeOwnerChatting: Boolean by rememberSaveable { mutableStateOf(false) }
                 var isAvailable: Boolean by rememberSaveable { mutableStateOf(uiFosterHome.fosterHome.available) }
+                var displayCanNotDeleteFosterHomeDialog: Boolean by rememberSaveable {
+                    mutableStateOf(
+                        false
+                    )
+                }
                 var displayDeleteDialog: Boolean by rememberSaveable { mutableStateOf(false) }
                 var displayFosterHomeWithResidentsDialog: Boolean by rememberSaveable {
                     mutableStateOf(
@@ -259,13 +269,24 @@ fun ModifyFosterHomeScreen(
                     allAcceptedNonHumanAnimals = it
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
-                RmNonHumanAnimalListCreator(
-                    title = stringResource(Res.string.non_human_animal_list_creator_resident_title),
-                    allAvailableNonHumanAnimals = allAvailableNonHumanAnimals,
-                    allExistentNonHumanAnimals = allResidentUiNonHumanAnimals
-                ) {
-                    allResidentUiNonHumanAnimals = it
+                LaunchedEffect(Unit) {
+                    modifyFosterHomeViewmodel.isFosterHomeCreatorChatting(
+                        fosterHomeId = uiFosterHome.fosterHome.id
+                    ) {
+                        isFosterHomeOwnerChatting = it
+                    }
+                }
+
+                if (!isFosterHomeOwnerChatting) {
+
+                    Spacer(modifier = Modifier.height(16.dp))
+                    RmNonHumanAnimalListCreator(
+                        title = stringResource(Res.string.non_human_animal_list_creator_resident_title),
+                        allAvailableNonHumanAnimals = allAvailableNonHumanAnimals,
+                        allExistentNonHumanAnimals = allResidentUiNonHumanAnimals
+                    ) {
+                        allResidentUiNonHumanAnimals = it
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -277,13 +298,30 @@ fun ModifyFosterHomeScreen(
                     textToLink = stringResource(Res.string.modify_foster_home_screen_delete_foster_home_button),
                     onClick = {
                         if (allResidentUiNonHumanAnimals.isEmpty()) {
-                            displayDeleteDialog = true
+
+                            if (isFosterHomeOwnerChatting) {
+                                displayCanNotDeleteFosterHomeDialog = true
+                            } else {
+                                displayDeleteDialog = true
+                            }
                         } else {
                             displayFosterHomeWithResidentsDialog = true
                         }
 
                     }
                 )
+                if (displayCanNotDeleteFosterHomeDialog) {
+                    RmDialog(
+                        emoji = "⚠️",
+                        title = stringResource(Res.string.modify_foster_home_screen_foster_home_started_title),
+                        message = stringResource(Res.string.modify_foster_home_screen_foster_home_started_message),
+                        allowMessage = stringResource(Res.string.modify_foster_home_screen_foster_home_started_ok_button),
+                        onClickAllow = {
+                            displayCanNotDeleteFosterHomeDialog = false
+                        },
+                        onClickDeny = { displayCanNotDeleteFosterHomeDialog = false }
+                    )
+                }
                 if (displayDeleteDialog) {
                     RmDialog(
                         emoji = "🗑️",

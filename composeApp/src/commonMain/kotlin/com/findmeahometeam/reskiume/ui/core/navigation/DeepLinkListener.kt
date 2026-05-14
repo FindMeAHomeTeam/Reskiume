@@ -7,6 +7,7 @@ import androidx.navigation.NavUri
 
 const val FOSTER_HOME_DEEP_LINK="vegan-for-the-animals://reskiu.me/fosterHome"
 const val RESCUE_EVENT_DEEP_LINK="vegan-for-the-animals://reskiu.me/rescueEvent"
+const val CHAT_DEEP_LINK="vegan-for-the-animals://reskiu.me/chat"
 
 @Composable
 fun DeepLinkListener(navController: NavController) {

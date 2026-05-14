@@ -37,7 +37,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
-import com.findmeahometeam.reskiume.domain.model.user.User
 import com.findmeahometeam.reskiume.domain.model.fosterHome.City
 import com.findmeahometeam.reskiume.domain.model.fosterHome.Country
 import com.findmeahometeam.reskiume.domain.model.fosterHome.toStringResource
@@ -61,14 +60,15 @@ import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.navigation.RESCUE_EVENT_DEEP_LINK
 import com.findmeahometeam.reskiume.ui.core.primaryGreen
 import com.findmeahometeam.reskiume.ui.core.textColor
-import com.findmeahometeam.reskiume.ui.profile.checkAllMyRescueEvents.UiRescueEvent
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import reskiume.composeapp.generated.resources.Res
 import reskiume.composeapp.generated.resources.check_foster_home_screen_share_rescue_event_title
+import reskiume.composeapp.generated.resources.check_rescue_event_screen_come_back_to_the_rescue_event_label
 import reskiume.composeapp.generated.resources.check_rescue_event_screen_creator_avatar_content_description
 import reskiume.composeapp.generated.resources.check_rescue_event_screen_join_the_rescue_event_label
+import reskiume.composeapp.generated.resources.check_rescue_event_screen_keep_chatting_button
 import reskiume.composeapp.generated.resources.check_rescue_event_screen_no_account_button
 import reskiume.composeapp.generated.resources.check_rescue_event_screen_no_account_label
 import reskiume.composeapp.generated.resources.check_rescue_event_screen_non_human_animals_to_rescue
@@ -86,16 +86,14 @@ import reskiume.composeapp.generated.resources.reskiume
 
 @Composable
 fun CheckRescueEventScreen(
-    onContactRescueEvent: (rescueEventId: String, nonHumanAnimalIds: List<String>) -> Unit,
+    onContactRescueEvent: (chatId: String, lastTimestamp: Long) -> Unit,
     onCreateAccount: () -> Unit,
     onBackPressed: () -> Unit
 ) {
     val checkRescueEventViewmodel: CheckRescueEventViewmodel =
         koinViewModel<CheckRescueEventViewmodel>()
 
-    val uiRescueEventState: UiState<UiRescueEvent> by checkRescueEventViewmodel.rescueEventFlow.collectAsStateWithLifecycle(
-        initialValue = UiState.Loading()
-    )
+    val uiRescueEventDetail: UiState<UiRescueEventDetail> by checkRescueEventViewmodel.rescueEventDetailState.collectAsStateWithLifecycle()
 
     var isShareButtonClicked: Boolean by remember { mutableStateOf(false) }
     var isStartChatClicked: Boolean by rememberSaveable { mutableStateOf(false) }
@@ -107,18 +105,18 @@ fun CheckRescueEventScreen(
 
     RmScaffold(
         title =
-            if (uiRescueEventState is UiState.Success) {
+            if (uiRescueEventDetail is UiState.Success) {
                 stringResource(
                     Res.string.check_rescue_event_screen_title,
-                    (uiRescueEventState as UiState.Success<UiRescueEvent>).data.rescueEvent.title,
+                    (uiRescueEventDetail as UiState.Success<UiRescueEventDetail>).data.rescueEvent.title,
                     stringResource(
                         City
-                            .valueOf((uiRescueEventState as UiState.Success<UiRescueEvent>).data.rescueEvent.city)
+                            .valueOf((uiRescueEventDetail as UiState.Success<UiRescueEventDetail>).data.rescueEvent.city)
                             .toStringResource()
                     ).substring(5),
                     stringResource(
                         Country
-                            .valueOf((uiRescueEventState as UiState.Success<UiRescueEvent>).data.rescueEvent.country)
+                            .valueOf((uiRescueEventDetail as UiState.Success<UiRescueEventDetail>).data.rescueEvent.country)
                             .toStringResource()
                     ).substring(5)
                 )
@@ -126,7 +124,7 @@ fun CheckRescueEventScreen(
                 ""
             },
         topAppBarActions = {
-            if (uiRescueEventState is UiState.Success) {
+            if (uiRescueEventDetail is UiState.Success) {
                 IconButton(
                     modifier = Modifier.padding(end = 16.dp).size(32.dp),
                     onClick = {
@@ -155,19 +153,19 @@ fun CheckRescueEventScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             RmResultState(
-                uiState = uiRescueEventState,
+                uiState = uiRescueEventDetail,
                 customErrorMessage = stringResource(
                     Res.string.general_error_invalid_deep_link,
                     stringResource(Res.string.rescue_event)
                 )
-            ) { uiRescueEvent: UiRescueEvent ->
+            ) { uiRescueEventDetail: UiRescueEventDetail ->
 
                 if (isShareButtonClicked) {
                     DisplayShareService(
-                        rescueEventTitle = uiRescueEvent.rescueEvent.title,
-                        allNonHumanAnimalsToRescue = uiRescueEvent.allUiNonHumanAnimalsToRescue,
-                        rescueEventCreatorId = uiRescueEvent.rescueEvent.creatorId,
-                        rescueEventId = uiRescueEvent.rescueEvent.id
+                        rescueEventTitle = uiRescueEventDetail.rescueEvent.title,
+                        allNonHumanAnimalsToRescue = uiRescueEventDetail.allUiNonHumanAnimalsToRescue,
+                        rescueEventCreatorId = uiRescueEventDetail.rescueEvent.creatorId,
+                        rescueEventId = uiRescueEventDetail.rescueEvent.id
                     )
                     isShareButtonClicked = false
                 }
@@ -175,11 +173,11 @@ fun CheckRescueEventScreen(
                 Spacer(modifier = Modifier.height(8.dp))
                 RmImage(
                     modifier = Modifier.height(300.dp).clip(RoundedCornerShape(15.dp)),
-                    imagePath = uiRescueEvent.rescueEvent.imageUrl,
+                    imagePath = uiRescueEventDetail.rescueEvent.imageUrl,
                     contentDescription =
                         stringResource(
                             Res.string.check_rescue_event_screen_rescue_event_avatar_content_description,
-                            uiRescueEvent.rescueEvent.title
+                            uiRescueEventDetail.rescueEvent.title
                         )
                 )
 
@@ -189,12 +187,15 @@ fun CheckRescueEventScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    DisplayCreator(uiRescueEvent.creator!!)
+                    DisplayCreator(
+                        uiRescueEventDetail.creator!!.username,
+                        uiRescueEventDetail.creator.image
+                    )
 
                     RmReport(
                         stringResource(Res.string.rescue_event),
-                        uiRescueEvent.rescueEvent.id,
-                        uiRescueEvent.rescueEvent.title
+                        uiRescueEventDetail.rescueEvent.id,
+                        uiRescueEventDetail.rescueEvent.title
                     )
                 }
 
@@ -208,33 +209,37 @@ fun CheckRescueEventScreen(
                 )
                 RmText(
                     modifier = Modifier.fillMaxWidth().padding(10.dp),
-                    text = uiRescueEvent.rescueEvent.description
+                    text = uiRescueEventDetail.rescueEvent.description
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
-                RmText(
-                    modifier = Modifier.fillMaxWidth().padding(10.dp),
-                    text = stringResource(Res.string.check_rescue_event_screen_rescue_event_needs_to_cover_label),
-                    textAlign = TextAlign.Start,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.ExtraBold
-                )
-                NeedToCoverList(uiRescueEvent.rescueEvent.allNeedsToCover)
+                if (uiRescueEventDetail.allUiNonHumanAnimalsToRescue.isNotEmpty()) {
 
-                Spacer(modifier = Modifier.height(8.dp))
-                RmText(
-                    modifier = Modifier.fillMaxWidth().padding(10.dp),
-                    text = stringResource(Res.string.check_rescue_event_screen_rescue_event_non_human_animals_to_rescue_label),
-                    textAlign = TextAlign.Start,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.ExtraBold
-                )
-                NonHumanAnimalToRescueList(
-                    uiRescueEvent.allUiNonHumanAnimalsToRescue
-                )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    RmText(
+                        modifier = Modifier.fillMaxWidth().padding(10.dp),
+                        text = stringResource(Res.string.check_rescue_event_screen_rescue_event_needs_to_cover_label),
+                        textAlign = TextAlign.Start,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                    NeedToCoverList(uiRescueEventDetail.rescueEvent.allNeedsToCover)
 
-                if (checkRescueEventViewmodel.canIStartTheChat()) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    RmText(
+                        modifier = Modifier.fillMaxWidth().padding(10.dp),
+                        text = stringResource(Res.string.check_rescue_event_screen_rescue_event_non_human_animals_to_rescue_label),
+                        textAlign = TextAlign.Start,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                    NonHumanAnimalToRescueList(
+                        uiRescueEventDetail.allUiNonHumanAnimalsToRescue
+                    )
+                }
 
+                if (checkRescueEventViewmodel.canIStartTheChat()
+                    || uiRescueEventDetail.chatExist
+                ) {
                     Spacer(modifier = Modifier.height(8.dp))
                     HorizontalDivider(
                         modifier = Modifier.fillMaxWidth().alpha(0.1f),
@@ -247,8 +252,12 @@ fun CheckRescueEventScreen(
                         RmText(
                             modifier = Modifier.fillMaxWidth().padding(10.dp),
                             text = stringResource(
-                                Res.string.check_rescue_event_screen_join_the_rescue_event_label,
-                                uiRescueEvent.rescueEvent.title
+                                if (uiRescueEventDetail.chatExist) {
+                                    Res.string.check_rescue_event_screen_come_back_to_the_rescue_event_label
+                                } else {
+                                    Res.string.check_rescue_event_screen_join_the_rescue_event_label
+                                },
+                                uiRescueEventDetail.rescueEvent.title
                             ),
                             textAlign = TextAlign.Start,
                             fontSize = 18.sp,
@@ -257,7 +266,13 @@ fun CheckRescueEventScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                         RmButton(
                             modifier = Modifier.fillMaxWidth(),
-                            text = stringResource(Res.string.check_rescue_event_screen_start_chat_button),
+                            text = stringResource(
+                                if (uiRescueEventDetail.chatExist) {
+                                    Res.string.check_rescue_event_screen_keep_chatting_button
+                                } else {
+                                    Res.string.check_rescue_event_screen_start_chat_button
+                                }
+                            ),
                         ) {
                             isStartChatClicked = true
                         }
@@ -273,10 +288,15 @@ fun CheckRescueEventScreen(
                                     }
                                 },
                                 onNotificationPermissionGranted = {
-                                    onContactRescueEvent(
-                                        uiRescueEvent.rescueEvent.id,
-                                        uiRescueEvent.allUiNonHumanAnimalsToRescue.map { it.id }
-                                    )
+                                    checkRescueEventViewmodel.findChat(
+                                        uiRescueEventDetail.rescueEvent.id,
+                                        uiRescueEventDetail.creator!!.uid,
+                                        uiRescueEventDetail.allUiNonHumanAnimalsToRescue
+                                    ) { chatId: String, lastTimestamp: Long ->
+
+                                        onContactRescueEvent(chatId, lastTimestamp)
+                                        isStartChatClicked = false
+                                    }
                                 }
                             )
                         }
@@ -285,7 +305,7 @@ fun CheckRescueEventScreen(
                             modifier = Modifier.fillMaxWidth().padding(10.dp),
                             text = stringResource(
                                 Res.string.check_rescue_event_screen_no_account_label,
-                                uiRescueEvent.creator!!.username
+                                uiRescueEventDetail.creator!!.username
                             ),
                             textToLink = stringResource(Res.string.check_rescue_event_screen_no_account_button),
                             textAlign = TextAlign.Start,
@@ -330,37 +350,39 @@ fun DisplayShareService(
 }
 
 @Composable
-fun DisplayCreator(creator: User) {
-
+fun DisplayCreator(
+    username: String,
+    imageUrl: String
+) {
     Row(
         modifier = Modifier.padding(10.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start
     ) {
-        if (creator.image.isBlank()) {
+        if (imageUrl.isBlank()) {
             Icon(
                 modifier = Modifier.size(40.dp),
                 painter = painterResource(Res.drawable.reskiume),
                 contentDescription =
                     stringResource(
                         Res.string.check_rescue_event_screen_creator_avatar_content_description,
-                        creator.username
+                        username
                     ),
                 tint = primaryGreen
             )
         } else {
             RmImage(
                 modifier = Modifier.size(40.dp).clip(CircleShape),
-                imagePath = creator.image,
+                imagePath = imageUrl,
                 contentDescription = stringResource(
                     Res.string.check_rescue_event_screen_creator_avatar_content_description,
-                    creator.username
+                    username
                 )
             )
         }
         Spacer(modifier = Modifier.width(8.dp))
         RmText(
-            text = creator.username,
+            text = username,
             fontWeight = FontWeight.Bold
         )
     }

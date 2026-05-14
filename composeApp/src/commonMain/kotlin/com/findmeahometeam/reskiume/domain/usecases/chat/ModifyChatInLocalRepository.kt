@@ -1,12 +1,10 @@
 package com.findmeahometeam.reskiume.domain.usecases.chat
 
 import com.findmeahometeam.reskiume.data.util.log.Log
+import com.findmeahometeam.reskiume.domain.model.chat.BlockedUserInfo
 import com.findmeahometeam.reskiume.domain.model.chat.Chat
 import com.findmeahometeam.reskiume.domain.model.chat.NonHumanAnimalInfo
-import com.findmeahometeam.reskiume.domain.model.chat.ActivistInfo
-import com.findmeahometeam.reskiume.domain.model.chat.BlockedUserInfo
 import com.findmeahometeam.reskiume.domain.repository.local.LocalChatRepository
-import kotlinx.coroutines.CoroutineScope
 
 class ModifyChatInLocalRepository(
     private val localChatRepository: LocalChatRepository,
@@ -15,7 +13,6 @@ class ModifyChatInLocalRepository(
     suspend operator fun invoke(
         updatedChat: Chat,
         previousChat: Chat,
-        coroutineScope: CoroutineScope,
         onModifyChat: suspend (isUpdated: Boolean) -> Unit
     ) {
         localChatRepository.modifyChat(
@@ -123,23 +120,23 @@ class ModifyChatInLocalRepository(
         var isSuccess = true
 
         val previousAllActivistsInfo =
-            previousChat.allActivistsInfo.toSet()
+            previousChat.allActivistsInfo.map { it.uid }.toSet()
 
         val updatedAllActivistsInfo =
-            updatedChat.allActivistsInfo.toSet()
+            updatedChat.allActivistsInfo.map { it.uid }.toSet()
 
-        val activistsInfoToManage: Set<ActivistInfo> =
+        val activistUidsToManage: Set<String> =
             (previousAllActivistsInfo - updatedAllActivistsInfo) +
                     (updatedAllActivistsInfo - previousAllActivistsInfo)
 
-        activistsInfoToManage.forEach { userInfoToManage ->
+        activistUidsToManage.forEach { uidToManage ->
             if (isSuccess) {
 
-                if (updatedAllActivistsInfo.contains(userInfoToManage)) {
+                if (updatedAllActivistsInfo.contains(uidToManage)) {
 
                     val userInfoEntity =
                         updatedChat.allActivistsInfo.first {
-                            it.uid == userInfoToManage.uid
+                            it.uid == uidToManage
                         }.toEntity()
 
                     localChatRepository.insertActivistInfoEntity(
@@ -163,9 +160,8 @@ class ModifyChatInLocalRepository(
 
                     val userInfo =
                         previousChat.allActivistsInfo.first {
-                            it.uid == userInfoToManage.uid
+                            it.uid == uidToManage
                         }
-
                     localChatRepository.deleteActivistInfoEntity(
                         userInfo.uid,
                         onDeleteActivistInfoEntity = { rowsDeleted ->

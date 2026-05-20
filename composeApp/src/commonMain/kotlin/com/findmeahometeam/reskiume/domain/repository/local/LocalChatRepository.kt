@@ -17,17 +17,17 @@ interface LocalChatRepository {
 
     suspend fun insertNonHumanAnimalInfoEntity(
         nonHumanAnimalInfoEntity: NonHumanAnimalInfoEntity,
-        onInsertNonHumanAnimalInfoEntity: (rowId: Long) -> Unit
+        onInsertNonHumanAnimalInfoEntity: suspend (rowId: Long) -> Unit
     )
 
     suspend fun insertActivistInfoEntity(
         activistInfoEntity: ActivistInfoEntity,
-        onInsertActivistInfoEntity: (rowId: Long) -> Unit
+        onInsertActivistInfoEntity: suspend (rowId: Long) -> Unit
     )
 
     suspend fun insertBlockedUserInfoEntity(
         blockedUserInfoEntity: BlockedUserInfoEntity,
-        onInsertBlockedUserInfoEntity: (rowId: Long) -> Unit
+        onInsertBlockedUserInfoEntity: suspend (rowId: Long) -> Unit
     )
 
     suspend fun insertChatMessageEntity(
@@ -47,17 +47,17 @@ interface LocalChatRepository {
 
     suspend fun deleteNonHumanAnimalInfoEntity(
         nonHumanAnimalId: String,
-        onDeleteNonHumanAnimalInfoEntity: (rowsDeleted: Int) -> Unit
+        onDeleteNonHumanAnimalInfoEntity: suspend (rowsDeleted: Int) -> Unit
     )
 
     suspend fun deleteActivistInfoEntity(
         uid: String,
-        onDeleteActivistInfoEntity: (rowsDeleted: Int) -> Unit
+        onDeleteActivistInfoEntity: suspend (rowsDeleted: Int) -> Unit
     )
 
     suspend fun deleteBlockedUserInfoEntity(
         uid: String,
-        onDeleteBlockedUserInfoEntity: (rowsDeleted: Int) -> Unit
+        onDeleteBlockedUserInfoEntity: suspend (rowsDeleted: Int) -> Unit
     )
 
     suspend fun deleteAllMyChats(

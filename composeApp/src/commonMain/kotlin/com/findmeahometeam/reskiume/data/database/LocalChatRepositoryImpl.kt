@@ -22,7 +22,7 @@ class LocalChatRepositoryImpl(
 
     override suspend fun insertNonHumanAnimalInfoEntity(
         nonHumanAnimalInfoEntity: NonHumanAnimalInfoEntity,
-        onInsertNonHumanAnimalInfoEntity: (rowId: Long) -> Unit
+        onInsertNonHumanAnimalInfoEntity: suspend (rowId: Long) -> Unit
     ) {
         onInsertNonHumanAnimalInfoEntity(
             reskiumeDatabase.getChatDao().insertNonHumanAnimalInfoEntity(nonHumanAnimalInfoEntity)
@@ -31,7 +31,7 @@ class LocalChatRepositoryImpl(
 
     override suspend fun insertActivistInfoEntity(
         activistInfoEntity: ActivistInfoEntity,
-        onInsertActivistInfoEntity: (rowId: Long) -> Unit
+        onInsertActivistInfoEntity: suspend (rowId: Long) -> Unit
     ) {
         onInsertActivistInfoEntity(
             reskiumeDatabase.getChatDao().insertActivistInfoEntity(activistInfoEntity)
@@ -40,7 +40,7 @@ class LocalChatRepositoryImpl(
 
     override suspend fun insertBlockedUserInfoEntity(
         blockedUserInfoEntity: BlockedUserInfoEntity,
-        onInsertBlockedUserInfoEntity: (rowId: Long) -> Unit
+        onInsertBlockedUserInfoEntity: suspend (rowId: Long) -> Unit
     ) {
         onInsertBlockedUserInfoEntity(
             reskiumeDatabase.getChatDao().insertBlockedUserInfoEntity(blockedUserInfoEntity)
@@ -74,7 +74,7 @@ class LocalChatRepositoryImpl(
 
     override suspend fun deleteNonHumanAnimalInfoEntity(
         nonHumanAnimalId: String,
-        onDeleteNonHumanAnimalInfoEntity: (rowsDeleted: Int) -> Unit
+        onDeleteNonHumanAnimalInfoEntity: suspend (rowsDeleted: Int) -> Unit
     ) {
         onDeleteNonHumanAnimalInfoEntity(
             reskiumeDatabase.getChatDao().deleteNonHumanAnimalInfoEntity(nonHumanAnimalId)
@@ -83,14 +83,14 @@ class LocalChatRepositoryImpl(
 
     override suspend fun deleteActivistInfoEntity(
         uid: String,
-        onDeleteActivistInfoEntity: (rowsDeleted: Int) -> Unit
+        onDeleteActivistInfoEntity: suspend (rowsDeleted: Int) -> Unit
     ) {
         onDeleteActivistInfoEntity(reskiumeDatabase.getChatDao().deleteActivistInfoEntity(uid))
     }
 
     override suspend fun deleteBlockedUserInfoEntity(
         uid: String,
-        onDeleteBlockedUserInfoEntity: (rowsDeleted: Int) -> Unit
+        onDeleteBlockedUserInfoEntity: suspend (rowsDeleted: Int) -> Unit
     ) {
         onDeleteBlockedUserInfoEntity(
             reskiumeDatabase.getChatDao().deleteBlockedUserInfoEntity(uid)

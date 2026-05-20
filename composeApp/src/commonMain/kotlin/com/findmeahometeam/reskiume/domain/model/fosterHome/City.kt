@@ -8,7 +8,6 @@ import reskiume.composeapp.generated.resources.agualva_cacem
 import reskiume.composeapp.generated.resources.aix_en_provence
 import reskiume.composeapp.generated.resources.albacete
 import reskiume.composeapp.generated.resources.alicante
-import reskiume.composeapp.generated.resources.alicante_city
 import reskiume.composeapp.generated.resources.almada
 import reskiume.composeapp.generated.resources.almeria
 import reskiume.composeapp.generated.resources.amadora
@@ -255,7 +254,6 @@ enum class City(val country: Country) {
     A_CORUNA(Country.SPAIN),
     ALBACETE(Country.SPAIN),
     ALICANTE(Country.SPAIN),
-    ALICANTE_CITY(Country.SPAIN),
     ALMERIA(Country.SPAIN),
     BADALONA(Country.SPAIN),
     BADAJOZ(Country.SPAIN),
@@ -477,7 +475,6 @@ fun City.toStringResource(): StringResource {
         City.CARTAGENA -> Res.string.cartagena
         City.OVIEDO -> Res.string.oviedo
         City.DONOSTIA_SAN_SEBASTIAN -> Res.string.donostia_san_sebastian
-        City.ALICANTE_CITY -> Res.string.alicante_city
         City.MERIDA -> Res.string.merida
         City.TOLEDO -> Res.string.toledo
         City.CACERES -> Res.string.caceres

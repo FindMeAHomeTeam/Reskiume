@@ -21,6 +21,7 @@ import com.findmeahometeam.reskiume.domain.usecases.chat.GetChatFromRemoteReposi
 import com.findmeahometeam.reskiume.domain.usecases.chat.InsertChatMessageInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.chat.InsertChatMessageInRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.chat.ModifyChatInRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.ModifyOnlyActivistsInChatInRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetFosterHomeFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetFosterHomeFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.ModifyFosterHomeInLocalRepository
@@ -96,6 +97,7 @@ class CheckChatViewmodel(
     private val getStringProvider: StringProvider,
     private val subscriptionManagerUtil: SubscriptionManagerUtil,
     private val modifyChatInRemoteRepository: ModifyChatInRemoteRepository,
+    private val modifyOnlyActivistsInChatInRemoteRepository: ModifyOnlyActivistsInChatInRemoteRepository,
     private val manageChatUtil: ManageChatUtil,
     private val deleteMyChatFromRemoteRepository: DeleteMyChatFromRemoteRepository,
     private val deleteMyChatFromLocalRepository: DeleteMyChatFromLocalRepository,
@@ -116,7 +118,7 @@ class CheckChatViewmodel(
     private val chatId: String =
         saveStateHandleProvider.provideObjectRoute(CheckChat::class).chatId
 
-    private val lastTimestamp: Long =
+    private var lastTimestamp: Long =
         saveStateHandleProvider.provideObjectRoute(CheckChat::class).lastTimestamp
 
     private var myUid = ""
@@ -124,6 +126,8 @@ class CheckChatViewmodel(
     private val oneDayInMilliseconds = 86400000
 
     private var job: Job? = null
+
+    private var lastestActivistCount = 0
 
     init {
         viewModelScope.launch {
@@ -141,6 +145,19 @@ class CheckChatViewmodel(
                     return@collect
                 }
 
+                // In case the collect function is emits multiple times
+                when {
+                    lastTimestamp != updatedChat.timestamp -> {
+                        lastTimestamp = updatedChat.timestamp
+
+                    }
+                    lastestActivistCount != updatedChat.allActivistsInfo.size -> {
+                        lastestActivistCount = updatedChat.allActivistsInfo.size
+                    }
+                    else -> {
+                        return@collect
+                    }
+                }
                 viewModelScope.launch {
 
                     val previousChat = getChatFromLocalRepository(chatId).firstOrNull()
@@ -273,7 +290,13 @@ class CheckChatViewmodel(
                         it.nonHumanAnimalId,
                         it.caregiverId,
                         viewModelScope
-                    ).first()
+                    ).first().let { nonHumanAnimal ->
+                        nonHumanAnimal.copy(
+                            imageUrl = getImagePathForFileNameFromLocalDataSource(
+                                nonHumanAnimal.imageUrl
+                            )
+                        )
+                    }
                 }
                 val chatHolderId = checkActivistUtil.getUser(
                     activistUid = chat.chatHolderId,
@@ -528,11 +551,11 @@ class CheckChatViewmodel(
     private suspend fun removeMyUserInChat(onSuccess: suspend () -> Unit) {
 
         val chat = getChatFromLocalRepository(chatId).first()!!
-        val updatedChat = chat.copy(
-            allActivistsInfo = chat.allActivistsInfo.filterNot { it.uid == myUid },
-            timestamp = Clock.System.now().toEpochMilliseconds()
-        )
-        val modifyChatInRemoteResult = modifyChatInRemoteRepository(updatedChat).first()
+        val modifyChatInRemoteResult = modifyOnlyActivistsInChatInRemoteRepository(
+            chatId = chat.id,
+            activistId = myUid,
+            shouldAdd = false
+        ).first()
         if (modifyChatInRemoteResult is DatabaseResult.Success) {
             onSuccess()
         }
@@ -594,36 +617,32 @@ class CheckChatViewmodel(
             if (allNonHumanAnimals.any { it.nonHumanAnimalState != NonHumanAnimalState.NEEDS_TO_BE_REHOMED }) {
 
                 viewModelScope.launch {
-                    var counter = 0
-                    allNonHumanAnimals.forEach {
+                    val allUpdatedNonHumanAnimals = allNonHumanAnimals.map {
 
-                        if (it.nonHumanAnimalState != NonHumanAnimalState.NEEDS_TO_BE_REHOMED) {
+                        val remoteNonHumanAnimal = getNonHumanAnimalFromRemoteRepository(
+                            it.id,
+                            it.caregiverId
+                        ).first()!!
 
-                            val remoteNonHumanAnimal = getNonHumanAnimalFromRemoteRepository(
-                                it.id,
-                                it.caregiverId
-                            ).first()!!
+                        it.copy(
+                            fosterHomeId = "",
+                            imageUrl = remoteNonHumanAnimal.imageUrl,
+                            nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_REHOMED
+                        )
+                    }
+                    modifyNonHumanAnimalInRemoteRepo(allUpdatedNonHumanAnimals) {
+                        viewModelScope.launch {
 
-                            val updatedNonHumanAnimal = it.copy(
-                                fosterHomeId = "",
-                                imageUrl = remoteNonHumanAnimal.imageUrl,
-                                nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_REHOMED
+                            modifyFosterHomeInLocalRepo(
+                                fosterHomeId = fosterHomeId,
+                                allNonHumanAnimals = allUpdatedNonHumanAnimals.mapIndexed { index, nonHumanAnimal ->
+                                    nonHumanAnimal.copy(
+                                        imageUrl = allNonHumanAnimals[index].imageUrl
+                                    )
+                                },
+                                onError = {},
+                                onSuccess = onComplete
                             )
-                            modifyNonHumanAnimalInRemoteRepo(updatedNonHumanAnimal) {
-                                viewModelScope.launch {
-
-                                    modifyFosterHomeInLocalRepo(
-                                        fosterHomeId,
-                                        updatedNonHumanAnimal.copy(imageUrl = it.imageUrl)
-                                    ) {
-                                        if (counter == allNonHumanAnimals.size - 1) {
-                                            onComplete()
-                                        } else {
-                                            counter += 1
-                                        }
-                                    }
-                                }
-                            }
                         }
                     }
                 }
@@ -638,29 +657,32 @@ class CheckChatViewmodel(
     }
 
     private suspend fun modifyNonHumanAnimalInRemoteRepo(
-        nonHumanAnimal: NonHumanAnimal,
+        allUpdatedNonHumanAnimals: List<NonHumanAnimal>,
         onSuccess: () -> Unit
     ) {
-        modifyNonHumanAnimalInRemoteRepository(nonHumanAnimal) { result ->
+        allUpdatedNonHumanAnimals.forEach { nonHumanAnimal ->
 
-            if (result is DatabaseResult.Success) {
-                log.d(
-                    "CheckChatViewmodel",
-                    "modifyNonHumanAnimalInRemoteRepo: Successfully updated the non human animal ${nonHumanAnimal.id} with state ${nonHumanAnimal.nonHumanAnimalState} in the remote data source"
-                )
-                onSuccess()
-            } else {
-                log.e(
-                    "CheckChatViewmodel",
-                    "modifyNonHumanAnimalInRemoteRepo: Something went wrong updating the non human animal ${nonHumanAnimal.id} in the remote data source"
-                )
+            modifyNonHumanAnimalInRemoteRepository(nonHumanAnimal) { result ->
+
+                if (result is DatabaseResult.Success) {
+                    log.d(
+                        "CheckChatViewmodel",
+                        "modifyNonHumanAnimalInRemoteRepo: Successfully updated the non human animal ${nonHumanAnimal.id} with state ${nonHumanAnimal.nonHumanAnimalState} in the remote data source"
+                    )
+                    onSuccess()
+                } else {
+                    log.e(
+                        "CheckChatViewmodel",
+                        "modifyNonHumanAnimalInRemoteRepo: Something went wrong updating the non human animal ${nonHumanAnimal.id} in the remote data source"
+                    )
+                }
             }
         }
     }
 
     private fun manageFosterHomesInRepos(
         fosterHomeId: String,
-        nonHumanAnimal: NonHumanAnimal,
+        allNonHumanAnimals: List<NonHumanAnimal>,
         onError: () -> Unit,
         onSuccess: () -> Unit
     ) {
@@ -668,14 +690,14 @@ class CheckChatViewmodel(
 
             modifyFosterHomeInLocalRepo(
                 fosterHomeId = fosterHomeId,
-                nonHumanAnimal = nonHumanAnimal,
+                allNonHumanAnimals = allNonHumanAnimals,
                 onError = onError
             ) {
                 viewModelScope.launch {
 
                     modifyFosterHomeInRemoteRepo(
                         fosterHomeId = fosterHomeId,
-                        nonHumanAnimal = nonHumanAnimal,
+                        allNonHumanAnimals = allNonHumanAnimals,
                         onError = onError
                     ) {
                         onSuccess()
@@ -687,25 +709,34 @@ class CheckChatViewmodel(
 
     private suspend fun modifyFosterHomeInRemoteRepo(
         fosterHomeId: String,
-        nonHumanAnimal: NonHumanAnimal,
+        allNonHumanAnimals: List<NonHumanAnimal>,
         onError: () -> Unit,
         onSuccess: () -> Unit
     ) {
         val fosterHome = getFosterHomeFromRemoteRepository(fosterHomeId).first()!!
 
+        val nonHumanAnimalState = allNonHumanAnimals.first().nonHumanAnimalState
+
         modifyFosterHomeInRemoteRepository(
-            isNonHumanAnimalSaved = nonHumanAnimal.nonHumanAnimalState == NonHumanAnimalState.SAVED,
+            isNonHumanAnimalSaved = nonHumanAnimalState == NonHumanAnimalState.SAVED,
             updatedFosterHome = fosterHome.copy(
-                allResidentNonHumanAnimals = if (nonHumanAnimal.nonHumanAnimalState == NonHumanAnimalState.REHOMED) {
+                allResidentNonHumanAnimals = if (nonHumanAnimalState == NonHumanAnimalState.REHOMED) {
                     fosterHome.allResidentNonHumanAnimals.plus(
-                        ResidentNonHumanAnimalForFosterHome(
-                            nonHumanAnimalId = nonHumanAnimal.id,
-                            caregiverId = nonHumanAnimal.caregiverId,
-                            fosterHomeId = fosterHomeId
-                        )
+
+                        allNonHumanAnimals.map {
+                            ResidentNonHumanAnimalForFosterHome(
+                                nonHumanAnimalId = it.id,
+                                caregiverId = it.caregiverId,
+                                fosterHomeId = fosterHomeId
+                            )
+                        }
                     )
                 } else {
-                    fosterHome.allResidentNonHumanAnimals.filter { it.nonHumanAnimalId != nonHumanAnimal.id }
+                    fosterHome.allResidentNonHumanAnimals.filter { resident ->
+                        allNonHumanAnimals.all { nonHumanAnimal ->
+                            resident.nonHumanAnimalId != nonHumanAnimal.id
+                        }
+                    }
                 }
             ),
             previousFosterHome = fosterHome,
@@ -715,13 +746,13 @@ class CheckChatViewmodel(
             if (result is DatabaseResult.Success) {
                 log.d(
                     "CheckChatViewmodel",
-                    "modifyFosterHomeInRemoteRepo: Successfully modified the foster home $fosterHomeId to modify the non human animal ${nonHumanAnimal.id} with state ${nonHumanAnimal.nonHumanAnimalState} in the remote data source"
+                    "modifyFosterHomeInRemoteRepo: Successfully modified the foster home $fosterHomeId to modify the non human animals with state $nonHumanAnimalState in the remote data source"
                 )
                 onSuccess()
             } else {
                 log.e(
                     "CheckChatViewmodel",
-                    "modifyFosterHomeInRemoteRepo: Something went wrong modifying the foster home $fosterHomeId to modify the non human animal ${nonHumanAnimal.id} with state ${nonHumanAnimal.nonHumanAnimalState} in the remote data source"
+                    "modifyFosterHomeInRemoteRepo: Something went wrong modifying the foster home $fosterHomeId to modify the non human animals with state $nonHumanAnimalState in the remote data source"
                 )
                 onError()
             }
@@ -730,25 +761,34 @@ class CheckChatViewmodel(
 
     private suspend fun modifyFosterHomeInLocalRepo(
         fosterHomeId: String,
-        nonHumanAnimal: NonHumanAnimal,
+        allNonHumanAnimals: List<NonHumanAnimal>,
         onError: () -> Unit = {},
         onSuccess: () -> Unit = {}
     ) {
         val fosterHome = getFosterHomeFromLocalRepository(fosterHomeId).first()!!
 
+        val nonHumanAnimalState = allNonHumanAnimals.first().nonHumanAnimalState
+
         modifyFosterHomeInLocalRepository(
-            isNonHumanAnimalSaved = nonHumanAnimal.nonHumanAnimalState == NonHumanAnimalState.SAVED,
+            isNonHumanAnimalSaved = nonHumanAnimalState == NonHumanAnimalState.SAVED,
             updatedFosterHome = fosterHome.copy(
-                allResidentNonHumanAnimals = if (nonHumanAnimal.nonHumanAnimalState == NonHumanAnimalState.REHOMED) {
+                allResidentNonHumanAnimals = if (nonHumanAnimalState == NonHumanAnimalState.REHOMED) {
                     fosterHome.allResidentNonHumanAnimals.plus(
-                        ResidentNonHumanAnimalForFosterHome(
-                            nonHumanAnimalId = nonHumanAnimal.id,
-                            caregiverId = nonHumanAnimal.caregiverId,
-                            fosterHomeId = fosterHomeId
-                        )
+
+                        allNonHumanAnimals.map {
+                            ResidentNonHumanAnimalForFosterHome(
+                                nonHumanAnimalId = it.id,
+                                caregiverId = it.caregiverId,
+                                fosterHomeId = fosterHomeId
+                            )
+                        }
                     )
                 } else {
-                    fosterHome.allResidentNonHumanAnimals.filter { it.nonHumanAnimalId != nonHumanAnimal.id }
+                    fosterHome.allResidentNonHumanAnimals.filter { resident ->
+                        allNonHumanAnimals.all { nonHumanAnimal ->
+                            resident.nonHumanAnimalId != nonHumanAnimal.id
+                        }
+                    }
                 }
             ),
             previousFosterHome = fosterHome,
@@ -758,13 +798,13 @@ class CheckChatViewmodel(
             if (isSuccess) {
                 log.d(
                     "CheckChatViewmodel",
-                    "modifyFosterHomeInLocalRepo: Successfully modified the foster home $fosterHomeId in the local data source"
+                    "modifyFosterHomeInLocalRepo: Successfully modified the foster home $fosterHomeId to modify the non human animals with state $nonHumanAnimalState in the local data source"
                 )
                 onSuccess()
             } else {
                 log.e(
                     "CheckChatViewmodel",
-                    "modifyFosterHomeInLocalRepo: Something went wrong modifying the foster home $fosterHomeId in the local data source"
+                    "modifyFosterHomeInLocalRepo: Something went wrong modifying the foster home $fosterHomeId to modify the non human animals with state $nonHumanAnimalState in the local data source"
                 )
                 onError()
             }
@@ -842,9 +882,9 @@ class CheckChatViewmodel(
 
                             if (isFosterHome) {
 
-                                manageNonHumanAnimalsInFosterHomes(
+                                manageFosterHomesInRepos(
                                     fosterHomeId = fosterHomeId,
-                                    allNonHumanAnimals = allNonHumanAnimals,
+                                    allNonHumanAnimals = allNonHumanAnimals.map { it.copy(nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_REHOMED) },
                                     onError = onError
                                 ) {
                                     deleteAllCachedObjectsInLocalRepo(allNonHumanAnimalIds) {
@@ -857,9 +897,9 @@ class CheckChatViewmodel(
                     }
                 } else if (isFosterHome) {
 
-                    manageNonHumanAnimalsInFosterHomes(
+                    manageFosterHomesInRepos(
                         fosterHomeId = fosterHomeId,
-                        allNonHumanAnimals = allNonHumanAnimals,
+                        allNonHumanAnimals = allNonHumanAnimals.map { it.copy(nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_REHOMED) },
                         onError = onError
                     ) {
                         deleteAllCachedObjectsInLocalRepo(allNonHumanAnimalIds) {
@@ -867,29 +907,6 @@ class CheckChatViewmodel(
                             onComplete()
                         }
                     }
-                }
-            }
-        }
-    }
-
-    private fun manageNonHumanAnimalsInFosterHomes(
-        fosterHomeId: String,
-        allNonHumanAnimals: List<NonHumanAnimal>,
-        onError: () -> Unit,
-        onComplete: () -> Unit
-    ) {
-        var counter = 0
-        allNonHumanAnimals.forEach {
-
-            manageFosterHomesInRepos(
-                fosterHomeId = fosterHomeId,
-                nonHumanAnimal = it.copy(nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_REHOMED),
-                onError = onError
-            ) {
-                if (counter == allNonHumanAnimals.size - 1) {
-                    onComplete()
-                } else {
-                    counter += 1
                 }
             }
         }
@@ -957,6 +974,7 @@ class CheckChatViewmodel(
     ) {
         viewModelScope.launch {
 
+            var counter = 0
             allNonHumanAnimalIds.forEach { nonHumanAnimalId ->
 
                 deleteNonHumanAnimalFromLocalRepository(
@@ -968,7 +986,11 @@ class CheckChatViewmodel(
                             "CheckChatViewmodel",
                             "deleteNonHumanAnimalFromLocalRepo: Successfully deleted the non human animal $nonHumanAnimalId from the local data source"
                         )
-                        onSuccess()
+                        if (counter == allNonHumanAnimalIds.size - 1) {
+                            onSuccess()
+                        } else {
+                            counter += 1
+                        }
                     } else {
                         log.e(
                             "CheckChatViewmodel",
@@ -1086,15 +1108,14 @@ class CheckChatViewmodel(
         onComplete: () -> Unit = {}
     ) {
         viewModelScope.launch {
-            var counter = 0
-            allNonHumanAnimals.forEach { nonHumanAnimal ->
+            val updatedNonHumanAnimals = allNonHumanAnimals.map { nonHumanAnimal ->
 
                 val remoteNonHumanAnimal = getNonHumanAnimalFromRemoteRepository(
                     nonHumanAnimal.id,
                     nonHumanAnimal.caregiverId
                 ).first()!!
 
-                val updatedNonHumanAnimal = nonHumanAnimal.copy(
+                nonHumanAnimal.copy(
                     fosterHomeId = if (nonHumanAnimalState == NonHumanAnimalState.REHOMED) {
                         fosterHomeId
                     } else {
@@ -1103,17 +1124,13 @@ class CheckChatViewmodel(
                     imageUrl = remoteNonHumanAnimal.imageUrl,
                     nonHumanAnimalState = nonHumanAnimalState
                 )
-                manageFosterHomesInRepos(
-                    fosterHomeId = fosterHomeId,
-                    nonHumanAnimal = updatedNonHumanAnimal,
-                    onError = onError
-                ) {
-                    if (counter == allNonHumanAnimals.size - 1) {
-                        onComplete()
-                    } else {
-                        counter += 1
-                    }
-                }
+            }
+            manageFosterHomesInRepos(
+                fosterHomeId = fosterHomeId,
+                allNonHumanAnimals = updatedNonHumanAnimals,
+                onError = onError
+            ) {
+                onComplete()
             }
         }
     }
@@ -1202,21 +1219,21 @@ class CheckChatViewmodel(
         onError: () -> Unit,
         onSuccess: () -> Unit
     ) {
-        allNonHumanAnimals.forEach { nonHumanAnimal ->
+        val allRemoteNonHumanAnimals = allNonHumanAnimals.map { nonHumanAnimal ->
 
-            val remoteNonHumanAnimal = getNonHumanAnimalFromRemoteRepository(
+            getNonHumanAnimalFromRemoteRepository(
                 nonHumanAnimal.id,
                 nonHumanAnimal.caregiverId
             ).first()!!
-
-            // Update the forster home with the last non human animal state
-            modifyFosterHomeInLocalRepo(
-                fosterHomeId = fosterHomeId,
-                nonHumanAnimal = remoteNonHumanAnimal,
-                onError = onError,
-                onSuccess = onSuccess
-            )
         }
+
+        // Update the forster home with the last non human animal state
+        modifyFosterHomeInLocalRepo(
+            fosterHomeId = fosterHomeId,
+            allNonHumanAnimals = allRemoteNonHumanAnimals,
+            onError = onError,
+            onSuccess = onSuccess
+        )
     }
 
     fun finishAndEvaluate(

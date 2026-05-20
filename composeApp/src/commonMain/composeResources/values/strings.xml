@@ -335,6 +335,9 @@
     <string name="check_foster_home_screen_continue_chat_button">Come back to the chat</string>
     <string name="check_foster_home_screen_share_foster_home_title">Do you need to foster a non-human animal? The foster home %1$s can take care of: %2$s. Find it in the Reskiume app using the following link %3$s</string>
     <string name="check_foster_home_screen_add_non_human_animals_to_foster_title">Add non-human animals to foster</string>
+    <string name="check_foster_home_screen_ok_button">Ok</string>
+    <string name="check_foster_home_screen_foster_home_not_available_title">This foster home is not available</string>
+    <string name="check_foster_home_screen_look_for_foster_homes_message">Please, keep looking for different foster homes</string>
 
     <!-- Check all my rescue events -->
     <string name="check_all_my_rescue_events_screen_title">Check my rescue events</string>
@@ -408,7 +411,10 @@
     <string name="check_rescue_event_screen_come_back_to_the_rescue_event_label">Come back to the rescue event %1$s</string>
     <string name="check_rescue_event_screen_start_chat_button">Start chat</string>
     <string name="check_rescue_event_screen_keep_chatting_button">Keep chatting</string>
-    <string name="check_foster_home_screen_share_rescue_event_title">Join the rescue event %1$s to rescue %2$s. Find it in the Reskiume app using the following link %3$s</string>
+    <string name="check_rescue_event_screen_share_rescue_event_title">Join the rescue event %1$s to rescue %2$s. Find it in the Reskiume app using the following link %3$s</string>
+    <string name="check_rescue_event_screen_ok_button">Ok</string>
+    <string name="check_rescue_event_screen_rescue_event_finished_title">This rescue event has finished</string>
+    <string name="check_rescue_event_screen_rescue_event_message">Please, keep looking for new rescue events. Your help is valuable.</string>
 
     <!-- Check all my chats -->
     <string name="check_all_my_chats_screen_title">Chats</string>

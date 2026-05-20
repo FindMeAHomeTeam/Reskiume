@@ -25,6 +25,7 @@ import com.findmeahometeam.reskiume.domain.usecases.chat.IsFosterHomeInChatInLoc
 import com.findmeahometeam.reskiume.domain.usecases.chat.IsNonHumanAnimalInChatInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.chat.ModifyChatInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.chat.ModifyChatInRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.ModifyOnlyActivistsInChatInRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.DeleteAllMyFosterHomesFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.DeleteAllMyFosterHomesFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.DeleteMyFosterHomeFromLocalRepository
@@ -130,6 +131,7 @@ val domainModule = module {
     factoryOf(::InsertChatMessageInRemoteRepository)
     factoryOf(::ModifyChatInLocalRepository)
     factoryOf(::ModifyChatInRemoteRepository)
+    factoryOf(::ModifyOnlyActivistsInChatInRemoteRepository)
     factoryOf(::DeleteMyChatFromLocalRepository)
     factoryOf(::DeleteMyChatFromRemoteRepository)
     factoryOf(::DeleteAllMyChatsFromLocalRepository)

@@ -50,9 +50,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
@@ -119,8 +117,6 @@ import reskiume.composeapp.generated.resources.ic_activists
 import reskiume.composeapp.generated.resources.ic_exit_group
 import reskiume.composeapp.generated.resources.ic_menu
 import reskiume.composeapp.generated.resources.ic_send
-import kotlin.Pair
-import kotlin.String
 
 @Composable
 fun CheckChatScreen(
@@ -656,9 +652,15 @@ private fun DisplayNonHumanAnimalAvatars(
         ) {
             (uiChatDetailState as UiState.Success<UiChatDetail>).data.allNonHumanAnimals.forEachIndexed { index, nonHumanAnimal ->
                 if (index < 3) {
-                    Avatar(
+                    RmDisplayAvatarOrPlaceholder(
                         avatar = nonHumanAnimal.imageUrl,
-                        avatarName = nonHumanAnimal.name
+                        avatarSize = 40.dp,
+                        contentDescription =
+                            stringResource(
+                                Res.string.check_chat_screen_image_content_description,
+                                nonHumanAnimal.name
+                            ),
+                        onClick = {}
                     )
                 }
             }
@@ -669,36 +671,6 @@ private fun DisplayNonHumanAnimalAvatars(
                 .clickable {
                     onClickNonHumanAnimals()
                 }
-        )
-    }
-}
-
-@Composable
-private fun Avatar(
-    avatar: String,
-    avatarName: String,
-    onClick: () -> Unit = {}
-) {
-    Box(
-        modifier = Modifier
-            .drawWithContent {
-                drawContent()
-                drawCircle(
-                    color = Color.White,
-                    radius = 50f,
-                    style = Stroke(5f)
-                )
-            }
-    ) {
-        RmDisplayAvatarOrPlaceholder(
-            avatar = avatar,
-            avatarSize = 40.dp,
-            contentDescription =
-                stringResource(
-                    Res.string.check_chat_screen_image_content_description,
-                    avatarName
-                ),
-            onClick = onClick
         )
     }
 }
@@ -806,9 +778,14 @@ private fun DisplayCheckAllActivists(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
                         ) {
-                            Avatar(
+                            RmDisplayAvatarOrPlaceholder(
                                 avatar = it.image,
-                                avatarName = it.username
+                                avatarSize = 40.dp,
+                                contentDescription =
+                                    stringResource(
+                                        Res.string.check_chat_screen_image_content_description,
+                                        it.username
+                                    )
                             ) {
                                 onClickActivist(it.uid)
                             }
@@ -819,6 +796,7 @@ private fun DisplayCheckAllActivists(
                                 fontWeight = FontWeight.Bold,
                             )
                         }
+                        Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
             }
@@ -856,9 +834,14 @@ private fun DisplayNonHumanAnimals(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        Avatar(
+                        RmDisplayAvatarOrPlaceholder(
                             avatar = nonHumanAnimal.imageUrl,
-                            avatarName = nonHumanAnimal.name
+                            avatarSize = 40.dp,
+                            contentDescription =
+                                stringResource(
+                                    Res.string.check_chat_screen_image_content_description,
+                                    nonHumanAnimal.name
+                                )
                         ) {
                             onCheckNonHumanAnimal(
                                 nonHumanAnimal.id,

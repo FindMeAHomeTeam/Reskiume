@@ -17,6 +17,9 @@ import com.findmeahometeam.reskiume.data.remote.database.remoteReview.RealtimeDa
 import com.findmeahometeam.reskiume.data.remote.database.remoteUser.RealtimeDatabaseRemoteUserFlowsRepositoryForIosDelegateImpl
 import com.findmeahometeam.reskiume.data.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepositoryForIosDelegateWrapperImpl
 import com.findmeahometeam.reskiume.data.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepositoryIosImpl
+import com.findmeahometeam.reskiume.data.remote.fireStore.remoteChat.FireStoreRemoteChatFlowsRepositoryForIosDelegateImpl
+import com.findmeahometeam.reskiume.data.remote.fireStore.remoteChat.FireStoreRemoteChatRepositoryForIosDelegateWrapperImpl
+import com.findmeahometeam.reskiume.data.remote.fireStore.remoteChat.FireStoreRemoteChatRepositoryIosImpl
 import com.findmeahometeam.reskiume.data.remote.fireStore.remoteRescueEvent.FireStoreRemoteRescueEventFlowsRepositoryForIosDelegateImpl
 import com.findmeahometeam.reskiume.data.remote.fireStore.remoteRescueEvent.FireStoreRemoteRescueEventRepositoryForIosDelegateWrapperImpl
 import com.findmeahometeam.reskiume.data.remote.fireStore.remoteRescueEvent.FireStoreRemoteRescueEventRepositoryIosImpl
@@ -42,6 +45,9 @@ import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteRevi
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserFlowsRepositoryForIosDelegate
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepositoryForIosDelegateWrapper
+import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.chat.FireStoreRemoteChatFlowsRepositoryForIosDelegate
+import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.chat.FireStoreRemoteChatRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.chat.FireStoreRemoteChatRepositoryForIosDelegateWrapper
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteFosterHome.FireStoreRemoteFosterHomeFlowsRepositoryForIosDelegate
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteFosterHome.FireStoreRemoteFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteFosterHome.FireStoreRemoteFosterHomeRepositoryForIosDelegateWrapper
@@ -102,4 +108,7 @@ actual val platformModule: Module = module {
     singleOf(::FireStoreRemoteRescueEventRepositoryForIosDelegateWrapperImpl) bind FireStoreRemoteRescueEventRepositoryForIosDelegateWrapper::class
     singleOf(::FCMSubscriberRepositoryIosImpl) bind FCMSubscriberRepository::class
     singleOf(::FCMSubscriberRepositoryForIosDelegateWrapperImpl) bind FCMSubscriberRepositoryForIosDelegateWrapper::class
+    singleOf(::FireStoreRemoteChatRepositoryIosImpl) bind FireStoreRemoteChatRepository::class
+    singleOf(::FireStoreRemoteChatFlowsRepositoryForIosDelegateImpl) bind FireStoreRemoteChatFlowsRepositoryForIosDelegate::class
+    singleOf(::FireStoreRemoteChatRepositoryForIosDelegateWrapperImpl) bind FireStoreRemoteChatRepositoryForIosDelegateWrapper::class
 }

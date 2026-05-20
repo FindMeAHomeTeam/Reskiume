@@ -125,16 +125,17 @@ class ModifyFosterHomeInRemoteRepository(
             )
             isSuccess = false
         } else {
+            val nonHumanAnimalState = when {
+                isNonHumanAnimalSaved -> NonHumanAnimalState.SAVED
+
+                containsResidentNonHumanAnimal -> NonHumanAnimalState.REHOMED
+
+                else -> NonHumanAnimalState.NEEDS_TO_BE_REHOMED
+            }
             realtimeDatabaseRemoteNonHumanAnimalRepository.modifyRemoteNonHumanAnimal(
                 remoteResidentNonHumanAnimal
                     .copy(
-                        nonHumanAnimalState = when {
-                            isNonHumanAnimalSaved -> NonHumanAnimalState.SAVED
-
-                            containsResidentNonHumanAnimal -> NonHumanAnimalState.REHOMED
-
-                            else -> NonHumanAnimalState.NEEDS_TO_BE_REHOMED
-                        },
+                        nonHumanAnimalState = nonHumanAnimalState,
                         fosterHomeId = if (containsResidentNonHumanAnimal) {
                             fosterHomeId
                         } else {
@@ -145,12 +146,12 @@ class ModifyFosterHomeInRemoteRepository(
                 if (databaseResult is DatabaseResult.Success) {
                     log.d(
                         "ModifyFosterHomeInRemoteRepository",
-                        "updateAdoptionStates: updated non human animal state for the non human animal ${remoteResidentNonHumanAnimal.id} in the remote data source"
+                        "updateAdoptionStates: updated non human animal state $nonHumanAnimalState for the non human animal ${remoteResidentNonHumanAnimal.id} in the remote data source"
                     )
                 } else {
                     log.e(
                         "ModifyFosterHomeInRemoteRepository",
-                        "updateAdoptionStates: failed to update the non human animal state for the non human animal ${remoteResidentNonHumanAnimal.id} in the remote data source"
+                        "updateAdoptionStates: failed to update the non human animal state $nonHumanAnimalState for the non human animal ${remoteResidentNonHumanAnimal.id} in the remote data source"
                     )
                     isSuccess = false
                 }

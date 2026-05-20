@@ -7,17 +7,13 @@ import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.LocalCache
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
-import com.findmeahometeam.reskiume.domain.model.chat.ActivistInfo
-import com.findmeahometeam.reskiume.domain.model.chat.Chat
-import com.findmeahometeam.reskiume.domain.model.chat.NonHumanAnimalInfo
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueEvent
 import com.findmeahometeam.reskiume.domain.model.user.User
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.chat.GetChatFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.chat.GetChatFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.chat.InsertChatInLocalRepository
-import com.findmeahometeam.reskiume.domain.usecases.chat.InsertChatInRemoteRepository
-import com.findmeahometeam.reskiume.domain.usecases.chat.ModifyChatInRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.ModifyOnlyActivistsInChatInRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.ui.core.components.UiState
@@ -45,9 +41,8 @@ class CheckRescueEventViewmodel(
     private val checkNonHumanAnimalUtil: CheckNonHumanAnimalUtil,
     private val getChatFromLocalRepository: GetChatFromLocalRepository,
     private val getChatFromRemoteRepository: GetChatFromRemoteRepository,
-    private val insertChatInRemoteRepository: InsertChatInRemoteRepository,
     private val insertChatInLocalRepository: InsertChatInLocalRepository,
-    private val modifyChatInRemoteRepository: ModifyChatInRemoteRepository,
+    private val modifyOnlyActivistsInChatInRemoteRepository: ModifyOnlyActivistsInChatInRemoteRepository,
     private val insertCacheInLocalRepository: InsertCacheInLocalRepository,
     private val log: Log
 ) : ViewModel() {
@@ -129,92 +124,38 @@ class CheckRescueEventViewmodel(
     fun findChat(
         rescueEventId: String,
         creatorId: String,
-        allNonHumanAnimals: List<NonHumanAnimal>,
         onChatFound: (chatId: String, lastTimestamp: Long) -> Unit
     ) {
         viewModelScope.launch {
-            var inexistentChatFlag = false
+
             val localChat = getChatFromLocalRepository(rescueEventId + creatorId).firstOrNull()
-            val chat = localChat
-                ?: getChatFromRemoteRepository(rescueEventId + creatorId, myUid).firstOrNull()
-                ?: Chat(
-                    id = rescueEventId + creatorId,
-                    fosterHomeId = "",
-                    rescueEventId = rescueEventId,
-                    chatHolderId = creatorId,
-                    allNonHumanAnimalsInfo = allNonHumanAnimals.map { nonHumanAnimal ->
-                        NonHumanAnimalInfo(
-                            nonHumanAnimalId = nonHumanAnimal.id,
-                            chatId = rescueEventId + creatorId,
-                            caregiverId = nonHumanAnimal.caregiverId
-                        )
-                    },
-                    allActivistsInfo = listOf(
-                        ActivistInfo(
-                            id = Clock.System.now().epochSeconds.toString() + rescueEventId + creatorId,
-                            chatId = rescueEventId + creatorId,
-                            uid = myUid
-                        )
-                    ),
-                    allBlockedUsersInfo = emptyList(),
-                    allChatMessages = emptyList(),
-                    myUserIsConnected = true,
-                    acceptedFoster = false,
-                    finished = false,
-                    addReview = false,
-                    timestamp = Clock.System.now().toEpochMilliseconds()
-                ).also {
-                    inexistentChatFlag = true
-                }
-            val lastTimestamp: Long = chat.allChatMessages.maxOfOrNull { it.timestamp } ?: 0L
+            if (localChat != null) {
+                onChatFound(localChat.id, localChat.timestamp)
 
-            when {
-                // It doesn't exists
-                inexistentChatFlag -> {
-                    val result = insertChatInRemoteRepository(chat).first()
-                    if (result is DatabaseResult.Success) {
-                        insertChatInLocalRepository(chat) { isSuccess ->
+            } else {
+                val remoteChat =
+                    getChatFromRemoteRepository(rescueEventId + creatorId, myUid).firstOrNull()
+                if (remoteChat != null) {
 
-                            if (isSuccess) {
-                                insertChatInLocalCache(chat.id) {
-
-                                    onChatFound(chat.id, lastTimestamp)
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // Only exists in remote
-                localChat == null -> {
-
-                    val result = modifyChatInRemoteRepository(
-                        chat.copy(
-                            allActivistsInfo = chat.allActivistsInfo + ActivistInfo(
-                                id = Clock.System.now().epochSeconds.toString() + rescueEventId + creatorId,
-                                chatId = rescueEventId + creatorId,
-                                uid = myUid
-                            ),
-                            timestamp = lastTimestamp
-                        )
+                    val result = modifyOnlyActivistsInChatInRemoteRepository(
+                        chatId = rescueEventId + creatorId,
+                        activistId = myUid,
+                        shouldAdd = true
                     ).first()
 
                     if (result is DatabaseResult.Success) {
-                        insertChatInLocalRepository(chat) { isSuccess ->
+                        insertChatInLocalRepository(remoteChat) { isSuccess ->
 
                             if (isSuccess) {
-                                insertChatInLocalCache(chat.id) {
+                                insertChatInLocalCache(remoteChat.id) {
 
-                                    onChatFound(chat.id, lastTimestamp)
+                                    onChatFound(remoteChat.id, remoteChat.timestamp)
                                 }
                             }
                         }
                     }
-                }
-
-                // Exists in local and maybe in remote
-                else -> {
-                    onChatFound(chat.id, lastTimestamp)
+                } else {
+                    onChatFound("", 0)
                 }
             }
         }

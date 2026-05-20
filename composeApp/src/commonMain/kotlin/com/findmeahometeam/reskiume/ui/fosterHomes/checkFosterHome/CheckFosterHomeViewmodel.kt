@@ -19,6 +19,7 @@ import com.findmeahometeam.reskiume.domain.usecases.chat.InsertChatInLocalReposi
 import com.findmeahometeam.reskiume.domain.usecases.chat.InsertChatInRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.chat.IsFosterHomeInChatInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.chat.IsNonHumanAnimalInChatInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetFosterHomeFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromLocalRepository
@@ -51,6 +52,7 @@ class CheckFosterHomeViewmodel(
     checkReviewsUtil: CheckReviewsUtil,
     getAllNonHumanAnimalsFromLocalRepository: GetAllNonHumanAnimalsFromLocalRepository,
     private val isNonHumanAnimalInChatInLocalRepository: IsNonHumanAnimalInChatInLocalRepository,
+    private val getFosterHomeFromRemoteRepository: GetFosterHomeFromRemoteRepository,
     private val getChatFromLocalRepository: GetChatFromLocalRepository,
     private val isFosterHomeInChatInLocalRepository: IsFosterHomeInChatInLocalRepository,
     private val insertChatInRemoteRepository: InsertChatInRemoteRepository,
@@ -164,27 +166,38 @@ class CheckFosterHomeViewmodel(
     ) {
         viewModelScope.launch {
 
-            var insertChatFlag = false
             if (chatId.isEmpty() && myUser?.uid != ownerId) {
                 chatId = fosterHomeId + myUid
             }
             val chat = getChatFromLocalRepository(chatId).firstOrNull()
-                ?: Chat(
-                    id = fosterHomeId + myUid,
+            if (chat != null) {
+                onChatFound(chat.id, chat.timestamp)
+            } else {
+
+                val remoteFosterHome = getFosterHomeFromRemoteRepository(
+                    fosterHomeId
+                ).firstOrNull()
+
+                if (remoteFosterHome == null || !remoteFosterHome.available) {
+                    onChatFound("", 0)
+                    return@launch
+                }
+                val chat = Chat(
+                    id = chatId,
                     fosterHomeId = fosterHomeId,
                     rescueEventId = "",
                     chatHolderId = ownerId,
                     allNonHumanAnimalsInfo = allNonHumanAnimals.map { nonHumanAnimal ->
                         NonHumanAnimalInfo(
                             nonHumanAnimalId = nonHumanAnimal.id,
-                            chatId = fosterHomeId + myUid,
+                            chatId = chatId,
                             caregiverId = nonHumanAnimal.caregiverId
                         )
                     },
                     allActivistsInfo = listOf(
                         ActivistInfo(
-                            id = Clock.System.now().epochSeconds.toString() + fosterHomeId + myUid,
-                            chatId = fosterHomeId + myUid,
+                            id = Clock.System.now().epochSeconds.toString() + chatId,
+                            chatId = chatId,
                             uid = myUid
                         )
                     ),
@@ -195,12 +208,10 @@ class CheckFosterHomeViewmodel(
                     finished = false,
                     addReview = false,
                     timestamp = Clock.System.now().toEpochMilliseconds()
-                ).also {
-                    insertChatFlag = true
-                }
-            val lastTimestamp: Long = chat.allChatMessages.maxOfOrNull { it.timestamp } ?: 0L
+                )
+                val lastMessageTimestamp: Long =
+                    chat.allChatMessages.maxOfOrNull { it.timestamp } ?: 0L
 
-            if (insertChatFlag) {
                 val result = insertChatInRemoteRepository(chat).first()
                 if (result is DatabaseResult.Success) {
                     insertChatInLocalRepository(chat) { isSuccess ->
@@ -208,13 +219,11 @@ class CheckFosterHomeViewmodel(
                         if (isSuccess) {
                             insertChatInLocalCache(chat.id) {
 
-                                onChatFound(chat.id, lastTimestamp)
+                                onChatFound(chat.id, lastMessageTimestamp)
                             }
                         }
                     }
                 }
-            } else {
-                onChatFound(chat.id, lastTimestamp)
             }
         }
     }

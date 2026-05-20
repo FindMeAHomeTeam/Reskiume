@@ -8,8 +8,12 @@ import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.LocalCache
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
+import com.findmeahometeam.reskiume.domain.model.chat.Chat
+import com.findmeahometeam.reskiume.domain.model.chat.NonHumanAnimalInfo
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueEvent
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.chat.InsertChatInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.InsertChatInRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.chat.IsNonHumanAnimalInChatInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.InsertRescueEventInLocalRepository
@@ -33,6 +37,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import reskiume.composeapp.generated.resources.Res
 import reskiume.composeapp.generated.resources.create_rescue_event_screen_turn_on_location
+import kotlin.collections.map
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlin.time.Clock
@@ -50,6 +55,8 @@ class CreateRescueEventViewmodel(
     private val insertRescueEventInRemoteRepository: InsertRescueEventInRemoteRepository,
     private val insertRescueEventInLocalRepository: InsertRescueEventInLocalRepository,
     private val insertCacheInLocalRepository: InsertCacheInLocalRepository,
+    private val insertChatInRemoteRepository: InsertChatInRemoteRepository,
+    private val insertChatInLocalRepository: InsertChatInLocalRepository,
     private val getUserFromLocalDataSource: GetUserFromLocalDataSource,
     private val subscriptionManagerUtil: SubscriptionManagerUtil,
     private val deleteImageFromLocalDataSource: DeleteImageFromLocalDataSource,
@@ -115,7 +122,10 @@ class CreateRescueEventViewmodel(
 
                         createCacheForRescueEventInLocalDataSource(updatedRescueEvent) {
 
-                            subscribeCreatorToTheirRescueEvent(updatedRescueEvent.id)
+                            createChatForRescueEvent(updatedRescueEvent) {
+
+                                subscribeCreatorToTheirRescueEventChat(updatedRescueEvent.id)
+                            }
                         }
                     }
                 }
@@ -277,12 +287,88 @@ class CreateRescueEventViewmodel(
         }
     }
 
-    private fun subscribeCreatorToTheirRescueEvent(rescueEventId: String) {
+    @OptIn(ExperimentalTime::class)
+    private fun createChatForRescueEvent(
+        updatedRescueEvent: RescueEvent,
+        onSuccess: () -> Unit
+    ) {
+        val chat = Chat(
+            id = updatedRescueEvent.id + updatedRescueEvent.creatorId,
+            fosterHomeId = "",
+            rescueEventId = updatedRescueEvent.id,
+            chatHolderId = updatedRescueEvent.creatorId,
+            allNonHumanAnimalsInfo = updatedRescueEvent.allNonHumanAnimalsToRescue.map { nonHumanAnimalToRescue ->
+                NonHumanAnimalInfo(
+                    nonHumanAnimalId = nonHumanAnimalToRescue.nonHumanAnimalId,
+                    chatId = updatedRescueEvent.id + updatedRescueEvent.creatorId,
+                    caregiverId = nonHumanAnimalToRescue.caregiverId
+                )
+            },
+            allActivistsInfo = emptyList(),
+            allBlockedUsersInfo = emptyList(),
+            allChatMessages = emptyList(),
+            myUserIsConnected = false,
+            acceptedFoster = false,
+            finished = false,
+            addReview = false,
+            timestamp = Clock.System.now().toEpochMilliseconds()
+        )
+        viewModelScope.launch {
+
+            val result = insertChatInRemoteRepository(chat).first()
+            if (result is DatabaseResult.Success) {
+                insertChatInLocalRepository(chat) { isSuccess ->
+
+                    if (isSuccess) {
+                        insertChatInLocalCache(
+                            chat.id,
+                            updatedRescueEvent.creatorId
+                        ) {
+
+                            onSuccess()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @OptIn(ExperimentalTime::class)
+    private suspend fun insertChatInLocalCache(
+        chatId: String,
+        creatorId: String,
+        onSuccess: () -> Unit
+    ) {
+        insertCacheInLocalRepository(
+            LocalCache(
+                cachedObjectId = chatId,
+                savedBy = creatorId,
+                section = Section.CHATS,
+                timestamp = Clock.System.now().epochSeconds
+            )
+        ) { rowId ->
+
+            if (rowId > 0) {
+                log.d(
+                    "CreateRescueEventViewmodel",
+                    "insertChatInLocalCache: $chatId added to local cache in section ${Section.CHATS}"
+                )
+                onSuccess()
+            } else {
+                log.e(
+                    "CreateRescueEventViewmodel",
+                    "insertChatInLocalCache: Error adding $chatId to local cache in section ${Section.CHATS}"
+                )
+            }
+        }
+    }
+
+    private fun subscribeCreatorToTheirRescueEventChat(rescueEventId: String) {
         viewModelScope.launch {
 
             val creatorId = observeAuthStateInAuthDataSource().first()!!.uid
             val creator = getUserFromLocalDataSource(creatorId).first()!!
-            subscriptionManagerUtil.subscribeToTopic(creator, rescueEventId, viewModelScope) {
+            subscriptionManagerUtil.subscribeToTopic(creator, rescueEventId + creatorId, viewModelScope) {
 
                 _saveChangesUiState.value = UiState.Success(Unit)
             }

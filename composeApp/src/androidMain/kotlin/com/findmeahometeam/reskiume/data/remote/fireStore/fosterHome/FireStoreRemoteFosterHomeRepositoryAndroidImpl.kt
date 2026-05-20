@@ -117,14 +117,26 @@ class FireStoreRemoteFosterHomeRepositoryAndroidImpl(
 
     override fun getRemoteFosterHome(id: String): Flow<RemoteFosterHome?> = flow {
 
-        val querySnapshot = firebaseFirestore
+        val documentSnapshot = firebaseFirestore
             .collection(Section.FOSTER_HOMES.path)
             .document(id)
             .get()
             .await()
 
-        val result: RemoteFosterHome? = querySnapshot.toObject(RemoteFosterHome::class.java)
-        emit(result)
+        if (documentSnapshot != null && documentSnapshot.exists()) {
+            log.d(
+                "FireStoreRemoteFosterHomeRepositoryAndroidImpl",
+                "getRemoteFosterHome: Remote foster home $id retrieved successfully"
+            )
+            val result: RemoteFosterHome? = documentSnapshot.toObject(RemoteFosterHome::class.java)
+            emit(result)
+        } else {
+            log.d(
+                "FireStoreRemoteFosterHomeRepositoryAndroidImpl",
+                "getRemoteFosterHome: Remote foster home $id does not exist"
+            )
+            emit(null)
+        }
 
     }.catch { e ->
         log.e(
@@ -142,8 +154,12 @@ class FireStoreRemoteFosterHomeRepositoryAndroidImpl(
             .await()
 
         val result: List<RemoteFosterHome?> =
-            querySnapshot.documents.map { documentSnapshot: DocumentSnapshot ->
-                documentSnapshot.toObject(RemoteFosterHome::class.java)
+            querySnapshot.documents.mapNotNull { documentSnapshot: DocumentSnapshot ->
+                if (documentSnapshot.exists()) {
+                    documentSnapshot.toObject(RemoteFosterHome::class.java)
+                } else {
+                    null
+                }
             }
         emit(result)
 
@@ -168,8 +184,12 @@ class FireStoreRemoteFosterHomeRepositoryAndroidImpl(
             .await()
 
         val result: List<RemoteFosterHome?> =
-            querySnapshot.documents.map { documentSnapshot: DocumentSnapshot ->
-                documentSnapshot.toObject(RemoteFosterHome::class.java)
+            querySnapshot.documents.mapNotNull { documentSnapshot: DocumentSnapshot ->
+                if (documentSnapshot.exists()) {
+                    documentSnapshot.toObject(RemoteFosterHome::class.java)
+                } else {
+                    null
+                }
             }
         emit(result)
 
@@ -198,8 +218,12 @@ class FireStoreRemoteFosterHomeRepositoryAndroidImpl(
             .await()
 
         val result: List<RemoteFosterHome?> =
-            querySnapshot.documents.map { documentSnapshot: DocumentSnapshot ->
-                documentSnapshot.toObject(RemoteFosterHome::class.java)
+            querySnapshot.documents.mapNotNull { documentSnapshot: DocumentSnapshot ->
+                if (documentSnapshot.exists()) {
+                    documentSnapshot.toObject(RemoteFosterHome::class.java)
+                } else {
+                    null
+                }
             }
         emit(result)
 

@@ -116,14 +116,27 @@ class FireStoreRemoteRescueEventRepositoryAndroidImpl(
 
     override fun getRemoteRescueEvent(id: String): Flow<RemoteRescueEvent?> = flow {
 
-        val querySnapshot = firebaseFirestore
+        val documentSnapshot = firebaseFirestore
             .collection(Section.RESCUE_EVENTS.path)
             .document(id)
             .get()
             .await()
 
-        val result: RemoteRescueEvent? = querySnapshot.toObject(RemoteRescueEvent::class.java)
-        emit(result)
+        if (documentSnapshot != null && documentSnapshot.exists()) {
+            log.d(
+                "FireStoreRemoteRescueEventRepositoryAndroidImpl",
+                "getRemoteRescueEvent: Remote rescue event $id retrieved successfully"
+            )
+            val result: RemoteRescueEvent? =
+                documentSnapshot.toObject(RemoteRescueEvent::class.java)
+            emit(result)
+        } else {
+            log.e(
+                "FireStoreRemoteRescueEventRepositoryAndroidImpl",
+                "getRemoteRescueEvent: Remote rescue event $id not found"
+            )
+            emit(null)
+        }
 
     }.catch { e ->
         log.e(
@@ -133,26 +146,31 @@ class FireStoreRemoteRescueEventRepositoryAndroidImpl(
         emit(null)
     }
 
-    override fun getAllMyRemoteRescueEvents(creatorId: String): Flow<List<RemoteRescueEvent?>> = flow {
-        val querySnapshot = firebaseFirestore
-            .collection(Section.RESCUE_EVENTS.path)
-            .whereEqualTo("creatorId", creatorId)
-            .get()
-            .await()
+    override fun getAllMyRemoteRescueEvents(creatorId: String): Flow<List<RemoteRescueEvent?>> =
+        flow {
+            val querySnapshot = firebaseFirestore
+                .collection(Section.RESCUE_EVENTS.path)
+                .whereEqualTo("creatorId", creatorId)
+                .get()
+                .await()
 
-        val result: List<RemoteRescueEvent?> =
-            querySnapshot.documents.map { documentSnapshot: DocumentSnapshot ->
-                documentSnapshot.toObject(RemoteRescueEvent::class.java)
-            }
-        emit(result)
+            val result: List<RemoteRescueEvent?> =
+                querySnapshot.documents.mapNotNull { documentSnapshot: DocumentSnapshot ->
+                    if (documentSnapshot.exists()) {
+                        documentSnapshot.toObject(RemoteRescueEvent::class.java)
+                    } else {
+                        null
+                    }
+                }
+            emit(result)
 
-    }.catch { e ->
-        log.e(
-            "FireStoreRemoteRescueEventRepositoryAndroidImpl",
-            "getAllMyRemoteRescueEvents: Error retrieving all remote rescue events from the creatorId $creatorId: ${e.message}"
-        )
-        emit(emptyList())
-    }
+        }.catch { e ->
+            log.e(
+                "FireStoreRemoteRescueEventRepositoryAndroidImpl",
+                "getAllMyRemoteRescueEvents: Error retrieving all remote rescue events from the creatorId $creatorId: ${e.message}"
+            )
+            emit(emptyList())
+        }
 
     override fun getAllRemoteRescueEventsByCountryAndCity(
         country: String,
@@ -166,8 +184,12 @@ class FireStoreRemoteRescueEventRepositoryAndroidImpl(
             .await()
 
         val result: List<RemoteRescueEvent?> =
-            querySnapshot.documents.map { documentSnapshot: DocumentSnapshot ->
-                documentSnapshot.toObject(RemoteRescueEvent::class.java)
+            querySnapshot.documents.mapNotNull { documentSnapshot: DocumentSnapshot ->
+                if (documentSnapshot.exists()) {
+                    documentSnapshot.toObject(RemoteRescueEvent::class.java)
+                } else {
+                    null
+                }
             }
         emit(result)
 
@@ -196,7 +218,11 @@ class FireStoreRemoteRescueEventRepositoryAndroidImpl(
 
         val result: List<RemoteRescueEvent?> =
             querySnapshot.documents.map { documentSnapshot: DocumentSnapshot ->
-                documentSnapshot.toObject(RemoteRescueEvent::class.java)
+                if (documentSnapshot.exists()) {
+                    documentSnapshot.toObject(RemoteRescueEvent::class.java)
+                } else {
+                    null
+                }
             }
         emit(result)
 

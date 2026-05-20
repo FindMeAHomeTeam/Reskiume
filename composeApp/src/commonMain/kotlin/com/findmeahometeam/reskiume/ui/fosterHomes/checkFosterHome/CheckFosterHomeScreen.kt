@@ -50,6 +50,7 @@ import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.backgroundColorForItems
 import com.findmeahometeam.reskiume.ui.core.components.ManagePermissionState
 import com.findmeahometeam.reskiume.ui.core.components.RmButton
+import com.findmeahometeam.reskiume.ui.core.components.RmDialog
 import com.findmeahometeam.reskiume.ui.core.components.RmImage
 import com.findmeahometeam.reskiume.ui.core.components.RmListAvatarType
 import com.findmeahometeam.reskiume.ui.core.components.RmListReviewItem
@@ -78,16 +79,19 @@ import reskiume.composeapp.generated.resources.check_foster_home_screen_foster_h
 import reskiume.composeapp.generated.resources.check_foster_home_screen_foster_home_avatar_content_description
 import reskiume.composeapp.generated.resources.check_foster_home_screen_foster_home_conditions_label
 import reskiume.composeapp.generated.resources.check_foster_home_screen_foster_home_description_label
+import reskiume.composeapp.generated.resources.check_foster_home_screen_foster_home_not_available_title
 import reskiume.composeapp.generated.resources.check_foster_home_screen_foster_home_resident_non_human_animals_label
 import reskiume.composeapp.generated.resources.check_foster_home_screen_keep_talking_to_owner_label
 import reskiume.composeapp.generated.resources.check_foster_home_screen_no_account_button
 import reskiume.composeapp.generated.resources.check_foster_home_screen_no_account_label
+import reskiume.composeapp.generated.resources.check_foster_home_screen_ok_button
 import reskiume.composeapp.generated.resources.check_foster_home_screen_owner_avatar_content_description
 import reskiume.composeapp.generated.resources.check_foster_home_screen_owner_reviews_label
 import reskiume.composeapp.generated.resources.check_foster_home_screen_register_non_human_animal_button
 import reskiume.composeapp.generated.resources.check_foster_home_screen_register_non_human_animal_to_talk_to_owner_label
 import reskiume.composeapp.generated.resources.check_foster_home_screen_register_other_non_human_animal_button
 import reskiume.composeapp.generated.resources.check_foster_home_screen_register_other_non_human_animal_to_foster_label
+import reskiume.composeapp.generated.resources.check_foster_home_screen_look_for_foster_homes_message
 import reskiume.composeapp.generated.resources.check_foster_home_screen_share_content_description
 import reskiume.composeapp.generated.resources.check_foster_home_screen_share_foster_home_title
 import reskiume.composeapp.generated.resources.check_foster_home_screen_start_chat_button
@@ -121,6 +125,7 @@ fun CheckFosterHomeScreen(
     val allAvailableNonHumanAnimals: List<NonHumanAnimal> by checkFosterHomeViewmodel.allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow.collectAsStateWithLifecycle()
 
     var isShareButtonClicked: Boolean by remember { mutableStateOf(false) }
+    var isFosterHomeUnavailable: Boolean by remember { mutableStateOf(false) }
 
     val scrollState = rememberScrollState()
 
@@ -335,7 +340,11 @@ fun CheckFosterHomeScreen(
                                         allNonHumanAnimals = it
                                     ) { chatId: String, lastTimestamp: Long ->
 
-                                        onContactFosterHome(chatId, lastTimestamp)
+                                        if (chatId.isBlank()) {
+                                            isFosterHomeUnavailable = true
+                                        } else {
+                                            onContactFosterHome(chatId, lastTimestamp)
+                                        }
                                     }
                                 }
                             )
@@ -353,6 +362,11 @@ fun CheckFosterHomeScreen(
                             fontWeight = FontWeight.ExtraBold,
                             onClick = onCreateAccount
                         )
+                    }
+                    if (isFosterHomeUnavailable) {
+                        DisplayFosterHomeNotAvailable {
+                            isFosterHomeUnavailable = false
+                        }
                     }
                 }
                 Spacer(modifier = Modifier.height(10.dp))
@@ -617,4 +631,18 @@ fun DisplayChatToOwner(
             }
         )
     }
+}
+
+@Composable
+fun DisplayFosterHomeNotAvailable(
+    onDismiss: () -> Unit
+) {
+    RmDialog(
+        emoji = "⚠️",
+        title = stringResource(Res.string.check_foster_home_screen_foster_home_not_available_title),
+        message = stringResource(Res.string.check_foster_home_screen_look_for_foster_homes_message),
+        allowMessage = stringResource(Res.string.check_foster_home_screen_ok_button),
+        onClickAllow = onDismiss,
+        onClickDeny = onDismiss
+    )
 }

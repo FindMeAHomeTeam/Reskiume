@@ -48,6 +48,7 @@ import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.backgroundColorForItems
 import com.findmeahometeam.reskiume.ui.core.components.ManagePermissionState
 import com.findmeahometeam.reskiume.ui.core.components.RmButton
+import com.findmeahometeam.reskiume.ui.core.components.RmDialog
 import com.findmeahometeam.reskiume.ui.core.components.RmImage
 import com.findmeahometeam.reskiume.ui.core.components.RmManageNotificationPermission
 import com.findmeahometeam.reskiume.ui.core.components.RmReport
@@ -64,7 +65,10 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import reskiume.composeapp.generated.resources.Res
-import reskiume.composeapp.generated.resources.check_foster_home_screen_share_rescue_event_title
+import reskiume.composeapp.generated.resources.check_rescue_event_screen_ok_button
+import reskiume.composeapp.generated.resources.check_rescue_event_screen_rescue_event_finished_title
+import reskiume.composeapp.generated.resources.check_rescue_event_screen_rescue_event_message
+import reskiume.composeapp.generated.resources.check_rescue_event_screen_share_rescue_event_title
 import reskiume.composeapp.generated.resources.check_rescue_event_screen_come_back_to_the_rescue_event_label
 import reskiume.composeapp.generated.resources.check_rescue_event_screen_creator_avatar_content_description
 import reskiume.composeapp.generated.resources.check_rescue_event_screen_join_the_rescue_event_label
@@ -97,6 +101,7 @@ fun CheckRescueEventScreen(
 
     var isShareButtonClicked: Boolean by remember { mutableStateOf(false) }
     var isStartChatClicked: Boolean by rememberSaveable { mutableStateOf(false) }
+    var isRescueEventNotAvailable: Boolean by rememberSaveable { mutableStateOf(false) }
     var notificationPermissionState: ManagePermissionState by rememberSaveable {
         mutableStateOf(ManagePermissionState.CHECK_PERMISSION)
     }
@@ -290,11 +295,14 @@ fun CheckRescueEventScreen(
                                 onNotificationPermissionGranted = {
                                     checkRescueEventViewmodel.findChat(
                                         uiRescueEventDetail.rescueEvent.id,
-                                        uiRescueEventDetail.creator!!.uid,
-                                        uiRescueEventDetail.allUiNonHumanAnimalsToRescue
+                                        uiRescueEventDetail.creator!!.uid
                                     ) { chatId: String, lastTimestamp: Long ->
 
-                                        onContactRescueEvent(chatId, lastTimestamp)
+                                        if (chatId.isEmpty()) {
+                                            isRescueEventNotAvailable = true
+                                        } else {
+                                            onContactRescueEvent(chatId, lastTimestamp)
+                                        }
                                         isStartChatClicked = false
                                     }
                                 }
@@ -315,6 +323,12 @@ fun CheckRescueEventScreen(
                         )
                     }
                     Spacer(modifier = Modifier.height(10.dp))
+
+                    if (isRescueEventNotAvailable) {
+                        DisplayRescueEventNotAvailable {
+                            isRescueEventNotAvailable = false
+                        }
+                    }
                 }
             }
         }
@@ -342,7 +356,7 @@ fun DisplayShareService(
     val rescueEventDeepLink = "$RESCUE_EVENT_DEEP_LINK/$rescueEventCreatorId/$rescueEventId"
 
     RmShareService(
-        Res.string.check_foster_home_screen_share_rescue_event_title,
+        Res.string.check_rescue_event_screen_share_rescue_event_title,
         rescueEventTitle,
         nonHumanAnimalsToRescueText,
         rescueEventDeepLink
@@ -480,4 +494,18 @@ fun ManageNotificationPermissionToStartChat(
             }
         }
     }
+}
+
+@Composable
+fun DisplayRescueEventNotAvailable(
+    onDismiss: () -> Unit
+) {
+    RmDialog(
+        emoji = "⚠️",
+        title = stringResource(Res.string.check_rescue_event_screen_rescue_event_finished_title),
+        message = stringResource(Res.string.check_rescue_event_screen_rescue_event_message),
+        allowMessage = stringResource(Res.string.check_rescue_event_screen_ok_button),
+        onClickAllow = onDismiss,
+        onClickDeny = onDismiss
+    )
 }

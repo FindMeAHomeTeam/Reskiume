@@ -7,6 +7,7 @@ import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.chat.FireStoreRemoteChatRepository
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
@@ -23,27 +24,28 @@ class FireStoreRemoteChatRepositoryAndroidImpl(
     private val log: Log
 ) : FireStoreRemoteChatRepository {
 
-    override fun insertRemoteChat(remoteChat: RemoteChat): Flow<DatabaseResult> = flow<DatabaseResult> {
+    override fun insertRemoteChat(remoteChat: RemoteChat): Flow<DatabaseResult> =
+        flow<DatabaseResult> {
 
-        firebaseFirestore
-            .collection(Section.CHATS.path)
-            .document(remoteChat.id!!)
-            .set(remoteChat.toMap())
-            .await()
+            firebaseFirestore
+                .collection(Section.CHATS.path)
+                .document(remoteChat.id!!)
+                .set(remoteChat.toMap())
+                .await()
 
-        log.d(
-            "FireStoreRemoteChatRepositoryAndroidImpl",
-            "insertRemoteChat: Successfully inserted the remote chat ${remoteChat.id}"
-        )
-        emit(DatabaseResult.Success)
+            log.d(
+                "FireStoreRemoteChatRepositoryAndroidImpl",
+                "insertRemoteChat: Successfully inserted the remote chat ${remoteChat.id}"
+            )
+            emit(DatabaseResult.Success)
 
-    }.catch { e ->
-        log.e(
-            "FireStoreRemoteChatRepositoryAndroidImpl",
-            "insertRemoteChat: Error inserting the remote chat ${remoteChat.id}: ${e.message}"
-        )
-        emit(DatabaseResult.Error(e.message ?: ""))
-    }
+        }.catch { e ->
+            log.e(
+                "FireStoreRemoteChatRepositoryAndroidImpl",
+                "insertRemoteChat: Error inserting the remote chat ${remoteChat.id}: ${e.message}"
+            )
+            emit(DatabaseResult.Error(e.message ?: ""))
+        }
 
     override fun insertRemoteChatMessage(remoteChatMessage: RemoteChatMessage): Flow<DatabaseResult> =
         flow<DatabaseResult> {
@@ -90,6 +92,50 @@ class FireStoreRemoteChatRepositoryAndroidImpl(
             log.e(
                 "FireStoreRemoteChatRepositoryAndroidImpl",
                 "modifyRemoteChat: Error modifying the remote chat ${remoteChat.id}: ${e.message}"
+            )
+            emit(DatabaseResult.Error(e.message ?: ""))
+        }
+
+    override fun modifyOnlyActivistsInRemoteChat(
+        chatId: String,
+        activistId: String,
+        shouldAdd: Boolean
+    ): Flow<DatabaseResult> =
+        flow<DatabaseResult> {
+
+            firebaseFirestore
+                .collection(Section.CHATS.path)
+                .document(chatId)
+                .update(
+                    "allActivistsInfo",
+                    if (shouldAdd) {
+                        FieldValue.arrayUnion(activistId)
+                    } else {
+                        FieldValue.arrayRemove(activistId)
+                    }
+                )
+                .await()
+
+            val action = if (shouldAdd) {
+                "added"
+            } else {
+                "removed"
+            }
+            log.d(
+                "FireStoreRemoteChatRepositoryAndroidImpl",
+                "modifyOnlyActivistsInRemoteChat: Successfully $action the activist $activistId in the remote chat $chatId"
+            )
+            emit(DatabaseResult.Success)
+
+        }.catch { e ->
+            val action = if (shouldAdd) {
+                "adding"
+            } else {
+                "removing"
+            }
+            log.e(
+                "FireStoreRemoteChatRepositoryAndroidImpl",
+                "modifyOnlyActivistsInRemoteChat: Error $action the activist $activistId in the remote chat $chatId: ${e.message}"
             )
             emit(DatabaseResult.Error(e.message ?: ""))
         }
@@ -166,17 +212,31 @@ class FireStoreRemoteChatRepositoryAndroidImpl(
             .addSnapshotListener { value, error ->
 
                 if (error == null) {
-                    val result: RemoteChat? = value?.toObject(RemoteChat::class.java)
-                    log.d(
-                        "FireStoreRemoteChatRepositoryAndroidImpl",
-                        "getRemoteChat: Successfully retrieved the remote chat $id"
-                    )
-                    val channelResult = trySend(result)
+                    if (value != null && value.exists()) {
+                        val result: RemoteChat? = value.toObject(RemoteChat::class.java)
+                        log.d(
+                            "FireStoreRemoteChatRepositoryAndroidImpl",
+                            "getRemoteChat: Successfully retrieved the remote chat $id"
+                        )
+                        val channelResult = trySend(result)
 
-                    if (channelResult.isSuccess) {
-                        log.d("FireStoreRemoteChatRepositoryAndroidImpl", "Successfully sent the remote chat $id to the flow")
+                        if (channelResult.isSuccess) {
+                            log.d(
+                                "FireStoreRemoteChatRepositoryAndroidImpl",
+                                "Successfully sent the remote chat $id to the flow"
+                            )
+                        } else {
+                            log.e(
+                                "FireStoreRemoteChatRepositoryAndroidImpl",
+                                "trySend failed! Channel closed? ${channelResult.isClosed}. Exception: ${channelResult.exceptionOrNull()?.message}"
+                            )
+                        }
                     } else {
-                        log.e("FireStoreRemoteChatRepositoryAndroidImpl", "trySend failed! Channel closed? ${channelResult.isClosed}. Exception: ${channelResult.exceptionOrNull()?.message}")
+                        log.d(
+                            "FireStoreRemoteChatRepositoryAndroidImpl",
+                            "getRemoteChat: The remote chat $id does not exist"
+                        )
+                        trySend(null)
                     }
                 } else {
                     log.e(
@@ -213,7 +273,11 @@ class FireStoreRemoteChatRepositoryAndroidImpl(
 
                     val list: List<RemoteChatMessage> =
                         querySnapshot?.documentChanges?.mapNotNull {
-                            it.document.toObject(RemoteChatMessage::class.java)
+                            if (it.document.exists()) {
+                                it.document.toObject(RemoteChatMessage::class.java)
+                            } else {
+                                null
+                            }
                         } ?: emptyList()
 
                     log.d(
@@ -261,7 +325,11 @@ class FireStoreRemoteChatRepositoryAndroidImpl(
                 if (error == null) {
                     val result: List<RemoteChat> =
                         value?.documents?.mapNotNull { documentSnapshot: DocumentSnapshot ->
-                            documentSnapshot.toObject(RemoteChat::class.java)
+                            if (documentSnapshot.exists()) {
+                                documentSnapshot.toObject(RemoteChat::class.java)
+                            } else {
+                                null
+                            }
                         } ?: emptyList()
                     log.d(
                         "FireStoreRemoteChatRepositoryAndroidImpl",

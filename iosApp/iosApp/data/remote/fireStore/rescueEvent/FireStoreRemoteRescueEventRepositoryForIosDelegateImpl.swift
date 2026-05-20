@@ -92,8 +92,10 @@ class FireStoreRemoteRescueEventRepositoryForIosDelegateImpl: FireStoreRemoteRes
 
         for rescueEventQueryDocumentSnapshot in querySnapshotForAllMyRescueEvents.documents {
             do {
-                let rescueEventDTO = try await rescueEventQueryDocumentSnapshot.reference.getDocument(as: RemoteRescueEventDTO.self)
-                remoteRescueEvents.append(rescueEventDTO.toKotlin())
+                if rescueEventQueryDocumentSnapshot.exists {
+                    let rescueEventDTO = try await rescueEventQueryDocumentSnapshot.reference.getDocument(as: RemoteRescueEventDTO.self)
+                    remoteRescueEvents.append(rescueEventDTO.toKotlin())
+                }
             } catch {
                 log.e(
                     tag: "FireStoreRemoteRescueEventRepositoryForIosDelegateImpl",
@@ -114,11 +116,24 @@ class FireStoreRemoteRescueEventRepositoryForIosDelegateImpl: FireStoreRemoteRes
         var remoteRescueEvents: [RemoteRescueEvent] = []
 
         do {
-            let rescueEventDTO = try await firebaseFirestore!
+            let documentSnapshot = try await firebaseFirestore!
                 .collection(Section.rescueEvents.path)
                 .document(rescueEventId)
-                .getDocument(as: RemoteRescueEventDTO.self)
-            remoteRescueEvents.append(rescueEventDTO.toKotlin())
+                .getDocument()
+
+            if documentSnapshot.exists {
+                log.d(
+                    tag: "FireStoreRemoteRescueEventRepositoryForIosDelegateImpl",
+                    message: "fetchRescueEvent: Successfully retrieved the remote rescue event \(rescueEventId)"
+                )
+                let rescueEventDTO = try documentSnapshot.data(as: RemoteRescueEventDTO.self)
+                remoteRescueEvents.append(rescueEventDTO.toKotlin())
+            } else {
+                log.d(
+                    tag: "FireStoreRemoteRescueEventRepositoryForIosDelegateImpl",
+                    message: "fetchRescueEvent: The remote rescue event \(rescueEventId) does not exist"
+                )
+            }
         } catch {
             log.e(
                 tag: "FireStoreRemoteRescueEventRepositoryForIosDelegateImpl",
@@ -146,8 +161,10 @@ class FireStoreRemoteRescueEventRepositoryForIosDelegateImpl: FireStoreRemoteRes
 
         for rescueEventQueryDocumentSnapshot in querySnapshotForAllMyRescueEvents.documents {
             do {
-                let rescueEventDTO = try await rescueEventQueryDocumentSnapshot.reference.getDocument(as: RemoteRescueEventDTO.self)
-                remoteRescueEvents.append(rescueEventDTO.toKotlin())
+                if rescueEventQueryDocumentSnapshot.exists {
+                    let rescueEventDTO = try await rescueEventQueryDocumentSnapshot.reference.getDocument(as: RemoteRescueEventDTO.self)
+                    remoteRescueEvents.append(rescueEventDTO.toKotlin())
+                }
             } catch {
                 log.e(
                     tag: "FireStoreRemoteRescueEventRepositoryForIosDelegateImpl",
@@ -180,8 +197,10 @@ class FireStoreRemoteRescueEventRepositoryForIosDelegateImpl: FireStoreRemoteRes
 
         for rescueEventQueryDocumentSnapshot in querySnapshotForAllMyRescueEvents.documents {
             do {
-                let rescueEventDTO = try await rescueEventQueryDocumentSnapshot.reference.getDocument(as: RemoteRescueEventDTO.self)
-                remoteRescueEvents.append(rescueEventDTO.toKotlin())
+                if rescueEventQueryDocumentSnapshot.exists {
+                    let rescueEventDTO = try await rescueEventQueryDocumentSnapshot.reference.getDocument(as: RemoteRescueEventDTO.self)
+                    remoteRescueEvents.append(rescueEventDTO.toKotlin())
+                }
             } catch {
                 log.e(
                     tag: "FireStoreRemoteRescueEventRepositoryForIosDelegateImpl",

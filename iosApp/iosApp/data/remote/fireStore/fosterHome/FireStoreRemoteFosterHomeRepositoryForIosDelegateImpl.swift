@@ -92,8 +92,11 @@ class FireStoreRemoteFosterHomeRepositoryForIosDelegateImpl: FireStoreRemoteFost
         
         for fosterHomeQueryDocumentSnapshot in querySnapshotForAllMyFosterHomes.documents {
             do {
-                let fosterHomeDTO = try await fosterHomeQueryDocumentSnapshot.reference.getDocument(as: RemoteFosterHomeDTO.self)
-                remoteFosterHomes.append(fosterHomeDTO.toKotlin())
+                if fosterHomeQueryDocumentSnapshot.exists {
+                    
+                    let fosterHomeDTO = try await fosterHomeQueryDocumentSnapshot.reference.getDocument(as: RemoteFosterHomeDTO.self)
+                    remoteFosterHomes.append(fosterHomeDTO.toKotlin())
+                }
             } catch {
                 log.e(
                     tag: "FireStoreRemoteFosterHomeRepositoryForIosDelegateImpl",
@@ -114,11 +117,24 @@ class FireStoreRemoteFosterHomeRepositoryForIosDelegateImpl: FireStoreRemoteFost
         var remoteFosterHomes: [RemoteFosterHome] = []
         
         do {
-            let fosterHomeDTO = try await firebaseFirestore!
+            let documentSnapshot = try await firebaseFirestore!
                 .collection(Section.fosterHomes.path)
                 .document(fosterHomeId)
-                .getDocument(as: RemoteFosterHomeDTO.self)
-            remoteFosterHomes.append(fosterHomeDTO.toKotlin())
+                .getDocument()
+            
+            if documentSnapshot.exists {
+                log.d(
+                    tag: "FireStoreRemoteFosterHomeRepositoryForIosDelegateImpl",
+                    message: "Successfully retrieved the remote foster home \(fosterHomeId)"
+                )
+                let fosterHomeDTO = try documentSnapshot.data(as: RemoteFosterHomeDTO.self)
+                remoteFosterHomes.append(fosterHomeDTO.toKotlin())
+            } else {
+                log.d(
+                    tag: "FireStoreRemoteFosterHomeRepositoryForIosDelegateImpl",
+                    message: "The remote foster home \(fosterHomeId) does not exist"
+                )
+            }
         } catch {
             log.e(
                 tag: "FireStoreRemoteFosterHomeRepositoryForIosDelegateImpl",
@@ -147,8 +163,10 @@ class FireStoreRemoteFosterHomeRepositoryForIosDelegateImpl: FireStoreRemoteFost
         
         for fosterHomeQueryDocumentSnapshot in querySnapshotForAllMyFosterHomes.documents {
             do {
-                let fosterHomeDTO = try await fosterHomeQueryDocumentSnapshot.reference.getDocument(as: RemoteFosterHomeDTO.self)
-                remoteFosterHomes.append(fosterHomeDTO.toKotlin())
+                if fosterHomeQueryDocumentSnapshot.exists {
+                    let fosterHomeDTO = try await fosterHomeQueryDocumentSnapshot.reference.getDocument(as: RemoteFosterHomeDTO.self)
+                    remoteFosterHomes.append(fosterHomeDTO.toKotlin())
+                }
             } catch {
                 log.e(
                     tag: "FireStoreRemoteFosterHomeRepositoryForIosDelegateImpl",
@@ -182,8 +200,10 @@ class FireStoreRemoteFosterHomeRepositoryForIosDelegateImpl: FireStoreRemoteFost
         
         for fosterHomeQueryDocumentSnapshot in querySnapshotForAllMyFosterHomes.documents {
             do {
-                let fosterHomeDTO = try await fosterHomeQueryDocumentSnapshot.reference.getDocument(as: RemoteFosterHomeDTO.self)
-                remoteFosterHomes.append(fosterHomeDTO.toKotlin())
+                if fosterHomeQueryDocumentSnapshot.exists {
+                    let fosterHomeDTO = try await fosterHomeQueryDocumentSnapshot.reference.getDocument(as: RemoteFosterHomeDTO.self)
+                    remoteFosterHomes.append(fosterHomeDTO.toKotlin())
+                }
             } catch {
                 log.e(
                     tag: "FireStoreRemoteFosterHomeRepositoryForIosDelegateImpl",

@@ -15,6 +15,12 @@ interface FireStoreRemoteChatRepository {
 
     fun modifyRemoteChat(remoteChat: RemoteChat): Flow<DatabaseResult>
 
+    fun modifyOnlyActivistsInRemoteChat(
+        chatId: String,
+        activistId: String,
+        shouldAdd: Boolean
+    ): Flow<DatabaseResult>
+
     fun deleteRemoteChat(
         uid: String,
         remoteChatId: String

@@ -22,8 +22,9 @@ import com.findmeahometeam.reskiume.ui.profile.createAccount.CreateAccountScreen
 import com.findmeahometeam.reskiume.ui.profile.deleteAccount.DeleteAccountScreen
 import com.findmeahometeam.reskiume.ui.profile.loginAccount.LoginAccountScreen
 import com.findmeahometeam.reskiume.ui.profile.modifyAccount.ModifyAccountScreen
-import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsScreen
+import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckAllReviewsScreen
 import com.findmeahometeam.reskiume.ui.profile.createNonHumanAnimal.CreateNonHumanAnimalScreen
+import com.findmeahometeam.reskiume.ui.profile.createReview.CreateReviewScreen
 import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.ModifyNonHumanAnimalScreen
 import com.findmeahometeam.reskiume.ui.rescueEvents.checkRescueEvent.CheckRescueEventScreen
 import com.findmeahometeam.reskiume.ui.rescueEvents.createRescueEvent.CreateRescueEventScreen
@@ -75,14 +76,17 @@ fun NavigationWrapper() {
         ) {
             CheckFosterHomeScreen(
                 onContactFosterHome = { chatId: String, lastTimestamp: Long ->
-                    if (mainNavController.previousBackStackEntry?.destination?.route?.contains(CheckChat::class.simpleName!!) == true) {
+                    if (mainNavController.previousBackStackEntry?.destination?.route?.contains(
+                            CheckChat::class.simpleName!!
+                        ) == true
+                    ) {
                         mainNavController.navigateUp()
                     } else {
                         mainNavController.navigate(CheckChat(chatId, lastTimestamp))
                     }
                 },
                 onReviewClick = { uid ->
-                    mainNavController.navigate(CheckReviews(uid))
+                    mainNavController.navigate(CheckAllReviews(uid))
                 },
                 onCreateAccount = {
                     mainNavController.navigate(Routes.CREATE_ACCOUNT.route)
@@ -130,7 +134,10 @@ fun NavigationWrapper() {
         ) {
             CheckRescueEventScreen(
                 onContactRescueEvent = { chatId: String, lastTimestamp: Long ->
-                    if (mainNavController.previousBackStackEntry?.destination?.route?.contains(CheckChat::class.simpleName!!) == true) {
+                    if (mainNavController.previousBackStackEntry?.destination?.route?.contains(
+                            CheckChat::class.simpleName!!
+                        ) == true
+                    ) {
                         mainNavController.navigateUp()
                     } else {
                         mainNavController.navigate(CheckChat(chatId, lastTimestamp))
@@ -165,11 +172,20 @@ fun NavigationWrapper() {
             ModifyAccountScreen(onBackPressed = { mainNavController.navigateUp() })
         }
 
-        composable<CheckReviews> {
-            CheckReviewsScreen(
+        composable<CheckAllReviews> {
+            CheckAllReviewsScreen(
                 onBackPressed = { mainNavController.navigateUp() },
                 onReviewClick = { uid ->
-                    mainNavController.navigate(CheckReviews(uid))
+                    mainNavController.navigate(CheckAllReviews(uid))
+                }
+            )
+        }
+
+        composable<CreateReview> {
+            CreateReviewScreen(
+                onBackPressed = { mainNavController.navigateUp() },
+                onFinished = {
+                    mainNavController.popBackStack(CheckChat::class, true)
                 }
             )
         }
@@ -217,15 +233,13 @@ fun NavigationWrapper() {
                     }
                 },
                 onCheckActivist = { uid: String ->
-                    mainNavController.navigate(CheckReviews(uid))
+                    mainNavController.navigate(CheckAllReviews(uid))
                 },
                 onCheckNonHumanAnimal = { nonHumanAnimalId: String, caregiverId: String ->
                     mainNavController.navigate(CheckNonHumanAnimal(nonHumanAnimalId, caregiverId))
                 },
-                onAddReview = { allActivistsToReview ->
-
-                    // TODO
-                    mainNavController.navigateUp()
+                onAddReview = { allActivistIdsToReview, chatId, rescueEventId, creatorId ->
+                    mainNavController.navigate(CreateReview(allActivistIdsToReview, chatId, rescueEventId, creatorId))
                 }
             )
         }
@@ -241,7 +255,7 @@ fun NavigationWrapper() {
             CheckAdviceScreen(
                 checkAdvice = it.toRoute(),
                 onAuthorClick = { uid ->
-                    mainNavController.navigate(CheckReviews(uid))
+                    mainNavController.navigate(CheckAllReviews(uid))
                 },
                 onBackPressed = { mainNavController.navigateUp() }
             )

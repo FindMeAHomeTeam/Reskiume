@@ -3,9 +3,11 @@ package com.findmeahometeam.reskiume.ui.location
 import com.findmeahometeam.reskiume.domain.repository.util.location.LocationRepository
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import platform.CoreLocation.CLAuthorizationStatus
 import platform.CoreLocation.CLLocation
@@ -26,7 +28,11 @@ class LocationRepositoryIosImpl : LocationRepository {
 
     override fun observeIfLocationEnabledFlow(): Flow<Boolean> = callbackFlow {
 
-        fun isLocationEnabled(): Boolean = CLLocationManager.locationServicesEnabled()
+        fun checkLocationStateAsynchronously() {
+            launch(Dispatchers.Default) {
+                trySend(CLLocationManager.locationServicesEnabled())
+            }
+        }
 
         val locationManager: CLLocationManager = CLLocationManager().apply {
 
@@ -35,13 +41,13 @@ class LocationRepositoryIosImpl : LocationRepository {
                     manager: CLLocationManager,
                     didChangeAuthorizationStatus: CLAuthorizationStatus
                 ) {
-                    trySend(isLocationEnabled())
+                    checkLocationStateAsynchronously()
                 }
             }
         }
 
         // Emit initial value
-        trySend(isLocationEnabled())
+        checkLocationStateAsynchronously()
 
         // Also re-check when coming back from Settings
         val center: NSNotificationCenter = NSNotificationCenter.defaultCenter
@@ -50,7 +56,7 @@ class LocationRepositoryIosImpl : LocationRepository {
             `object` = null,
             queue = NSOperationQueue.mainQueue
         ) { _ ->
-            trySend(isLocationEnabled())
+            checkLocationStateAsynchronously()
         }
 
         awaitClose {

@@ -135,7 +135,7 @@ class CheckRescueEventViewmodel(
             } else {
                 val remoteChat =
                     getChatFromRemoteRepository(rescueEventId + creatorId, myUid).firstOrNull()
-                if (remoteChat != null) {
+                if (remoteChat?.finished == false) {
 
                     val result = modifyOnlyActivistsInChatInRemoteRepository(
                         chatId = rescueEventId + creatorId,
@@ -144,12 +144,15 @@ class CheckRescueEventViewmodel(
                     ).first()
 
                     if (result is DatabaseResult.Success) {
-                        insertChatInLocalRepository(remoteChat) { isSuccess ->
+                        val currentChat =
+                            getChatFromRemoteRepository(rescueEventId + creatorId, myUid).first()!!
+
+                        insertChatInLocalRepository(currentChat) { isSuccess ->
 
                             if (isSuccess) {
-                                insertChatInLocalCache(remoteChat.id) {
+                                insertChatInLocalCache(currentChat.id) {
 
-                                    onChatFound(remoteChat.id, remoteChat.timestamp)
+                                    onChatFound(currentChat.id, currentChat.timestamp)
                                 }
                             }
                         }

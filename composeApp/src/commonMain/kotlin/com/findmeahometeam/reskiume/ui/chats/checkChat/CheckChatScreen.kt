@@ -61,7 +61,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
-import com.findmeahometeam.reskiume.domain.model.user.User
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.backgroundColorForItems
 import com.findmeahometeam.reskiume.ui.core.components.RmButton
@@ -124,7 +123,7 @@ fun CheckChatScreen(
     onCheckDetails: (isFosterHome: Boolean, id: String, chatHolderId: String, chatId: String) -> Unit,
     onCheckActivist: (uid: String) -> Unit,
     onCheckNonHumanAnimal: (nonHumanAnimalId: String, caregiverId: String) -> Unit,
-    onAddReview: (allActivistsToReview: List<User>) -> Unit
+    onAddReview: (allActivistIdsToReview: List<String>, chatId: String, rescueEventId: String, creatorId: String) -> Unit
 ) {
     val checkChatViewmodel: CheckChatViewmodel = koinViewModel<CheckChatViewmodel>()
 
@@ -138,6 +137,7 @@ fun CheckChatScreen(
     var clickedCheckAllActivists: Boolean by rememberSaveable { mutableStateOf(false) }
     var displayNonHumanAnimals: Boolean by rememberSaveable { mutableStateOf(true) }
     var finishAndEvaluateClicked: Boolean by rememberSaveable { mutableStateOf(false) }
+    var displayReviewOrBack: Boolean by rememberSaveable { mutableStateOf(false) }
     var message: String by rememberSaveable { mutableStateOf("") }
 
     val keyboardHeight = WindowInsets.ime.getBottom(LocalDensity.current)
@@ -232,6 +232,7 @@ fun CheckChatScreen(
                                                         )
                                                     }
                                                 )
+                                                displayReviewOrBack = true
                                                 clickedLeave = false
                                             }
                                         },
@@ -298,6 +299,7 @@ fun CheckChatScreen(
                                                     fosterHomeId = uiChatDetail.fosterHomeId,
                                                     allNonHumanAnimals = uiChatDetail.allNonHumanAnimals
                                                 )
+                                                displayReviewOrBack = true
                                             },
                                             onAcceptToFoster = {
                                                 checkChatViewmodel.acceptFoster(
@@ -312,6 +314,7 @@ fun CheckChatScreen(
                                             },
                                             onLeaveChat = {
                                                 checkChatViewmodel.leaveTheDeletedChat()
+                                                displayReviewOrBack = true
                                             }
                                         )
                                     } else {
@@ -332,6 +335,7 @@ fun CheckChatScreen(
                                                     fosterHomeId = uiChatDetail.fosterHomeId,
                                                     allNonHumanAnimals = uiChatDetail.allNonHumanAnimals
                                                 )
+                                                displayReviewOrBack = true
                                                 finishAndEvaluateClicked = false
                                             } else {
                                                 DisplayNonHumanAnimalStateDialogs(
@@ -347,6 +351,7 @@ fun CheckChatScreen(
                                                             creatorId = uiChatDetail.chatHolderId,
                                                             isThereAnyActivist = uiChatDetail.allActivists.isNotEmpty()
                                                         )
+                                                        displayReviewOrBack = true
                                                         finishAndEvaluateClicked = false
                                                     }
                                                 )
@@ -377,12 +382,14 @@ fun CheckChatScreen(
                                                     rescueEventId = uiChatDetail.rescueEventId,
                                                     allNonHumanAnimals = uiChatDetail.allNonHumanAnimals
                                                 )
+                                                displayReviewOrBack = true
                                             }
                                         }
                                     } else {
                                         RmButton(stringResource(Res.string.check_chat_screen_leave_chat_option)) {
                                             if (uiState !is UiState.Loading) {
                                                 checkChatViewmodel.leaveTheDeletedChat()
+                                                displayReviewOrBack = true
                                             }
                                         }
                                     }
@@ -397,10 +404,19 @@ fun CheckChatScreen(
                                     Spacer(modifier = Modifier.height(8.dp))
                                     RmResultState(uiState) {
 
-                                        if (uiChatDetail.addReview) {
-                                            onAddReview(uiChatDetail.allActivists)
-                                        } else {
-                                            onBackPressed()
+                                        if (displayReviewOrBack) {
+
+                                            if (uiChatDetail.addReview) {
+                                                onAddReview(
+                                                    uiChatDetail.allActivists.map { it.uid },
+                                                    uiChatDetail.chatId,
+                                                    uiChatDetail.rescueEventId,
+                                                    uiChatDetail.chatHolderId
+                                                )
+                                            } else {
+                                                onBackPressed()
+                                            }
+                                            displayReviewOrBack = false
                                         }
                                     }
                                 }
@@ -454,7 +470,7 @@ fun CheckChatScreen(
                                 ) {
                                     items(
                                         items = uiAllChatMessages,
-                                        key = { it.hashCode() }
+                                        key = { it.timestamp }
                                     ) { uiChatMessage ->
                                         ChatMessageItem(
                                             modifier = Modifier.animateItem(),

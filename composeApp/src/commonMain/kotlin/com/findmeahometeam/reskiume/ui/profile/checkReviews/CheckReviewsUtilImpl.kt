@@ -89,7 +89,7 @@ class CheckReviewsUtilImpl (
     private suspend fun Review.toUiReview(myUserUid: String): UiReview {
         val author: User? = getActivist(authorUid, myUserUid)
         return UiReview(
-            date = getFormattedDateFromEpochSeconds(timestamp),
+            date = getFormattedDateFromEpochMilliseconds(timestamp),
             authorUid = author?.uid ?: "",
             authorName = author?.username ?: "",
             authorUri = author?.image ?: "",
@@ -104,8 +104,8 @@ class CheckReviewsUtilImpl (
     }
 
     @OptIn(ExperimentalTime::class)
-    private fun getFormattedDateFromEpochSeconds(epochSeconds: Long): String {
-        val epoch = Instant.fromEpochSeconds(epochSeconds)
+    private fun getFormattedDateFromEpochMilliseconds(epochSeconds: Long): String {
+        val epoch = Instant.fromEpochMilliseconds(epochSeconds)
         val customFormat: DateTimeFormat<DateTimeComponents> = DateTimeComponents.Format {
             year(); char('-'); monthNumber(); char('-'); day()
         }

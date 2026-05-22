@@ -11,7 +11,7 @@ import com.findmeahometeam.reskiume.ui.core.navigation.CheckAllMyRescueEvents
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckChat
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckFosterHome
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckRescueEvent
-import com.findmeahometeam.reskiume.ui.core.navigation.CheckReviews
+import com.findmeahometeam.reskiume.ui.core.navigation.CheckAllReviews
 import com.findmeahometeam.reskiume.ui.core.navigation.CreateFosterHome
 import com.findmeahometeam.reskiume.ui.core.navigation.CreateRescueEvent
 import com.findmeahometeam.reskiume.ui.core.navigation.ModifyFosterHome
@@ -77,7 +77,7 @@ fun BottomNavigationWrapper(
                     mainNavHostController.navigate(Routes.MODIFY_ACCOUNT.route)
                 },
                 navigateToCheckReviewsScreen = { uid ->
-                    mainNavHostController.navigate(CheckReviews(uid))
+                    mainNavHostController.navigate(CheckAllReviews(uid))
                 },
                 navigateToCheckNonHumanAnimalsScreen = { myUid ->
                     mainNavHostController.navigate(CheckAllMyNonHumanAnimals(myUid))

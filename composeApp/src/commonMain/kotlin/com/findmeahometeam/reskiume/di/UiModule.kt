@@ -32,12 +32,13 @@ import com.findmeahometeam.reskiume.ui.profile.createAccount.CreateAccountViewmo
 import com.findmeahometeam.reskiume.ui.profile.deleteAccount.DeleteAccountViewmodel
 import com.findmeahometeam.reskiume.ui.profile.loginAccount.LoginAccountViewmodel
 import com.findmeahometeam.reskiume.ui.profile.modifyAccount.ModifyAccountViewmodel
-import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsViewmodel
+import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckAllReviewsViewmodel
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckActivistUtil
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckActivistUtilImpl
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsUtil
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsUtilImpl
 import com.findmeahometeam.reskiume.ui.profile.createNonHumanAnimal.CreateNonHumanAnimalViewmodel
+import com.findmeahometeam.reskiume.ui.profile.createReview.CreateReviewViewmodel
 import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.DeleteNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.DeleteNonHumanAnimalUtilImpl
 import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.ModifyNonHumanAnimalViewmodel
@@ -99,7 +100,7 @@ val uiModule = module {
             get()
         )
     }
-    viewModelOf(::CheckReviewsViewmodel)
+    viewModelOf(::CheckAllReviewsViewmodel)
     singleOf(::CheckReviewsUtilImpl) bind CheckReviewsUtil::class
     singleOf(::CheckActivistUtilImpl) bind CheckActivistUtil::class
     viewModelOf(::CheckAllMyNonHumanAnimalsViewmodel)
@@ -166,4 +167,5 @@ val uiModule = module {
         )
     }
     singleOf(::ManageChatUtilImpl) bind ManageChatUtil::class
+    viewModelOf(::CreateReviewViewmodel)
 }

@@ -49,7 +49,15 @@ class ModifyRescueEvent(val rescueEventId: String)
 class CreateRescueEvent(val creatorId: String)
 
 @Serializable
-class CheckReviews(val uid: String)
+class CheckAllReviews(val uid: String)
+
+@Serializable
+class CreateReview(
+    val allActivistIdsToReview: List<String>,
+    val chatId: String,
+    val rescueEventId: String,
+    val creatorId: String
+)
 
 @Serializable
 class CheckAllMyNonHumanAnimals(val caregiverId: String)

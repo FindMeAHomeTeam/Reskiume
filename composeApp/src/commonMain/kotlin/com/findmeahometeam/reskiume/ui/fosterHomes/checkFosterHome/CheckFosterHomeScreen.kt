@@ -628,6 +628,7 @@ fun DisplayChatToOwner(
 
                 onFindChat(allSelectedNonHumanAnimalsToFoster)
                 isStartChatClicked = false
+                allSelectedNonHumanAnimalsToFoster = emptyList()
             }
         )
     }

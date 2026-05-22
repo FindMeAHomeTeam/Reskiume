@@ -132,6 +132,15 @@
     <string name="check_reviews_screen_no_reviews">No reviews at the moment</string>
     <string name="check_reviews_screen_user_deleted">User deleted</string>
 
+    <!-- Create review screen -->
+    <string name="create_review_screen_title">Rate your experience</string>
+    <string name="create_review_screen_description">You're amazing! Thank you for helping non-human animals 🎉🎉</string>
+    <string name="create_review_screen_activist_avatar_content_description">%1$s's avatar</string>
+    <string name="create_review_screen_submit_reviews_button">Submit reviews</string>
+
+    <!-- Review activist list item -->
+    <string name="review_activist_list_item_leave_review">Leave a comment for %1$s</string>
+
     <!-- Check all non-human animals -->
     <string name="check_all_non_human_animals_screen_registered_non_human_animals_title">Registered non-human animals</string>
     <string name="check_all_non_human_animals_screen_no_non_human_animals">There are no non-human animals registered</string>

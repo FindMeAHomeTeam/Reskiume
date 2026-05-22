@@ -68,7 +68,7 @@ import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.ModifyNonHuma
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.ModifyNonHumanAnimalInRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.DeleteAllMyRescueEventsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.DeleteAllMyRescueEventsFromRemoteRepository
-import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.DeleteMyRescueEventFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.DeleteRescueEventFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.DeleteMyRescueEventFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetAllMyRescueEventsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetAllMyRescueEventsFromRemoteRepository
@@ -196,7 +196,7 @@ val domainModule = module {
     // rescueEvent
     factoryOf(::DeleteAllMyRescueEventsFromLocalRepository)
     factoryOf(::DeleteAllMyRescueEventsFromRemoteRepository)
-    factoryOf(::DeleteMyRescueEventFromLocalRepository)
+    factoryOf(::DeleteRescueEventFromLocalRepository)
     factoryOf(::DeleteMyRescueEventFromRemoteRepository)
     factoryOf(::GetAllMyRescueEventsFromLocalRepository)
     factoryOf(::GetAllRescueEventsFromLocalRepository)

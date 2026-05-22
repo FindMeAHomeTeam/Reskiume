@@ -10,7 +10,7 @@ import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHuman
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.firstOrNull
 
-class DeleteMyRescueEventFromLocalRepository(
+class DeleteRescueEventFromLocalRepository(
     private val localRescueEventRepository: LocalRescueEventRepository,
     private val checkNonHumanAnimalUtil: CheckNonHumanAnimalUtil,
     private val localNonHumanAnimalRepository: LocalNonHumanAnimalRepository,
@@ -19,14 +19,19 @@ class DeleteMyRescueEventFromLocalRepository(
     suspend operator fun invoke(
         id: String,
         nonHumanAnimalState: NonHumanAnimalState,
+        isMyRescueEvent: Boolean,
         coroutineScope: CoroutineScope,
         onDeleteRescueEvent: suspend (rowsDeleted: Int) -> Unit
     ) {
-        val isSuccess = updateAdoptionStates(
-            id,
-            nonHumanAnimalState,
-            coroutineScope
-        )
+        val isSuccess = if (isMyRescueEvent) {
+            updateAdoptionStates(
+                id,
+                nonHumanAnimalState,
+                coroutineScope
+            )
+        } else {
+            true
+        }
         if (isSuccess) {
             localRescueEventRepository.deleteRescueEvent(id, onDeleteRescueEvent)
         }

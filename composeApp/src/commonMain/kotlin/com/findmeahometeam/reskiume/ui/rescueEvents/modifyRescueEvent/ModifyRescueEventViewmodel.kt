@@ -367,7 +367,6 @@ class ModifyRescueEventViewmodel(
         deleteRescueEventUtil.deleteRescueEvent(
             id = id,
             creatorId = creatorId,
-            nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_REHOMED,
             coroutineScope = viewModelScope,
             deleteOnLocal = true,
             deleteOnRemote = true,

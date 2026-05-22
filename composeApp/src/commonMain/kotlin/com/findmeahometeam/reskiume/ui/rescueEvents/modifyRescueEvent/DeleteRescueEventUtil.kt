@@ -7,7 +7,7 @@ interface DeleteRescueEventUtil {
     fun deleteRescueEvent(
         id: String,
         creatorId: String,
-        nonHumanAnimalState: NonHumanAnimalState,
+        nonHumanAnimalState: NonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_REHOMED,
         coroutineScope: CoroutineScope,
         deleteOnLocal: Boolean, // In case the user is owner or not of the remote data or
         deleteOnRemote: Boolean, // the rescue event is finished and needs the local rescue event to remember the review

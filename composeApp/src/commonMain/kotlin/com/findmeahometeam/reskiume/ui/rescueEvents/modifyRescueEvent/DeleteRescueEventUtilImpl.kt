@@ -8,7 +8,7 @@ import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueEvent
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteCacheFromLocalRepository
-import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.DeleteMyRescueEventFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.DeleteRescueEventFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.DeleteMyRescueEventFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetRescueEventFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetRescueEventFromRemoteRepository
@@ -22,7 +22,7 @@ class DeleteRescueEventUtilImpl(
     private val deleteImageFromRemoteDataSource: DeleteImageFromRemoteDataSource,
     private val deleteImageFromLocalDataSource: DeleteImageFromLocalDataSource,
     private val deleteMyRescueEventFromRemoteRepository: DeleteMyRescueEventFromRemoteRepository,
-    private val deleteMyRescueEventFromLocalRepository: DeleteMyRescueEventFromLocalRepository,
+    private val deleteRescueEventFromLocalRepository: DeleteRescueEventFromLocalRepository,
     private val deleteCacheFromLocalRepository: DeleteCacheFromLocalRepository,
     private val log: Log
 ) : DeleteRescueEventUtil {
@@ -61,6 +61,7 @@ class DeleteRescueEventUtilImpl(
                         id,
                         nonHumanAnimalState,
                         deleteOnLocal,
+                        isMyRescueEvent = deleteOnRemote,
                         coroutineScope,
                         onError
                     ) {
@@ -210,6 +211,7 @@ class DeleteRescueEventUtilImpl(
         id: String,
         nonHumanAnimalState: NonHumanAnimalState,
         deleteOnLocal: Boolean,
+        isMyRescueEvent: Boolean,
         coroutineScope: CoroutineScope,
         onError: () -> Unit,
         onSuccess: suspend () -> Unit
@@ -220,9 +222,10 @@ class DeleteRescueEventUtilImpl(
                 onSuccess()
                 return@launch
             }
-            deleteMyRescueEventFromLocalRepository(
+            deleteRescueEventFromLocalRepository(
                 id,
                 nonHumanAnimalState,
+                isMyRescueEvent,
                 coroutineScope
             ) { rowsDeleted: Int ->
 

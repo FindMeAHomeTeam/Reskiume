@@ -127,7 +127,7 @@ class CheckChatViewmodel(
 
     private var job: Job? = null
 
-    private var lastestActivistCount = 0
+    private var latestActivistIds: Set<String> = emptySet()
 
     init {
         viewModelScope.launch {
@@ -145,15 +145,30 @@ class CheckChatViewmodel(
                     return@collect
                 }
 
+                val currentActivistIds = updatedChat.allActivistsInfo.map { it.uid }.toSet()
+
+                // If the activist is out, stop the messages
+                if (updatedChat.chatHolderId != myUid
+                    && !currentActivistIds.contains(myUid)
+                ) {
+                    job?.cancel()
+                    log.d(
+                        "CheckChatViewmodel",
+                        "init: User is out of the chat"
+                    )
+                }
+
                 // In case the collect function is emits multiple times
                 when {
                     lastTimestamp != updatedChat.timestamp -> {
                         lastTimestamp = updatedChat.timestamp
+                        latestActivistIds = currentActivistIds
+                    }
 
+                    latestActivistIds != currentActivistIds -> {
+                        latestActivistIds = currentActivistIds
                     }
-                    lastestActivistCount != updatedChat.allActivistsInfo.size -> {
-                        lastestActivistCount = updatedChat.allActivistsInfo.size
-                    }
+
                     else -> {
                         return@collect
                     }
@@ -228,7 +243,7 @@ class CheckChatViewmodel(
             if (myUid.isEmpty()) {
                 myUid = observeAuthStateInAuthDataSource().first()!!.uid
             }
-            subscribeToChatIfNecessary(myUid) {
+            subscribeToChatIfNecessary {
 
                 job = viewModelScope.launch {
 
@@ -312,6 +327,15 @@ class CheckChatViewmodel(
                             activistUid = it.uid,
                             myUserUid = chat.savedBy
                         )
+                    }
+                }.let {
+                    if (myUid == chatHolderId) {
+                        it
+                    } else {
+                        it + checkActivistUtil.getUser(
+                            activistUid = chatHolderId,
+                            myUserUid = chat.savedBy
+                        )!!
                     }
                 }
                 val myUsername = checkActivistUtil.getUser(
@@ -400,7 +424,8 @@ class CheckChatViewmodel(
                             getDate(currentChatMessage.timestamp)
                         } else {
                             ""
-                        }
+                        },
+                        timestamp = chatMessage.timestamp
                     ).also {
                         previousChatMessage = currentChatMessage
                     }
@@ -416,10 +441,8 @@ class CheckChatViewmodel(
     private val _uiState: MutableStateFlow<UiState<Unit>> = MutableStateFlow(UiState.Idle())
     val uiState: StateFlow<UiState<Unit>> = _uiState.asStateFlow()
 
-    private suspend fun subscribeToChatIfNecessary(
-        myUid: String,
-        onComplete: () -> Unit
-    ) {
+    private suspend fun subscribeToChatIfNecessary(onComplete: () -> Unit) {
+
         val myUser = checkActivistUtil.getUser(
             activistUid = myUid,
             myUserUid = myUid
@@ -884,7 +907,11 @@ class CheckChatViewmodel(
 
                                 manageFosterHomesInRepos(
                                     fosterHomeId = fosterHomeId,
-                                    allNonHumanAnimals = allNonHumanAnimals.map { it.copy(nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_REHOMED) },
+                                    allNonHumanAnimals = allNonHumanAnimals.map {
+                                        it.copy(
+                                            nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_REHOMED
+                                        )
+                                    },
                                     onError = onError
                                 ) {
                                     deleteAllCachedObjectsInLocalRepo(allNonHumanAnimalIds) {
@@ -1402,5 +1429,6 @@ data class UiChatMessage(
     val avatar: String,
     val isMyMessage: Boolean = false,
     val hour: String,
-    val date: String = ""
+    val date: String = "",
+    val timestamp: Long
 )

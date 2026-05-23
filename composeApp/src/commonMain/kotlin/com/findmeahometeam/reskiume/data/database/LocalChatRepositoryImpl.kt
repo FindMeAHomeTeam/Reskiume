@@ -1,11 +1,11 @@
 package com.findmeahometeam.reskiume.data.database
 
+import com.findmeahometeam.reskiume.data.database.entity.chat.ActivistInfoEntity
+import com.findmeahometeam.reskiume.data.database.entity.chat.BlockedUserInfoEntity
 import com.findmeahometeam.reskiume.data.database.entity.chat.ChatEntity
 import com.findmeahometeam.reskiume.data.database.entity.chat.ChatEntityWithAllData
 import com.findmeahometeam.reskiume.data.database.entity.chat.ChatMessageEntity
 import com.findmeahometeam.reskiume.data.database.entity.chat.NonHumanAnimalInfoEntity
-import com.findmeahometeam.reskiume.data.database.entity.chat.ActivistInfoEntity
-import com.findmeahometeam.reskiume.data.database.entity.chat.BlockedUserInfoEntity
 import com.findmeahometeam.reskiume.domain.repository.local.LocalChatRepository
 import kotlinx.coroutines.flow.Flow
 

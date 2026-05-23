@@ -216,7 +216,7 @@ fun ModifyRescueEventScreen(
                 }
 
                 LaunchedEffect(Unit) {
-                    modifyRescueEventViewmodel.isUserChattingWithTheseNonHumanAnimal(
+                    modifyRescueEventViewmodel.isUserChattingWithAnyOfTheseNonHumanAnimal(
                         nonHumanAnimalIds = uiRescueEvent.allUiNonHumanAnimalsToRescue.map { it.id }
                     ) {
                         isRescueEventCreatorChatting = it

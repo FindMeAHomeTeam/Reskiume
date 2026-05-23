@@ -412,7 +412,7 @@ class ModifyRescueEventViewmodel(
         }
     }
 
-    fun isUserChattingWithTheseNonHumanAnimal(
+    fun isUserChattingWithAnyOfTheseNonHumanAnimal(
         nonHumanAnimalIds: List<String>,
         onComplete: (Boolean) -> Unit,
     ) {

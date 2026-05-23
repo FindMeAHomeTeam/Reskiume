@@ -250,7 +250,7 @@ fun CreateFosterHomeScreen(
                 allAvailableNonHumanAnimals = allAvailableUiNonHumanAnimals.minus(
                     allResidentUiNonHumanAnimals.toSet()
                 ),
-                allExistentNonHumanAnimals = allResidentUiNonHumanAnimals
+                allSelectedNonHumanAnimals = allResidentUiNonHumanAnimals
             ) {
                 allResidentUiNonHumanAnimals = it
             }

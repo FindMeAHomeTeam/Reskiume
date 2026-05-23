@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -47,23 +48,44 @@ import reskiume.composeapp.generated.resources.non_human_animal_list_creator_uns
 fun RmNonHumanAnimalListCreator(
     title: String,
     allAvailableNonHumanAnimals: List<NonHumanAnimal>,
-    allExistentNonHumanAnimals: List<NonHumanAnimal>,
+    allSelectedNonHumanAnimals: List<NonHumanAnimal>,
     onAddNonHumanAnimal: (List<NonHumanAnimal>) -> Unit
 ) {
-    var availableNonHumanAnimals: List<NonHumanAnimal> by rememberSaveable(allAvailableNonHumanAnimals, stateSaver = NonHumanAnimalListSaver) {
+    // Current non-human animals that can be selected
+    var availableNonHumanAnimals: List<NonHumanAnimal> by rememberSaveable(stateSaver = NonHumanAnimalListSaver) {
         mutableStateOf(
             allAvailableNonHumanAnimals
         )
     }
-    var existentNonHumanAnimals: List<NonHumanAnimal> by rememberSaveable(allExistentNonHumanAnimals, stateSaver = NonHumanAnimalListSaver) {
-        mutableStateOf(
-            allExistentNonHumanAnimals
-        )
-    }
-    var selectedNonHumanAnimal: NonHumanAnimal? by rememberSaveable(stateSaver = NonHumanAnimalSaver) {
+
+    // Non-human animal choice from dropdown before being added to the list
+    var nonHumanAnimalChoiceFromDropdown: NonHumanAnimal? by rememberSaveable(stateSaver = NonHumanAnimalSaver) {
         mutableStateOf(
             null
         )
+    }
+
+    // Non-human animals that are added to the list
+    var selectedNonHumanAnimals: List<NonHumanAnimal> by rememberSaveable(stateSaver = NonHumanAnimalListSaver) {
+        mutableStateOf(
+            allSelectedNonHumanAnimals
+        )
+    }
+
+    LaunchedEffect(allAvailableNonHumanAnimals) {
+        availableNonHumanAnimals = allAvailableNonHumanAnimals
+    }
+
+    LaunchedEffect(allSelectedNonHumanAnimals) {
+        selectedNonHumanAnimals =
+            if (allSelectedNonHumanAnimals.any { selectedNonHumanAnimal ->
+                    availableNonHumanAnimals.contains(selectedNonHumanAnimal)
+                }
+            ) {
+                emptyList()
+            } else {
+                allSelectedNonHumanAnimals
+            }
     }
 
     Column(
@@ -89,15 +111,15 @@ fun RmNonHumanAnimalListCreator(
             RmDropDownMenu(
                 modifier = Modifier.weight(1f),
                 dropDownLabel = stringResource(Res.string.non_human_animal_list_creator_non_human_animal_label),
-                defaultElementText = if (selectedNonHumanAnimal == null) {
+                defaultElementText = if (nonHumanAnimalChoiceFromDropdown == null) {
                     stringResource(Res.string.non_human_animal_list_creator_unselected_non_human_animal_label)
                 } else {
-                    selectedNonHumanAnimal?.nonHumanAnimalType?.toEmoji() + " " + selectedNonHumanAnimal?.name
+                    nonHumanAnimalChoiceFromDropdown?.nonHumanAnimalType?.toEmoji() + " " + nonHumanAnimalChoiceFromDropdown?.name
                 },
                 items = availableNonHumanAnimals.map {
                     Pair(it, it.nonHumanAnimalType.toEmoji() + " " + it.name)
                 },
-                onClick = { selectedNonHumanAnimal = it },
+                onClick = { nonHumanAnimalChoiceFromDropdown = it },
             )
 
             IconButton(
@@ -105,16 +127,16 @@ fun RmNonHumanAnimalListCreator(
                     .padding(start = 16.dp, top = 8.dp)
                     .size(32.dp),
                 onClick = {
-                    if (selectedNonHumanAnimal != null) {
+                    if (nonHumanAnimalChoiceFromDropdown != null) {
 
-                        val existingItems = existentNonHumanAnimals.filter {
-                            it.id == selectedNonHumanAnimal!!.id
+                        val existingItems = selectedNonHumanAnimals.filter {
+                            it.id == nonHumanAnimalChoiceFromDropdown!!.id
                         }
                         if (existingItems.isEmpty()) {
-                            availableNonHumanAnimals -= selectedNonHumanAnimal!!
-                            existentNonHumanAnimals += selectedNonHumanAnimal!!
-                            onAddNonHumanAnimal(existentNonHumanAnimals)
-                            selectedNonHumanAnimal = null
+                            availableNonHumanAnimals -= nonHumanAnimalChoiceFromDropdown!!
+                            selectedNonHumanAnimals += nonHumanAnimalChoiceFromDropdown!!
+                            onAddNonHumanAnimal(selectedNonHumanAnimals)
+                            nonHumanAnimalChoiceFromDropdown = null
                         }
                     }
                 }
@@ -122,14 +144,14 @@ fun RmNonHumanAnimalListCreator(
                 Icon(
                     painter = painterResource(Res.drawable.ic_add),
                     contentDescription = stringResource(Res.string.non_human_animal_list_creator_add_content_description),
-                    tint = if (selectedNonHumanAnimal == null) tertiaryGreen else primaryGreen,
+                    tint = if (nonHumanAnimalChoiceFromDropdown == null) tertiaryGreen else primaryGreen,
                     modifier = Modifier.size(24.dp),
                 )
             }
         }
     }
 
-    if (existentNonHumanAnimals.isNotEmpty()) {
+    if (selectedNonHumanAnimals.isNotEmpty()) {
         Spacer(modifier = Modifier.height(8.dp))
 
         Column(
@@ -141,7 +163,7 @@ fun RmNonHumanAnimalListCreator(
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.Center
         ) {
-            existentNonHumanAnimals.forEachIndexed { index, existentNonHumanAnimal ->
+            selectedNonHumanAnimals.forEachIndexed { index, existentNonHumanAnimal ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -158,12 +180,12 @@ fun RmNonHumanAnimalListCreator(
                     IconButton(
                         modifier = Modifier.size(32.dp),
                         onClick = {
-                            existentNonHumanAnimals.first {
+                            selectedNonHumanAnimals.first {
                                 it == existentNonHumanAnimal
                             }.also {
                                 availableNonHumanAnimals += it
-                                existentNonHumanAnimals -= it
-                                onAddNonHumanAnimal(existentNonHumanAnimals)
+                                selectedNonHumanAnimals -= it
+                                onAddNonHumanAnimal(selectedNonHumanAnimals)
                             }
                         }
                     ) {
@@ -175,7 +197,7 @@ fun RmNonHumanAnimalListCreator(
                         )
                     }
                 }
-                if (index < existentNonHumanAnimals.size - 1) {
+                if (index < selectedNonHumanAnimals.size - 1) {
                     Spacer(modifier = Modifier.height(8.dp))
                 }
             }

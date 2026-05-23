@@ -578,7 +578,7 @@ fun DisplayChatToOwner(
         RmNonHumanAnimalListCreator(
             title = stringResource(Res.string.check_foster_home_screen_add_non_human_animals_to_foster_title),
             allAvailableNonHumanAnimals = allAvailableNonHumanAnimals,
-            allExistentNonHumanAnimals = allSelectedNonHumanAnimalsToFoster
+            allSelectedNonHumanAnimals = allSelectedNonHumanAnimalsToFoster
         ) { allNonHumanAnimalsSelected ->
             allSelectedNonHumanAnimalsToFoster = allNonHumanAnimalsSelected
         }
@@ -628,7 +628,6 @@ fun DisplayChatToOwner(
 
                 onFindChat(allSelectedNonHumanAnimalsToFoster)
                 isStartChatClicked = false
-                allSelectedNonHumanAnimalsToFoster = emptyList()
             }
         )
     }

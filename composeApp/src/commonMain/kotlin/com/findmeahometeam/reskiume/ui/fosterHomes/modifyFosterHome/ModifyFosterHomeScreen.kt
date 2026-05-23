@@ -283,7 +283,7 @@ fun ModifyFosterHomeScreen(
                     RmNonHumanAnimalListCreator(
                         title = stringResource(Res.string.non_human_animal_list_creator_resident_title),
                         allAvailableNonHumanAnimals = allAvailableNonHumanAnimals,
-                        allExistentNonHumanAnimals = allResidentUiNonHumanAnimals
+                        allSelectedNonHumanAnimals = allResidentUiNonHumanAnimals
                     ) {
                         allResidentUiNonHumanAnimals = it
                     }

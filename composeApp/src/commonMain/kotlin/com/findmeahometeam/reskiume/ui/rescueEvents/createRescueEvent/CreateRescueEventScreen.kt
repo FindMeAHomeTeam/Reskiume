@@ -236,7 +236,7 @@ fun CreateRescueEventScreen(
             RmNonHumanAnimalListCreator(
                 title = stringResource(Res.string.non_human_animal_list_creator_save_title),
                 allAvailableNonHumanAnimals = allAvailableNonHumanAnimals,
-                allExistentNonHumanAnimals = emptyList()
+                allSelectedNonHumanAnimals = emptyList()
             ) {
                 uiAllNonHumanAnimalsToRescue = it
             }

@@ -113,8 +113,8 @@ class LocalChatRepositoryImpl(
     override fun getAllMyChats(uid: String): Flow<List<ChatEntityWithAllData>> =
         reskiumeDatabase.getChatDao().getAllMyChats(uid)
 
-    override suspend fun isNonHumanAnimalInChat(nonHumanAnimalId: String): Boolean =
-        reskiumeDatabase.getChatDao().isNonHumanAnimalInChat(nonHumanAnimalId) != null
+    override fun getNonHumanAnimalInfo(nonHumanAnimalId: String): Flow<NonHumanAnimalInfoEntity?> =
+        reskiumeDatabase.getChatDao().getNonHumanAnimalInfo(nonHumanAnimalId)
 
     override suspend fun isFosterHomeChat(fosterHomeId: String): Boolean =
         reskiumeDatabase.getChatDao().isFosterHomeInChat(fosterHomeId).isNotEmpty()

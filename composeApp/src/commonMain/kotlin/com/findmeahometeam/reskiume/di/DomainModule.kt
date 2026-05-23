@@ -22,7 +22,7 @@ import com.findmeahometeam.reskiume.domain.usecases.chat.InsertChatInRemoteRepos
 import com.findmeahometeam.reskiume.domain.usecases.chat.InsertChatMessageInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.chat.InsertChatMessageInRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.chat.IsFosterHomeInChatInLocalRepository
-import com.findmeahometeam.reskiume.domain.usecases.chat.IsNonHumanAnimalInChatInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.GetNonHumanAnimalInfoInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.chat.ModifyChatInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.chat.ModifyChatInRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.chat.ModifyOnlyActivistsInChatInRemoteRepository
@@ -142,7 +142,7 @@ val domainModule = module {
     factoryOf(::GetAllChatMessagesFromRemoteRepository)
     factoryOf(::GetAllMyChatsFromLocalRepository)
     factoryOf(::GetAllMyChatsFromRemoteRepository)
-    factoryOf(::IsNonHumanAnimalInChatInLocalRepository)
+    factoryOf(::GetNonHumanAnimalInfoInLocalRepository)
     factoryOf(::IsFosterHomeInChatInLocalRepository)
 
     // fosterHome

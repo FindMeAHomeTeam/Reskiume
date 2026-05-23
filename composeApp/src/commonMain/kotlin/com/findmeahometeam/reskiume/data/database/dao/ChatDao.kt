@@ -64,7 +64,7 @@ interface ChatDao {
 
     @Transaction
     @Query("SELECT * FROM NonHumanAnimalInfoEntity WHERE nonHumanAnimalId = :nonHumanAnimalId")
-    suspend fun isNonHumanAnimalInChat(nonHumanAnimalId: String): NonHumanAnimalInfoEntity?
+    fun getNonHumanAnimalInfo(nonHumanAnimalId: String): Flow<NonHumanAnimalInfoEntity?>
 
     @Transaction
     @Query("SELECT * FROM ChatEntity WHERE fosterHomeId = :fosterHomeId")

@@ -18,7 +18,7 @@ import com.findmeahometeam.reskiume.domain.usecases.chat.GetChatFromLocalReposit
 import com.findmeahometeam.reskiume.domain.usecases.chat.InsertChatInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.chat.InsertChatInRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.chat.IsFosterHomeInChatInLocalRepository
-import com.findmeahometeam.reskiume.domain.usecases.chat.IsNonHumanAnimalInChatInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.GetNonHumanAnimalInfoInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetFosterHomeFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
@@ -31,11 +31,14 @@ import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHuman
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckActivistUtil
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsUtil
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.UiReview
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -51,7 +54,7 @@ class CheckFosterHomeViewmodel(
     private val checkNonHumanAnimalUtil: CheckNonHumanAnimalUtil,
     checkReviewsUtil: CheckReviewsUtil,
     getAllNonHumanAnimalsFromLocalRepository: GetAllNonHumanAnimalsFromLocalRepository,
-    private val isNonHumanAnimalInChatInLocalRepository: IsNonHumanAnimalInChatInLocalRepository,
+    private val getNonHumanAnimalInfoInLocalRepository: GetNonHumanAnimalInfoInLocalRepository,
     private val getFosterHomeFromRemoteRepository: GetFosterHomeFromRemoteRepository,
     private val getChatFromLocalRepository: GetChatFromLocalRepository,
     private val isFosterHomeInChatInLocalRepository: IsFosterHomeInChatInLocalRepository,
@@ -133,17 +136,20 @@ class CheckFosterHomeViewmodel(
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow: StateFlow<List<NonHumanAnimal>> =
-        getAllNonHumanAnimalsFromLocalRepository().map {
-            it.mapNotNull { nonHumanAnimal ->
-                if (nonHumanAnimal.nonHumanAnimalState == NonHumanAnimalState.NEEDS_TO_BE_REHOMED
-                    && !isNonHumanAnimalInChatInLocalRepository(nonHumanAnimal.id)
-                ) {
-                    nonHumanAnimal
-                } else {
-                    null
+        getAllNonHumanAnimalsFromLocalRepository().flatMapConcat {
+            flowOf(
+                it.mapNotNull { nonHumanAnimal ->
+                    if (nonHumanAnimal.nonHumanAnimalState == NonHumanAnimalState.NEEDS_TO_BE_REHOMED
+                        && getNonHumanAnimalInfoInLocalRepository(nonHumanAnimal.id).firstOrNull() == null
+                    ) {
+                        nonHumanAnimal
+                    } else {
+                        null
+                    }
                 }
-            }
+            )
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),

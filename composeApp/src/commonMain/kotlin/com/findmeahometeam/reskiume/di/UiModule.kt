@@ -97,6 +97,8 @@ val uiModule = module {
             get(),
             get(),
             get(),
+            get(),
+            get(),
             get()
         )
     }

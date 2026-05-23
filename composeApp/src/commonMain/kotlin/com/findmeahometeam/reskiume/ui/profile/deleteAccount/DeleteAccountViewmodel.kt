@@ -8,11 +8,14 @@ import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.Review
+import com.findmeahometeam.reskiume.domain.model.chat.Chat
 import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueEvent
 import com.findmeahometeam.reskiume.domain.model.user.User
 import com.findmeahometeam.reskiume.domain.usecases.authUser.DeleteUserFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.chat.DeleteAllMyChatsFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.GetAllMyChatsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.DeleteAllMyFosterHomesFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.DeleteAllMyFosterHomesFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllFosterHomesFromLocalRepository
@@ -37,17 +40,22 @@ import com.findmeahometeam.reskiume.domain.usecases.user.GetAllUsersFromLocalDat
 import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.util.fcm.UnsubscribeFromAllTopicsFromSubscriberRepository
 import com.findmeahometeam.reskiume.ui.core.components.UiState
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class DeleteAccountViewmodel(
     observeAuthStateInAuthDataSource: ObserveAuthStateInAuthDataSource,
     private val unsubscribeFromAllTopicsFromSubscriberRepository: UnsubscribeFromAllTopicsFromSubscriberRepository,
+    private val getAllMyChatsFromLocalRepository: GetAllMyChatsFromLocalRepository,
+    private val deleteAllMyChatsFromLocalRepository: DeleteAllMyChatsFromLocalRepository,
     private val getAllMyRescueEventsFromRemoteRepository: GetAllMyRescueEventsFromRemoteRepository,
     private val getAllRescueEventsFromLocalRepository: GetAllRescueEventsFromLocalRepository,
     private val deleteAllMyRescueEventsFromRemoteRepository: DeleteAllMyRescueEventsFromRemoteRepository,
@@ -73,27 +81,41 @@ class DeleteAccountViewmodel(
     private val deleteUsersFromLocalDataSource: DeleteUsersFromLocalDataSource,
     private val log: Log
 ) : ViewModel() {
+
+    private var myUid: String = ""
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val allMyChats: StateFlow<List<Chat>> =
+        observeAuthStateInAuthDataSource().flatMapConcat { authUser: AuthUser? ->
+            myUid = authUser?.uid!!
+            getAllMyChatsFromLocalRepository(myUid)
+        }.stateIn(
+            viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptyList()
+        )
+
     private var _deletionState: MutableStateFlow<UiState<Unit>> = MutableStateFlow(UiState.Idle())
     val deletionState: StateFlow<UiState<Unit>> = _deletionState.asStateFlow()
 
-    private val authUserState: Flow<AuthUser?> = observeAuthStateInAuthDataSource()
 
     fun deleteAccount(password: String) {
         getUserFromRemoteRepo { user ->
 
             unsubscribeFromAllTopics(user)
 
-            // TODO delete chats first
+            manageLocalChatsDeletion(user.uid) {
 
-            manageRescueEventsDeletion(user.uid) {
+                manageRescueEventsDeletion(user.uid) {
 
-                manageFosterHomesDeletion(user.uid) {
+                    manageFosterHomesDeletion(user.uid) {
 
-                    manageNonHumanAnimalsDeletion(user.uid) {
+                        manageNonHumanAnimalsDeletion(user.uid) {
 
-                        manageUserReviewsDeletion(user.uid) {
+                            manageUserReviewsDeletion(user.uid) {
 
-                            manageUserDeletion(user, password)
+                                manageUserDeletion(user, password)
+                            }
                         }
                     }
                 }
@@ -103,25 +125,15 @@ class DeleteAccountViewmodel(
 
     private fun getUserFromRemoteRepo(onSuccess: (User) -> Unit) {
         viewModelScope.launch {
-            val authUser: AuthUser? = authUserState.firstOrNull()
-
-            if (authUser == null) {
-                _deletionState.value = UiState.Error()
-                log.e(
-                    "DeleteAccountViewmodel",
-                    "getUserFromRemoteRepo: User UID is blank"
-                )
-                return@launch
-            }
             _deletionState.value = UiState.Loading()
 
-            val remoteUser: User? = getUserFromRemoteDataSource(authUser.uid).firstOrNull()
+            val remoteUser: User? = getUserFromRemoteDataSource(myUid).firstOrNull()
             if (remoteUser == null) {
 
                 _deletionState.value = UiState.Error()
                 log.e(
                     "DeleteAccountViewmodel",
-                    "getUserFromRemoteRepo: User ${authUser.uid} not found in remote data source"
+                    "getUserFromRemoteRepo: User $myUid not found in remote data source"
                 )
             } else {
                 onSuccess(remoteUser)
@@ -134,6 +146,47 @@ class DeleteAccountViewmodel(
 
             if (user.subscriptions.isNotEmpty()) {
                 unsubscribeFromAllTopicsFromSubscriberRepository(user.subscriptions).first()
+            }
+        }
+    }
+
+    private fun manageLocalChatsDeletion(uid: String, onComplete: () -> Unit) {
+
+        viewModelScope.launch {
+
+            if (allMyChats.value.isEmpty()) {
+                onComplete()
+            } else {
+
+                deleteAllMyChatsFromLocalDataSource(uid) {
+
+                    onComplete()
+                }
+            }
+        }
+    }
+
+    private fun deleteAllMyChatsFromLocalDataSource(
+        uid: String,
+        onSuccess: () -> Unit
+    ) {
+        viewModelScope.launch {
+
+            deleteAllMyChatsFromLocalRepository(uid) { rowsDeleted ->
+
+                if (rowsDeleted > 0) {
+                    log.d(
+                        "DeleteAccountViewmodel",
+                        "deleteAllMyChatsFromLocalDataSource: deleted $rowsDeleted chats where the user $uid participates from the local repository"
+                    )
+                    onSuccess()
+                } else {
+                    log.e(
+                        "DeleteAccountViewmodel",
+                        "deleteAllMyChatsFromLocalDataSource: failed to delete chats where the user $uid participates from the local repository"
+                    )
+                    _deletionState.value = UiState.Error()
+                }
             }
         }
     }

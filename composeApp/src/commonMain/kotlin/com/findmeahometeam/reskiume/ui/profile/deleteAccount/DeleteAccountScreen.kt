@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.findmeahometeam.reskiume.domain.model.chat.Chat
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.components.RmAvatar
 import com.findmeahometeam.reskiume.ui.core.components.RmButton
@@ -44,18 +45,30 @@ import reskiume.composeapp.generated.resources.delete_account_screen_delete_acco
 import reskiume.composeapp.generated.resources.delete_account_screen_delete_account_title
 import reskiume.composeapp.generated.resources.delete_account_screen_delete_error_message
 import reskiume.composeapp.generated.resources.delete_account_screen_explanation_delete_account_message
+import reskiume.composeapp.generated.resources.delete_account_screen_finish_exit_chats
 import reskiume.composeapp.generated.resources.ic_warning
 
 @Composable
 fun DeleteAccountScreen(onBackPressed: () -> Unit) {
 
     val deleteAccountViewmodel: DeleteAccountViewmodel = koinViewModel<DeleteAccountViewmodel>()
+
+    val allMyChats: List<Chat> by deleteAccountViewmodel.allMyChats.collectAsStateWithLifecycle()
+
+    val isAnyChatOpen: Boolean = allMyChats.any { !it.finished }
+
     val deletionState: UiState<Unit> by deleteAccountViewmodel.deletionState.collectAsStateWithLifecycle()
 
     var password by rememberSaveable { mutableStateOf("") }
-    val buttonEnabled by remember(password) {
+
+    val buttonEnabled by remember(
+        isAnyChatOpen,
+        password
+    ) {
         derivedStateOf {
-            password.isNotBlank() && password.length >= 6
+            !isAnyChatOpen
+                    && password.isNotBlank()
+                    && password.length >= 6
         }
     }
 
@@ -77,11 +90,7 @@ fun DeleteAccountScreen(onBackPressed: () -> Unit) {
             verticalArrangement = Arrangement.Center
         ) {
             Spacer(modifier = Modifier.weight(1f))
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
+            if (isAnyChatOpen) {
                 RmAvatar(
                     RmListAvatarType.Icon(
                         backgroundColor = secondaryRed,
@@ -92,45 +101,68 @@ fun DeleteAccountScreen(onBackPressed: () -> Unit) {
                 Spacer(Modifier.height(16.dp))
                 RmText(
                     modifier = Modifier.fillMaxWidth().padding(10.dp),
-                    text = stringResource(Res.string.delete_account_screen_are_you_sure_delete_account_message),
+                    text = stringResource(Res.string.delete_account_screen_finish_exit_chats),
                     textAlign = TextAlign.Center,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Black
                 )
-                Spacer(Modifier.height(5.dp))
-                RmText(
-                    modifier = Modifier.fillMaxWidth().padding(10.dp),
-                    text = stringResource(Res.string.delete_account_screen_explanation_delete_account_message),
-                    textAlign = TextAlign.Center,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = secondaryTextColor
-                )
-                Spacer(Modifier.height(5.dp))
-                RmPasswordTextField(
+                Spacer(modifier = Modifier.weight(1f))
+            } else {
+                Column(
                     modifier = Modifier.fillMaxWidth(),
-                    password = password,
-                    onValueChange = { password = it }
-                )
-                Spacer(Modifier.height(10.dp))
-                RmResultState(
-                    uiState = deletionState,
-                    customErrorMessage = stringResource(Res.string.delete_account_screen_delete_error_message),
-                    onSuccess = { onBackPressed() }
-                )
-            }
-            Spacer(modifier = Modifier.weight(1f))
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                RmButton(
-                    text = stringResource(Res.string.delete_account_screen_delete_account_button),
-                    containerColor = primaryRed,
-                    enabled = buttonEnabled
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    deleteAccountViewmodel.deleteAccount(password)
+                    RmAvatar(
+                        RmListAvatarType.Icon(
+                            backgroundColor = secondaryRed,
+                            icon = Res.drawable.ic_warning,
+                            iconColor = primaryRed
+                        )
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    RmText(
+                        modifier = Modifier.fillMaxWidth().padding(10.dp),
+                        text = stringResource(Res.string.delete_account_screen_are_you_sure_delete_account_message),
+                        textAlign = TextAlign.Center,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Black
+                    )
+                    Spacer(Modifier.height(5.dp))
+                    RmText(
+                        modifier = Modifier.fillMaxWidth().padding(10.dp),
+                        text = stringResource(Res.string.delete_account_screen_explanation_delete_account_message),
+                        textAlign = TextAlign.Center,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = secondaryTextColor
+                    )
+                    Spacer(Modifier.height(5.dp))
+                    RmPasswordTextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        password = password,
+                        onValueChange = { password = it }
+                    )
+                    Spacer(Modifier.height(10.dp))
+                    RmResultState(
+                        uiState = deletionState,
+                        customErrorMessage = stringResource(Res.string.delete_account_screen_delete_error_message),
+                        onSuccess = { onBackPressed() }
+                    )
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    RmButton(
+                        text = stringResource(Res.string.delete_account_screen_delete_account_button),
+                        containerColor = primaryRed,
+                        enabled = buttonEnabled
+                    ) {
+                        deleteAccountViewmodel.deleteAccount(password)
+                    }
                 }
             }
         }

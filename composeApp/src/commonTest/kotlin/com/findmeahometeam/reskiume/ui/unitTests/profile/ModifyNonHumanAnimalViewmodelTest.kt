@@ -5,16 +5,19 @@ import com.findmeahometeam.reskiume.CoroutineTestDispatcher
 import com.findmeahometeam.reskiume.authUser
 import com.findmeahometeam.reskiume.data.database.entity.LocalCacheEntity
 import com.findmeahometeam.reskiume.data.database.entity.NonHumanAnimalEntity
+import com.findmeahometeam.reskiume.data.database.entity.chat.NonHumanAnimalInfoEntity
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.remote.response.RemoteNonHumanAnimal
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalChatRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.chat.GetNonHumanAnimalInfoInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
@@ -32,6 +35,7 @@ import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.ModifyNonHuma
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.ModifyNonHumanAnimalInRemoteRepository
 import com.findmeahometeam.reskiume.localCache
 import com.findmeahometeam.reskiume.nonHumanAnimal
+import com.findmeahometeam.reskiume.rescueEventChat
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.navigation.ModifyNonHumanAnimal
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
@@ -52,6 +56,7 @@ import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
 import dev.mokkery.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runCurrent
@@ -109,6 +114,7 @@ class ModifyNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
         localCacheUpdatedInLocalDatasourceArg: Int = 1,
         numberOfNonHumanAnimalsDeletedFromLocalCacheArg: Int = 1,
         numberOfNonHumanAnimalsDeletedFromLocalCacheWithWrongIdArg: Int = 1,
+        nonHumanAnimalInfoEntityReturned: Flow<NonHumanAnimalInfoEntity> = flowOf(rescueEventChat.allNonHumanAnimalsInfo.first().toEntity()),
         databaseResultAfterModifyingRemoteNonHumanAnimalArg: DatabaseResult = DatabaseResult.Success,
         databaseResultAfterDeletingRemoteNonHumanAnimalArg: DatabaseResult = DatabaseResult.Success,
         remoteNonHumanAnimalArg: RemoteNonHumanAnimal = nonHumanAnimal.toData(),
@@ -180,6 +186,13 @@ class ModifyNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
                 onDeleteLocalCacheEntityWithWrongId.get()
                     .invoke(numberOfNonHumanAnimalsDeletedFromLocalCacheWithWrongIdArg)
             }
+        }
+
+        val localChatRepository: LocalChatRepository = mock {
+
+            everySuspend {
+                getNonHumanAnimalInfo(nonHumanAnimal.id)
+            } returns nonHumanAnimalInfoEntityReturned
         }
 
         val realtimeDatabaseRemoteNonHumanAnimalRepository: RealtimeDatabaseRemoteNonHumanAnimalRepository =
@@ -337,6 +350,9 @@ class ModifyNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
         val modifyCacheInLocalRepository =
             ModifyCacheInLocalRepository(localCacheRepository)
 
+        val getNonHumanAnimalInfoInLocalRepository =
+            GetNonHumanAnimalInfoInLocalRepository(localChatRepository)
+
         val deleteNonHumanAnimalFromRemoteRepository =
             DeleteNonHumanAnimalFromRemoteRepository(realtimeDatabaseRemoteNonHumanAnimalRepository)
 
@@ -383,6 +399,7 @@ class ModifyNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
             modifyNonHumanAnimalInRemoteRepository,
             modifyNonHumanAnimalInLocalRepository,
             modifyCacheInLocalRepository,
+            getNonHumanAnimalInfoInLocalRepository,
             log
         )
     }

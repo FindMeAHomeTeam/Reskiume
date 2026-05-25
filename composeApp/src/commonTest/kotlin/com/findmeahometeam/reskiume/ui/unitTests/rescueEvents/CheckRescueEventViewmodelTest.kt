@@ -3,27 +3,46 @@ package com.findmeahometeam.reskiume.ui.unitTests.rescueEvents
 import app.cash.turbine.test
 import com.findmeahometeam.reskiume.CoroutineTestDispatcher
 import com.findmeahometeam.reskiume.authUser
+import com.findmeahometeam.reskiume.data.database.entity.chat.ChatEntityWithAllData
+import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
+import com.findmeahometeam.reskiume.data.remote.response.chat.RemoteChat
+import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.user.User
+import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalChatRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.chat.FireStoreRemoteChatRepository
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.chat.GetChatFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.GetChatFromRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.InsertChatInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.ModifyOnlyActivistsInChatInRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.nonHumanAnimal
 import com.findmeahometeam.reskiume.rescueEvent
+import com.findmeahometeam.reskiume.rescueEventChat
+import com.findmeahometeam.reskiume.rescueEventChatEntityWithAllData
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckRescueEvent
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
-import com.findmeahometeam.reskiume.ui.profile.checkAllMyRescueEvents.UiRescueEvent
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckActivistUtil
 import com.findmeahometeam.reskiume.ui.rescueEvents.checkRescueEvent.CheckRescueEventUtil
 import com.findmeahometeam.reskiume.ui.rescueEvents.checkRescueEvent.CheckRescueEventViewmodel
+import com.findmeahometeam.reskiume.ui.rescueEvents.checkRescueEvent.UiRescueEventDetail
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import com.findmeahometeam.reskiume.user
+import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
+import dev.mokkery.matcher.capture.Capture
+import dev.mokkery.matcher.capture.capture
+import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -32,10 +51,21 @@ import kotlin.test.assertTrue
 
 class CheckRescueEventViewmodelTest : CoroutineTestDispatcher() {
 
+    private val onInsertLocalCacheEntity = Capture.slot<(rowId: Long) -> Unit>()
+
+    private val log: Log = mock {
+        every { d(any(), any()) } calls { println(it) }
+        every { e(any(), any()) } calls { println(it) }
+    }
+
     private fun getCheckRescueEventViewmodel(
         rescueEventId: String = rescueEvent.id,
         creatorId: String = rescueEvent.creatorId,
-        userReturned: User? = user
+        userReturned: User? = user,
+        localChatReturned: Flow<ChatEntityWithAllData> = flowOf(rescueEventChatEntityWithAllData),
+        remoteChatReturned: Flow<RemoteChat> = flowOf(rescueEventChat.toData()),
+        databaseResultOfModifyingOnlyActivistsInRemoteChat: Flow<DatabaseResult> = flowOf(DatabaseResult.Success),
+        rowIdInsertedInLocalCacheRepository: Long = 1L
     ): CheckRescueEventViewmodel {
 
         val saveStateHandleProvider: SaveStateHandleProvider = mock {
@@ -96,11 +126,60 @@ class CheckRescueEventViewmodelTest : CoroutineTestDispatcher() {
             every { getFileNameFromLocalImagePath(rescueEvent.imageUrl) } returns rescueEvent.imageUrl
         }
 
+        val localChatRepository: LocalChatRepository = mock {
+            every { getChat(rescueEventChat.id) } returns localChatReturned
+            every { getChat("otherIdotherCreatorId") } returns localChatReturned
+        }
+
+        val fireStoreRemoteChatRepository: FireStoreRemoteChatRepository = mock {
+            everySuspend {
+                getRemoteChat(rescueEventChat.id)
+            } returns remoteChatReturned
+
+            everySuspend {
+                modifyOnlyActivistsInRemoteChat(
+                    rescueEventChat.id,
+                    user.uid,
+                    true
+                )
+            } returns databaseResultOfModifyingOnlyActivistsInRemoteChat
+        }
+
+        val localCacheRepository: LocalCacheRepository = mock {
+            everySuspend {
+                insertLocalCacheEntity(
+                    any(),
+                    capture(onInsertLocalCacheEntity)
+                )
+            } calls {
+                onInsertLocalCacheEntity.get().invoke(rowIdInsertedInLocalCacheRepository)
+            }
+        }
+
         val observeAuthStateInAuthDataSource =
             ObserveAuthStateInAuthDataSource(authRepository)
 
         val getImagePathForFileNameFromLocalDataSource =
             GetImagePathForFileNameFromLocalDataSource(manageImagePath)
+
+        val getChatFromLocalRepository =
+            GetChatFromLocalRepository(localChatRepository)
+
+        val getChatFromRemoteRepository =
+            GetChatFromRemoteRepository(fireStoreRemoteChatRepository)
+
+        val modifyOnlyActivistsInChatInRemoteRepository =
+            ModifyOnlyActivistsInChatInRemoteRepository(fireStoreRemoteChatRepository)
+
+        val insertCacheInLocalRepository =
+            InsertCacheInLocalRepository(localCacheRepository)
+
+        val insertChatInLocalRepository =
+            InsertChatInLocalRepository(
+                localChatRepository,
+                authRepository,
+                log
+            )
 
         return CheckRescueEventViewmodel(
             saveStateHandleProvider,
@@ -108,28 +187,36 @@ class CheckRescueEventViewmodelTest : CoroutineTestDispatcher() {
             checkActivistUtil,
             observeAuthStateInAuthDataSource,
             getImagePathForFileNameFromLocalDataSource,
-            checkNonHumanAnimalUtil
+            checkNonHumanAnimalUtil,
+            getChatFromLocalRepository,
+            getChatFromRemoteRepository,
+            insertChatInLocalRepository,
+            modifyOnlyActivistsInChatInRemoteRepository,
+            insertCacheInLocalRepository,
+            log
         )
     }
 
     @Test
     fun `given a rescue event_when I click to check it_then rescue event is retrieved`() =
         runTest {
-            getCheckRescueEventViewmodel().rescueEventFlow.test {
+            getCheckRescueEventViewmodel().rescueEventDetailState.test {
+                assertTrue { awaitItem() is UiState.Loading }
                 assertEquals(
                     UiState.Success(
-                        UiRescueEvent(
+                        UiRescueEventDetail(
                             rescueEvent = rescueEvent,
                             allUiNonHumanAnimalsToRescue = listOf(
                                 nonHumanAnimal,
                                 nonHumanAnimal.copy(id = nonHumanAnimal.id + "second")
                             ),
-                            creator = user
+                            creator = user,
+                            chatExist = true
                         )
                     ),
                     awaitItem()
                 )
-                awaitComplete()
+                ensureAllEventsConsumed()
             }
         }
 
@@ -138,12 +225,13 @@ class CheckRescueEventViewmodelTest : CoroutineTestDispatcher() {
         runTest {
             getCheckRescueEventViewmodel(
                 rescueEventId = "wrongId"
-            ).rescueEventFlow.test {
+            ).rescueEventDetailState.test {
+                assertTrue { awaitItem() is UiState.Loading }
                 assertEquals(
                     UiState.Error(),
                     awaitItem()
                 )
-                awaitComplete()
+                ensureAllEventsConsumed()
             }
         }
 
@@ -152,12 +240,13 @@ class CheckRescueEventViewmodelTest : CoroutineTestDispatcher() {
         runTest {
             getCheckRescueEventViewmodel(
                 userReturned = null
-            ).rescueEventFlow.test {
+            ).rescueEventDetailState.test {
+                assertTrue { awaitItem() is UiState.Loading }
                 assertEquals(
                     UiState.Error(),
                     awaitItem()
                 )
-                awaitComplete()
+                ensureAllEventsConsumed()
             }
         }
 
@@ -166,21 +255,23 @@ class CheckRescueEventViewmodelTest : CoroutineTestDispatcher() {
         runTest {
             val checkRescueEventViewmodel = getCheckRescueEventViewmodel()
 
-            checkRescueEventViewmodel.rescueEventFlow.test {
+            checkRescueEventViewmodel.rescueEventDetailState.test {
+                assertTrue { awaitItem() is UiState.Loading }
                 assertEquals(
                     UiState.Success(
-                        UiRescueEvent(
+                        UiRescueEventDetail(
                             rescueEvent = rescueEvent,
                             allUiNonHumanAnimalsToRescue = listOf(
                                 nonHumanAnimal,
                                 nonHumanAnimal.copy(id = nonHumanAnimal.id + "second")
                             ),
-                            creator = user
+                            creator = user,
+                            chatExist = true
                         )
                     ),
                     awaitItem()
                 )
-                awaitComplete()
+                ensureAllEventsConsumed()
             }
 
             val result = checkRescueEventViewmodel.isLoggedIn()
@@ -196,21 +287,23 @@ class CheckRescueEventViewmodelTest : CoroutineTestDispatcher() {
                 creatorId = "otherCreatorId"
             )
 
-            checkRescueEventViewmodel.rescueEventFlow.test {
+            checkRescueEventViewmodel.rescueEventDetailState.test {
+                assertTrue { awaitItem() is UiState.Loading }
                 assertEquals(
                     UiState.Success(
-                        UiRescueEvent(
+                        UiRescueEventDetail(
                             rescueEvent = rescueEvent,
                             allUiNonHumanAnimalsToRescue = listOf(
                                 nonHumanAnimal,
                                 nonHumanAnimal.copy(id = nonHumanAnimal.id + "second")
                             ),
-                            creator = user
+                            creator = user,
+                            chatExist = true
                         )
                     ),
                     awaitItem()
                 )
-                awaitComplete()
+                ensureAllEventsConsumed()
             }
 
             val result = checkRescueEventViewmodel.canIStartTheChat()

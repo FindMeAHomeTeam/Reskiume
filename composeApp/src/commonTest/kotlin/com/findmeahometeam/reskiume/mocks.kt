@@ -1,5 +1,6 @@
 package com.findmeahometeam.reskiume
 
+import com.findmeahometeam.reskiume.data.database.entity.chat.ChatEntityWithAllData
 import com.findmeahometeam.reskiume.data.database.entity.fosterHome.FosterHomeWithAllNonHumanAnimalData
 import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.RescueEventWithAllNeedsAndNonHumanAnimalData
 import com.findmeahometeam.reskiume.data.database.entity.user.UserWithAllSubscriptionData
@@ -12,6 +13,9 @@ import com.findmeahometeam.reskiume.domain.model.LocalCache
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
 import com.findmeahometeam.reskiume.domain.model.Review
+import com.findmeahometeam.reskiume.domain.model.chat.ActivistInfo
+import com.findmeahometeam.reskiume.domain.model.chat.Chat
+import com.findmeahometeam.reskiume.domain.model.chat.NonHumanAnimalInfo
 import com.findmeahometeam.reskiume.domain.model.user.User
 import com.findmeahometeam.reskiume.domain.model.fosterHome.AcceptedNonHumanAnimalForFosterHome
 import com.findmeahometeam.reskiume.domain.model.fosterHome.City
@@ -24,6 +28,8 @@ import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueEvent
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueNeed
 import com.findmeahometeam.reskiume.domain.model.user.Subscription
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.UiReview
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 // Mocked user data for testing
 
@@ -215,4 +221,80 @@ val rescueEventWithAllNeedsAndNonHumanAnimalData = RescueEventWithAllNeedsAndNon
     rescueEventEntity = rescueEvent.toEntity(),
     allNonHumanAnimalsToRescue = rescueEvent.allNonHumanAnimalsToRescue.map { it.toEntity() },
     allNeedsToCover = rescueEvent.allNeedsToCover.map { it.toEntity() }
+)
+
+// Mocked chat data for testing
+
+@OptIn(ExperimentalTime::class)
+val fosterHomeChat = Chat(
+    id = fosterHome.id + user.uid,
+    fosterHomeId = fosterHome.id,
+    rescueEventId = "",
+    chatHolderId = fosterHome.ownerId,
+    allNonHumanAnimalsInfo = listOf(
+            NonHumanAnimalInfo(
+                nonHumanAnimalId = nonHumanAnimal.id,
+                chatId = fosterHome.id + user.uid,
+                caregiverId = nonHumanAnimal.caregiverId
+            )
+        ),
+    allActivistsInfo = listOf(
+        ActivistInfo(
+            id = Clock.System.now().epochSeconds.toString() + fosterHome.id + user.uid,
+            chatId = fosterHome.id + user.uid,
+            uid = user.uid
+        )
+    ),
+    allBlockedUsersInfo = emptyList(),
+    allChatMessages = emptyList(),
+    myUserIsConnected = true,
+    acceptedFoster = false,
+    finished = false,
+    addReview = false,
+    timestamp = Clock.System.now().toEpochMilliseconds()
+)
+
+val fosterHomeChatEntityWithAllData = ChatEntityWithAllData(
+    chatEntity = fosterHomeChat.toEntity(),
+    allNonHumanAnimalsInfo = fosterHomeChat.allNonHumanAnimalsInfo.map { it.toEntity() },
+    allActivistsInfo = fosterHomeChat.allActivistsInfo.map { it.toEntity() },
+    allBlockedUsersInfo = fosterHomeChat.allBlockedUsersInfo.map { it.toEntity() },
+    allChatMessages = fosterHomeChat.allChatMessages.map { it.toEntity() },
+)
+
+@OptIn(ExperimentalTime::class)
+val rescueEventChat = Chat(
+    id = rescueEvent.id + rescueEvent.creatorId,
+    fosterHomeId = "",
+    rescueEventId = rescueEvent.id,
+    chatHolderId = rescueEvent.creatorId,
+    allNonHumanAnimalsInfo = listOf(
+        NonHumanAnimalInfo(
+            nonHumanAnimalId = nonHumanAnimal.id,
+            chatId = rescueEvent.id + rescueEvent.creatorId,
+            caregiverId = nonHumanAnimal.caregiverId
+        )
+    ),
+    allActivistsInfo = listOf(
+        ActivistInfo(
+            id = Clock.System.now().epochSeconds.toString() + rescueEvent.id + rescueEvent.creatorId,
+            chatId = rescueEvent.id + rescueEvent.creatorId,
+            uid = user.uid
+        )
+    ),
+    allBlockedUsersInfo = emptyList(),
+    allChatMessages = emptyList(),
+    myUserIsConnected = true,
+    acceptedFoster = false,
+    finished = false,
+    addReview = false,
+    timestamp = Clock.System.now().toEpochMilliseconds()
+)
+
+val rescueEventChatEntityWithAllData = ChatEntityWithAllData(
+    chatEntity = rescueEventChat.toEntity(),
+    allNonHumanAnimalsInfo = rescueEventChat.allNonHumanAnimalsInfo.map { it.toEntity() },
+    allActivistsInfo = rescueEventChat.allActivistsInfo.map { it.toEntity() },
+    allBlockedUsersInfo = rescueEventChat.allBlockedUsersInfo.map { it.toEntity() },
+    allChatMessages = rescueEventChat.allChatMessages.map { it.toEntity() },
 )

@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.findmeahometeam.reskiume.CoroutineTestDispatcher
 import com.findmeahometeam.reskiume.authUser
 import com.findmeahometeam.reskiume.data.database.entity.LocalCacheEntity
+import com.findmeahometeam.reskiume.data.database.entity.chat.NonHumanAnimalInfoEntity
 import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.RescueEventWithAllNeedsAndNonHumanAnimalData
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
@@ -15,6 +16,7 @@ import com.findmeahometeam.reskiume.domain.model.rescueEvent.NeedToCover
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.NonHumanAnimalToRescue
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueNeed
 import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalChatRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalRescueEventRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
@@ -23,6 +25,7 @@ import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonH
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteRescueEvent.FireStoreRemoteRescueEventRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.chat.GetNonHumanAnimalInfoInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
@@ -37,6 +40,7 @@ import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSou
 import com.findmeahometeam.reskiume.localCache
 import com.findmeahometeam.reskiume.nonHumanAnimal
 import com.findmeahometeam.reskiume.rescueEvent
+import com.findmeahometeam.reskiume.rescueEventChat
 import com.findmeahometeam.reskiume.rescueEventWithAllNeedsAndNonHumanAnimalData
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.navigation.ModifyRescueEvent
@@ -142,7 +146,8 @@ class ModifyRescueEventViewmodelTest : CoroutineTestDispatcher() {
         modifiedRescueEventInLocalRowsUpdatedArg: Int = 1,
         modifiedRescueEventWithoutImageInLocalRowsUpdatedArg: Int = 1,
         rescueEventWithAllNeedsAndNonHumanAnimalDataReturn: RescueEventWithAllNeedsAndNonHumanAnimalData? = rescueEventWithAllNeedsAndNonHumanAnimalData,
-        numberOfNonHumanAnimalsUpdatedInLocalRepositoryArg: Int = 1
+        numberOfNonHumanAnimalsUpdatedInLocalRepositoryArg: Int = 1,
+        nonHumanAnimalInfoEntityReturned: Flow<NonHumanAnimalInfoEntity?> = flowOf(rescueEventChat.allNonHumanAnimalsInfo[0].toEntity())
     ): ModifyRescueEventViewmodel {
 
         val saveStateHandleProvider: SaveStateHandleProvider = mock {
@@ -437,6 +442,13 @@ class ModifyRescueEventViewmodelTest : CoroutineTestDispatcher() {
             }
         }
 
+        val localChatRepository: LocalChatRepository = mock {
+
+            every {
+                getNonHumanAnimalInfo(nonHumanAnimal.id)
+            } returns nonHumanAnimalInfoEntityReturned
+        }
+
         val manageImagePath: ManageImagePath = mock {
 
             every { getImagePathForFileName(nonHumanAnimal.imageUrl) } returns nonHumanAnimal.imageUrl
@@ -455,6 +467,8 @@ class ModifyRescueEventViewmodelTest : CoroutineTestDispatcher() {
                 deleteRescueEvent(
                     id = rescueEvent.id,
                     creatorId = rescueEvent.creatorId,
+                    deleteOnLocal = true,
+                    deleteOnRemote = true,
                     coroutineScope = any(),
                     onError = any(),
                     onComplete = capture(onCompletedDeleteRescueEvent)
@@ -482,6 +496,9 @@ class ModifyRescueEventViewmodelTest : CoroutineTestDispatcher() {
 
         val getAllNonHumanAnimalsFromLocalRepository =
             GetAllNonHumanAnimalsFromLocalRepository(localNonHumanAnimalRepository)
+
+        val getNonHumanAnimalInfoInLocalRepository =
+            GetNonHumanAnimalInfoInLocalRepository(localChatRepository)
 
         val getRescueEventFromRemoteRepository =
             GetRescueEventFromRemoteRepository(fireStoreRemoteRescueEventRepository)
@@ -529,6 +546,7 @@ class ModifyRescueEventViewmodelTest : CoroutineTestDispatcher() {
             getImagePathForFileNameFromLocalDataSource,
             checkNonHumanAnimalUtil,
             getAllNonHumanAnimalsFromLocalRepository,
+            getNonHumanAnimalInfoInLocalRepository,
             getRescueEventFromRemoteRepository,
             deleteImageFromRemoteDataSource,
             deleteImageFromLocalDataSource,
@@ -568,7 +586,9 @@ class ModifyRescueEventViewmodelTest : CoroutineTestDispatcher() {
     @Test
     fun `given my rescue event to modify_when I want to add non human animals to rescue_then rescue event list available non human animals`() =
         runTest {
-            getModifyRescueEventViewmodel().allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow.test {
+            getModifyRescueEventViewmodel(
+                nonHumanAnimalInfoEntityReturned = flowOf(null)
+            ).allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow.test {
                 assertEquals(listOf(nonHumanAnimal), awaitItem())
                 awaitComplete()
             }

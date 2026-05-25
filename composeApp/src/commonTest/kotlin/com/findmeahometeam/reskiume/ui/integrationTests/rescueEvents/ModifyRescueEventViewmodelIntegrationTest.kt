@@ -9,6 +9,7 @@ import com.findmeahometeam.reskiume.domain.model.rescueEvent.NeedToCover
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.NonHumanAnimalToRescue
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueNeed
 import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalChatRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalRescueEventRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
@@ -17,6 +18,7 @@ import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonH
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteRescueEvent.FireStoreRemoteRescueEventRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.chat.GetNonHumanAnimalInfoInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
@@ -41,6 +43,7 @@ import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeDeleteNonHuman
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeDeleteRescueEventUtil
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeFireStoreRemoteRescueEventRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalCacheRepository
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalChatRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalRescueEventRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalUserRepository
@@ -96,6 +99,7 @@ class ModifyRescueEventViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 nonHumanAnimal.copy(id = nonHumanAnimal.id + "second").toEntity()
             )
         ),
+        localChatRepository: LocalChatRepository = FakeLocalChatRepository(),
         manageImagePath: ManageImagePath = FakeManageImagePath(),
         deleteRescueEventUtil: DeleteRescueEventUtil = FakeDeleteRescueEventUtil(),
         localUserRepository: LocalUserRepository = FakeLocalUserRepository(
@@ -113,6 +117,9 @@ class ModifyRescueEventViewmodelIntegrationTest : CoroutineTestDispatcher() {
 
         val getAllNonHumanAnimalsFromLocalRepository =
             GetAllNonHumanAnimalsFromLocalRepository(localNonHumanAnimalRepository)
+
+        val getNonHumanAnimalInfoInLocalRepository =
+            GetNonHumanAnimalInfoInLocalRepository(localChatRepository)
 
         val getRescueEventFromRemoteRepository =
             GetRescueEventFromRemoteRepository(fireStoreRemoteRescueEventRepository)
@@ -160,6 +167,7 @@ class ModifyRescueEventViewmodelIntegrationTest : CoroutineTestDispatcher() {
             getImagePathForFileNameFromLocalDataSource,
             checkNonHumanAnimalUtil,
             getAllNonHumanAnimalsFromLocalRepository,
+            getNonHumanAnimalInfoInLocalRepository,
             getRescueEventFromRemoteRepository,
             deleteImageFromRemoteDataSource,
             deleteImageFromLocalDataSource,

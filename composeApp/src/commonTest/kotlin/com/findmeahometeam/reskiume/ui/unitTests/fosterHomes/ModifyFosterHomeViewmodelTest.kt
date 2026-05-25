@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.findmeahometeam.reskiume.CoroutineTestDispatcher
 import com.findmeahometeam.reskiume.authUser
 import com.findmeahometeam.reskiume.data.database.entity.LocalCacheEntity
+import com.findmeahometeam.reskiume.data.database.entity.chat.NonHumanAnimalInfoEntity
 import com.findmeahometeam.reskiume.data.database.entity.fosterHome.FosterHomeWithAllNonHumanAnimalData
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
@@ -16,6 +17,7 @@ import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
 import com.findmeahometeam.reskiume.domain.model.fosterHome.AcceptedNonHumanAnimalForFosterHome
 import com.findmeahometeam.reskiume.domain.model.fosterHome.ResidentNonHumanAnimalForFosterHome
 import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalChatRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
@@ -24,6 +26,8 @@ import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonH
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteFosterHome.FireStoreRemoteFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.chat.GetNonHumanAnimalInfoInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.IsFosterHomeInChatInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetFosterHomeFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetFosterHomeFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.ModifyFosterHomeInLocalRepository
@@ -36,6 +40,7 @@ import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLoca
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.fosterHome
+import com.findmeahometeam.reskiume.fosterHomeChat
 import com.findmeahometeam.reskiume.fosterHomeWithAllNonHumanAnimalData
 import com.findmeahometeam.reskiume.localCache
 import com.findmeahometeam.reskiume.nonHumanAnimal
@@ -136,7 +141,9 @@ class ModifyFosterHomeViewmodelTest : CoroutineTestDispatcher() {
         modifiedFosterHomeInLocalRowsUpdatedArg: Int = 1,
         modifiedFosterHomeWithoutImageInLocalRowsUpdatedArg: Int = 1,
         fosterHomeWithAllNonHumanAnimalLocalDataReturn: FosterHomeWithAllNonHumanAnimalData? = fosterHomeWithAllNonHumanAnimalData,
-        numberOfNonHumanAnimalsUpdatedInLocalRepositoryArg: Int = 1
+        numberOfNonHumanAnimalsUpdatedInLocalRepositoryArg: Int = 1,
+        nonHumanAnimalInfoReturned: Flow<NonHumanAnimalInfoEntity?> = flowOf(fosterHomeChat.allNonHumanAnimalsInfo.first().toEntity()),
+        isFosterHomeInChat: Boolean = false,
     ): ModifyFosterHomeViewmodel {
 
         val saveStateHandleProvider: SaveStateHandleProvider = mock {
@@ -420,6 +427,17 @@ class ModifyFosterHomeViewmodelTest : CoroutineTestDispatcher() {
             }
         }
 
+        val localChatRepository: LocalChatRepository = mock {
+
+            every {
+                getNonHumanAnimalInfo(nonHumanAnimal.id)
+            } returns nonHumanAnimalInfoReturned
+
+            everySuspend {
+                isFosterHomeChat(fosterHome.id)
+            } returns isFosterHomeInChat
+        }
+
         val manageImagePath: ManageImagePath = mock {
 
             every { getImagePathForFileName(nonHumanAnimal.imageUrl) } returns nonHumanAnimal.imageUrl
@@ -466,6 +484,9 @@ class ModifyFosterHomeViewmodelTest : CoroutineTestDispatcher() {
         val getAllNonHumanAnimalsFromLocalRepository =
             GetAllNonHumanAnimalsFromLocalRepository(localNonHumanAnimalRepository)
 
+        val getNonHumanAnimalInfoInLocalRepository =
+            GetNonHumanAnimalInfoInLocalRepository(localChatRepository)
+
         val getFosterHomeFromRemoteRepository =
             GetFosterHomeFromRemoteRepository(fireStoreRemoteFosterHomeRepository)
 
@@ -506,12 +527,16 @@ class ModifyFosterHomeViewmodelTest : CoroutineTestDispatcher() {
         val getUserFromLocalDataSource =
             GetUserFromLocalDataSource(localUserRepository)
 
+        val isFosterHomeInChatInLocalRepository =
+            IsFosterHomeInChatInLocalRepository(localChatRepository)
+
         return ModifyFosterHomeViewmodel(
             saveStateHandleProvider,
             getFosterHomeFromLocalRepository,
             getImagePathForFileNameFromLocalDataSource,
             checkNonHumanAnimalUtil,
             getAllNonHumanAnimalsFromLocalRepository,
+            getNonHumanAnimalInfoInLocalRepository,
             getFosterHomeFromRemoteRepository,
             deleteImageFromRemoteDataSource,
             deleteImageFromLocalDataSource,
@@ -523,6 +548,7 @@ class ModifyFosterHomeViewmodelTest : CoroutineTestDispatcher() {
             observeAuthStateInAuthDataSource,
             getUserFromLocalDataSource,
             subscriptionManagerUtil,
+            isFosterHomeInChatInLocalRepository,
             log
         )
     }
@@ -547,7 +573,9 @@ class ModifyFosterHomeViewmodelTest : CoroutineTestDispatcher() {
     @Test
     fun `given my foster home to modify_when I want to add residents_then foster home list available non human animals`() =
         runTest {
-            getModifyFosterHomeViewmodel().allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow.test {
+            getModifyFosterHomeViewmodel(
+                nonHumanAnimalInfoReturned = flowOf(null)
+            ).allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow.test {
                 assertEquals(listOf(nonHumanAnimal), awaitItem())
                 awaitComplete()
             }

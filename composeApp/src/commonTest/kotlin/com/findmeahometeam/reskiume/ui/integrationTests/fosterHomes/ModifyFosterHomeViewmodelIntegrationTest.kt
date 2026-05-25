@@ -10,6 +10,7 @@ import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
 import com.findmeahometeam.reskiume.domain.model.fosterHome.AcceptedNonHumanAnimalForFosterHome
 import com.findmeahometeam.reskiume.domain.model.fosterHome.ResidentNonHumanAnimalForFosterHome
 import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalChatRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
@@ -18,6 +19,8 @@ import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonH
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteFosterHome.FireStoreRemoteFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.chat.GetNonHumanAnimalInfoInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.IsFosterHomeInChatInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetFosterHomeFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetFosterHomeFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.ModifyFosterHomeInLocalRepository
@@ -45,6 +48,7 @@ import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeDeleteFosterHo
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeDeleteNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeFireStoreRemoteFosterHomeRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalCacheRepository
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalChatRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalFosterHomeRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalUserRepository
@@ -87,6 +91,7 @@ class ModifyFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
         storageRepository: StorageRepository = FakeStorageRepository(),
         localFosterHomeRepository: LocalFosterHomeRepository = FakeLocalFosterHomeRepository(),
         localNonHumanAnimalRepository: LocalNonHumanAnimalRepository = FakeLocalNonHumanAnimalRepository(),
+        localChatRepository: LocalChatRepository = FakeLocalChatRepository(),
         manageImagePath: ManageImagePath = FakeManageImagePath(),
         deleteFosterHomeUtil: DeleteFosterHomeUtil = FakeDeleteFosterHomeUtil(),
         localUserRepository: LocalUserRepository = FakeLocalUserRepository(
@@ -104,6 +109,9 @@ class ModifyFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
 
         val getAllNonHumanAnimalsFromLocalRepository =
             GetAllNonHumanAnimalsFromLocalRepository(localNonHumanAnimalRepository)
+
+        val getNonHumanAnimalInfoInLocalRepository =
+            GetNonHumanAnimalInfoInLocalRepository(localChatRepository)
 
         val getFosterHomeFromRemoteRepository =
             GetFosterHomeFromRemoteRepository(fireStoreRemoteFosterHomeRepository)
@@ -145,12 +153,16 @@ class ModifyFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
         val getUserFromLocalDataSource =
             GetUserFromLocalDataSource(localUserRepository)
 
+        val isFosterHomeInChatInLocalRepository =
+            IsFosterHomeInChatInLocalRepository(localChatRepository)
+
         return ModifyFosterHomeViewmodel(
             saveStateHandleProvider,
             getFosterHomeFromLocalRepository,
             getImagePathForFileNameFromLocalDataSource,
             checkNonHumanAnimalUtil,
             getAllNonHumanAnimalsFromLocalRepository,
+            getNonHumanAnimalInfoInLocalRepository,
             getFosterHomeFromRemoteRepository,
             deleteImageFromRemoteDataSource,
             deleteImageFromLocalDataSource,
@@ -162,6 +174,7 @@ class ModifyFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
             observeAuthStateInAuthDataSource,
             getUserFromLocalDataSource,
             subscriptionManagerUtil,
+            isFosterHomeInChatInLocalRepository,
             log
         )
     }

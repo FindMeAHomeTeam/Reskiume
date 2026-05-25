@@ -111,10 +111,12 @@ class ModifyFosterHomeInRemoteRepositoryTest {
             )
 
             modifyFosterHomeInRemoteRepository(
-                fosterHome,
+                isNonHumanAnimalSaved = false,
+                updatedFosterHome = fosterHome,
                 previousFosterHome = previousFosterHome,
-                coroutineScope = TestScope()
-            ) {}
+                coroutineScope = TestScope(),
+                {},
+            )
             verifySuspend {
                 realtimeDatabaseRemoteNonHumanAnimalRepository.modifyRemoteNonHumanAnimal(
                     nonHumanAnimal.copy(
@@ -139,15 +141,17 @@ class ModifyFosterHomeInRemoteRepositoryTest {
             )
 
             modifyFosterHomeInRemoteRepository(
-                fosterHome.copy(
+                isNonHumanAnimalSaved = false,
+                updatedFosterHome = fosterHome.copy(
                     id = "otherFosterHomeId",
                     allResidentNonHumanAnimals = fosterHome.allResidentNonHumanAnimals.map {
                         it.copy(nonHumanAnimalId = nonHumanAnimal.id + "other")
                     }
                 ),
                 previousFosterHome = previousFosterHome,
-                coroutineScope = TestScope()
-            ) {}
+                coroutineScope = TestScope(),
+                {},
+            )
             verifySuspend {
                 deleteNonHumanAnimalUtil.deleteNonHumanAnimal(
                     id = nonHumanAnimal.id + "other",

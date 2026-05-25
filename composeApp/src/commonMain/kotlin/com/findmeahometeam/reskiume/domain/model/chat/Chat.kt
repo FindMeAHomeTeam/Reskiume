@@ -40,7 +40,7 @@ data class Chat(
         )
     }
 
-    fun toRemoteChat(): RemoteChat {
+    fun toData(): RemoteChat {
         return RemoteChat(
             id = id.ifBlank { setId() },
             fosterHomeId = fosterHomeId,

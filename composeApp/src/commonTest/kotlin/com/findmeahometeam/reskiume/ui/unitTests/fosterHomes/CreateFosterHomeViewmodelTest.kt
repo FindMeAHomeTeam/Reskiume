@@ -3,12 +3,14 @@ package com.findmeahometeam.reskiume.ui.unitTests.fosterHomes
 import app.cash.turbine.test
 import com.findmeahometeam.reskiume.CoroutineTestDispatcher
 import com.findmeahometeam.reskiume.authUser
+import com.findmeahometeam.reskiume.data.database.entity.chat.NonHumanAnimalInfoEntity
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalChatRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
@@ -18,6 +20,7 @@ import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteFos
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.repository.util.location.LocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.chat.GetNonHumanAnimalInfoInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.InsertFosterHomeInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.InsertFosterHomeInRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
@@ -29,6 +32,7 @@ import com.findmeahometeam.reskiume.domain.usecases.util.location.GetLocationFro
 import com.findmeahometeam.reskiume.domain.usecases.util.location.ObserveIfLocationEnabledFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.RequestEnableLocationFromLocationRepository
 import com.findmeahometeam.reskiume.fosterHome
+import com.findmeahometeam.reskiume.fosterHomeChat
 import com.findmeahometeam.reskiume.nonHumanAnimal
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.fosterHomes.createFosterHome.CreateFosterHomeViewmodel
@@ -49,6 +53,7 @@ import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
 import dev.mokkery.verify
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -103,6 +108,7 @@ class CreateFosterHomeViewmodelTest : CoroutineTestDispatcher() {
         databaseResultOfModifyingNonHumanAnimalInRemoteRepositoryArg: DatabaseResult = DatabaseResult.Success,
         imagePathToUploadToRemoteForFosterHome: String = fosterHome.imageUrl,
         flagOfLocalImageDeletedArg: Boolean = true,
+        nonHumanAnimalInfoReturned: Flow<NonHumanAnimalInfoEntity?> = flowOf(fosterHomeChat.allNonHumanAnimalsInfo.first().toEntity()),
         insertedAcceptedNonHumanAnimalForFosterHomeInLocalRowIdArg: Long = 1L,
         insertedAcceptedSecondNonHumanAnimalForFosterHomeInLocalRowIdArg: Long = 1L,
         insertedResidentNonHumanAnimalIdForFosterHomeInLocalRowIdArg: Long = 1L,
@@ -172,6 +178,13 @@ class CreateFosterHomeViewmodelTest : CoroutineTestDispatcher() {
                     capture(onImageDeletedFromLocal)
                 )
             } calls { onImageDeletedFromLocal.get().invoke(flagOfLocalImageDeletedArg) }
+        }
+
+        val localChatRepository: LocalChatRepository = mock {
+
+            every {
+                getNonHumanAnimalInfo(nonHumanAnimal.id)
+            } returns nonHumanAnimalInfoReturned
         }
 
         val authRepository: AuthRepository = mock {
@@ -424,6 +437,9 @@ class CreateFosterHomeViewmodelTest : CoroutineTestDispatcher() {
         val deleteImageFromLocalDataSource =
             DeleteImageFromLocalDataSource(storageRepository)
 
+        val getNonHumanAnimalInfoInLocalRepository =
+            GetNonHumanAnimalInfoInLocalRepository(localChatRepository)
+
         return CreateFosterHomeViewmodel(
             getAllNonHumanAnimalsFromLocalRepository,
             observeIfLocationEnabledFromLocationRepository,
@@ -438,6 +454,7 @@ class CreateFosterHomeViewmodelTest : CoroutineTestDispatcher() {
             getUserFromLocalDataSource,
             subscriptionManagerUtil,
             deleteImageFromLocalDataSource,
+            getNonHumanAnimalInfoInLocalRepository,
             log
         )
     }
@@ -445,7 +462,9 @@ class CreateFosterHomeViewmodelTest : CoroutineTestDispatcher() {
     @Test
     fun `given my foster home to create_when I want to add residents_then foster home list available non human animals`() =
         runTest {
-            getCreateFosterHomeViewmodel().allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow.test {
+            getCreateFosterHomeViewmodel(
+                nonHumanAnimalInfoReturned = flowOf(null)
+            ).allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow.test {
                 assertEquals(listOf(nonHumanAnimal), awaitItem())
                 awaitComplete()
             }

@@ -6,6 +6,7 @@ import com.findmeahometeam.reskiume.authUser
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalChatRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
@@ -15,6 +16,7 @@ import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteFos
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.repository.util.location.LocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.chat.GetNonHumanAnimalInfoInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.InsertFosterHomeInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.InsertFosterHomeInRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
@@ -36,6 +38,7 @@ import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeCheckNonHumanA
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeDeleteNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeFireStoreRemoteFosterHomeRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalCacheRepository
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalChatRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalFosterHomeRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalUserRepository
@@ -75,6 +78,7 @@ class CreateFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
             )
         ),
         storageRepository: StorageRepository = FakeStorageRepository(),
+        localChatRepository: LocalChatRepository = FakeLocalChatRepository(),
         authRepository: AuthRepository = FakeAuthRepository(
             authUser = authUser,
             authEmail = user.email,
@@ -143,6 +147,9 @@ class CreateFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
         val deleteImageFromLocalDataSource =
             DeleteImageFromLocalDataSource(storageRepository)
 
+        val getNonHumanAnimalInfoInLocalRepository =
+            GetNonHumanAnimalInfoInLocalRepository(localChatRepository)
+
         return CreateFosterHomeViewmodel(
             getAllNonHumanAnimalsFromLocalRepository,
             observeIfLocationEnabledFromLocationRepository,
@@ -157,6 +164,7 @@ class CreateFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
             getUserFromLocalDataSource,
             subscriptionManagerUtil,
             deleteImageFromLocalDataSource,
+            getNonHumanAnimalInfoInLocalRepository,
             log
         )
     }

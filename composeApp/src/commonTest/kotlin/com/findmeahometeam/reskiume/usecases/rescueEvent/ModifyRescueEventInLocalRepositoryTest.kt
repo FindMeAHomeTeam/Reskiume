@@ -272,7 +272,12 @@ class ModifyRescueEventInLocalRepositoryTest {
                 allNeedsToCover = emptyList()
             )
 
-            modifyRescueEventInLocalRepository(rescueEvent, previousRescueEvent, this) {}
+            modifyRescueEventInLocalRepository(
+                isNonHumanAnimalSaved = false,
+                updatedRescueEvent = rescueEvent,
+                previousRescueEvent,
+                this
+            ) {}
 
             verifySuspend {
                 manageImagePath.getFileNameFromLocalImagePath(rescueEvent.imageUrl)
@@ -310,7 +315,8 @@ class ModifyRescueEventInLocalRepositoryTest {
                 allNeedsToCover = emptyList()
             )
             modifyRescueEventInLocalRepository(
-                rescueEvent.copy(
+                isNonHumanAnimalSaved = false,
+                updatedRescueEvent = rescueEvent.copy(
                     id = "otherRescueEventId",
                     savedBy = authUser.uid,
                     allNonHumanAnimalsToRescue = rescueEvent.allNonHumanAnimalsToRescue.map {
@@ -369,6 +375,7 @@ class ModifyRescueEventInLocalRepositoryTest {
             val previousRescueEvent = rescueEvent
 
             modifyRescueEventInLocalRepository(
+                isNonHumanAnimalSaved = false,
                 updatedRescueEvent,
                 previousRescueEvent,
                 this
@@ -413,6 +420,7 @@ class ModifyRescueEventInLocalRepositoryTest {
             )
 
             modifyRescueEventInLocalRepository(
+                isNonHumanAnimalSaved = false,
                 updatedRescueEvent,
                 previousRescueEvent,
                 this
@@ -455,6 +463,7 @@ class ModifyRescueEventInLocalRepositoryTest {
             )
 
             modifyRescueEventInLocalRepository(
+                isNonHumanAnimalSaved = false,
                 updatedRescueEvent,
                 previousRescueEvent,
                 this

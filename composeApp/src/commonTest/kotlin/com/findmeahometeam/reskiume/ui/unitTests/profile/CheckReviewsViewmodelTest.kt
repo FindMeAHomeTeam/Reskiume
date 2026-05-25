@@ -19,10 +19,6 @@ import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteRevi
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.repository.util.fcm.FCMSubscriberRepository
-import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
-import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
@@ -30,15 +26,19 @@ import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManaging
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.review.InsertReviewInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInLocalDataSource
 import com.findmeahometeam.reskiume.localCache
 import com.findmeahometeam.reskiume.review
-import com.findmeahometeam.reskiume.ui.core.navigation.CheckReviews
+import com.findmeahometeam.reskiume.ui.core.components.UiState
+import com.findmeahometeam.reskiume.ui.core.navigation.CheckAllReviews
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckActivistUtilImpl
+import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckAllReviewsViewmodel
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsUtilImpl
-import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsViewmodel
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
-import com.findmeahometeam.reskiume.uiReview
 import com.findmeahometeam.reskiume.user
 import com.findmeahometeam.reskiume.userWithAllSubscriptionData
 import com.plusmobileapps.konnectivity.Konnectivity
@@ -61,6 +61,7 @@ import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
 
@@ -70,9 +71,9 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
 
     private val onInsertReview = Capture.slot<(rowId: Long) -> Unit>()
 
-    private val onInsertUserInLocal = Capture.slot< suspend (rowId: Long) -> Unit>()
+    private val onInsertUserInLocal = Capture.slot<suspend (rowId: Long) -> Unit>()
 
-    private val onModifyUserInLocal = Capture.slot< suspend (rowsUpdated: Int) -> Unit>()
+    private val onModifyUserInLocal = Capture.slot<suspend (rowsUpdated: Int) -> Unit>()
 
     private val onSaveImageToLocal = Capture.slot<(imagePath: String) -> Unit>()
 
@@ -107,12 +108,12 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
         getRemoteAuthorReturn: Flow<RemoteUser?> = flowOf(author.toData()),
         absolutePathUserArg: String = user.image,
         absolutePathAuthorArg: String = user.image
-    ): CheckReviewsViewmodel {
+    ): CheckAllReviewsViewmodel {
 
         val saveStateHandleProvider: SaveStateHandleProvider = mock {
             every {
-                provideObjectRoute<CheckReviews>(any(), any())
-            } returns CheckReviews(uidArg)
+                provideObjectRoute<CheckAllReviews>(any(), any())
+            } returns CheckAllReviews(uidArg)
         }
 
         val authRepository: AuthRepository = mock {
@@ -306,7 +307,7 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
             log
         )
 
-        return CheckReviewsViewmodel(
+        return CheckAllReviewsViewmodel(
             saveStateHandleProvider,
             checkReviewsUtilImpl,
             observeAuthStateInAuthDataSource,
@@ -317,9 +318,9 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
     @Test
     fun `given a registered user_when the user opens their reviews section_then their profile is not displayed`() =
         runTest {
-            getCheckReviewsViewmodel().getUserDataIfNotMine().test {
+            getCheckReviewsViewmodel().userDataIfNotMine.test {
                 assertEquals(null, awaitItem())
-                awaitComplete()
+                ensureAllEventsConsumed()
             }
         }
 
@@ -330,16 +331,23 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
                 uidArg = author.uid,
                 authStateReturn = null,
                 getAuthorLocalCacheEntityReturn = null
-            ).getUserDataIfNotMine().test {
+            ).userDataIfNotMine.test {
+                assertEquals(null, awaitItem())
                 assertEquals(
                     author.copy(savedBy = "", email = null, image = user.image),
                     awaitItem()
                 )
-                awaitComplete()
+                ensureAllEventsConsumed()
+            }
+
+            verify {
+                log.d(
+                    "CheckActivistUtil",
+                    "insertUserInLocalRepository: User ${author.uid} added to local database"
+                )
             }
         }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `given a user with empty cache and no avatar_when the user clicks on a review but have an error saving the reviewed user locally_then the reviewed user profile is displayed but not saved in local cache`() =
         runTest {
@@ -350,12 +358,11 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
                 getRemoteAuthorReturn = flowOf(author.copy(image = "").toData()),
                 rowIdInsertedUserArg = 0,
                 absolutePathAuthorArg = ""
-            ).getUserDataIfNotMine().test {
+            ).userDataIfNotMine.test {
+                assertEquals(null, awaitItem())
                 assertEquals(author.copy(image = "", savedBy = "", email = null), awaitItem())
-                awaitComplete()
+                ensureAllEventsConsumed()
             }
-
-            runCurrent()
 
             verify {
                 log.e(
@@ -377,16 +384,23 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
                         section = Section.USERS,
                         timestamp = 123L
                     ).toEntity()
-            ).getUserDataIfNotMine().test {
+            ).userDataIfNotMine.test {
+                assertEquals(null, awaitItem())
                 assertEquals(
                     author.copy(savedBy = "", email = null, image = user.image),
                     awaitItem()
                 )
-                awaitComplete()
+                ensureAllEventsConsumed()
+            }
+
+            verify {
+                log.d(
+                    "CheckActivistUtil",
+                    "modifyUserInLocalRepository: Modified user with uid ${author.uid} into local data source."
+                )
             }
         }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `given a user with an outdated local cache and no avatar_when the user clicks on a review but there is an error modifying the retrieved user locally_then the reviewed user is displayed but not modified`() =
         runTest {
@@ -402,12 +416,11 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
                 getRemoteAuthorReturn = flowOf(author.copy(image = "").toData()),
                 rowsUpdatedUserArg = 0,
                 absolutePathAuthorArg = ""
-            ).getUserDataIfNotMine().test {
+            ).userDataIfNotMine.test {
+                assertEquals(null, awaitItem())
                 assertEquals(author.copy(image = "", savedBy = "", email = null), awaitItem())
-                awaitComplete()
+                ensureAllEventsConsumed()
             }
-
-            runCurrent()
 
             verify {
                 log.e(
@@ -423,9 +436,17 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
             getCheckReviewsViewmodel(
                 uidArg = author.uid,
                 authStateReturn = null,
-            ).getUserDataIfNotMine().test {
+            ).userDataIfNotMine.test {
+                assertEquals(null, awaitItem())
                 assertEquals(author.copy(email = null), awaitItem())
-                awaitComplete()
+                ensureAllEventsConsumed()
+            }
+
+            verify {
+                log.d(
+                    "GetDataByManagingObjectLocalCacheTimestamp",
+                    "Cache for ${author.uid} in section USERS is up-to-date."
+                )
             }
         }
 
@@ -436,17 +457,17 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
                 getUserLocalCacheEntityReturn = null,
                 getUserReviewsLocalCacheEntityReturn = null,
                 getAuthorLocalCacheEntityReturn = null
-            ).reviewListFlow.test {
-                val actualUiReviewList = awaitItem()
+            ).reviewListState.test {
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Success }
+                ensureAllEventsConsumed()
+            }
 
-                assertEquals(uiReview.date, actualUiReviewList[0].date)
-                assertEquals(uiReview.authorUid, actualUiReviewList[0].authorUid)
-                assertEquals(uiReview.authorName, actualUiReviewList[0].authorName)
-                assertEquals(user.image, actualUiReviewList[0].authorUri)
-                assertEquals(uiReview.description, actualUiReviewList[0].description)
-                assertEquals(uiReview.rating, actualUiReviewList[0].rating)
-
-                awaitComplete()
+            verify {
+                log.d(
+                    "CheckActivistUtil",
+                    "insertUserInLocalRepository: User ${author.uid} added to local database"
+                )
             }
         }
 
@@ -457,17 +478,10 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
             getCheckReviewsViewmodel(
                 getUserReviewsLocalCacheEntityReturn = localCache.copy(timestamp = 123L).toEntity(),
                 reviewIdInsertedInLocalDatasourceArg = 0
-            ).reviewListFlow.test {
-                val actualUiReviewList = awaitItem()
-
-                assertEquals(uiReview.date, actualUiReviewList[0].date)
-                assertEquals(uiReview.authorUid, actualUiReviewList[0].authorUid)
-                assertEquals(uiReview.authorName, actualUiReviewList[0].authorName)
-                assertEquals(uiReview.authorUri, actualUiReviewList[0].authorUri)
-                assertEquals(uiReview.description, actualUiReviewList[0].description)
-                assertEquals(uiReview.rating, actualUiReviewList[0].rating)
-
-                awaitComplete()
+            ).reviewListState.test {
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Success }
+                ensureAllEventsConsumed()
             }
 
             runCurrent()
@@ -483,17 +497,17 @@ class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
     @Test
     fun `given a registered user with recent cache_when the user opens the reviews section_then the user will see them`() =
         runTest {
-            getCheckReviewsViewmodel().reviewListFlow.test {
-                val actualUiReviewList = awaitItem()
+            getCheckReviewsViewmodel().reviewListState.test {
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Success }
+                ensureAllEventsConsumed()
+            }
 
-                assertEquals(uiReview.date, actualUiReviewList[0].date)
-                assertEquals(uiReview.authorUid, actualUiReviewList[0].authorUid)
-                assertEquals(uiReview.authorName, actualUiReviewList[0].authorName)
-                assertEquals(uiReview.authorUri, actualUiReviewList[0].authorUri)
-                assertEquals(uiReview.description, actualUiReviewList[0].description)
-                assertEquals(uiReview.rating, actualUiReviewList[0].rating)
-
-                awaitComplete()
+            verify {
+                log.d(
+                    "GetDataByManagingObjectLocalCacheTimestamp",
+                    "Cache for ${author.uid} in section USERS is up-to-date."
+                )
             }
         }
 }

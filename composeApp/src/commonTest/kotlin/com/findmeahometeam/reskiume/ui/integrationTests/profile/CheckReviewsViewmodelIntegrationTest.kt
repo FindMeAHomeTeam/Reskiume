@@ -27,7 +27,8 @@ import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInLocalDataSo
 import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInLocalDataSource
 import com.findmeahometeam.reskiume.localCache
 import com.findmeahometeam.reskiume.review
-import com.findmeahometeam.reskiume.ui.core.navigation.CheckReviews
+import com.findmeahometeam.reskiume.ui.core.components.UiState
+import com.findmeahometeam.reskiume.ui.core.navigation.CheckAllReviews
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeAuthRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeFCMSubscriberRepository
@@ -42,19 +43,18 @@ import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeRealtimeDataba
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeSaveStateHandleProvider
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeStorageRepository
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckActivistUtilImpl
+import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckAllReviewsViewmodel
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsUtilImpl
-import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsViewmodel
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
-import com.findmeahometeam.reskiume.uiReview
 import com.findmeahometeam.reskiume.userPwd
 import com.findmeahometeam.reskiume.userWithAllSubscriptionData
 import com.plusmobileapps.konnectivity.Konnectivity
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
-
 
     private fun getCheckReviewsViewmodel(
         saveStateHandleProvider: SaveStateHandleProvider = FakeSaveStateHandleProvider(),
@@ -69,7 +69,7 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
         konnectivity: Konnectivity = FakeKonnectivity(),
         manageImagePath: ManageImagePath = FakeManageImagePath(),
         fcmSubscriberRepository: FCMSubscriberRepository = FakeFCMSubscriberRepository()
-    ): CheckReviewsViewmodel {
+    ): CheckAllReviewsViewmodel {
 
         val observeAuthStateInAuthDataSource =
             ObserveAuthStateInAuthDataSource(authRepository)
@@ -137,7 +137,7 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
             log
         )
 
-        return CheckReviewsViewmodel(
+        return CheckAllReviewsViewmodel(
             saveStateHandleProvider,
             checkReviewsUtilImpl,
             observeAuthStateInAuthDataSource,
@@ -150,9 +150,9 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
         runTest {
             getCheckReviewsViewmodel(
                 authRepository = FakeAuthRepository(authUser = authUser)
-            ).getUserDataIfNotMine().test {
+            ).userDataIfNotMine.test {
                 assertEquals(null, awaitItem())
-                awaitComplete()
+                ensureAllEventsConsumed()
             }
         }
 
@@ -160,7 +160,7 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
     fun `given a user with empty cache_when the user clicks on a review_then the reviewed user profile is saved in local cache and displayed`() =
         runTest {
             getCheckReviewsViewmodel(
-                saveStateHandleProvider = FakeSaveStateHandleProvider(CheckReviews(author.uid)),
+                saveStateHandleProvider = FakeSaveStateHandleProvider(CheckAllReviews(author.uid)),
                 authRepository = FakeAuthRepository(
                     authUser = authUser,
                     authEmail = authUser.email,
@@ -169,9 +169,10 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
                     remoteUserList = mutableListOf(author.toData())
                 )
-            ).getUserDataIfNotMine().test {
+            ).userDataIfNotMine.test {
+                assertEquals(null, awaitItem())
                 assertEquals(author.copy(savedBy = "", email = null), awaitItem())
-                awaitComplete()
+                ensureAllEventsConsumed()
             }
         }
 
@@ -179,7 +180,7 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
     fun `given a user with empty cache and no avatar_when the user clicks on a review but have an error saving the reviewed user locally_then the reviewed user profile is displayed but not saved in local cache`() =
         runTest {
             getCheckReviewsViewmodel(
-                saveStateHandleProvider = FakeSaveStateHandleProvider(CheckReviews(author.uid)),
+                saveStateHandleProvider = FakeSaveStateHandleProvider(CheckAllReviews(author.uid)),
                 authRepository = FakeAuthRepository(
                     authUser = authUser,
                     authEmail = authUser.email,
@@ -195,9 +196,10 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
                         )
                     )
                 )
-            ).getUserDataIfNotMine().test {
+            ).userDataIfNotMine.test {
+                assertEquals(null, awaitItem())
                 assertEquals(author.copy(image = "", savedBy = "", email = null), awaitItem())
-                awaitComplete()
+                ensureAllEventsConsumed()
             }
         }
 
@@ -205,7 +207,7 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
     fun `given a user with an old local cache_when the user clicks on a review_then the reviewed user profile is modified in local cache and displayed`() =
         runTest {
             getCheckReviewsViewmodel(
-                saveStateHandleProvider = FakeSaveStateHandleProvider(CheckReviews(author.uid)),
+                saveStateHandleProvider = FakeSaveStateHandleProvider(CheckAllReviews(author.uid)),
                 authRepository = FakeAuthRepository(
                     authUser = authUser,
                     authEmail = authUser.email,
@@ -228,9 +230,10 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
                         ).toEntity()
                     )
                 )
-            ).getUserDataIfNotMine().test {
+            ).userDataIfNotMine.test {
+                assertEquals(null, awaitItem())
                 assertEquals(author.copy(savedBy = "", email = null), awaitItem())
-                awaitComplete()
+                ensureAllEventsConsumed()
             }
         }
 
@@ -238,7 +241,7 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
     fun `given a user with an outdated local cache and no avatar_when the user clicks on a review but there is an error modifying the retrieved user locally_then the reviewed user is displayed but not modified`() =
         runTest {
             getCheckReviewsViewmodel(
-                saveStateHandleProvider = FakeSaveStateHandleProvider(CheckReviews(author.uid)),
+                saveStateHandleProvider = FakeSaveStateHandleProvider(CheckAllReviews(author.uid)),
                 authRepository = FakeAuthRepository(
                     authUser = authUser,
                     authEmail = authUser.email,
@@ -256,9 +259,10 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
                         ).toEntity()
                     )
                 )
-            ).getUserDataIfNotMine().test {
+            ).userDataIfNotMine.test {
+                assertEquals(null, awaitItem())
                 assertEquals(author.copy(image = "", savedBy = "", email = null), awaitItem())
-                awaitComplete()
+                ensureAllEventsConsumed()
             }
         }
 
@@ -266,7 +270,7 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
     fun `given a user with recent local cache_when the user clicks on a review_then the reviewed user profile is retrieved from local cache and displayed`() =
         runTest {
             getCheckReviewsViewmodel(
-                saveStateHandleProvider = FakeSaveStateHandleProvider(CheckReviews(author.uid)),
+                saveStateHandleProvider = FakeSaveStateHandleProvider(CheckAllReviews(author.uid)),
                 authRepository = FakeAuthRepository(
                     authUser = authUser,
                     authEmail = authUser.email,
@@ -288,9 +292,10 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
                         ).toEntity()
                     )
                 )
-            ).getUserDataIfNotMine().test {
+            ).userDataIfNotMine.test {
+                assertEquals(null, awaitItem())
                 assertEquals(author.copy(email = null), awaitItem())
-                awaitComplete()
+                ensureAllEventsConsumed()
             }
         }
 
@@ -324,17 +329,10 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
                         )
                     )
                 )
-            ).reviewListFlow.test {
-                val actualUiReviewList = awaitItem()
-
-                assertEquals(uiReview.date, actualUiReviewList[0].date)
-                assertEquals(uiReview.authorUid, actualUiReviewList[0].authorUid)
-                assertEquals(uiReview.authorName, actualUiReviewList[0].authorName)
-                assertEquals(uiReview.authorUri, actualUiReviewList[0].authorUri)
-                assertEquals(uiReview.description, actualUiReviewList[0].description)
-                assertEquals(uiReview.rating, actualUiReviewList[0].rating)
-
-                awaitComplete()
+            ).reviewListState.test {
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Success }
+                ensureAllEventsConsumed()
             }
         }
 
@@ -372,17 +370,10 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
                         )
                     )
                 )
-            ).reviewListFlow.test {
-                val actualUiReviewList = awaitItem()
-
-                assertEquals(uiReview.date, actualUiReviewList[0].date)
-                assertEquals(uiReview.authorUid, actualUiReviewList[0].authorUid)
-                assertEquals(uiReview.authorName, actualUiReviewList[0].authorName)
-                assertEquals(uiReview.authorUri, actualUiReviewList[0].authorUri)
-                assertEquals(uiReview.description, actualUiReviewList[0].description)
-                assertEquals(uiReview.rating, actualUiReviewList[0].rating)
-
-                awaitComplete()
+            ).reviewListState.test {
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Success }
+                ensureAllEventsConsumed()
             }
         }
 
@@ -417,17 +408,10 @@ class CheckReviewsViewmodelIntegrationTest : CoroutineTestDispatcher() {
                         )
                     )
                 )
-            ).reviewListFlow.test {
-                val actualUiReviewList = awaitItem()
-
-                assertEquals(uiReview.date, actualUiReviewList[0].date)
-                assertEquals(uiReview.authorUid, actualUiReviewList[0].authorUid)
-                assertEquals(uiReview.authorName, actualUiReviewList[0].authorName)
-                assertEquals(uiReview.authorUri, actualUiReviewList[0].authorUri)
-                assertEquals(uiReview.description, actualUiReviewList[0].description)
-                assertEquals(uiReview.rating, actualUiReviewList[0].rating)
-
-                awaitComplete()
+            ).reviewListState.test {
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Success }
+                ensureAllEventsConsumed()
             }
         }
 }

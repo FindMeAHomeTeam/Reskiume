@@ -9,6 +9,7 @@ import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.remote.response.rescueEvent.RemoteRescueEvent
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalRescueEventRepository
@@ -19,7 +20,7 @@ import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepo
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.DeleteCacheFromLocalRepository
-import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.DeleteMyRescueEventFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.DeleteRescueEventFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.DeleteMyRescueEventFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetRescueEventFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetRescueEventFromRemoteRepository
@@ -307,8 +308,8 @@ class DeleteRescueEventUtilTest : CoroutineTestDispatcher() {
                 log
             )
 
-        val deleteMyRescueEventFromLocalRepository =
-            DeleteMyRescueEventFromLocalRepository(
+        val deleteRescueEventFromLocalRepository =
+            DeleteRescueEventFromLocalRepository(
                 localRescueEventRepository,
                 checkNonHumanAnimalUtil,
                 localNonHumanAnimalRepository,
@@ -324,7 +325,7 @@ class DeleteRescueEventUtilTest : CoroutineTestDispatcher() {
             deleteImageFromRemoteDataSource,
             deleteImageFromLocalDataSource,
             deleteMyRescueEventFromRemoteRepository,
-            deleteMyRescueEventFromLocalRepository,
+            deleteRescueEventFromLocalRepository,
             deleteCacheFromLocalRepository,
             log
         )
@@ -339,8 +340,10 @@ class DeleteRescueEventUtilTest : CoroutineTestDispatcher() {
             deleteRescueEventUtil.deleteRescueEvent(
                 rescueEvent.id,
                 rescueEvent.creatorId,
+                NonHumanAnimalState.NEEDS_TO_BE_REHOMED,
                 this,
-                false,
+                deleteOnLocal = true,
+                deleteOnRemote = true,
                 {},
                 {},
             )
@@ -366,8 +369,10 @@ class DeleteRescueEventUtilTest : CoroutineTestDispatcher() {
             deleteRescueEventUtil.deleteRescueEvent(
                 rescueEvent.id,
                 rescueEvent.creatorId,
+                NonHumanAnimalState.NEEDS_TO_BE_REHOMED,
                 this,
-                false,
+                deleteOnLocal = true,
+                deleteOnRemote = true,
                 {},
                 {},
             )
@@ -393,8 +398,10 @@ class DeleteRescueEventUtilTest : CoroutineTestDispatcher() {
             deleteRescueEventUtil.deleteRescueEvent(
                 rescueEvent.id,
                 rescueEvent.creatorId,
+                NonHumanAnimalState.NEEDS_TO_BE_REHOMED,
                 this,
-                false,
+                deleteOnLocal = true,
+                deleteOnRemote = true,
                 {},
                 {},
             )
@@ -420,8 +427,10 @@ class DeleteRescueEventUtilTest : CoroutineTestDispatcher() {
             deleteRescueEventUtil.deleteRescueEvent(
                 rescueEvent.id,
                 rescueEvent.creatorId,
+                NonHumanAnimalState.NEEDS_TO_BE_REHOMED,
                 this,
-                false,
+                deleteOnLocal = true,
+                deleteOnRemote = true,
                 {},
                 {},
             )
@@ -447,8 +456,10 @@ class DeleteRescueEventUtilTest : CoroutineTestDispatcher() {
             deleteRescueEventUtil.deleteRescueEvent(
                 rescueEvent.id,
                 rescueEvent.creatorId,
+                NonHumanAnimalState.NEEDS_TO_BE_REHOMED,
                 this,
-                false,
+                deleteOnLocal = true,
+                deleteOnRemote = true,
                 {},
                 {},
             )
@@ -474,8 +485,10 @@ class DeleteRescueEventUtilTest : CoroutineTestDispatcher() {
             deleteRescueEventUtil.deleteRescueEvent(
                 rescueEvent.id,
                 rescueEvent.creatorId,
+                NonHumanAnimalState.NEEDS_TO_BE_REHOMED,
                 this,
-                false,
+                deleteOnLocal = true,
+                deleteOnRemote = true,
                 {},
                 {},
             )
@@ -501,8 +514,10 @@ class DeleteRescueEventUtilTest : CoroutineTestDispatcher() {
             deleteRescueEventUtil.deleteRescueEvent(
                 rescueEvent.id,
                 rescueEvent.creatorId,
+                NonHumanAnimalState.NEEDS_TO_BE_REHOMED,
                 this,
-                false,
+                deleteOnLocal = true,
+                deleteOnRemote = true,
                 {},
                 {},
             )
@@ -528,8 +543,10 @@ class DeleteRescueEventUtilTest : CoroutineTestDispatcher() {
             deleteRescueEventUtil.deleteRescueEvent(
                 rescueEvent.id,
                 rescueEvent.creatorId,
+                NonHumanAnimalState.NEEDS_TO_BE_REHOMED,
                 this,
-                true,
+                deleteOnLocal = true,
+                deleteOnRemote = true,
                 {},
                 {},
             )

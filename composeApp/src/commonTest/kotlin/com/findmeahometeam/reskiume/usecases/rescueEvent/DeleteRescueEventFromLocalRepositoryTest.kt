@@ -1,9 +1,10 @@
 package com.findmeahometeam.reskiume.usecases.rescueEvent
 
 import com.findmeahometeam.reskiume.data.util.log.Log
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalRescueEventRepository
-import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.DeleteMyRescueEventFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.DeleteRescueEventFromLocalRepository
 import com.findmeahometeam.reskiume.nonHumanAnimal
 import com.findmeahometeam.reskiume.rescueEvent
 import com.findmeahometeam.reskiume.rescueEventWithAllNeedsAndNonHumanAnimalData
@@ -21,7 +22,7 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
-class DeleteMyRescueEventFromLocalRepositoryTest {
+class DeleteRescueEventFromLocalRepositoryTest {
 
     val localNonHumanAnimalRepository: LocalNonHumanAnimalRepository = mock {
 
@@ -100,8 +101,8 @@ class DeleteMyRescueEventFromLocalRepositoryTest {
         every { e(any(), any()) } calls { println(it) }
     }
 
-    private val deleteMyRescueEventFromLocalRepository =
-        DeleteMyRescueEventFromLocalRepository(
+    private val deleteRescueEventFromLocalRepository =
+        DeleteRescueEventFromLocalRepository(
             localRescueEventRepository,
             checkNonHumanAnimalUtil,
             localNonHumanAnimalRepository,
@@ -111,7 +112,12 @@ class DeleteMyRescueEventFromLocalRepositoryTest {
     @Test
     fun `given my local rescue event_when the app deletes it_then modifyNonHumanAnimal and deleteRescueEvent are called`() =
         runTest {
-            deleteMyRescueEventFromLocalRepository(rescueEvent.id, TestScope()) {}
+            deleteRescueEventFromLocalRepository(
+                rescueEvent.id,
+                NonHumanAnimalState.NEEDS_TO_BE_REHOMED,
+                isMyRescueEvent = true,
+                TestScope()
+            ) {}
             verifySuspend {
                 localNonHumanAnimalRepository.modifyNonHumanAnimal(nonHumanAnimal.toEntity(), any())
                 localRescueEventRepository.deleteRescueEvent(rescueEvent.id, any())
@@ -121,7 +127,12 @@ class DeleteMyRescueEventFromLocalRepositoryTest {
     @Test
     fun `given my local rescue event_when the app deletes it on account deletion but the non human animals to save were deleted_then only deleteRescueEvent is called`() =
         runTest {
-            deleteMyRescueEventFromLocalRepository("otherRescueEventId", TestScope()) {}
+            deleteRescueEventFromLocalRepository(
+                "otherRescueEventId",
+                NonHumanAnimalState.NEEDS_TO_BE_REHOMED,
+                isMyRescueEvent = true,
+                TestScope()
+            ) {}
             verifySuspend {
                 localRescueEventRepository.deleteRescueEvent("otherRescueEventId", any())
             }

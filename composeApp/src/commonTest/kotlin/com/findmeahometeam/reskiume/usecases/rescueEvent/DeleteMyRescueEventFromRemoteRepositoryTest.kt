@@ -2,6 +2,7 @@ package com.findmeahometeam.reskiume.usecases.rescueEvent
 
 import com.findmeahometeam.reskiume.authUser
 import com.findmeahometeam.reskiume.data.util.log.Log
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteRescueEvent.FireStoreRemoteRescueEventRepository
@@ -113,6 +114,7 @@ class DeleteMyRescueEventFromRemoteRepositoryTest {
         runTest {
             deleteMyRescueEventFromRemoteRepository(
                 rescueEvent.id,
+                NonHumanAnimalState.NEEDS_TO_BE_REHOMED,
                 this
             ) {}
             verifySuspend {
@@ -132,6 +134,7 @@ class DeleteMyRescueEventFromRemoteRepositoryTest {
         runTest {
             deleteMyRescueEventFromRemoteRepository(
                 "otherRescueEventId",
+                NonHumanAnimalState.NEEDS_TO_BE_REHOMED,
                 this
             ) {}
             verifySuspend {

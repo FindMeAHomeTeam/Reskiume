@@ -44,6 +44,7 @@ import com.plusmobileapps.konnectivity.Konnectivity
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class CheckNonHumanAnimalViewmodelIntegrationTest : CoroutineTestDispatcher() {
 
@@ -139,8 +140,9 @@ class CheckNonHumanAnimalViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     remoteNonHumanAnimalList = mutableListOf(nonHumanAnimal.toData())
                 )
             ).nonHumanAnimalFlow.test {
+                assertTrue { awaitItem() is UiState.Loading }
                 assertEquals(UiState.Success(nonHumanAnimal.copy(savedBy = "", imageUrl = "${nonHumanAnimal.caregiverId}${nonHumanAnimal.id}.webp")), awaitItem())
-                awaitComplete()
+                ensureAllEventsConsumed()
             }
         }
 
@@ -164,8 +166,9 @@ class CheckNonHumanAnimalViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     )
                 )
             ).nonHumanAnimalFlow.test {
+                assertTrue { awaitItem() is UiState.Loading }
                 assertEquals(UiState.Success(nonHumanAnimal.copy(savedBy = "", imageUrl = "${nonHumanAnimal.caregiverId}${nonHumanAnimal.id}.webp")), awaitItem())
-                awaitComplete()
+                ensureAllEventsConsumed()
             }
         }
 
@@ -203,7 +206,8 @@ class CheckNonHumanAnimalViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     )
                 )
             ).nonHumanAnimalFlow.test {
-                awaitComplete()
+                assertTrue { awaitItem() is UiState.Loading }
+                ensureAllEventsConsumed()
             }
         }
 
@@ -223,8 +227,9 @@ class CheckNonHumanAnimalViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     )
                 )
             ).nonHumanAnimalFlow.test {
+                assertTrue { awaitItem() is UiState.Loading }
                 assertEquals(UiState.Success(nonHumanAnimal), awaitItem())
-                awaitComplete()
+                ensureAllEventsConsumed()
             }
         }
 
@@ -250,7 +255,8 @@ class CheckNonHumanAnimalViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     )
                 )
             ).nonHumanAnimalFlow.test {
-                awaitComplete()
+                assertTrue { awaitItem() is UiState.Loading }
+                ensureAllEventsConsumed()
             }
         }
 }

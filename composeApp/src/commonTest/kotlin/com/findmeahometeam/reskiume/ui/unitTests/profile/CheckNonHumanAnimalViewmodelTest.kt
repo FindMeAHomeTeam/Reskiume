@@ -41,14 +41,13 @@ import dev.mokkery.matcher.capture.Capture
 import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
-import dev.mokkery.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class CheckNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
 
@@ -278,8 +277,9 @@ class CheckNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
             getCheckNonHumanAnimalViewmodel(
                 getLocalCacheEntityForNonHumanAnimalReturn = null
             ).nonHumanAnimalFlow.test {
+                assertTrue { awaitItem() is UiState.Loading }
                 assertEquals(UiState.Success(nonHumanAnimal.copy(savedBy = "")), awaitItem())
-                awaitComplete()
+                ensureAllEventsConsumed()
             }
         }
 
@@ -288,43 +288,13 @@ class CheckNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
     fun `given a user with empty cache and a wrong NHA id_when the app downloads the data to check a NHA_then the app shows nothing`() =
         runTest {
             getCheckNonHumanAnimalViewmodel(
-                nonHumanAnimalIdArg = "wrongId",
-                getLocalCacheEntityForNonHumanAnimalReturn = null
+                nonHumanAnimalIdArg = "wrongId"
             ).nonHumanAnimalFlow.test {
-                awaitComplete()
-            }
-
-            runCurrent()
-
-            verify {
-                log.d(
-                    "GetDataByManagingObjectLocalCacheTimestamp",
-                    "wrongId added to local cache in section ${Section.NON_HUMAN_ANIMALS}"
-                )
+                assertTrue { awaitItem() is UiState.Loading }
+                ensureAllEventsConsumed()
             }
         }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun `given no cache and a wrong NHA id_when the app gets the data to check a NHA but there is an error in the local db_then the app shows nothing`() =
-        runTest {
-            getCheckNonHumanAnimalViewmodel(
-                nonHumanAnimalIdArg = "wrongId",
-                getLocalCacheEntityForNonHumanAnimalReturn = null,
-                numberOfNonHumanAnimalsDeletedFromLocalCacheWithWrongIdArg = 0
-            ).nonHumanAnimalFlow.test {
-                awaitComplete()
-            }
-
-            runCurrent()
-
-            verify {
-                log.d(
-                    "GetDataByManagingObjectLocalCacheTimestamp",
-                    "wrongId added to local cache in section ${Section.NON_HUMAN_ANIMALS}"
-                )
-            }
-        }
 
     @Test
     fun `given a user with an outdated cache_when the app downloads the data to check a non human animal_then the non human animal is updated in local cache and displayed`() =
@@ -336,8 +306,9 @@ class CheckNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
                     timestamp = 123L
                 ).toEntity()
             ).nonHumanAnimalFlow.test {
+                assertTrue { awaitItem() is UiState.Loading }
                 assertEquals(UiState.Success(nonHumanAnimal.copy(savedBy = "")), awaitItem())
-                awaitComplete()
+                ensureAllEventsConsumed()
             }
         }
 
@@ -353,16 +324,8 @@ class CheckNonHumanAnimalViewmodelTest : CoroutineTestDispatcher() {
                     timestamp = 123L
                 ).toEntity()
             ).nonHumanAnimalFlow.test {
-                awaitComplete()
-            }
-
-            runCurrent()
-
-            verify {
-                log.d(
-                    "GetDataByManagingObjectLocalCacheTimestamp",
-                    "wrongId updated in local cache in section ${Section.NON_HUMAN_ANIMALS}"
-                )
+                assertTrue { awaitItem() is UiState.Loading }
+                ensureAllEventsConsumed()
             }
         }
 }

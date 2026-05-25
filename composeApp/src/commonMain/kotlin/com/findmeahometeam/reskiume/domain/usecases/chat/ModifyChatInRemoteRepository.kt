@@ -8,5 +8,5 @@ import kotlinx.coroutines.flow.Flow
 class ModifyChatInRemoteRepository(private val fireStoreRemoteChatRepository: FireStoreRemoteChatRepository) {
 
     operator fun invoke(chat: Chat): Flow<DatabaseResult> =
-        fireStoreRemoteChatRepository.modifyRemoteChat(chat.toRemoteChat())
+        fireStoreRemoteChatRepository.modifyRemoteChat(chat.toData())
 }

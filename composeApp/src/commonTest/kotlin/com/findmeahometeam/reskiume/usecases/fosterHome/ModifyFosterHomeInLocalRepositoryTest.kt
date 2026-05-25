@@ -199,7 +199,12 @@ class ModifyFosterHomeInLocalRepositoryTest {
                 allResidentNonHumanAnimals = emptyList()
             )
 
-            modifyFosterHomeInLocalRepository(fosterHome, previousFosterHome, TestScope()) {}
+            modifyFosterHomeInLocalRepository(
+                isNonHumanAnimalSaved = false,
+                updatedFosterHome = fosterHome,
+                previousFosterHome,
+                TestScope()
+            ) {}
 
             verifySuspend {
                 manageImagePath.getFileNameFromLocalImagePath(fosterHome.imageUrl)
@@ -234,7 +239,8 @@ class ModifyFosterHomeInLocalRepositoryTest {
                 allResidentNonHumanAnimals = emptyList()
             )
             modifyFosterHomeInLocalRepository(
-                fosterHome.copy(
+                isNonHumanAnimalSaved = false,
+                updatedFosterHome = fosterHome.copy(
                     id = "otherFosterHomeId",
                     savedBy = authUser.uid,
                     allResidentNonHumanAnimals = fosterHome.allResidentNonHumanAnimals.map {
@@ -288,6 +294,7 @@ class ModifyFosterHomeInLocalRepositoryTest {
             val previousFosterHome = fosterHome
 
             modifyFosterHomeInLocalRepository(
+                isNonHumanAnimalSaved = false,
                 updatedFosterHome,
                 previousFosterHome,
                 TestScope()
@@ -333,6 +340,7 @@ class ModifyFosterHomeInLocalRepositoryTest {
             )
 
             modifyFosterHomeInLocalRepository(
+                isNonHumanAnimalSaved = false,
                 updatedFosterHome,
                 previousFosterHome,
                 TestScope()

@@ -3,6 +3,7 @@ package com.findmeahometeam.reskiume.ui.unitTests.profile
 import app.cash.turbine.test
 import com.findmeahometeam.reskiume.CoroutineTestDispatcher
 import com.findmeahometeam.reskiume.authUser
+import com.findmeahometeam.reskiume.data.database.entity.chat.ChatEntityWithAllData
 import com.findmeahometeam.reskiume.data.database.entity.fosterHome.FosterHomeWithAllNonHumanAnimalData
 import com.findmeahometeam.reskiume.data.database.entity.user.UserWithAllSubscriptionData
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
@@ -13,6 +14,7 @@ import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.Review
 import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalChatRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalRescueEventRepository
@@ -28,6 +30,8 @@ import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepo
 import com.findmeahometeam.reskiume.domain.repository.util.fcm.FCMSubscriberRepository
 import com.findmeahometeam.reskiume.domain.usecases.authUser.DeleteUserFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.chat.DeleteAllMyChatsFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.GetAllMyChatsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.DeleteAllMyFosterHomesFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.DeleteAllMyFosterHomesFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllFosterHomesFromLocalRepository
@@ -52,6 +56,8 @@ import com.findmeahometeam.reskiume.domain.usecases.user.GetAllUsersFromLocalDat
 import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.util.fcm.UnsubscribeFromAllTopicsFromSubscriberRepository
 import com.findmeahometeam.reskiume.fosterHome
+import com.findmeahometeam.reskiume.fosterHomeChat
+import com.findmeahometeam.reskiume.fosterHomeChatEntityWithAllData
 import com.findmeahometeam.reskiume.fosterHomeWithAllNonHumanAnimalData
 import com.findmeahometeam.reskiume.nonHumanAnimal
 import com.findmeahometeam.reskiume.rescueEvent
@@ -80,12 +86,15 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
 
     private val onDeleteUserFromAuth = Capture.slot<(String) -> Unit>()
+
+    private val onDeleteAllMyChatsFromLocal = Capture.slot<(rowsDeleted: Int) -> Unit>()
 
     private val onDeleteUserFromLocal = Capture.slot<(Int) -> Unit>()
 
@@ -145,6 +154,8 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
         rowsDeletedOfAllMyRescueEventsArg: Int = 1,
         deleteUserFromAuthErrorArg: String = "",
         unsubscribeFromAllTopicsReturn: Flow<Boolean> = flowOf(true),
+        allMyChatsReturned: Flow<List<ChatEntityWithAllData>> = flowOf(listOf(fosterHomeChatEntityWithAllData)),
+        rowsDeletedOfAllMyChatsArg: Int = 1,
         myRemoteFosterHomesResult: List<RemoteFosterHome?> = listOf(fosterHome.toData()),
         databaseResultOfDeletingAllRemoteFosterHomesArg: DatabaseResult = DatabaseResult.Success,
         localFosterHomesResult: List<FosterHomeWithAllNonHumanAnimalData> = listOf(
@@ -192,6 +203,22 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
         val fcmSubscriberRepository: FCMSubscriberRepository = mock {
 
             everySuspend { unsubscribeFromAllTopics(user.subscriptions) } returns unsubscribeFromAllTopicsReturn
+        }
+
+        val localChatRepository: LocalChatRepository = mock {
+
+            every {
+                getAllMyChats(user.uid)
+            } returns allMyChatsReturned
+
+            everySuspend {
+                deleteAllMyChats(
+                    user.uid,
+                    capture(onDeleteAllMyChatsFromLocal)
+                )
+            } calls {
+                onDeleteAllMyChatsFromLocal.get().invoke(rowsDeletedOfAllMyChatsArg)
+            }
         }
 
         val fireStoreRemoteRescueEventRepository: FireStoreRemoteRescueEventRepository = mock {
@@ -540,6 +567,12 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
         val unsubscribeFromAllTopicsFromSubscriberRepository =
             UnsubscribeFromAllTopicsFromSubscriberRepository(fcmSubscriberRepository)
 
+        val getAllMyChatsFromLocalRepository =
+            GetAllMyChatsFromLocalRepository(localChatRepository)
+
+        val deleteAllMyChatsFromLocalRepository =
+            DeleteAllMyChatsFromLocalRepository(localChatRepository)
+
         val getAllMyRescueEventsFromRemoteRepository =
             GetAllMyRescueEventsFromRemoteRepository(fireStoreRemoteRescueEventRepository)
 
@@ -636,6 +669,8 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
         return DeleteAccountViewmodel(
             observeAuthStateInAuthDataSource,
             unsubscribeFromAllTopicsFromSubscriberRepository,
+            getAllMyChatsFromLocalRepository,
+            deleteAllMyChatsFromLocalRepository,
             getAllMyRescueEventsFromRemoteRepository,
             getAllRescueEventsFromLocalRepository,
             deleteAllMyRescueEventsFromRemoteRepository,
@@ -667,6 +702,11 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
     fun `given a registered user_when that user deletes their account using their password_then their account is deleted`() =
         runTest {
             val deleteAccountViewmodel = getDeleteAccountViewmodel()
+            deleteAccountViewmodel.allMyChats.test {
+                assertEquals( emptyList(), awaitItem())
+                assertEquals( listOf(fosterHomeChat), awaitItem())
+                ensureAllEventsConsumed()
+            }
             deleteAccountViewmodel.deleteAccount(userPwd)
             deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
@@ -688,6 +728,11 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
             val deleteAccountViewmodel = getDeleteAccountViewmodel(
                 flagOfDeletingRemoteRescueEventImageArg = false
             )
+            deleteAccountViewmodel.allMyChats.test {
+                assertEquals( emptyList(), awaitItem())
+                assertEquals( listOf(fosterHomeChat), awaitItem())
+                ensureAllEventsConsumed()
+            }
             deleteAccountViewmodel.deleteAccount(userPwd)
             deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
@@ -709,6 +754,11 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
             val deleteAccountViewmodel = getDeleteAccountViewmodel(
                 flagOfDeletingLocalRescueEventImageArg = false
             )
+            deleteAccountViewmodel.allMyChats.test {
+                assertEquals( emptyList(), awaitItem())
+                assertEquals( listOf(fosterHomeChat), awaitItem())
+                ensureAllEventsConsumed()
+            }
             deleteAccountViewmodel.deleteAccount(userPwd)
             deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
@@ -730,6 +780,11 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
             val deleteAccountViewmodel = getDeleteAccountViewmodel(
                 databaseResultOfDeletingAllRemoteRescueEventsArg = DatabaseResult.Error()
             )
+            deleteAccountViewmodel.allMyChats.test {
+                assertEquals( emptyList(), awaitItem())
+                assertEquals( listOf(fosterHomeChat), awaitItem())
+                ensureAllEventsConsumed()
+            }
             deleteAccountViewmodel.deleteAccount(userPwd)
             deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
@@ -751,6 +806,11 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
             val deleteAccountViewmodel = getDeleteAccountViewmodel(
                 rowsDeletedOfAllMyRescueEventsArg = 0
             )
+            deleteAccountViewmodel.allMyChats.test {
+                assertEquals( emptyList(), awaitItem())
+                assertEquals( listOf(fosterHomeChat), awaitItem())
+                ensureAllEventsConsumed()
+            }
             deleteAccountViewmodel.deleteAccount(userPwd)
             deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
@@ -772,6 +832,11 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
             val deleteAccountViewmodel = getDeleteAccountViewmodel(
                 remoteFosterHomeImageDeletedArg = false
             )
+            deleteAccountViewmodel.allMyChats.test {
+                assertEquals( emptyList(), awaitItem())
+                assertEquals( listOf(fosterHomeChat), awaitItem())
+                ensureAllEventsConsumed()
+            }
             deleteAccountViewmodel.deleteAccount(userPwd)
             deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
@@ -793,6 +858,11 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
             val deleteAccountViewmodel = getDeleteAccountViewmodel(
                 localFosterHomeImageDeletedArg = false
             )
+            deleteAccountViewmodel.allMyChats.test {
+                assertEquals( emptyList(), awaitItem())
+                assertEquals( listOf(fosterHomeChat), awaitItem())
+                ensureAllEventsConsumed()
+            }
             deleteAccountViewmodel.deleteAccount(userPwd)
             deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
@@ -814,6 +884,11 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
             val deleteAccountViewmodel = getDeleteAccountViewmodel(
                 databaseResultOfDeletingAllRemoteFosterHomesArg = DatabaseResult.Error()
             )
+            deleteAccountViewmodel.allMyChats.test {
+                assertEquals( emptyList(), awaitItem())
+                assertEquals( listOf(fosterHomeChat), awaitItem())
+                ensureAllEventsConsumed()
+            }
             deleteAccountViewmodel.deleteAccount(userPwd)
             deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
@@ -835,6 +910,11 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
             val deleteAccountViewmodel = getDeleteAccountViewmodel(
                 rowsDeletedOfAllMyFosterHomesArg = 0
             )
+            deleteAccountViewmodel.allMyChats.test {
+                assertEquals( emptyList(), awaitItem())
+                assertEquals( listOf(fosterHomeChat), awaitItem())
+                ensureAllEventsConsumed()
+            }
             deleteAccountViewmodel.deleteAccount(userPwd)
             deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
@@ -856,6 +936,11 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
             val deleteAccountViewmodel = getDeleteAccountViewmodel(
                 remoteNonHumanAnimalImageDeletedArg = false
             )
+            deleteAccountViewmodel.allMyChats.test {
+                assertEquals( emptyList(), awaitItem())
+                assertEquals( listOf(fosterHomeChat), awaitItem())
+                ensureAllEventsConsumed()
+            }
             deleteAccountViewmodel.deleteAccount(userPwd)
             deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
@@ -877,6 +962,11 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
             val deleteAccountViewmodel = getDeleteAccountViewmodel(
                 localNonHumanAnimalImageDeletedArg = false
             )
+            deleteAccountViewmodel.allMyChats.test {
+                assertEquals( emptyList(), awaitItem())
+                assertEquals( listOf(fosterHomeChat), awaitItem())
+                ensureAllEventsConsumed()
+            }
             deleteAccountViewmodel.deleteAccount(userPwd)
             deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
@@ -898,6 +988,11 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
             val deleteAccountViewmodel = getDeleteAccountViewmodel(
                 databaseResultAfterDeletingAllRemoteNonHumanAnimalArg = DatabaseResult.Error()
             )
+            deleteAccountViewmodel.allMyChats.test {
+                assertEquals( emptyList(), awaitItem())
+                assertEquals( listOf(fosterHomeChat), awaitItem())
+                ensureAllEventsConsumed()
+            }
             deleteAccountViewmodel.deleteAccount(userPwd)
             deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
@@ -919,6 +1014,11 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
             val deleteAccountViewmodel = getDeleteAccountViewmodel(
                 rowsDeletedOfAllNonHumanAnimalsArg = 0
             )
+            deleteAccountViewmodel.allMyChats.test {
+                assertEquals( emptyList(), awaitItem())
+                assertEquals( listOf(fosterHomeChat), awaitItem())
+                ensureAllEventsConsumed()
+            }
             deleteAccountViewmodel.deleteAccount(userPwd)
             deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
@@ -940,6 +1040,11 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
             val deleteAccountViewmodel = getDeleteAccountViewmodel(
                 getRemoteReviewsResult = emptyList()
             )
+            deleteAccountViewmodel.allMyChats.test {
+                assertEquals( emptyList(), awaitItem())
+                assertEquals( listOf(fosterHomeChat), awaitItem())
+                ensureAllEventsConsumed()
+            }
             deleteAccountViewmodel.deleteAccount(userPwd)
             deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
@@ -955,6 +1060,11 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
             val deleteAccountViewmodel = getDeleteAccountViewmodel(
                 deleteRemoteReviewsArg = DatabaseResult.Error("error"),
             )
+            deleteAccountViewmodel.allMyChats.test {
+                assertEquals( emptyList(), awaitItem())
+                assertEquals( listOf(fosterHomeChat), awaitItem())
+                ensureAllEventsConsumed()
+            }
             deleteAccountViewmodel.deleteAccount(userPwd)
 
             runCurrent()
@@ -973,6 +1083,11 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
             val deleteAccountViewmodel = getDeleteAccountViewmodel(
                 deleteLocalReviewsArg = 0
             )
+            deleteAccountViewmodel.allMyChats.test {
+                assertEquals( emptyList(), awaitItem())
+                assertEquals( listOf(fosterHomeChat), awaitItem())
+                ensureAllEventsConsumed()
+            }
             deleteAccountViewmodel.deleteAccount(userPwd)
 
             runCurrent()
@@ -989,6 +1104,11 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
             val deleteAccountViewmodel = getDeleteAccountViewmodel(
                 deleteLocalCacheEntityArg = 0
             )
+            deleteAccountViewmodel.allMyChats.test {
+                assertEquals( emptyList(), awaitItem())
+                assertEquals( listOf(fosterHomeChat), awaitItem())
+                ensureAllEventsConsumed()
+            }
             deleteAccountViewmodel.deleteAccount(userPwd)
 
             runCurrent()
@@ -1000,32 +1120,17 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
         }
 
     @Test
-    fun `given a registered user_when that user deletes their account using their password but there is an error retrieving their account on the auth repository_then the app displays an error`() =
-        runTest {
-            val deleteAccountViewmodel = getDeleteAccountViewmodel(
-                authStateResult = null
-            )
-            deleteAccountViewmodel.deleteAccount(userPwd)
-            deleteAccountViewmodel.deletionState.test {
-                assertTrue { awaitItem() is UiState.Idle }
-                assertTrue { awaitItem() is UiState.Error }
-                ensureAllEventsConsumed()
-            }
-            verify {
-                log.e(
-                    "DeleteAccountViewmodel",
-                    "getUserFromRemoteRepo: User UID is blank"
-                )
-            }
-        }
-
-    @Test
     fun `given a registered user_when that user deletes their account using their password but their avatar deletion fails in data sources_then their account is deleted`() =
         runTest {
             val deleteAccountViewmodel = getDeleteAccountViewmodel(
                 remoteImageDeletedArg = false,
                 localImageDeletedArg = false
             )
+            deleteAccountViewmodel.allMyChats.test {
+                assertEquals( emptyList(), awaitItem())
+                assertEquals( listOf(fosterHomeChat), awaitItem())
+                ensureAllEventsConsumed()
+            }
             deleteAccountViewmodel.deleteAccount(userPwd)
             deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
@@ -1051,6 +1156,11 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
             val deleteAccountViewmodel = getDeleteAccountViewmodel(
                 remoteUserResult = null
             )
+            deleteAccountViewmodel.allMyChats.test {
+                assertEquals( emptyList(), awaitItem())
+                assertEquals( listOf(fosterHomeChat), awaitItem())
+                ensureAllEventsConsumed()
+            }
             deleteAccountViewmodel.deleteAccount(userPwd)
             deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
@@ -1072,6 +1182,11 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
             val deleteAccountViewmodel = getDeleteAccountViewmodel(
                 successRemoteUserArg = DatabaseResult.Error("error")
             )
+            deleteAccountViewmodel.allMyChats.test {
+                assertEquals( emptyList(), awaitItem())
+                assertEquals( listOf(fosterHomeChat), awaitItem())
+                ensureAllEventsConsumed()
+            }
             deleteAccountViewmodel.deleteAccount(userPwd)
             deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
@@ -1099,6 +1214,11 @@ class DeleteAccountViewmodelTest : CoroutineTestDispatcher() {
                 deleteUserFromAuthErrorArg = "error",
                 deleteUserFromLocalArg = 0
             )
+            deleteAccountViewmodel.allMyChats.test {
+                assertEquals( emptyList(), awaitItem())
+                assertEquals( listOf(fosterHomeChat), awaitItem())
+                ensureAllEventsConsumed()
+            }
             deleteAccountViewmodel.deleteAccount(userPwd)
             deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }

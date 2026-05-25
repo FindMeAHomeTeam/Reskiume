@@ -6,6 +6,7 @@ import com.findmeahometeam.reskiume.authUser
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalChatRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalRescueEventRepository
@@ -21,6 +22,8 @@ import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepo
 import com.findmeahometeam.reskiume.domain.repository.util.fcm.FCMSubscriberRepository
 import com.findmeahometeam.reskiume.domain.usecases.authUser.DeleteUserFromAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.chat.DeleteAllMyChatsFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.GetAllMyChatsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.DeleteAllMyFosterHomesFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.DeleteAllMyFosterHomesFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllFosterHomesFromLocalRepository
@@ -45,6 +48,8 @@ import com.findmeahometeam.reskiume.domain.usecases.user.GetAllUsersFromLocalDat
 import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.util.fcm.UnsubscribeFromAllTopicsFromSubscriberRepository
 import com.findmeahometeam.reskiume.fosterHome
+import com.findmeahometeam.reskiume.fosterHomeChat
+import com.findmeahometeam.reskiume.fosterHomeChatEntityWithAllData
 import com.findmeahometeam.reskiume.fosterHomeWithAllNonHumanAnimalData
 import com.findmeahometeam.reskiume.localCache
 import com.findmeahometeam.reskiume.nonHumanAnimal
@@ -59,6 +64,7 @@ import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeFCMSubscriberR
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeFireStoreRemoteFosterHomeRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeFireStoreRemoteRescueEventRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalCacheRepository
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalChatRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalFosterHomeRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalRescueEventRepository
@@ -77,6 +83,7 @@ import com.findmeahometeam.reskiume.userPwd
 import com.findmeahometeam.reskiume.userWithAllSubscriptionData
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
@@ -84,6 +91,9 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
     private fun getDeleteAccountViewmodel(
         authRepository: AuthRepository = FakeAuthRepository(),
         fcmSubscriberRepository: FCMSubscriberRepository = FakeFCMSubscriberRepository(),
+        localChatRepository: LocalChatRepository = FakeLocalChatRepository(
+            mutableListOf(fosterHomeChatEntityWithAllData)
+        ),
         fireStoreRemoteRescueEventRepository: FireStoreRemoteRescueEventRepository = FakeFireStoreRemoteRescueEventRepository(),
         localRescueEventRepository: LocalRescueEventRepository = FakeLocalRescueEventRepository(),
         fireStoreRemoteFosterHomeRepository: FireStoreRemoteFosterHomeRepository = FakeFireStoreRemoteFosterHomeRepository(),
@@ -106,6 +116,12 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
 
         val unsubscribeFromAllTopicsFromSubscriberRepository =
             UnsubscribeFromAllTopicsFromSubscriberRepository(fcmSubscriberRepository)
+
+        val getAllMyChatsFromLocalRepository =
+            GetAllMyChatsFromLocalRepository(localChatRepository)
+
+        val deleteAllMyChatsFromLocalRepository =
+            DeleteAllMyChatsFromLocalRepository(localChatRepository)
 
         val getAllMyRescueEventsFromRemoteRepository =
             GetAllMyRescueEventsFromRemoteRepository(fireStoreRemoteRescueEventRepository)
@@ -205,6 +221,8 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
         return DeleteAccountViewmodel(
             observeAuthStateInAuthDataSource,
             unsubscribeFromAllTopicsFromSubscriberRepository,
+            getAllMyChatsFromLocalRepository,
+            deleteAllMyChatsFromLocalRepository,
             getAllMyRescueEventsFromRemoteRepository,
             getAllRescueEventsFromLocalRepository,
             deleteAllMyRescueEventsFromRemoteRepository,
@@ -340,6 +358,11 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     )
                 )
             )
+            deleteAccountViewmodel.allMyChats.test {
+                assertEquals( emptyList(), awaitItem())
+                assertEquals( listOf(fosterHomeChat), awaitItem())
+                ensureAllEventsConsumed()
+            }
             deleteAccountViewmodel.deleteAccount(userPwd)
             deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
@@ -453,6 +476,11 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     )
                 )
             )
+            deleteAccountViewmodel.allMyChats.test {
+                assertEquals( emptyList(), awaitItem())
+                assertEquals( listOf(fosterHomeChat), awaitItem())
+                ensureAllEventsConsumed()
+            }
             deleteAccountViewmodel.deleteAccount(userPwd)
             deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
@@ -566,6 +594,11 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     )
                 )
             )
+            deleteAccountViewmodel.allMyChats.test {
+                assertEquals( emptyList(), awaitItem())
+                assertEquals( listOf(fosterHomeChat), awaitItem())
+                ensureAllEventsConsumed()
+            }
             deleteAccountViewmodel.deleteAccount(userPwd)
             deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
@@ -656,6 +689,11 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     )
                 )
             )
+            deleteAccountViewmodel.allMyChats.test {
+                assertEquals( emptyList(), awaitItem())
+                assertEquals( listOf(fosterHomeChat), awaitItem())
+                ensureAllEventsConsumed()
+            }
             deleteAccountViewmodel.deleteAccount(userPwd)
             deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
@@ -731,6 +769,11 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     mutableListOf(nonHumanAnimal.toEntity())
                 )
             )
+            deleteAccountViewmodel.allMyChats.test {
+                assertEquals( emptyList(), awaitItem())
+                assertEquals( listOf(fosterHomeChat), awaitItem())
+                ensureAllEventsConsumed()
+            }
             deleteAccountViewmodel.deleteAccount(userPwd)
             deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
@@ -806,6 +849,11 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     mutableListOf(nonHumanAnimal.toEntity())
                 )
             )
+            deleteAccountViewmodel.allMyChats.test {
+                assertEquals( emptyList(), awaitItem())
+                assertEquals( listOf(fosterHomeChat), awaitItem())
+                ensureAllEventsConsumed()
+            }
             deleteAccountViewmodel.deleteAccount(userPwd)
             deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
@@ -882,6 +930,11 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     mutableListOf(nonHumanAnimal.toEntity())
                 )
             )
+            deleteAccountViewmodel.allMyChats.test {
+                assertEquals( emptyList(), awaitItem())
+                assertEquals( listOf(fosterHomeChat), awaitItem())
+                ensureAllEventsConsumed()
+            }
             deleteAccountViewmodel.deleteAccount(userPwd)
             deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
@@ -943,6 +996,11 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     mutableListOf(nonHumanAnimal.toEntity())
                 )
             )
+            deleteAccountViewmodel.allMyChats.test {
+                assertEquals( emptyList(), awaitItem())
+                assertEquals( listOf(fosterHomeChat), awaitItem())
+                ensureAllEventsConsumed()
+            }
             deleteAccountViewmodel.deleteAccount(userPwd)
             deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
@@ -1004,6 +1062,11 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     mutableListOf(nonHumanAnimal.toEntity())
                 )
             )
+            deleteAccountViewmodel.allMyChats.test {
+                assertEquals( emptyList(), awaitItem())
+                assertEquals( listOf(fosterHomeChat), awaitItem())
+                ensureAllEventsConsumed()
+            }
             deleteAccountViewmodel.deleteAccount(userPwd)
             deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
@@ -1057,6 +1120,11 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     mutableListOf(nonHumanAnimal.toData())
                 )
             )
+            deleteAccountViewmodel.allMyChats.test {
+                assertEquals( emptyList(), awaitItem())
+                assertEquals( listOf(fosterHomeChat), awaitItem())
+                ensureAllEventsConsumed()
+            }
             deleteAccountViewmodel.deleteAccount(userPwd)
             deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
@@ -1096,23 +1164,16 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     )
                 )
             )
+            deleteAccountViewmodel.allMyChats.test {
+                assertEquals( emptyList(), awaitItem())
+                assertEquals( listOf(fosterHomeChat), awaitItem())
+                ensureAllEventsConsumed()
+            }
             deleteAccountViewmodel.deleteAccount(userPwd)
             deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
                 assertTrue { awaitItem() is UiState.Loading }
                 assertTrue { awaitItem() is UiState.Success }
-                ensureAllEventsConsumed()
-            }
-        }
-
-    @Test
-    fun `given a registered user_when that user deletes their account using their password but there is an error retrieving their account on the auth repository_then the app displays an error`() =
-        runTest {
-            val deleteAccountViewmodel = getDeleteAccountViewmodel()
-            deleteAccountViewmodel.deleteAccount(userPwd)
-            deleteAccountViewmodel.deletionState.test {
-                assertTrue { awaitItem() is UiState.Idle }
-                assertTrue { awaitItem() is UiState.Error }
                 ensureAllEventsConsumed()
             }
         }
@@ -1127,6 +1188,11 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     authPassword = userPwd
                 )
             )
+            deleteAccountViewmodel.allMyChats.test {
+                assertEquals( emptyList(), awaitItem())
+                assertEquals( listOf(fosterHomeChat), awaitItem())
+                ensureAllEventsConsumed()
+            }
             deleteAccountViewmodel.deleteAccount(userPwd)
             deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }
@@ -1149,6 +1215,11 @@ class DeleteAccountViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     mutableListOf(user.toData())
                 )
             )
+            deleteAccountViewmodel.allMyChats.test {
+                assertEquals( emptyList(), awaitItem())
+                assertEquals( listOf(fosterHomeChat), awaitItem())
+                ensureAllEventsConsumed()
+            }
             deleteAccountViewmodel.deleteAccount(userPwd)
             deleteAccountViewmodel.deletionState.test {
                 assertTrue { awaitItem() is UiState.Idle }

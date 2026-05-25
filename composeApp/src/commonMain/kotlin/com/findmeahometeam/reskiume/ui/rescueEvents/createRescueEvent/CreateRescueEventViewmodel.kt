@@ -360,6 +360,7 @@ class CreateRescueEventViewmodel(
                     "CreateRescueEventViewmodel",
                     "insertChatInLocalCache: Error adding $chatId to local cache in section ${Section.CHATS}"
                 )
+                _saveChangesUiState.value = UiState.Error()
             }
         }
     }

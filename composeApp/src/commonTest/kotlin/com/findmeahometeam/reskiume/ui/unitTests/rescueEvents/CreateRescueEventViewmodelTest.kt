@@ -3,21 +3,27 @@ package com.findmeahometeam.reskiume.ui.unitTests.rescueEvents
 import app.cash.turbine.test
 import com.findmeahometeam.reskiume.CoroutineTestDispatcher
 import com.findmeahometeam.reskiume.authUser
+import com.findmeahometeam.reskiume.data.database.entity.chat.NonHumanAnimalInfoEntity
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalChatRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalRescueEventRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.chat.FireStoreRemoteChatRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteRescueEvent.FireStoreRemoteRescueEventRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.repository.util.location.LocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.chat.GetNonHumanAnimalInfoInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.InsertChatInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.InsertChatInRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
@@ -30,6 +36,7 @@ import com.findmeahometeam.reskiume.domain.usecases.util.location.ObserveIfLocat
 import com.findmeahometeam.reskiume.domain.usecases.util.location.RequestEnableLocationFromLocationRepository
 import com.findmeahometeam.reskiume.nonHumanAnimal
 import com.findmeahometeam.reskiume.rescueEvent
+import com.findmeahometeam.reskiume.rescueEventChat
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.DeleteNonHumanAnimalUtil
@@ -49,6 +56,7 @@ import dev.mokkery.matcher.capture.capture
 import dev.mokkery.matcher.capture.get
 import dev.mokkery.mock
 import dev.mokkery.verify
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -95,6 +103,12 @@ class CreateRescueEventViewmodelTest : CoroutineTestDispatcher() {
     private val modifySecondNonHumanAnimalInLocalRepository =
         Capture.slot<(rowsUpdated: Int) -> Unit>()
 
+    private val onInsertChat = Capture.slot<suspend (rowId: Long) -> Unit>()
+
+    private val onInsertNonHumanInfo = Capture.slot<suspend (rowId: Long) -> Unit>()
+
+    private val onInsertActivistInfo = Capture.slot<suspend (rowId: Long) -> Unit>()
+
     private val log: Log = mock {
         every { d(any(), any()) } calls { println(it) }
         every { e(any(), any()) } calls { println(it) }
@@ -107,6 +121,7 @@ class CreateRescueEventViewmodelTest : CoroutineTestDispatcher() {
         locationReturn: Pair<Double, Double> = Pair(rescueEvent.longitude, rescueEvent.latitude),
         authStateReturn: AuthUser? = authUser,
         localCacheCreatedInLocalDatasourceArg: Long = 1L,
+        databaseResultOfCreatingChatInRemoteRepoArg: DatabaseResult = DatabaseResult.Success,
         databaseResultOfCreatingRescueEventsInRemoteRepoArg: DatabaseResult = DatabaseResult.Success,
         databaseResultOfModifyingNonHumanAnimalInRemoteRepositoryArg: DatabaseResult = DatabaseResult.Success,
         databaseResultOfModifyingSecondNonHumanAnimalInRemoteRepositoryArg: DatabaseResult = DatabaseResult.Success,
@@ -119,7 +134,13 @@ class CreateRescueEventViewmodelTest : CoroutineTestDispatcher() {
         insertedRowIdOfRescueEventInLocalArg: Long = 1L,
         insertedRowIdOfRescueEventWithoutImageInLocalArg: Long = 1L,
         numberOfNonHumanAnimalsUpdatedInLocalRepositoryArg: Int = 1,
-        numberOfSecondNonHumanAnimalsUpdatedInLocalRepositoryArg: Int = 1
+        numberOfSecondNonHumanAnimalsUpdatedInLocalRepositoryArg: Int = 1,
+        nonHumanAnimalInfoEntityReturned: Flow<NonHumanAnimalInfoEntity?> = flowOf(
+            rescueEventChat.allNonHumanAnimalsInfo.first().toEntity()
+        ),
+        chatIdInsertedInLocalRepositoryArg: Long = 1L,
+        nonHumanAnimalInfoIdInsertedInLocalRepositoryArg: Long = 1L,
+        activistInfoIdInsertedInLocalRepositoryArg: Long = 1L
     ): CreateRescueEventViewmodel {
 
 
@@ -152,6 +173,39 @@ class CreateRescueEventViewmodelTest : CoroutineTestDispatcher() {
             } calls {
                 modifySecondNonHumanAnimalInLocalRepository.get()
                     .invoke(numberOfSecondNonHumanAnimalsUpdatedInLocalRepositoryArg)
+            }
+        }
+
+        val localChatRepository: LocalChatRepository = mock {
+            every {
+                getNonHumanAnimalInfo(nonHumanAnimal.id)
+            } returns nonHumanAnimalInfoEntityReturned
+
+            everySuspend {
+                insertChat(
+                    any(),
+                    capture(onInsertChat)
+                )
+            } calls {
+                onInsertChat.get().invoke(chatIdInsertedInLocalRepositoryArg)
+            }
+
+            everySuspend {
+                insertNonHumanAnimalInfoEntity(
+                    any(),
+                    capture(onInsertNonHumanInfo)
+                )
+            } calls {
+                onInsertNonHumanInfo.get().invoke(nonHumanAnimalInfoIdInsertedInLocalRepositoryArg)
+            }
+
+            everySuspend {
+                insertActivistInfoEntity(
+                    rescueEventChat.allActivistsInfo.first().toEntity(),
+                    capture(onInsertActivistInfo)
+                )
+            } calls {
+                onInsertActivistInfo.get().invoke(activistInfoIdInsertedInLocalRepositoryArg)
             }
         }
 
@@ -386,6 +440,12 @@ class CreateRescueEventViewmodelTest : CoroutineTestDispatcher() {
             } calls { onInsertLocalCacheEntity.get().invoke(localCacheCreatedInLocalDatasourceArg) }
         }
 
+        val fireStoreRemoteChatRepository: FireStoreRemoteChatRepository = mock {
+            everySuspend {
+                insertRemoteChat(any())
+            } returns flowOf(databaseResultOfCreatingChatInRemoteRepoArg)
+        }
+
         val manageImagePath: ManageImagePath = mock {
 
             every { getImagePathForFileName(nonHumanAnimal.imageUrl) } returns nonHumanAnimal.imageUrl
@@ -437,6 +497,9 @@ class CreateRescueEventViewmodelTest : CoroutineTestDispatcher() {
         val getAllNonHumanAnimalsFromLocalRepository =
             GetAllNonHumanAnimalsFromLocalRepository(localNonHumanAnimalRepository)
 
+        val getNonHumanAnimalInfoInLocalRepository =
+            GetNonHumanAnimalInfoInLocalRepository(localChatRepository)
+
         val observeIfLocationEnabledFromLocationRepository =
             ObserveIfLocationEnabledFromLocationRepository(locationRepository)
 
@@ -480,6 +543,16 @@ class CreateRescueEventViewmodelTest : CoroutineTestDispatcher() {
         val insertCacheInLocalRepository =
             InsertCacheInLocalRepository(localCacheRepository)
 
+        val insertChatInRemoteRepository =
+            InsertChatInRemoteRepository(fireStoreRemoteChatRepository)
+
+        val insertChatInLocalRepository =
+            InsertChatInLocalRepository(
+                localChatRepository,
+                authRepository,
+                log
+            )
+
         val getUserFromLocalDataSource =
             GetUserFromLocalDataSource(localUserRepository)
 
@@ -488,6 +561,7 @@ class CreateRescueEventViewmodelTest : CoroutineTestDispatcher() {
 
         return CreateRescueEventViewmodel(
             getAllNonHumanAnimalsFromLocalRepository,
+            getNonHumanAnimalInfoInLocalRepository,
             observeIfLocationEnabledFromLocationRepository,
             requestEnableLocationFromLocationRepository,
             getLocationFromLocationRepository,
@@ -497,6 +571,8 @@ class CreateRescueEventViewmodelTest : CoroutineTestDispatcher() {
             insertRescueEventInRemoteRepository,
             insertRescueEventInLocalRepository,
             insertCacheInLocalRepository,
+            insertChatInRemoteRepository,
+            insertChatInLocalRepository,
             getUserFromLocalDataSource,
             subscriptionManagerUtil,
             deleteImageFromLocalDataSource,
@@ -507,7 +583,9 @@ class CreateRescueEventViewmodelTest : CoroutineTestDispatcher() {
     @Test
     fun `given my rescue event to create_when I want to add non human animals to rescue_then the rescue event list available non human animals`() =
         runTest {
-            getCreateRescueEventViewmodel().allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow.test {
+            getCreateRescueEventViewmodel(
+                nonHumanAnimalInfoEntityReturned = flowOf(null)
+            ).allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow.test {
                 assertEquals(listOf(nonHumanAnimal), awaitItem())
                 awaitComplete()
             }
@@ -627,7 +705,7 @@ class CreateRescueEventViewmodelTest : CoroutineTestDispatcher() {
 
             createRescueEventViewmodel.saveChangesUiState.test {
                 assertTrue { awaitItem() is UiState.Loading }
-                assertTrue { awaitItem() is UiState.Success }
+                assertTrue { awaitItem() is UiState.Error }
                 ensureAllEventsConsumed()
             }
             verify {

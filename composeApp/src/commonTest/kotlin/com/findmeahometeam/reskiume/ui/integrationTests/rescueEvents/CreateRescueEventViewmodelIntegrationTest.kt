@@ -6,15 +6,20 @@ import com.findmeahometeam.reskiume.authUser
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalChatRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalRescueEventRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.chat.FireStoreRemoteChatRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteRescueEvent.FireStoreRemoteRescueEventRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
 import com.findmeahometeam.reskiume.domain.repository.util.location.LocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.chat.GetNonHumanAnimalInfoInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.InsertChatInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.InsertChatInRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.InsertRescueEventInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.InsertRescueEventInRemoteRepository
@@ -34,8 +39,10 @@ import com.findmeahometeam.reskiume.ui.rescueEvents.createRescueEvent.CreateResc
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeAuthRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeCheckNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeDeleteNonHumanAnimalUtil
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeFireStoreRemoteChatRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeFireStoreRemoteRescueEventRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalCacheRepository
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalChatRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalRescueEventRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalUserRepository
@@ -68,6 +75,7 @@ class CreateRescueEventViewmodelIntegrationTest : CoroutineTestDispatcher() {
 
     private fun getCreateRescueEventViewmodel(
         localNonHumanAnimalRepository: LocalNonHumanAnimalRepository = FakeLocalNonHumanAnimalRepository(),
+        localChatRepository: LocalChatRepository = FakeLocalChatRepository(),
         locationRepository: LocationRepository = FakeLocationRepository(
             Pair(
                 rescueEvent.longitude,
@@ -85,6 +93,7 @@ class CreateRescueEventViewmodelIntegrationTest : CoroutineTestDispatcher() {
         realtimeDatabaseRemoteNonHumanAnimalRepository: RealtimeDatabaseRemoteNonHumanAnimalRepository = FakeRealtimeDatabaseRemoteNonHumanAnimalRepository(),
         localRescueEventRepository: LocalRescueEventRepository = FakeLocalRescueEventRepository(),
         localCacheRepository: LocalCacheRepository = FakeLocalCacheRepository(),
+        fireStoreRemoteChatRepository: FireStoreRemoteChatRepository = FakeFireStoreRemoteChatRepository(),
         manageImagePath: ManageImagePath = FakeManageImagePath(),
         checkNonHumanAnimalUtil: CheckNonHumanAnimalUtil = FakeCheckNonHumanAnimalUtil(
             mutableListOf(nonHumanAnimal, nonHumanAnimal.copy(id = nonHumanAnimal.id + "second"))
@@ -99,6 +108,9 @@ class CreateRescueEventViewmodelIntegrationTest : CoroutineTestDispatcher() {
 
         val getAllNonHumanAnimalsFromLocalRepository =
             GetAllNonHumanAnimalsFromLocalRepository(localNonHumanAnimalRepository)
+
+        val getNonHumanAnimalInfoInLocalRepository =
+            GetNonHumanAnimalInfoInLocalRepository(localChatRepository)
 
         val observeIfLocationEnabledFromLocationRepository =
             ObserveIfLocationEnabledFromLocationRepository(locationRepository)
@@ -137,6 +149,16 @@ class CreateRescueEventViewmodelIntegrationTest : CoroutineTestDispatcher() {
         val insertCacheInLocalRepository =
             InsertCacheInLocalRepository(localCacheRepository)
 
+        val insertChatInRemoteRepository =
+            InsertChatInRemoteRepository(fireStoreRemoteChatRepository)
+
+        val insertChatInLocalRepository =
+            InsertChatInLocalRepository(
+                localChatRepository,
+                authRepository,
+                log
+            )
+
         val getUserFromLocalDataSource =
             GetUserFromLocalDataSource(localUserRepository)
 
@@ -145,6 +167,7 @@ class CreateRescueEventViewmodelIntegrationTest : CoroutineTestDispatcher() {
 
         return CreateRescueEventViewmodel(
             getAllNonHumanAnimalsFromLocalRepository,
+            getNonHumanAnimalInfoInLocalRepository,
             observeIfLocationEnabledFromLocationRepository,
             requestEnableLocationFromLocationRepository,
             getLocationFromLocationRepository,
@@ -154,6 +177,8 @@ class CreateRescueEventViewmodelIntegrationTest : CoroutineTestDispatcher() {
             insertRescueEventInRemoteRepository,
             insertRescueEventInLocalRepository,
             insertCacheInLocalRepository,
+            insertChatInRemoteRepository,
+            insertChatInLocalRepository,
             getUserFromLocalDataSource,
             subscriptionManagerUtil,
             deleteImageFromLocalDataSource,

@@ -1,5 +1,6 @@
 package com.findmeahometeam.reskiume.ui.integrationTests.fakes
 
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueEvent
 import com.findmeahometeam.reskiume.rescueEvent
 import com.findmeahometeam.reskiume.ui.rescueEvents.modifyRescueEvent.DeleteRescueEventUtil
@@ -12,8 +13,10 @@ class FakeDeleteRescueEventUtil(
     override fun deleteRescueEvent(
         id: String,
         creatorId: String,
+        nonHumanAnimalState: NonHumanAnimalState,
         coroutineScope: CoroutineScope,
-        onlyDeleteOnLocal: Boolean,
+        deleteOnLocal: Boolean,
+        deleteOnRemote: Boolean,
         onError: () -> Unit,
         onComplete: () -> Unit
     ) {

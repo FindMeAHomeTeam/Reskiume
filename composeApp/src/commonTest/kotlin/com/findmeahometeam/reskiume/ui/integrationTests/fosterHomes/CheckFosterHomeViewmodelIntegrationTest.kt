@@ -3,26 +3,43 @@ package com.findmeahometeam.reskiume.ui.integrationTests.fosterHomes
 import app.cash.turbine.test
 import com.findmeahometeam.reskiume.CoroutineTestDispatcher
 import com.findmeahometeam.reskiume.authUser
+import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
+import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalChatRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.chat.FireStoreRemoteChatRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteFosterHome.FireStoreRemoteFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.chat.GetChatFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.GetNonHumanAnimalInfoInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.InsertChatInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.InsertChatInRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.IsFosterHomeInChatInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetFosterHomeFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromLocalRepository
 import com.findmeahometeam.reskiume.fosterHome
 import com.findmeahometeam.reskiume.nonHumanAnimal
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckFosterHome
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
-import com.findmeahometeam.reskiume.ui.fosterHomes.checkAllFosterHomes.UiFosterHome
 import com.findmeahometeam.reskiume.ui.fosterHomes.checkFosterHome.CheckFosterHomeUtil
 import com.findmeahometeam.reskiume.ui.fosterHomes.checkFosterHome.CheckFosterHomeViewmodel
+import com.findmeahometeam.reskiume.ui.fosterHomes.checkFosterHome.UiFosterHomeDetail
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeAuthRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeCheckActivistUtil
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeCheckFosterHomeUtil
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeCheckNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeCheckReviewsUtil
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeFireStoreRemoteChatRepository
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeFireStoreRemoteFosterHomeRepository
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalCacheRepository
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalChatRepository
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLocalNonHumanAnimalRepository
+import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeLog
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeManageImagePath
 import com.findmeahometeam.reskiume.ui.integrationTests.fakes.FakeSaveStateHandleProvider
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
@@ -53,7 +70,12 @@ class CheckFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
         checkNonHumanAnimalUtil: CheckNonHumanAnimalUtil = FakeCheckNonHumanAnimalUtil(),
         checkReviewsUtil: CheckReviewsUtil = FakeCheckReviewsUtil(),
         localNonHumanAnimalRepository: LocalNonHumanAnimalRepository = FakeLocalNonHumanAnimalRepository(),
-        manageImagePath: ManageImagePath = FakeManageImagePath()
+        localChatRepository: LocalChatRepository = FakeLocalChatRepository(),
+        fireStoreRemoteChatRepository: FireStoreRemoteChatRepository = FakeFireStoreRemoteChatRepository(),
+        fireStoreRemoteFosterHomeRepository: FireStoreRemoteFosterHomeRepository = FakeFireStoreRemoteFosterHomeRepository(),
+        manageImagePath: ManageImagePath = FakeManageImagePath(),
+        localCacheRepository: LocalCacheRepository = FakeLocalCacheRepository(),
+        log: Log = FakeLog()
     ): CheckFosterHomeViewmodel {
 
         val observeAuthStateInAuthDataSource =
@@ -65,6 +87,31 @@ class CheckFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
         val getAllNonHumanAnimalsFromLocalRepository =
             GetAllNonHumanAnimalsFromLocalRepository(localNonHumanAnimalRepository)
 
+        val getNonHumanAnimalInfoInLocalRepository =
+            GetNonHumanAnimalInfoInLocalRepository(localChatRepository)
+
+        val getFosterHomeFromRemoteRepository =
+            GetFosterHomeFromRemoteRepository(fireStoreRemoteFosterHomeRepository)
+
+        val getChatFromLocalRepository =
+            GetChatFromLocalRepository(localChatRepository)
+
+        val isFosterHomeInChatInLocalRepository =
+            IsFosterHomeInChatInLocalRepository(localChatRepository)
+
+        val insertChatInRemoteRepository =
+            InsertChatInRemoteRepository(fireStoreRemoteChatRepository)
+
+        val insertChatInLocalRepository =
+            InsertChatInLocalRepository(
+                localChatRepository,
+                authRepository,
+                log
+            )
+
+        val insertCacheInLocalRepository =
+            InsertCacheInLocalRepository(localCacheRepository)
+
         return CheckFosterHomeViewmodel(
             saveStateHandleProvider,
             checkFosterHomeUtil,
@@ -73,25 +120,35 @@ class CheckFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
             getImagePathForFileNameFromLocalDataSource,
             checkNonHumanAnimalUtil,
             checkReviewsUtil,
-            getAllNonHumanAnimalsFromLocalRepository
+            getAllNonHumanAnimalsFromLocalRepository,
+            getNonHumanAnimalInfoInLocalRepository,
+            getFosterHomeFromRemoteRepository,
+            getChatFromLocalRepository,
+            isFosterHomeInChatInLocalRepository,
+            insertChatInRemoteRepository,
+            insertChatInLocalRepository,
+            insertCacheInLocalRepository,
+            log
         )
     }
 
     @Test
     fun `given a foster home_when I click to check it_then foster home is retrieved`() =
         runTest {
-            getCheckFosterHomeViewmodel().fosterHomeFlow.test {
+            getCheckFosterHomeViewmodel().fosterHomeState.test {
+                assertTrue { awaitItem() is UiState.Loading }
                 assertEquals(
                     UiState.Success(
-                        UiFosterHome(
+                        UiFosterHomeDetail(
                             fosterHome = fosterHome,
                             allResidentUiNonHumanAnimals = listOf(nonHumanAnimal),
-                            owner = user
+                            owner = user,
+                            chatExist = false
                         )
                     ),
                     awaitItem()
                 )
-                awaitComplete()
+                ensureAllEventsConsumed()
             }
         }
 
@@ -102,12 +159,13 @@ class CheckFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 saveStateHandleProvider = FakeSaveStateHandleProvider(
                     CheckFosterHome("wrongId", fosterHome.ownerId)
                 )
-            ).fosterHomeFlow.test {
+            ).fosterHomeState.test {
+                assertTrue { awaitItem() is UiState.Loading }
                 assertEquals(
                     UiState.Error(),
                     awaitItem()
                 )
-                awaitComplete()
+                ensureAllEventsConsumed()
             }
         }
 
@@ -116,12 +174,13 @@ class CheckFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
         runTest {
             getCheckFosterHomeViewmodel(
                 checkActivistUtil = FakeCheckActivistUtil(null)
-            ).fosterHomeFlow.test {
+            ).fosterHomeState.test {
+                assertTrue { awaitItem() is UiState.Loading }
                 assertEquals(
                     UiState.Error(),
                     awaitItem()
                 )
-                awaitComplete()
+                ensureAllEventsConsumed()
             }
         }
 
@@ -133,8 +192,9 @@ class CheckFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
                     mutableListOf(nonHumanAnimal.toEntity())
                 )
             ).allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow.test {
+                assertEquals(emptyList(), awaitItem())
                 assertEquals(listOf(nonHumanAnimal), awaitItem())
-                awaitComplete()
+                ensureAllEventsConsumed()
             }
         }
 
@@ -144,12 +204,13 @@ class CheckFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
             getCheckFosterHomeViewmodel(
                 localNonHumanAnimalRepository = FakeLocalNonHumanAnimalRepository(
                     mutableListOf(
-                        nonHumanAnimal.copy(nonHumanAnimalState = NonHumanAnimalState.REHOMED).toEntity()
+                        nonHumanAnimal.copy(nonHumanAnimalState = NonHumanAnimalState.REHOMED)
+                            .toEntity()
                     )
                 )
             ).allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow.test {
                 assertEquals(emptyList(), awaitItem())
-                awaitComplete()
+                ensureAllEventsConsumed()
             }
         }
 
@@ -167,18 +228,20 @@ class CheckFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
         runTest {
             val checkFosterHomeViewmodel = getCheckFosterHomeViewmodel()
 
-            checkFosterHomeViewmodel.fosterHomeFlow.test {
+            checkFosterHomeViewmodel.fosterHomeState.test {
+                assertTrue { awaitItem() is UiState.Loading }
                 assertEquals(
                     UiState.Success(
-                        UiFosterHome(
+                        UiFosterHomeDetail(
                             fosterHome = fosterHome,
                             allResidentUiNonHumanAnimals = listOf(nonHumanAnimal),
-                            owner = user
+                            owner = user,
+                            chatExist = false
                         )
                     ),
                     awaitItem()
                 )
-                awaitComplete()
+                ensureAllEventsConsumed()
             }
 
             val result = checkFosterHomeViewmodel.isLoggedIn()
@@ -199,18 +262,20 @@ class CheckFosterHomeViewmodelIntegrationTest : CoroutineTestDispatcher() {
                 checkActivistUtil = FakeCheckActivistUtil(user.copy(uid = "otherOwnerId"))
             )
 
-            checkRescueEventViewmodel.fosterHomeFlow.test {
+            checkRescueEventViewmodel.fosterHomeState.test {
+                assertTrue { awaitItem() is UiState.Loading }
                 assertEquals(
                     UiState.Success(
-                        UiFosterHome(
+                        UiFosterHomeDetail(
                             fosterHome = fosterHome.copy(id = "wrongId", ownerId = "otherOwnerId"),
                             allResidentUiNonHumanAnimals = listOf(nonHumanAnimal),
-                            owner = user
+                            owner = user,
+                            chatExist = false
                         )
                     ),
                     awaitItem()
                 )
-                awaitComplete()
+                ensureAllEventsConsumed()
             }
 
             val result = checkRescueEventViewmodel.canIStartTheChat()

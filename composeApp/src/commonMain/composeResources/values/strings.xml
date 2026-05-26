@@ -377,7 +377,7 @@
     <string name="create_rescue_event_screen_rescue_event_city">City</string>
     <string name="create_rescue_event_screen_create_a_rescue_event_button">Create a rescue event</string>
     <string name="create_rescue_event_screen_create_the_rescue_event_button">Create the rescue event %1$s</string>
-    <string name="create_rescue_event_screen_turn_on_location">Please, turn on the location to get your position</string>
+    <string name="create_rescue_event_screen_turn_on_location">Please, turn on the location to get your position and try again</string>
 
     <!-- Need to cover list creator -->
     <string name="need_to_cover_list_creator_title">Select needs to cover:</string>

@@ -234,7 +234,8 @@ class CreateRescueEventViewmodelIntegrationTest : CoroutineTestDispatcher() {
     fun `given my rescue event to create_when I add needs to cover and non human animals to rescue without my rescue event location_then an error is displayed`() =
         runTest {
             val createRescueEventViewmodel = getCreateRescueEventViewmodel(
-                stringProvider = FakeStringProvider("Please, turn on the location to get your position"),
+                stringProvider = FakeStringProvider("Please, turn on the location to get your position and try again"),
+                locationRepository = FakeLocationRepository(Pair(0.0, 0.0))
             )
 
             createRescueEventViewmodel.createRescueEvent(rescueEvent)

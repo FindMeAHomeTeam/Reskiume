@@ -610,7 +610,9 @@ class CreateRescueEventViewmodelTest : CoroutineTestDispatcher() {
     @Test
     fun `given my rescue event to create_when I add non human animals to rescue and needs to cover without my rescue event location_then an error is displayed`() =
         runTest {
-            val createRescueEventViewmodel = getCreateRescueEventViewmodel()
+            val createRescueEventViewmodel = getCreateRescueEventViewmodel(
+                locationReturn = Pair(0.0, 0.0)
+            )
 
             createRescueEventViewmodel.createRescueEvent(rescueEvent)
 

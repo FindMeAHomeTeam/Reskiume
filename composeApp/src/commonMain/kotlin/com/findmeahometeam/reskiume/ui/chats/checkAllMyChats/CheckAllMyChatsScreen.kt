@@ -52,8 +52,11 @@ fun CheckAllMyChatsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(backgroundColor)
-                .padding(padding)
-                .padding(horizontal = 16.dp),
+                .padding(
+                    top = padding.calculateTopPadding(),
+                    start = 16.dp,
+                    end = 16.dp
+                ),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {

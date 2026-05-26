@@ -4,7 +4,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -62,8 +61,8 @@ import reskiume.composeapp.generated.resources.check_all_rescue_events_screen_se
 import reskiume.composeapp.generated.resources.check_all_rescue_events_screen_title
 import reskiume.composeapp.generated.resources.ic_add
 import reskiume.composeapp.generated.resources.manage_location_permission_message_check_all
-import reskiume.composeapp.generated.resources.rescue_event
 import reskiume.composeapp.generated.resources.manage_location_permission_turn_on_location_message_check_all
+import reskiume.composeapp.generated.resources.rescue_event
 
 @Composable
 fun CheckAllRescueEventsScreen(
@@ -127,11 +126,13 @@ fun CheckAllRescueEventsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(backgroundColor)
-                .padding(padding)
-                .padding(horizontal = 16.dp),
+                .padding(
+                    top = padding.calculateTopPadding(),
+                    start = 16.dp,
+                    end = 16.dp
+                ),
             horizontalAlignment = Alignment.CenterHorizontally,
-            state = lazyListState,
-            contentPadding = PaddingValues(bottom = if (authState?.uid == null) 0.dp else 72.dp) // Add space to the FAB
+            state = lazyListState
         ) {
             item {
                 RmDisplaySingleChoiceSegmentedButtonRow(

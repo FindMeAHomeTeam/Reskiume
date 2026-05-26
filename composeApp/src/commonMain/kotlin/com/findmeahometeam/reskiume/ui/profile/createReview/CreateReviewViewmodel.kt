@@ -136,11 +136,13 @@ class CreateReviewViewmodel(
         onSuccess: (updatedReviews: List<Review>) -> Unit
     ) {
         var counter = 0
+        val updatedReviews: MutableList<Review> = mutableListOf()
         viewModelScope.launch {
 
-            reviews.forEach { review ->
+            reviews.forEachIndexed { index, review ->
 
-                insertReviewInRemoteRepository(review.copy(timestamp = Clock.System.now().toEpochMilliseconds())) {
+                updatedReviews.add(review.copy(timestamp = Clock.System.now().toEpochMilliseconds()))
+                insertReviewInRemoteRepository(updatedReviews[index]) {
 
                     if (it is DatabaseResult.Success) {
                         log.d(
@@ -148,7 +150,7 @@ class CreateReviewViewmodel(
                             "insertReviewInRemoteRepository: Review for ${review.reviewedUid} added to remote database"
                         )
                         if (counter == reviews.size - 1) {
-                            onSuccess(reviews)
+                            onSuccess(updatedReviews)
                         } else {
                             counter += 1
                         }

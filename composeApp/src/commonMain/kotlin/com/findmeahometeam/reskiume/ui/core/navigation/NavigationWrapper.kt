@@ -18,13 +18,13 @@ import com.findmeahometeam.reskiume.ui.profile.checkAllMyFosterHomes.CheckAllMyF
 import com.findmeahometeam.reskiume.ui.profile.checkAllMyRescueEvents.CheckAllMyRescueEventsScreen
 import com.findmeahometeam.reskiume.ui.profile.checkMyAllNonHumanAnimals.CheckAllMyNonHumanAnimalsScreen
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalScreen
+import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckAllReviewsScreen
 import com.findmeahometeam.reskiume.ui.profile.createAccount.CreateAccountScreen
+import com.findmeahometeam.reskiume.ui.profile.createNonHumanAnimal.CreateNonHumanAnimalScreen
+import com.findmeahometeam.reskiume.ui.profile.createReview.CreateReviewScreen
 import com.findmeahometeam.reskiume.ui.profile.deleteAccount.DeleteAccountScreen
 import com.findmeahometeam.reskiume.ui.profile.loginAccount.LoginAccountScreen
 import com.findmeahometeam.reskiume.ui.profile.modifyAccount.ModifyAccountScreen
-import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckAllReviewsScreen
-import com.findmeahometeam.reskiume.ui.profile.createNonHumanAnimal.CreateNonHumanAnimalScreen
-import com.findmeahometeam.reskiume.ui.profile.createReview.CreateReviewScreen
 import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.ModifyNonHumanAnimalScreen
 import com.findmeahometeam.reskiume.ui.rescueEvents.checkRescueEvent.CheckRescueEventScreen
 import com.findmeahometeam.reskiume.ui.rescueEvents.createRescueEvent.CreateRescueEventScreen
@@ -185,7 +185,15 @@ fun NavigationWrapper() {
             CreateReviewScreen(
                 onBackPressed = { mainNavController.navigateUp() },
                 onFinished = {
-                    mainNavController.popBackStack(CheckChat::class, true)
+                    mainNavController.navigateUp()
+
+                    if (mainNavController.previousBackStackEntry?.destination?.route?.contains(
+                            CheckRescueEvent::class.simpleName!!
+                        ) == true
+                    ) {
+                        mainNavController.navigateUp()
+                    }
+                    mainNavController.navigateUp()
                 }
             )
         }

@@ -185,6 +185,7 @@ fun CreateAccountScreen(onBackPressed: () -> Unit, navigateToLoginScreen: () -> 
             Spacer(modifier = Modifier.height(10.dp))
             RmPasswordTextField(
                 modifier = Modifier.fillMaxWidth(),
+                label = stringResource(Res.string.create_password_text_field_label),
                 password = pwd,
                 onValueChange = { pwd = it }
             )

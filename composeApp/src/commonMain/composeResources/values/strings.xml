@@ -90,6 +90,7 @@
 
     <!-- Password text field -->
     <string name="password_text_field_label">Password</string>
+    <string name="create_password_text_field_label">Password (6 or more characters)</string>
     <string name="password_text_field_show_password_content_description">Show password</string>
     <string name="password_text_field_hide_password_content_description">Hide password</string>
 

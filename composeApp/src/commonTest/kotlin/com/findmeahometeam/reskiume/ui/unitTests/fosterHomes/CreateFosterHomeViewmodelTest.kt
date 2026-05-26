@@ -489,7 +489,9 @@ class CreateFosterHomeViewmodelTest : CoroutineTestDispatcher() {
     @Test
     fun `given my foster home to create_when I add accepted and resident non human animals without my foster home location_then an error is displayed`() =
         runTest {
-            val createFosterHomeViewmodel = getCreateFosterHomeViewmodel()
+            val createFosterHomeViewmodel = getCreateFosterHomeViewmodel(
+                locationReturn = Pair(0.0, 0.0)
+            )
 
             createFosterHomeViewmodel.createFosterHome(fosterHome)
 

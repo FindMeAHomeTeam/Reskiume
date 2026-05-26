@@ -3,9 +3,11 @@ package com.findmeahometeam.reskiume.ui.profile.createAccount
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -49,6 +51,7 @@ import reskiume.composeapp.generated.resources.create_account_screen_describe_yo
 import reskiume.composeapp.generated.resources.create_account_screen_email_field_label
 import reskiume.composeapp.generated.resources.create_account_screen_log_in
 import reskiume.composeapp.generated.resources.create_account_screen_name_field_label
+import reskiume.composeapp.generated.resources.create_password_text_field_label
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -101,8 +104,14 @@ fun CreateAccountScreen(onBackPressed: () -> Unit, navigateToLoginScreen: () -> 
         onBackPressed = onBackPressed,
     ) { padding ->
         Column(
-            modifier = Modifier.fillMaxSize().background(backgroundColor).padding(padding)
-                .padding(horizontal = 16.dp).verticalScroll(scrollState),
+            modifier = Modifier
+                .fillMaxSize()
+                .background(backgroundColor)
+                .padding(padding)
+                .consumeWindowInsets(padding)
+                .imePadding()
+                .padding(horizontal = 16.dp)
+                .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             RmAddPhoto(

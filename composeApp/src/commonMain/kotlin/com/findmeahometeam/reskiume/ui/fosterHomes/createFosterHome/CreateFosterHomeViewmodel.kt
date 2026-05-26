@@ -134,14 +134,19 @@ class CreateFosterHomeViewmodel(
             val fosterHomeId = Clock.System.now().epochSeconds.toString() + ownerId
 
             if (fosterHomeLongitude == 0.0 || fosterHomeLatitude == 0.0) {
-                val errorMessage =
-                    getStringProvider.getStringResource(Res.string.create_foster_home_screen_turn_on_location)
-                log.d(
-                    "CreateFosterHomeViewmodel",
-                    errorMessage
-                )
-                _saveChangesUiState.value = UiState.Error(errorMessage)
-                return@launch
+
+                updateLocation()
+
+                if (fosterHomeLongitude == 0.0 || fosterHomeLatitude == 0.0) {
+                    val errorMessage =
+                        getStringProvider.getStringResource(Res.string.create_foster_home_screen_turn_on_location)
+                    log.d(
+                        "CreateFosterHomeViewmodel",
+                        errorMessage
+                    )
+                    _saveChangesUiState.value = UiState.Error(errorMessage)
+                    return@launch
+                }
             }
 
             val updatedFosterHome = createdFosterHome.copy(

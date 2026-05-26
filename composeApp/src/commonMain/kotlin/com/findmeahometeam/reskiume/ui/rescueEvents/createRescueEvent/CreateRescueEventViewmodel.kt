@@ -144,14 +144,19 @@ class CreateRescueEventViewmodel(
             val rescueEventId = Clock.System.now().epochSeconds.toString() + creatorId
 
             if (rescueEventLongitude == 0.0 || rescueEventLatitude == 0.0) {
-                val errorMessage =
-                    getStringProvider.getStringResource(Res.string.create_rescue_event_screen_turn_on_location)
-                log.d(
-                    "CreateRescueEventViewmodel",
-                    errorMessage
-                )
-                _saveChangesUiState.value = UiState.Error(errorMessage)
-                return@launch
+
+                updateLocation()
+
+                if (rescueEventLongitude == 0.0 || rescueEventLatitude == 0.0) {
+                    val errorMessage =
+                        getStringProvider.getStringResource(Res.string.create_rescue_event_screen_turn_on_location)
+                    log.d(
+                        "CreateRescueEventViewmodel",
+                        errorMessage
+                    )
+                    _saveChangesUiState.value = UiState.Error(errorMessage)
+                    return@launch
+                }
             }
 
             val updatedRescueEvent = createdRescueEvent.copy(

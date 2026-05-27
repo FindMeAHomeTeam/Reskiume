@@ -337,9 +337,11 @@ private fun DisplayExtendedFloatingActionButtonToCreateFosterHomeIfLoggedIn(
 }
 
 /**
- * Returns whether the lazy list is currently scrolling up.
- * author: Google
- * link: https://github.com/android/codelab-android-compose/blob/main/AnimationCodelab/finished/src/main/java/com/example/android/codelab/animation/ui/home/Home.kt#L355
+ * Composable function that returns whether the lazy list is currently scrolling up.
+ *
+ * ATTRIBUTION NOTICE:
+ * Original Author: Google
+ * Source URL: https://github.com/android/codelab-android-compose/blob/main/AnimationCodelab/finished/src/main/java/com/example/android/codelab/animation/ui/home/Home.kt#L355
  */
 @Composable
 fun LazyListState.isScrollingUp(): Boolean {

@@ -35,10 +35,17 @@ import reskiume.composeapp.generated.resources.ic_rating
 import reskiume.composeapp.generated.resources.rating_bar_rated_content_description
 import kotlin.math.round
 
-
 /**
- * Composable function that displays a RatingBar
- * based of https://gist.github.com/mkhotych/7f3db5a629814ced8b7ae18bd3504e2d
+ * Composable function that displays a RatingBar.
+ *
+ * ATTRIBUTION NOTICE:
+ * This component is an adapted implementation from an open-source GitHub Gist.
+ * Original Author: mkhotych (Maksym Khotych)
+ * Source URL: https://gist.github.com/mkhotych/7f3db5a629814ced8b7ae18bd3504e2d
+ *
+ * Modifications made by Find me a home team:
+ * - Adapted color schemes and icons for Reskiume design system
+ * - Modified default parameters and resource imports
  *
  * @param modifier The modifier for the RatingBar
  * @param rating The current rating value of the RatingBar

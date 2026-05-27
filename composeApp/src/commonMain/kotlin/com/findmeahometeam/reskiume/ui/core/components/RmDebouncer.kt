@@ -12,10 +12,14 @@ import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 /**
- * Wraps an [onClick] lambda with another one that supports debouncing. The default deboucing time
+ *
+ * This composable wraps an [onClick] lambda with another one that supports debouncing. The default deboucing time
  * is 1000ms.
  *
- * @author https://gist.github.com/leonardoaramaki/153b27eb5325f878ad4bb7ffe540c2ef
+ * ATTRIBUTION NOTICE:
+ * Original Author: leonardoaramaki (Leonardo Aramaki)
+ * Source URL: https://gist.github.com/leonardoaramaki/153b27eb5325f878ad4bb7ffe540c2ef
+ *
  * @return debounced onClick
  */
 @OptIn(ExperimentalTime::class)
@@ -38,6 +42,12 @@ inline fun rmDebouncer(
 
 /**
  * The same as [Modifier.clickable] with support to debouncing.
+ *
+ * ATTRIBUTION NOTICE:
+ * Original Author: leonardoaramaki (Leonardo Aramaki)
+ * Source URL: https://gist.github.com/leonardoaramaki/153b27eb5325f878ad4bb7ffe540c2ef
+ *
+ * @return Modifier with debounced onClick
  */
 fun Modifier.debouncedClickable(
     debounceTime: Long = 1000L,

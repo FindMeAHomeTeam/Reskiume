@@ -7,7 +7,6 @@ import com.findmeahometeam.reskiume.data.database.LocalNonHumanAnimalRepositoryI
 import com.findmeahometeam.reskiume.data.database.LocalRescueEventRepositoryImpl
 import com.findmeahometeam.reskiume.data.database.LocalReviewRepositoryImpl
 import com.findmeahometeam.reskiume.data.database.LocalUserRepositoryImpl
-import com.findmeahometeam.reskiume.data.util.translator.TranslatorImpl
 import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalChatRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalFosterHomeRepository
@@ -15,7 +14,6 @@ import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalR
 import com.findmeahometeam.reskiume.domain.repository.local.LocalRescueEventRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalReviewRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
-import com.findmeahometeam.reskiume.domain.repository.util.translator.Translator
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -27,6 +25,5 @@ val dataModule = module {
     singleOf(::LocalNonHumanAnimalRepositoryImpl) bind LocalNonHumanAnimalRepository::class
     singleOf(::LocalFosterHomeRepositoryImpl) bind LocalFosterHomeRepository::class
     singleOf(::LocalRescueEventRepositoryImpl) bind LocalRescueEventRepository::class
-    singleOf(::TranslatorImpl) bind Translator::class
     singleOf(::LocalChatRepositoryImpl) bind LocalChatRepository::class
 }

@@ -1,5 +1,5 @@
 import Foundation
-import ComposeApp
+import Shared
 
 @MainActor
 final class FirebaseAnalyticsManager {

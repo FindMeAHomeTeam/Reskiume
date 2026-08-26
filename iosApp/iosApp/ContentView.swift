@@ -8,7 +8,7 @@ import FirebaseFirestore
 import FirebaseMessaging
 import UserNotifications
 import SwiftUI
-import ComposeApp
+import Shared
 
 struct ComposeView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController {

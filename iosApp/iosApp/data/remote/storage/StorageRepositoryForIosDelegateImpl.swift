@@ -1,4 +1,4 @@
-import ComposeApp
+import Shared
 import FirebaseStorage
 
 class StorageRepositoryForIosDelegateImpl: StorageRepository {

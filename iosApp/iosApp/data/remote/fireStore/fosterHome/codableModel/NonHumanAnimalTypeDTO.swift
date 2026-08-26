@@ -1,4 +1,4 @@
-import ComposeApp
+import Shared
 
 enum NonHumanAnimalTypeDTO: String, Codable {
     case unselected

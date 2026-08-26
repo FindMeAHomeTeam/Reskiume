@@ -1,4 +1,4 @@
-import ComposeApp
+import Shared
 
 struct RemoteNonHumanAnimalInfoDTO: Codable {
     let nonHumanAnimalId: String?

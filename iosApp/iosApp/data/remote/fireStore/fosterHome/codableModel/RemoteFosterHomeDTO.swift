@@ -1,4 +1,4 @@
-import ComposeApp
+import Shared
 
 struct RemoteFosterHomeDTO: Codable {
     let id: String?

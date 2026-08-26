@@ -1,4 +1,4 @@
-import ComposeApp
+import Shared
 
 struct RemoteAcceptedNonHumanAnimalForFosterHomeDTO: Codable {
     let acceptedNonHumanAnimalId: String?

@@ -1,4 +1,4 @@
-import ComposeApp
+import Shared
 
 struct RemoteBlockedUserInfoDTO: Codable {
     let id: String?

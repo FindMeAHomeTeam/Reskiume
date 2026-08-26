@@ -1,6 +1,6 @@
 import Foundation
 import FirebaseAuth
-import ComposeApp
+import Shared
 import KMPNativeCoroutinesAsync
 
 class AuthRepositoryForIosDelegateImpl: AuthRepositoryForIosDelegate {

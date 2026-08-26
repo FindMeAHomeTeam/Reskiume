@@ -1,4 +1,4 @@
-import ComposeApp
+import Shared
 import FirebaseMessaging
 
 class FCMSubscriberRepositoryForIosDelegateImpl: FCMSubscriberRepositoryForIosDelegate {

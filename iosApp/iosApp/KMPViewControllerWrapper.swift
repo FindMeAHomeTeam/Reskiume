@@ -1,5 +1,5 @@
 import UIKit
-import ComposeApp
+import Shared
 import FirebaseDatabaseInternal
 
 class KMPViewControllerWrapper: UIViewController {

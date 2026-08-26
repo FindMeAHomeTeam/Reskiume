@@ -1,4 +1,4 @@
-import ComposeApp
+import Shared
 
 enum RescueNeedDTO: String, Codable {
     case unselected

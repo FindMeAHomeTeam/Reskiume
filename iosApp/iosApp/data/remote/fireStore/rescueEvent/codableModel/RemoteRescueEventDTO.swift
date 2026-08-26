@@ -1,4 +1,4 @@
-import ComposeApp
+import Shared
 
 struct RemoteRescueEventDTO: Codable {
     let id: String?

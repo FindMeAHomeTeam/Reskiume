@@ -1,0 +1,365 @@
+package com.findmeahometeam.reskiume.ui.profile.modifyAccount
+
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.findmeahometeam.reskiume.domain.model.user.User
+import com.findmeahometeam.reskiume.domain.model.fosterHome.City
+import com.findmeahometeam.reskiume.domain.model.fosterHome.Country
+import com.findmeahometeam.reskiume.ui.core.backgroundColor
+import com.findmeahometeam.reskiume.ui.core.components.ManagePermissionState
+import com.findmeahometeam.reskiume.ui.core.components.MaxCharacters
+import com.findmeahometeam.reskiume.ui.core.components.RmAddPhoto
+import com.findmeahometeam.reskiume.ui.core.components.RmAvatar
+import com.findmeahometeam.reskiume.ui.core.components.RmButton
+import com.findmeahometeam.reskiume.ui.core.components.RmCheckbox
+import com.findmeahometeam.reskiume.ui.core.components.RmListAvatarType
+import com.findmeahometeam.reskiume.ui.core.components.RmManageNotificationArea
+import com.findmeahometeam.reskiume.ui.core.components.RmManageNotificationPermission
+import com.findmeahometeam.reskiume.ui.core.components.RmPasswordTextField
+import com.findmeahometeam.reskiume.ui.core.components.RmResultState
+import com.findmeahometeam.reskiume.ui.core.components.RmScaffold
+import com.findmeahometeam.reskiume.ui.core.components.RmText
+import com.findmeahometeam.reskiume.ui.core.components.RmTextField
+import com.findmeahometeam.reskiume.ui.core.components.RmTextLink
+import com.findmeahometeam.reskiume.ui.core.components.UiState
+import com.findmeahometeam.reskiume.ui.core.primaryGreen
+import com.findmeahometeam.reskiume.ui.core.tertiaryGreen
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
+import reskiume.shared.generated.resources.Res
+import reskiume.shared.generated.resources.ic_warning
+import reskiume.shared.generated.resources.modify_account_change_your_password_checkbox_label
+import reskiume.shared.generated.resources.modify_account_current_password_field_label
+import reskiume.shared.generated.resources.modify_account_describe_yourself_field_label
+import reskiume.shared.generated.resources.modify_account_email_field_label
+import reskiume.shared.generated.resources.modify_account_log_out_account_message
+import reskiume.shared.generated.resources.modify_account_log_out_text
+import reskiume.shared.generated.resources.modify_account_name_field_label
+import reskiume.shared.generated.resources.modify_account_new_password_field_label
+import reskiume.shared.generated.resources.modify_account_save_changes_button
+import reskiume.shared.generated.resources.modify_account_user_account_title
+import reskiume.shared.generated.resources.modify_account_verify_email_label
+
+@Composable
+fun ModifyAccountScreen(onBackPressed: () -> Unit) {
+
+    val modifyAccountViewmodel: ModifyAccountViewmodel =
+        koinViewModel<ModifyAccountViewmodel>()
+    val uiState: UiState<Unit> by modifyAccountViewmodel.uiState.collectAsStateWithLifecycle(
+        initialValue = UiState.Idle()
+    )
+    val userState: UiState<User> by modifyAccountViewmodel.userState.collectAsStateWithLifecycle(
+        initialValue = UiState.Loading()
+    )
+    val scrollState = rememberScrollState()
+
+    RmScaffold(
+        title = stringResource(
+            Res.string.modify_account_user_account_title,
+            if (userState is UiState.Success) (userState as UiState.Success<User>).data.username else ""
+        ),
+        onBackPressed = onBackPressed,
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(backgroundColor)
+                .padding(padding)
+                .consumeWindowInsets(padding)
+                .imePadding()
+                .padding(horizontal = 16.dp)
+                .verticalScroll(scrollState),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            RmResultState(
+                uiState = userState,
+                onIdle = { onBackPressed() },
+                onSuccess = { user ->
+
+                    var permissionState: ManagePermissionState by rememberSaveable {
+                        mutableStateOf(
+                            ManagePermissionState.CHECK_PERMISSION
+                        )
+                    }
+                    var receiveRescueNotifications: Boolean by rememberSaveable {
+                        mutableStateOf(
+                            user.countryForRescueEventNotifications != Country.UNSELECTED.name
+                        )
+                    }
+                    var notificationArea: String by rememberSaveable { mutableStateOf(user.countryForRescueEventNotifications + user.cityForRescueEventNotifications) }
+                    var countryForRescueEventNotifications: Country by rememberSaveable {
+                        mutableStateOf(
+                            Country.valueOf(
+                                user.countryForRescueEventNotifications
+                            )
+                        )
+                    }
+                    var cityForRescueEventNotifications: City by rememberSaveable {
+                        mutableStateOf(
+                            City.valueOf(user.cityForRescueEventNotifications)
+                        )
+                    }
+                    var name: String by rememberSaveable { mutableStateOf(user.username) }
+                    var description: String by rememberSaveable { mutableStateOf(user.description) }
+                    var imageUri: String by rememberSaveable { mutableStateOf(user.image) }
+                    var email: String by rememberSaveable { mutableStateOf(user.email ?: "") }
+                    val emailRegexPattern =
+                        Regex("^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$")
+                    var currentPassword: String by rememberSaveable { mutableStateOf("") }
+                    var isNewPassword: Boolean by rememberSaveable { mutableStateOf(false) }
+                    var newPassword: String by rememberSaveable { mutableStateOf("") }
+                    val isEmailAlertVisible by remember(email) {
+                        derivedStateOf {
+                            email != user.email && email.matches(emailRegexPattern)
+                        }
+                    }
+                    val isCurrentPasswordVisible by remember(
+                        isNewPassword,
+                        email
+                    ) {
+                        derivedStateOf {
+                            isNewPassword || email != user.email && email.matches(
+                                emailRegexPattern
+                            )
+                        }
+                    }
+                    val isUpdateUserButtonEnabled by remember(
+                        countryForRescueEventNotifications,
+                        cityForRescueEventNotifications,
+                        name,
+                        description,
+                        imageUri,
+                        email,
+                        currentPassword,
+                        newPassword
+                    ) {
+                        derivedStateOf {
+                            if (receiveRescueNotifications) {
+                                countryForRescueEventNotifications != Country.UNSELECTED
+                                        && cityForRescueEventNotifications != City.UNSELECTED
+                            } else {
+                                true
+                            }
+                                    && name.isNotBlank()
+                                    && email.matches(emailRegexPattern)
+                                    && (if (isCurrentPasswordVisible) currentPassword.length >= 6 else true)
+                                    && (if (isNewPassword) newPassword.length >= 6 else true)
+                                    && (countryForRescueEventNotifications.name != user.countryForRescueEventNotifications
+                                    || cityForRescueEventNotifications.name != user.cityForRescueEventNotifications
+                                    || name != user.username
+                                    || description != user.description
+                                    || imageUri != user.image
+                                    || email != user.email
+                                    || newPassword != currentPassword)
+                        }
+                    }
+
+                    RmAddPhoto(
+                        currentImageUri = imageUri,
+                        onUriRetrieved = {
+                            imageUri = it
+                        },
+                        onDeleteDiscardedImage = {
+                            modifyAccountViewmodel.deleteLocalImage(it)
+                        }
+                    )
+
+                    if (permissionState != ManagePermissionState.PERMISSION_GRANTED) {
+                        RmManageNotificationPermission(permissionState = permissionState) {
+                            permissionState = it
+                        }
+                    }
+
+                    if (permissionState == ManagePermissionState.PERMISSION_GRANTED) {
+
+                        Spacer(modifier = Modifier.height(15.dp))
+                        RmManageNotificationArea(
+                            receiveRescueNotifications = receiveRescueNotifications,
+                            onUpdateReceiveRescueNotifications = { isChecked ->
+                                receiveRescueNotifications = isChecked
+                                if (!isChecked) {
+                                    countryForRescueEventNotifications = Country.UNSELECTED
+                                    cityForRescueEventNotifications = City.UNSELECTED
+                                    notificationArea = countryForRescueEventNotifications.name + cityForRescueEventNotifications.name
+                                }
+                            },
+                            countryForRescueEventNotifications = countryForRescueEventNotifications,
+                            cityForRescueEventNotifications = cityForRescueEventNotifications
+                        ) { selectedCountry, selectedCity ->
+                            countryForRescueEventNotifications = selectedCountry
+                            cityForRescueEventNotifications = selectedCity
+                            notificationArea = selectedCountry.name + selectedCity.name
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+                    RmTextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = name,
+                        maxCharacters = MaxCharacters.TITLE,
+                        label = stringResource(Res.string.modify_account_name_field_label),
+                        onValueChange = { name = it },
+                        supportingText = {
+                            RmText(
+                                modifier = Modifier.fillMaxWidth(),
+                                text = "${name.length} / ${MaxCharacters.TITLE.max}",
+                                textAlign = TextAlign.End,
+                            )
+                        }
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+                    RmTextField(
+                        modifier = Modifier.fillMaxWidth().height(100.dp),
+                        text = description,
+                        label = stringResource(Res.string.modify_account_describe_yourself_field_label),
+                        onValueChange = { description = it }
+                    )
+
+                    AnimatedVisibility(isEmailAlertVisible) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Spacer(modifier = Modifier.height(10.dp))
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                RmAvatar(
+                                    RmListAvatarType.Icon(
+                                        backgroundColor = tertiaryGreen,
+                                        icon = Res.drawable.ic_warning,
+                                        iconColor = primaryGreen
+                                    )
+                                )
+                                Spacer(modifier = Modifier.width(5.dp))
+                                RmText(
+                                    text = stringResource(Res.string.modify_account_verify_email_label),
+                                    fontWeight = FontWeight.Bold,
+                                    color = primaryGreen
+                                )
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                    RmTextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = email,
+                        label = stringResource(Res.string.modify_account_email_field_label),
+                        onValueChange = { email = it }
+                    )
+
+                    LaunchedEffect(isCurrentPasswordVisible) {
+                        if (!isCurrentPasswordVisible) {
+                            currentPassword = ""
+                        }
+                    }
+                    AnimatedVisibility(isCurrentPasswordVisible) {
+                        Column {
+                            Spacer(modifier = Modifier.height(10.dp))
+                            RmPasswordTextField(
+                                label = stringResource(Res.string.modify_account_current_password_field_label),
+                                modifier = Modifier.fillMaxWidth(),
+                                password = currentPassword,
+                                onValueChange = { currentPassword = it }
+                            )
+                        }
+                    }
+
+                    LaunchedEffect(isNewPassword) {
+                        if (!isNewPassword) {
+                            newPassword = ""
+                        }
+                    }
+                    AnimatedVisibility(isNewPassword) {
+                        Column {
+                            Spacer(modifier = Modifier.height(10.dp))
+                            RmPasswordTextField(
+                                label = stringResource(Res.string.modify_account_new_password_field_label),
+                                modifier = Modifier.fillMaxWidth(),
+                                password = newPassword,
+                                onValueChange = { newPassword = it }
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+                    RmCheckbox(
+                        label = stringResource(Res.string.modify_account_change_your_password_checkbox_label),
+                        isChecked = isNewPassword
+                    ) { isChecked ->
+                        isNewPassword = isChecked
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+                    RmResultState(uiState, onSuccess = { onBackPressed() })
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Spacer(modifier = Modifier.weight(1f))
+                    RmButton(
+                        text = stringResource(Res.string.modify_account_save_changes_button),
+                        enabled = isUpdateUserButtonEnabled,
+                        onClick = {
+                            modifyAccountViewmodel.saveUserChanges(
+                                isDifferentEmail = email != user.email,
+                                isDifferentImage = imageUri != user.image,
+                                user = user.copy(
+                                    username = name,
+                                    description = description,
+                                    email = email,
+                                    image = imageUri,
+                                    countryForRescueEventNotifications = countryForRescueEventNotifications.name,
+                                    cityForRescueEventNotifications = cityForRescueEventNotifications.name,
+                                ),
+                                currentPassword = currentPassword,
+                                updatedPassword = newPassword,
+                                shouldUpdateNotificationArea = receiveRescueNotifications,
+                                previousNotificationArea = user.countryForRescueEventNotifications + user.cityForRescueEventNotifications,
+                                updatedNotificationArea = notificationArea
+                            )
+                        }
+                    )
+
+                    Spacer(modifier = Modifier.height(15.dp))
+                    RmTextLink(
+                        text = stringResource(Res.string.modify_account_log_out_account_message),
+                        textToLink = stringResource(Res.string.modify_account_log_out_text),
+                        onClick = {
+                            modifyAccountViewmodel.logOut()
+                            onBackPressed()
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+            )
+        }
+    }
+}

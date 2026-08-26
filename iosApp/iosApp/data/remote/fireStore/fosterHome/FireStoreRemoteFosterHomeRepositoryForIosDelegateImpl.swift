@@ -1,4 +1,4 @@
-import ComposeApp
+import Shared
 import FirebaseCore
 import FirebaseFirestore
 import KMPNativeCoroutinesAsync

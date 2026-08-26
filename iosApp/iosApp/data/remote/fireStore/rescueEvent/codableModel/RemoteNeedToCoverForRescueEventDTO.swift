@@ -1,4 +1,4 @@
-import ComposeApp
+import Shared
 
 struct RemoteNeedToCoverForRescueEventDTO: Codable {
     let needToCoverId: String?

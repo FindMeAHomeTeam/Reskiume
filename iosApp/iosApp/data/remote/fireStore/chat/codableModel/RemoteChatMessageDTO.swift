@@ -1,4 +1,4 @@
-import ComposeApp
+import Shared
 
 struct RemoteChatMessageDTO: Codable {
     let id: String?

@@ -1,4 +1,4 @@
-import ComposeApp
+import Shared
 
 enum GenderDTO: String, Codable {
     case unselected

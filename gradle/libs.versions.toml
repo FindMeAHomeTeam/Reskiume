@@ -2,7 +2,7 @@
 agp = "9.3.2"
 android-compileSdk = "37"
 android-minSdk = "24"
-android-targetSdk = "36"
+android-targetSdk = "37"
 androidx-activity = "1.13.0"
 androidx-lifecycle = "2.11.0"
 coil = "3.5.0"
@@ -52,13 +52,13 @@ kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigation" }
-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "runtime" }
-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "foundation" }
-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "material3" }
-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "ui" }
-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "componentsResources" }
-ui-tooling-preview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "uiToolingPreview" }
-ui-tooling = { module = "org.jetbrains.compose.ui:ui-tooling", version.ref = "uiTooling" }
+compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "runtime" }
+compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "foundation" }
+compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "material3" }
+compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "ui" }
+compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "componentsResources" }
+compose-uiToolingPreview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "uiToolingPreview" }
+compose-uiTooling = { module = "org.jetbrains.compose.ui:ui-tooling", version.ref = "uiTooling" }
 
 #tests
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }

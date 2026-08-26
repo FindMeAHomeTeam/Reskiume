@@ -15,7 +15,7 @@ class FCMSubscriberRepositoryAndroidImpl(
 ) : FCMSubscriberRepository {
 
     init {
-        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+        FirebaseMessaging.getInstance().register().addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 log.d(
                     "FCMSubscriberRepositoryAndroidImpl",

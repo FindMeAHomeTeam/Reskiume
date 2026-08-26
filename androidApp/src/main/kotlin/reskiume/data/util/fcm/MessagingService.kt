@@ -1,4 +1,4 @@
-package com.findmeahometeam.reskiume.data.util.fcm
+package reskiume.data.util.fcm
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -8,13 +8,13 @@ import android.media.RingtoneManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.net.toUri
-import com.findmeahometeam.reskiume.MainActivity
 import com.findmeahometeam.reskiume.R
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.ui.util.fcm.MessagingServiceViewModel
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import org.koin.android.ext.android.inject
+import reskiume.MainActivity
 
 class MessagingService() : FirebaseMessagingService() {
 
@@ -24,9 +24,9 @@ class MessagingService() : FirebaseMessagingService() {
     private val messagingServiceViewModel: MessagingServiceViewModel by inject()
     private val log: Log by inject()
 
-    override fun onNewToken(token: String) {
-        super.onNewToken(token)
-        log.d("MessagingService", "onNewToken: $token")
+    override fun onRegistered(installationId: String) {
+        super.onRegistered(installationId)
+        log.d("MessagingService", "onRegistered: $installationId")
     }
 
     override fun onDeletedMessages() {

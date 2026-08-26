@@ -1,9 +1,9 @@
 package com.findmeahometeam.reskiume.data.database.entity.fosterHome
 
-import androidx.room.Embedded
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import androidx.room.Relation
+import androidx.room3.Embedded
+import androidx.room3.Entity
+import androidx.room3.PrimaryKey
+import androidx.room3.Relation
 import com.findmeahometeam.reskiume.domain.model.fosterHome.AcceptedNonHumanAnimalForFosterHome
 import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
 import com.findmeahometeam.reskiume.domain.model.fosterHome.ResidentNonHumanAnimalForFosterHome
@@ -49,13 +49,13 @@ data class FosterHomeEntity(
 data class FosterHomeWithAllNonHumanAnimalData(
     @Embedded val fosterHomeEntity: FosterHomeEntity,
     @Relation(
-        parentColumn = "id",
-        entityColumn = "fosterHomeId"
+        parentColumns = ["id"],
+        entityColumns = ["fosterHomeId"]
     )
     val allAcceptedNonHumanAnimals: List<AcceptedNonHumanAnimalEntityForFosterHome>,
     @Relation(
-        parentColumn = "id",
-        entityColumn = "fosterHomeId"
+        parentColumns = ["id"],
+        entityColumns = ["fosterHomeId"]
     )
     val allResidentNonHumanAnimalIds: List<ResidentNonHumanAnimalIdEntityForFosterHome>
 )

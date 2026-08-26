@@ -1,9 +1,9 @@
 package com.findmeahometeam.reskiume.data.database.entity.user
 
-import androidx.room.Embedded
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import androidx.room.Relation
+import androidx.room3.Embedded
+import androidx.room3.Entity
+import androidx.room3.PrimaryKey
+import androidx.room3.Relation
 import com.findmeahometeam.reskiume.domain.model.user.Subscription
 import com.findmeahometeam.reskiume.domain.model.user.User
 
@@ -38,8 +38,8 @@ data class UserEntity(
 data class UserWithAllSubscriptionData(
     @Embedded val userEntity: UserEntity,
     @Relation(
-        parentColumn = "uid",
-        entityColumn = "uid"
+        parentColumns = ["uid"],
+        entityColumns = ["uid"]
     )
     val allSubscriptions: List<SubscriptionEntityForUser>
 )

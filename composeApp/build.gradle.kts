@@ -8,9 +8,7 @@ plugins {
     alias(libs.plugins.composeHotReload)
     alias(libs.plugins.kotlinxSerialization)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.androidx.room)
-    alias(libs.plugins.google.services)
-    alias(libs.plugins.crashlytics.plugin)
+    alias(libs.plugins.androidx.room3)
     alias(libs.plugins.nativecoroutines.plugin)
     alias(libs.plugins.mokkery)
 }
@@ -71,7 +69,7 @@ kotlin {
             implementation(libs.navigation.compose)
             implementation(libs.paging.common)
             implementation(libs.paging.compose)
-            implementation(libs.androidx.room.runtime)
+            implementation(libs.androidx.room3.runtime)
             implementation(libs.androidx.sqlite.bundled)
             implementation(libs.kotlinx.datetime)
             implementation(libs.kotlinx.serialization.json)
@@ -112,14 +110,13 @@ kotlin {
 }
 
 dependencies {
-    debugImplementation(libs.ui.tooling)
-    add("kspCommonMainMetadata", libs.androidx.room.compiler)
-    add("kspAndroid", libs.androidx.room.compiler)
-    add("kspIosX64", libs.androidx.room.compiler)
-    add("kspIosArm64", libs.androidx.room.compiler)
-    add("kspIosSimulatorArm64", libs.androidx.room.compiler)
+    androidRuntimeClasspath(libs.compose.uiTooling)
+    add("kspCommonMainMetadata", libs.androidx.room3.compiler)
+    add("kspAndroid", libs.androidx.room3.compiler)
+    add("kspIosArm64", libs.androidx.room3.compiler)
+    add("kspIosSimulatorArm64", libs.androidx.room3.compiler)
 }
 
-room {
+room3 {
     schemaDirectory("$projectDir/schemas")
 }

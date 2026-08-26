@@ -21,7 +21,7 @@ konnectivity = "0.1-alpha01"
 kotlin = "2.4.10"
 kotlinxDatetime = "0.8.0"
 kotlinx-serialization = "1.11.0" 
-ksp = "2.3.2"
+ksp = "2.3.11"
 ktor = "3.5.2"
 material3 = "1.9.0"
 mokkery-plugin = "3.4.2"
@@ -29,9 +29,9 @@ moko-permissions = "0.20.1"
 nativecoroutines = "1.0.5"
 navigation = "2.9.2"
 paging = "3.5.1"
-room = "2.8.4" 
+room3 = "3.0.1"
 runtime = "1.11.1"
-sqlite = "2.7.0" 
+sqlite = "2.7.0"
 turbine = "1.2.1"
 ui = "1.11.1"
 uiTooling = "1.11.1"
@@ -87,11 +87,11 @@ ktor-serialization = { module = "io.ktor:ktor-serialization-kotlinx-json", versi
 ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
 ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
 
-#room
+#room3
 androidx-sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
-androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
-androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
-androidx-room-sqlite-wrapper = { module = "androidx.room:room-sqlite-wrapper", version.ref = "room" }
+androidx-room3-runtime = { module = "androidx.room3:room3-runtime", version.ref = "room3" }
+androidx-room3-compiler = { module = "androidx.room3:room3-compiler", version.ref = "room3" }
+androidx-room3-sqlite-wrapper = { module = "androidx.room3:room3-sqlite-wrapper", version.ref = "room3" }
 
 #imagePicker
 image-picker-kmp = { module = "io.github.ismoy:imagepickerkmp", version.ref = "imagepickerkmp" }
@@ -125,7 +125,7 @@ composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "k
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinxSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-androidx-room = { id = "androidx.room", version.ref = "room" }
+androidx-room3 = { id = "androidx.room3", version.ref = "room3" }
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 crashlytics-plugin = { id = "com.google.firebase.crashlytics", version.ref = "crashlyticsPlugin" }
 nativecoroutines-plugin = { id = "com.rickclephas.kmp.nativecoroutines", version.ref = "nativecoroutines" }

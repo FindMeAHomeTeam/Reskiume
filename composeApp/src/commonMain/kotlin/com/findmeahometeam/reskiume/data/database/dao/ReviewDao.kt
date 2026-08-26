@@ -1,9 +1,9 @@
 package com.findmeahometeam.reskiume.data.database.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy.Companion.REPLACE
-import androidx.room.Query
+import androidx.room3.Dao
+import androidx.room3.Insert
+import androidx.room3.OnConflictStrategy.Companion.REPLACE
+import androidx.room3.Query
 import com.findmeahometeam.reskiume.data.database.entity.ReviewEntity
 import kotlinx.coroutines.flow.Flow
 

@@ -1,9 +1,9 @@
 package com.findmeahometeam.reskiume.data.database.entity.chat
 
-import androidx.room.Embedded
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import androidx.room.Relation
+import androidx.room3.Embedded
+import androidx.room3.Entity
+import androidx.room3.PrimaryKey
+import androidx.room3.Relation
 import com.findmeahometeam.reskiume.domain.model.chat.ActivistInfo
 import com.findmeahometeam.reskiume.domain.model.chat.BlockedUserInfo
 import com.findmeahometeam.reskiume.domain.model.chat.Chat
@@ -51,23 +51,23 @@ data class ChatEntity(
 data class ChatEntityWithAllData(
     @Embedded val chatEntity: ChatEntity,
     @Relation(
-        parentColumn = "id",
-        entityColumn = "chatId"
+        parentColumns = ["id"],
+        entityColumns = ["chatId"]
     )
     val allNonHumanAnimalsInfo: List<NonHumanAnimalInfoEntity>,
     @Relation(
-        parentColumn = "id",
-        entityColumn = "chatId"
+        parentColumns = ["id"],
+        entityColumns = ["chatId"]
     )
     val allActivistsInfo: List<ActivistInfoEntity>,
     @Relation(
-        parentColumn = "id",
-        entityColumn = "chatId"
+        parentColumns = ["id"],
+        entityColumns = ["chatId"]
     )
     val allBlockedUsersInfo: List<BlockedUserInfoEntity>,
     @Relation(
-        parentColumn = "id",
-        entityColumn = "chatId"
+        parentColumns = ["id"],
+        entityColumns = ["chatId"]
     )
     val allChatMessages: List<ChatMessageEntity>
 )

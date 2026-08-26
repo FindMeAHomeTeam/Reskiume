@@ -1,9 +1,9 @@
 package com.findmeahometeam.reskiume.data.database.entity.rescueEvent
 
-import androidx.room.Embedded
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import androidx.room.Relation
+import androidx.room3.Embedded
+import androidx.room3.Entity
+import androidx.room3.PrimaryKey
+import androidx.room3.Relation
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.NeedToCover
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.NonHumanAnimalToRescue
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueEvent
@@ -46,13 +46,13 @@ data class RescueEventEntity(
 data class RescueEventWithAllNeedsAndNonHumanAnimalData(
     @Embedded val rescueEventEntity: RescueEventEntity,
     @Relation(
-        parentColumn = "id",
-        entityColumn = "rescueEventId"
+        parentColumns = ["id"],
+        entityColumns = ["rescueEventId"]
     )
     val allNonHumanAnimalsToRescue: List<NonHumanAnimalToRescueEntityForRescueEvent>,
     @Relation(
-        parentColumn = "id",
-        entityColumn = "rescueEventId"
+        parentColumns = ["id"],
+        entityColumns = ["rescueEventId"]
     )
     val allNeedsToCover: List<NeedToCoverEntityForRescueEvent>
 )

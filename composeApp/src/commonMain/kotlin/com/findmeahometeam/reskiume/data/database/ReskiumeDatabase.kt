@@ -1,9 +1,11 @@
+@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+
 package com.findmeahometeam.reskiume.data.database
 
-import androidx.room.ConstructedBy
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import androidx.room.RoomDatabaseConstructor
+import androidx.room3.ConstructedBy
+import androidx.room3.Database
+import androidx.room3.RoomDatabase
+import androidx.room3.RoomDatabaseConstructor
 import com.findmeahometeam.reskiume.data.database.dao.ChatDao
 import com.findmeahometeam.reskiume.data.database.dao.FosterHomeDao
 import com.findmeahometeam.reskiume.data.database.dao.LocalCacheDao
@@ -62,7 +64,7 @@ abstract class ReskiumeDatabase : RoomDatabase() {
 const val DATABASE_NAME = "reskiume_database.db"
 
 // The Room compiler generates the `actual` implementations.
-@Suppress("NO_ACTUAL_FOR_EXPECT")
+@Suppress("KotlinNoActualForExpect")
 expect object ReskiumeConstructor : RoomDatabaseConstructor<ReskiumeDatabase> {
     override fun initialize(): ReskiumeDatabase
 }

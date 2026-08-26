@@ -1,0 +1,72 @@
+package com.findmeahometeam.reskiume.di
+
+import com.findmeahometeam.reskiume.data.database.ReskiumeDatabase
+import com.findmeahometeam.reskiume.data.util.analytics.Analytics
+import com.findmeahometeam.reskiume.data.util.log.Log
+import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteReview.RealtimeDatabaseRemoteReviewRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.chat.FireStoreRemoteChatRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteFosterHome.FireStoreRemoteFosterHomeRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteRescueEvent.FireStoreRemoteRescueEventRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
+import com.findmeahometeam.reskiume.domain.repository.util.fcm.FCMSubscriberRepository
+import com.findmeahometeam.reskiume.domain.repository.util.location.LocationRepository
+import com.findmeahometeam.reskiume.ui.fosterHomes.shareService.ShareService
+import com.findmeahometeam.reskiume.ui.profile.giveFeedback.GiveFeedback
+import com.findmeahometeam.reskiume.ui.util.ManageImagePath
+import com.google.firebase.Firebase
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.database
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
+import com.google.firebase.functions.FirebaseFunctions
+import com.google.firebase.functions.functions
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.android.Android
+import org.koin.core.module.Module
+import org.koin.core.module.dsl.singleOf
+import org.koin.dsl.bind
+import org.koin.dsl.module
+import reskiume.data.database.getDatabase
+import reskiume.data.remote.auth.AuthRepositoryAndroidImpl
+import reskiume.data.remote.database.nonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepositoryAndroidImpl
+import reskiume.data.remote.database.remoteReview.RealtimeDatabaseRemoteReviewRepositoryAndroidImpl
+import reskiume.data.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepositoryAndroidImpl
+import reskiume.data.remote.fireStore.chat.FireStoreRemoteChatRepositoryAndroidImpl
+import reskiume.data.remote.fireStore.fosterHome.FireStoreRemoteFosterHomeRepositoryAndroidImpl
+import reskiume.data.remote.fireStore.rescueEvent.FireStoreRemoteRescueEventRepositoryAndroidImpl
+import reskiume.data.remote.storage.StorageRepositoryAndroidImpl
+import reskiume.data.util.analytics.AnalyticsAndroidImpl
+import reskiume.data.util.fcm.FCMSubscriberRepositoryAndroidImpl
+import reskiume.data.util.fcm.MessagingService
+import reskiume.data.util.log.LogAndroidImpl
+import reskiume.ui.fosterHomes.shareService.ShareServiceAndroidImpl
+import reskiume.ui.location.LocationRepositoryAndroidImpl
+import reskiume.ui.profile.giveFeedback.GiveFeedbackImpl
+import reskiume.ui.util.ManageImagePathImpl
+
+val platformModule: Module = module {
+    singleOf(::LogAndroidImpl) bind Log::class
+    singleOf(::AnalyticsAndroidImpl) bind Analytics::class
+    singleOf(::AuthRepositoryAndroidImpl) bind AuthRepository::class
+    single<ReskiumeDatabase> { getDatabase(get()) }
+    single<DatabaseReference>{ Firebase.database.reference }
+    singleOf(::RealtimeDatabaseRemoteUserRepositoryAndroidImpl) bind RealtimeDatabaseRemoteUserRepository::class
+    singleOf(::RealtimeDatabaseRemoteReviewRepositoryAndroidImpl) bind RealtimeDatabaseRemoteReviewRepository::class
+    singleOf(::StorageRepositoryAndroidImpl) bind StorageRepository::class
+    singleOf(::RealtimeDatabaseRemoteNonHumanAnimalRepositoryAndroidImpl) bind RealtimeDatabaseRemoteNonHumanAnimalRepository::class
+    singleOf(::GiveFeedbackImpl) bind GiveFeedback::class
+    singleOf(::ManageImagePathImpl) bind ManageImagePath::class
+    single<HttpClient> { HttpClient(Android) }
+    single<FirebaseFirestore> { Firebase.firestore }
+    singleOf(::FireStoreRemoteFosterHomeRepositoryAndroidImpl) bind FireStoreRemoteFosterHomeRepository::class
+    singleOf(::LocationRepositoryAndroidImpl) bind LocationRepository::class
+    singleOf(::ShareServiceAndroidImpl) bind ShareService::class
+    singleOf(::FireStoreRemoteRescueEventRepositoryAndroidImpl) bind FireStoreRemoteRescueEventRepository::class
+    singleOf(::FCMSubscriberRepositoryAndroidImpl) bind FCMSubscriberRepository::class
+    singleOf(::MessagingService)
+    single<FirebaseFunctions> { Firebase.functions }
+    singleOf(::FireStoreRemoteChatRepositoryAndroidImpl) bind FireStoreRemoteChatRepository::class
+}

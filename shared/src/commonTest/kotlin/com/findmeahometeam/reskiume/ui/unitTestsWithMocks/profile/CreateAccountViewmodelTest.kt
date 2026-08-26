@@ -1,0 +1,444 @@
+package com.findmeahometeam.reskiume.ui.unitTestsWithMocks.profile
+
+import app.cash.turbine.test
+import com.findmeahometeam.reskiume.CoroutineTestDispatcher
+import com.findmeahometeam.reskiume.authUser
+import com.findmeahometeam.reskiume.data.remote.response.AuthResult
+import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
+import com.findmeahometeam.reskiume.data.util.Section
+import com.findmeahometeam.reskiume.data.util.log.Log
+import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
+import com.findmeahometeam.reskiume.domain.repository.util.fcm.FCMSubscriberRepository
+import com.findmeahometeam.reskiume.domain.usecases.authUser.CreateUserWithEmailAndPasswordInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.authUser.DeleteUserFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.DeleteUserFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
+import com.findmeahometeam.reskiume.ui.core.components.UiState
+import com.findmeahometeam.reskiume.ui.profile.createAccount.CreateAccountViewmodel
+import com.findmeahometeam.reskiume.ui.util.ManageImagePath
+import com.findmeahometeam.reskiume.user
+import com.findmeahometeam.reskiume.userPwd
+import dev.mokkery.answering.calls
+import dev.mokkery.answering.returns
+import dev.mokkery.every
+import dev.mokkery.everySuspend
+import dev.mokkery.matcher.any
+import dev.mokkery.matcher.capture.Capture
+import dev.mokkery.matcher.capture.capture
+import dev.mokkery.matcher.capture.get
+import dev.mokkery.mock
+import dev.mokkery.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.test.runTest
+import kotlin.test.Test
+import kotlin.test.assertTrue
+
+class CreateAccountViewmodelTest : CoroutineTestDispatcher() {
+
+    private val onDeleteUserFromAuth = Capture.slot<(String) -> Unit>()
+
+    private val onImageUploaded = Capture.slot<(String) -> Unit>()
+
+    private val onImageDeletedFromRemote = Capture.slot<(Boolean) -> Unit>()
+
+    private val onImageDeletedFromLocal = Capture.slot<(Boolean) -> Unit>()
+
+    private val onInsertLocalCache = Capture.slot<(rowId: Long) -> Unit>()
+
+    private val onSuccessRemoteUser = Capture.slot<(DatabaseResult) -> Unit>()
+
+    private val onInsertUserInLocal = Capture.slot<suspend (Long) -> Unit>()
+
+    private val onInsertUserSubscriptionInLocal = Capture.slot<suspend (rowId: Long) -> Unit>()
+
+    private val log: Log = mock {
+        every { d(any(), any()) } calls { println(it) }
+        every { e(any(), any()) } calls { println(it) }
+    }
+
+    private fun getCreateAccountViewmodel(
+        createUserWithEmailAndPasswordResult: AuthResult = AuthResult.Success(authUser),
+        onDeleteUserErrorArg: String = "",
+        onImageUploadedArg: String = user.image,
+        onImageDeletedFromRemoteArg: Boolean = true,
+        onImageDeletedFromLocalArg: Boolean = true,
+        rowIdInsertedCacheArg: Long = 1L,
+        insertRemoteUserArg: DatabaseResult = DatabaseResult.Success,
+        deleteRemoteUserArg: DatabaseResult = DatabaseResult.Success,
+        onInsertUserArg: Long = 1L,
+        rowIdOfInsertingUserSubscriptionArg: Long = 1L
+    ): CreateAccountViewmodel {
+        val authRepository: AuthRepository = mock {
+
+            every {
+                authState
+            } returns flowOf(authUser)
+
+            everySuspend {
+                createUserWithEmailAndPassword(
+                    user.email!!,
+                    userPwd
+                )
+            } returns createUserWithEmailAndPasswordResult
+
+            everySuspend { deleteUser(any(), capture(onDeleteUserFromAuth)) } calls {
+                onDeleteUserFromAuth.get().invoke(onDeleteUserErrorArg)
+            }
+        }
+
+        val fCMSubscriberRepository: FCMSubscriberRepository = mock {
+            everySuspend { subscribeToTopic(user.subscriptions[0].topic) } returns flowOf(true)
+        }
+
+        val storageRepository: StorageRepository = mock {
+            every {
+                uploadImage(
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                    capture(onImageUploaded)
+                )
+            } calls { onImageUploaded.get().invoke(onImageUploadedArg) }
+
+            everySuspend {
+                deleteRemoteImage(
+                    any(),
+                    any(),
+                    any(),
+                    capture(onImageDeletedFromRemote)
+                )
+            } calls { onImageDeletedFromRemote.get().invoke(onImageDeletedFromRemoteArg) }
+
+            every {
+                deleteLocalImage(
+                    user.image,
+                    capture(onImageDeletedFromLocal)
+                )
+            } calls { onImageDeletedFromLocal.get().invoke(onImageDeletedFromLocalArg) }
+        }
+
+        val localCacheRepository: LocalCacheRepository = mock {
+            everySuspend {
+                insertLocalCacheEntity(
+                    any(),
+                    capture(onInsertLocalCache)
+                )
+            } calls { onInsertLocalCache.get().invoke(rowIdInsertedCacheArg) }
+        }
+
+        val realtimeDatabaseRemoteUserRepository: RealtimeDatabaseRemoteUserRepository = mock {
+            everySuspend {
+                insertRemoteUser(
+                    any(),
+                    capture(onSuccessRemoteUser)
+                )
+            } calls { onSuccessRemoteUser.get().invoke(insertRemoteUserArg) }
+
+            every {
+                deleteRemoteUser(
+                    any(),
+                    capture(onSuccessRemoteUser)
+                )
+            } calls { onSuccessRemoteUser.get().invoke(deleteRemoteUserArg) }
+        }
+
+        val localUserRepository: LocalUserRepository = mock {
+            everySuspend { insertUser(any(), capture(onInsertUserInLocal)) } calls {
+                onInsertUserInLocal.get().invoke(onInsertUserArg)
+            }
+
+            everySuspend {
+                insertSubscription(
+                    any(),
+                    capture(onInsertUserSubscriptionInLocal)
+                )
+            } calls {
+                onInsertUserSubscriptionInLocal.get().invoke(rowIdOfInsertingUserSubscriptionArg)
+            }
+        }
+
+        val manageImagePath: ManageImagePath = mock {
+
+            every { getImagePathForFileName(user.image) } returns user.image
+
+            every { getFileNameFromLocalImagePath(user.image) } returns user.image
+        }
+
+        val createUserWithEmailAndPasswordInAuthDataSource =
+            CreateUserWithEmailAndPasswordInAuthDataSource(authRepository)
+
+        val insertUserInRemoteDataSource =
+            InsertUserInRemoteDataSource(realtimeDatabaseRemoteUserRepository)
+
+        val uploadImageToRemoteDataSource =
+            UploadImageToRemoteDataSource(storageRepository)
+
+        val insertCacheInLocalRepository =
+            InsertCacheInLocalRepository(localCacheRepository)
+
+        val insertUserInLocalDataSource =
+            InsertUserInLocalDataSource(
+                authRepository,
+                manageImagePath,
+                localUserRepository,
+                fCMSubscriberRepository,
+                log
+            )
+
+        val deleteUserFromAuthDataSource =
+            DeleteUserFromAuthDataSource(authRepository)
+
+        val deleteUserFromRemoteDataSource =
+            DeleteUserFromRemoteDataSource(realtimeDatabaseRemoteUserRepository)
+
+        val deleteImageFromRemoteDataSource =
+            DeleteImageFromRemoteDataSource(storageRepository)
+
+        val deleteImageFromLocalDataSource =
+            DeleteImageFromLocalDataSource(storageRepository)
+
+        return CreateAccountViewmodel(
+            createUserWithEmailAndPasswordInAuthDataSource,
+            insertUserInRemoteDataSource,
+            uploadImageToRemoteDataSource,
+            insertCacheInLocalRepository,
+            insertUserInLocalDataSource,
+            deleteUserFromAuthDataSource,
+            deleteUserFromRemoteDataSource,
+            deleteImageFromRemoteDataSource,
+            deleteImageFromLocalDataSource,
+            log
+        )
+    }
+
+    @Test
+    fun `given an unregistered user_when that user creates an account using email_then the account is created`() =
+        runTest {
+            val createAccountViewmodel = getCreateAccountViewmodel()
+            createAccountViewmodel.saveUserChanges(user, userPwd, user.subscriptions[0].topic)
+            createAccountViewmodel.state.test {
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Success }
+                ensureAllEventsConsumed()
+            }
+            verify {
+                log.d(
+                    "CreateAccountViewmodel",
+                    "saveUserCacheLocally: user ${user.uid} added to the local cache in section ${Section.USERS}"
+                )
+            }
+        }
+
+    @Test
+    fun `given an unregistered user_when that user creates an account using email but there is an error creating it_then the app displays an error`() =
+        runTest {
+            val createAccountViewmodel = getCreateAccountViewmodel(
+                createUserWithEmailAndPasswordResult = AuthResult.Error("error"),
+            )
+            createAccountViewmodel.saveUserChanges(user, userPwd, user.subscriptions[0].topic)
+            createAccountViewmodel.state.test {
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Error }
+                ensureAllEventsConsumed()
+            }
+            verify {
+                log.e(
+                    "CreateAccountViewmodel",
+                    "createAuthUserUsingEmailAndPwd: auth user not created in the auth repository - error"
+                )
+            }
+        }
+
+    @Test
+    fun `given an unregistered user_when that user creates an account using email without a subscription_then the account is created`() =
+        runTest {
+            val createAccountViewmodel = getCreateAccountViewmodel()
+            createAccountViewmodel.saveUserChanges(user, userPwd, "")
+            createAccountViewmodel.state.test {
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Success }
+                ensureAllEventsConsumed()
+            }
+            verify {
+                log.d(
+                    "CreateAccountViewmodel",
+                    "saveUserCacheLocally: user ${user.uid} added to the local cache in section ${Section.USERS}"
+                )
+            }
+        }
+
+    @Test
+    fun `given an unregistered user_when that user creates an account using email but there is an error deleting the user avatar in the remote data source_then the account is created`() =
+        runTest {
+            val createAccountViewmodel = getCreateAccountViewmodel(
+                onImageUploadedArg = ""
+            )
+            createAccountViewmodel.saveUserChanges(user, userPwd, user.subscriptions[0].topic)
+            createAccountViewmodel.state.test {
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Success }
+                ensureAllEventsConsumed()
+            }
+            verify {
+                log.d(
+                    "CreateAccountViewmodel",
+                    "uploadImageToRemoteRepo: Download URI is blank"
+                )
+            }
+        }
+
+    @Test
+    fun `given an unregistered user_when that user creates an account using email but there is an error storing user data in the remote data source_then the app displays an error`() =
+        runTest {
+            val createAccountViewmodel = getCreateAccountViewmodel(
+                insertRemoteUserArg = DatabaseResult.Error("error")
+            )
+            createAccountViewmodel.saveUserChanges(user, userPwd, user.subscriptions[0].topic)
+            createAccountViewmodel.state.test {
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Error }
+                ensureAllEventsConsumed()
+            }
+            verify {
+                log.e(
+                    "CreateAccountViewmodel",
+                    "deleteAccountFromAuthDataSource: deleted account from the auth repository - error"
+                )
+            }
+        }
+
+    @Test
+    fun `given an unregistered user_when that user creates an account using email but there is an error storing user data and deleting their data in the remote data source_then the app displays an error`() =
+        runTest {
+            val createAccountViewmodel = getCreateAccountViewmodel(
+                insertRemoteUserArg = DatabaseResult.Error("error"),
+                onDeleteUserErrorArg = "error"
+            )
+            createAccountViewmodel.saveUserChanges(user, userPwd, user.subscriptions[0].topic)
+            createAccountViewmodel.state.test {
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Error }
+                ensureAllEventsConsumed()
+            }
+            verify {
+                log.e(
+                    "CreateAccountViewmodel",
+                    "saveUserToRemoteRepo: failed to save the user ${user.uid} in the remote repository"
+                )
+                log.e(
+                    "CreateAccountViewmodel",
+                    "deleteAccountFromAuthDataSource: failed to delete account from the auth repository - error - error"
+                )
+            }
+        }
+
+    @Test
+    fun `given an unregistered user_when that user creates an account using email but there is an error storing that user in the local datasource_then the app displays an error`() =
+        runTest {
+            val createAccountViewmodel = getCreateAccountViewmodel(
+                onInsertUserArg = 0
+            )
+            createAccountViewmodel.saveUserChanges(user, userPwd, user.subscriptions[0].topic)
+            createAccountViewmodel.state.test {
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Error }
+                ensureAllEventsConsumed()
+            }
+            verify {
+                log.e(
+                    "CreateAccountViewmodel",
+                    "insertUserInLocalRepo: failed to create the user ${user.uid} in the local repository"
+                )
+            }
+        }
+
+    @Test
+    fun `given an unregistered user_when that user creates an account using email but there is an error storing the user in the local repo and deleting their data in the remote repo_then the app displays an error`() =
+        runTest {
+            val createAccountViewmodel = getCreateAccountViewmodel(
+                onInsertUserArg = 0,
+                deleteRemoteUserArg = DatabaseResult.Error("error")
+            )
+            createAccountViewmodel.saveUserChanges(user, userPwd, user.subscriptions[0].topic)
+            createAccountViewmodel.state.test {
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Error }
+                ensureAllEventsConsumed()
+            }
+            verify {
+                log.e(
+                    "CreateAccountViewmodel",
+                    "insertUserInLocalRepo: failed to create the user ${user.uid} in the local repository"
+                )
+                log.e(
+                    "CreateAccountViewmodel",
+                    "deleteAccountFromRemoteDataSource: failed to delete the user ${user.uid} in the remote repository - error"
+                )
+            }
+        }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `given an unregistered user_when that user creates an account using email but there is an error storing the cache in the local datasource_then logE is called`() =
+        runTest {
+            val createAccountViewmodel = getCreateAccountViewmodel(
+                rowIdInsertedCacheArg = 0
+            )
+            createAccountViewmodel.saveUserChanges(user, userPwd, user.subscriptions[0].topic)
+
+            createAccountViewmodel.state.test {
+                assertTrue { awaitItem() is UiState.Loading }
+                ensureAllEventsConsumed()
+            }
+            runCurrent()
+
+            verify {
+                log.e(
+                    "CreateAccountViewmodel",
+                    "saveUserCacheLocally: Error adding the user ${user.uid} to the local cache in section ${Section.USERS}"
+                )
+            }
+        }
+
+    @Test
+    fun `given an image to discard_when the user clicks on the delete button_then the image is discarded`() =
+        runTest {
+            val createAccountViewmodel = getCreateAccountViewmodel()
+            createAccountViewmodel.deleteLocalImage(user.image)
+
+            verify {
+                log.d(
+                    "CreateAccountViewModel",
+                    "deleteLocalImage: the image ${user.image} was deleted successfully in the local data source"
+                )
+            }
+        }
+
+    @Test
+    fun `given an image to discard_when the user clicks on the delete button but the deletion fails_then the image is not discarded`() =
+        runTest {
+            val createAccountViewmodel = getCreateAccountViewmodel(
+                onImageDeletedFromLocalArg = false
+            )
+            createAccountViewmodel.deleteLocalImage(user.image)
+
+            verify {
+                log.e(
+                    "CreateAccountViewModel",
+                    "deleteLocalImage: failed to delete the image ${user.image} in the local data source"
+                )
+            }
+        }
+}

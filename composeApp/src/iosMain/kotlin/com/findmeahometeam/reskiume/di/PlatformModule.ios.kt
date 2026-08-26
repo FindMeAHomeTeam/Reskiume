@@ -75,7 +75,7 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
-actual val platformModule: Module = module {
+val platformModule: Module = module {
     singleOf(::LogIosImpl) bind Log::class
     singleOf(::AnalyticsIosImpl) bind Analytics::class
     singleOf(::AuthRepositoryIosImpl) bind AuthRepository::class

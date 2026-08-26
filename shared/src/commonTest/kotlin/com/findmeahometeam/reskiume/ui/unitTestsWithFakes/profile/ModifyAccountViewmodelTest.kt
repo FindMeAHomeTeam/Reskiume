@@ -1,0 +1,562 @@
+package com.findmeahometeam.reskiume.ui.unitTestsWithFakes.profile
+
+import app.cash.turbine.test
+import com.findmeahometeam.reskiume.CoroutineTestDispatcher
+import com.findmeahometeam.reskiume.authUser
+import com.findmeahometeam.reskiume.data.util.Section
+import com.findmeahometeam.reskiume.data.util.log.Log
+import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
+import com.findmeahometeam.reskiume.domain.repository.util.fcm.FCMSubscriberRepository
+import com.findmeahometeam.reskiume.domain.usecases.authUser.ModifyUserEmailInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.authUser.ModifyUserPasswordInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.authUser.SignOutFromAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInRemoteDataSource
+import com.findmeahometeam.reskiume.localCache
+import com.findmeahometeam.reskiume.ui.core.components.UiState
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeAuthRepository
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeFCMSubscriberRepository
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeLocalCacheRepository
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeLocalUserRepository
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeLog
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeManageImagePath
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeRealtimeDatabaseRemoteUserRepository
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeStorageRepository
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeSubscriptionManagerUtil
+import com.findmeahometeam.reskiume.ui.profile.modifyAccount.ModifyAccountViewmodel
+import com.findmeahometeam.reskiume.ui.util.ManageImagePath
+import com.findmeahometeam.reskiume.ui.util.fcm.SubscriptionManagerUtil
+import com.findmeahometeam.reskiume.user
+import com.findmeahometeam.reskiume.userPwd
+import com.findmeahometeam.reskiume.userWithAllSubscriptionData
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.test.runTest
+import kotlin.test.Test
+import kotlin.test.assertNotEquals
+import kotlin.test.assertTrue
+
+class ModifyAccountViewmodelTest : CoroutineTestDispatcher() {
+
+    private val log: Log = FakeLog()
+
+    private fun getModifyAccountViewmodel(
+        authRepository: AuthRepository = FakeAuthRepository(),
+        localUserRepository: LocalUserRepository = FakeLocalUserRepository(),
+        realtimeDatabaseRemoteUserRepository: RealtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(),
+        storageRepository: StorageRepository = FakeStorageRepository(),
+        manageImagePath: ManageImagePath = FakeManageImagePath(),
+        localCacheRepository: LocalCacheRepository = FakeLocalCacheRepository(),
+        fCMSubscriberRepository: FCMSubscriberRepository = FakeFCMSubscriberRepository(),
+        subscriptionManagerUtil: SubscriptionManagerUtil = FakeSubscriptionManagerUtil()
+    ): ModifyAccountViewmodel {
+
+        val observeAuthStateInAuthDataSource =
+            ObserveAuthStateInAuthDataSource(authRepository)
+
+        val getUserFromLocalDataSource =
+            GetUserFromLocalDataSource(localUserRepository)
+
+        val getImagePathForFileNameFromLocalDataSource =
+            GetImagePathForFileNameFromLocalDataSource(manageImagePath)
+
+        val getUserFromRemoteDataSource =
+            GetUserFromRemoteDataSource(realtimeDatabaseRemoteUserRepository)
+
+        val modifyUserEmailInAuthDataSource =
+            ModifyUserEmailInAuthDataSource(authRepository)
+
+        val modifyUserPasswordInAuthDataSource =
+            ModifyUserPasswordInAuthDataSource(authRepository)
+
+        val deleteImageFromLocalDataSource =
+            DeleteImageFromLocalDataSource(storageRepository)
+
+        val deleteImageFromRemoteDataSource =
+            DeleteImageFromRemoteDataSource(storageRepository)
+
+        val uploadImageToRemoteDataSource =
+            UploadImageToRemoteDataSource(storageRepository)
+
+        val modifyUserInRemoteDataSource =
+            ModifyUserInRemoteDataSource(realtimeDatabaseRemoteUserRepository)
+
+        val modifyUserInLocalDataSource =
+            ModifyUserInLocalDataSource(
+                manageImagePath,
+                fCMSubscriberRepository,
+                localUserRepository,
+                authRepository,
+                log
+            )
+
+        val modifyCacheInLocalRepository =
+            ModifyCacheInLocalRepository(localCacheRepository)
+
+        val signOutFromAuthDataSource =
+            SignOutFromAuthDataSource(authRepository)
+
+        return ModifyAccountViewmodel(
+            observeAuthStateInAuthDataSource,
+            getUserFromLocalDataSource,
+            getImagePathForFileNameFromLocalDataSource,
+            getUserFromRemoteDataSource,
+            modifyUserEmailInAuthDataSource,
+            modifyUserPasswordInAuthDataSource,
+            deleteImageFromLocalDataSource,
+            deleteImageFromRemoteDataSource,
+            uploadImageToRemoteDataSource,
+            modifyUserInRemoteDataSource,
+            modifyUserInLocalDataSource,
+            modifyCacheInLocalRepository,
+            signOutFromAuthDataSource,
+            subscriptionManagerUtil,
+            log
+        )
+    }
+
+    @Test
+    fun `given a registered user_when that user modifies their account_then the account is updated with its new rescue event subscription`() =
+        runTest {
+            val modifyAccountViewmodel = getModifyAccountViewmodel(
+                authRepository = FakeAuthRepository(
+                    authUser = authUser,
+                    authEmail = user.email,
+                    authPassword = userPwd
+                ),
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
+                    mutableListOf(user.toData())
+                ),
+                storageRepository = FakeStorageRepository(
+                    remoteDatasourceList = mutableListOf(
+                        Pair("${Section.USERS.path}/${user.uid}", user.image)
+                    ),
+                    localDatasourceList = mutableListOf(
+                        Pair(
+                            "local_path",
+                            user.image
+                        )
+                    )
+                ),
+                localUserRepository = FakeLocalUserRepository(
+                    mutableListOf(
+                        userWithAllSubscriptionData
+                    )
+                ),
+                fCMSubscriberRepository = FakeFCMSubscriberRepository(
+                    user.subscriptions.toMutableList()
+                )
+            )
+            modifyAccountViewmodel.saveUserChanges(
+                isDifferentEmail = true,
+                isDifferentImage = true,
+                user = user,
+                currentPassword = userPwd,
+                updatedPassword = "123456",
+                shouldUpdateNotificationArea = true,
+                previousNotificationArea = user.subscriptions[0].topic,
+                updatedNotificationArea = "SPAINSEVILLE"
+            )
+            modifyAccountViewmodel.uiState.test {
+                assertTrue { awaitItem() is UiState.Idle }
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Success }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given a registered user_when that user modifies their account without changing the rescue event subscription_then the account is updated`() =
+        runTest {
+            val modifyAccountViewmodel = getModifyAccountViewmodel(
+                authRepository = FakeAuthRepository(
+                    authUser = authUser,
+                    authEmail = user.email,
+                    authPassword = userPwd
+                ),
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
+                    mutableListOf(user.toData())
+                ),
+                storageRepository = FakeStorageRepository(
+                    remoteDatasourceList = mutableListOf(
+                        Pair("${Section.USERS.path}/${user.uid}", user.image)
+                    ),
+                    localDatasourceList = mutableListOf(
+                        Pair(
+                            "local_path",
+                            user.image
+                        )
+                    )
+                ),
+                localUserRepository = FakeLocalUserRepository(
+                    mutableListOf(
+                        userWithAllSubscriptionData
+                    )
+                ),
+                fCMSubscriberRepository = FakeFCMSubscriberRepository(
+                    user.subscriptions.toMutableList()
+                )
+            )
+            modifyAccountViewmodel.saveUserChanges(
+                isDifferentEmail = true,
+                isDifferentImage = true,
+                user = user,
+                currentPassword = userPwd,
+                updatedPassword = "123456",
+                shouldUpdateNotificationArea = true,
+                previousNotificationArea = user.subscriptions[0].topic,
+                updatedNotificationArea = user.subscriptions[0].topic
+            )
+            modifyAccountViewmodel.uiState.test {
+                assertTrue { awaitItem() is UiState.Idle }
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Success }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given a registered user_when that user modifies their account deleting the current rescue event subscription_then the account is updated`() =
+        runTest {
+            val modifyAccountViewmodel = getModifyAccountViewmodel(
+                authRepository = FakeAuthRepository(
+                    authUser = authUser,
+                    authEmail = user.email,
+                    authPassword = userPwd
+                ),
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
+                    mutableListOf(user.toData())
+                ),
+                storageRepository = FakeStorageRepository(
+                    remoteDatasourceList = mutableListOf(
+                        Pair("${Section.USERS.path}/${user.uid}", user.image)
+                    ),
+                    localDatasourceList = mutableListOf(
+                        Pair(
+                            "local_path",
+                            user.image
+                        )
+                    )
+                ),
+                localUserRepository = FakeLocalUserRepository(
+                    mutableListOf(
+                        userWithAllSubscriptionData
+                    )
+                ),
+                fCMSubscriberRepository = FakeFCMSubscriberRepository(
+                    user.subscriptions.toMutableList()
+                )
+            )
+            modifyAccountViewmodel.saveUserChanges(
+                isDifferentEmail = true,
+                isDifferentImage = true,
+                user = user,
+                currentPassword = userPwd,
+                updatedPassword = "123456",
+                shouldUpdateNotificationArea = false,
+                previousNotificationArea = user.subscriptions[0].topic,
+                updatedNotificationArea = "UNSELECTEDUNSELECTED"
+            )
+            modifyAccountViewmodel.uiState.test {
+                assertTrue { awaitItem() is UiState.Idle }
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Success }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given a registered user_when that user modifies their account updating the current rescue event subscription_then the account is updated`() =
+        runTest {
+            val modifyAccountViewmodel = getModifyAccountViewmodel(
+                authRepository = FakeAuthRepository(
+                    authUser = authUser,
+                    authEmail = user.email,
+                    authPassword = userPwd
+                ),
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
+                    mutableListOf(user.toData())
+                ),
+                storageRepository = FakeStorageRepository(
+                    remoteDatasourceList = mutableListOf(
+                        Pair("${Section.USERS.path}/${user.uid}", user.image)
+                    ),
+                    localDatasourceList = mutableListOf(
+                        Pair(
+                            "local_path",
+                            user.image
+                        )
+                    )
+                ),
+                localUserRepository = FakeLocalUserRepository(
+                    mutableListOf(
+                        userWithAllSubscriptionData
+                    )
+                ),
+                fCMSubscriberRepository = FakeFCMSubscriberRepository(
+                    mutableListOf(user.subscriptions[0])
+                )
+            )
+            modifyAccountViewmodel.saveUserChanges(
+                isDifferentEmail = true,
+                isDifferentImage = true,
+                user = user,
+                currentPassword = userPwd,
+                updatedPassword = "123456",
+                shouldUpdateNotificationArea = true,
+                previousNotificationArea = user.subscriptions[0].topic,
+                updatedNotificationArea = "SPAINSEVILLE"
+            )
+            modifyAccountViewmodel.uiState.test {
+                assertTrue { awaitItem() is UiState.Idle }
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Success }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given a registered user_when that user modifies their email but the app fails_then it displays an error`() =
+        runTest {
+            val modifyAccountViewmodel = getModifyAccountViewmodel()
+            modifyAccountViewmodel.saveUserChanges(
+                isDifferentEmail = true,
+                isDifferentImage = true,
+                user = user,
+                currentPassword = userPwd,
+                updatedPassword = "123456",
+                shouldUpdateNotificationArea = false,
+                previousNotificationArea = user.subscriptions[0].topic,
+                updatedNotificationArea = user.subscriptions[0].topic
+            )
+            modifyAccountViewmodel.uiState.test {
+                assertTrue { awaitItem() is UiState.Idle }
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Error }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given a registered user_when that user modifies their password but the app fails_then it displays an error`() =
+        runTest {
+            val modifyAccountViewmodel = getModifyAccountViewmodel()
+            modifyAccountViewmodel.saveUserChanges(
+                isDifferentEmail = false,
+                isDifferentImage = true,
+                user = user,
+                currentPassword = userPwd,
+                updatedPassword = "123456",
+                shouldUpdateNotificationArea = false,
+                previousNotificationArea = user.subscriptions[0].topic,
+                updatedNotificationArea = user.subscriptions[0].topic
+            )
+            modifyAccountViewmodel.uiState.test {
+                assertTrue { awaitItem() is UiState.Idle }
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Error }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given a registered user_when that user modifies their account but the remote data source fails to delete their avatar_then the app displays an error`() =
+        runTest {
+            val modifyAccountViewmodel = getModifyAccountViewmodel(
+                authRepository = FakeAuthRepository(
+                    authUser = authUser,
+                    authEmail = user.email,
+                    authPassword = userPwd
+                ),
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
+                    mutableListOf(user.toData())
+                )
+            )
+            modifyAccountViewmodel.saveUserChanges(
+                isDifferentEmail = true,
+                isDifferentImage = true,
+                user = user,
+                currentPassword = userPwd,
+                updatedPassword = "123456",
+                shouldUpdateNotificationArea = false,
+                previousNotificationArea = user.subscriptions[0].topic,
+                updatedNotificationArea = user.subscriptions[0].topic
+            )
+            modifyAccountViewmodel.uiState.test {
+                assertTrue { awaitItem() is UiState.Idle }
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Error }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given a registered user_when that user modifies their account but the local data source fails to delete their avatar_then the app displays an error`() =
+        runTest {
+            val modifyAccountViewmodel = getModifyAccountViewmodel(
+                authRepository = FakeAuthRepository(
+                    authUser = authUser,
+                    authEmail = user.email,
+                    authPassword = userPwd
+                ),
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
+                    mutableListOf(user.toData())
+                ),
+                storageRepository = FakeStorageRepository(
+                    remoteDatasourceList = mutableListOf(
+                        Pair("${Section.USERS.path}/${user.uid}", user.image)
+                    )
+                ),
+                localUserRepository = FakeLocalUserRepository(
+                    mutableListOf(
+                        userWithAllSubscriptionData
+                    )
+                )
+            )
+            modifyAccountViewmodel.saveUserChanges(
+                isDifferentEmail = true,
+                isDifferentImage = true,
+                user = user,
+                currentPassword = userPwd,
+                updatedPassword = "123456",
+                shouldUpdateNotificationArea = false,
+                previousNotificationArea = user.subscriptions[0].topic,
+                updatedNotificationArea = user.subscriptions[0].topic
+            )
+            modifyAccountViewmodel.uiState.test {
+                assertTrue { awaitItem() is UiState.Idle }
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Error }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given a registered user_when that user modifies their account with an empty avatar_then the account is updated`() =
+        runTest {
+            val user = user.copy(image = "")
+            val modifyAccountViewmodel = getModifyAccountViewmodel(
+                authRepository = FakeAuthRepository(
+                    authUser = authUser.copy(photoUrl = user.image),
+                    authEmail = user.email,
+                    authPassword = userPwd
+                ),
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
+                    mutableListOf(user.toData())
+                ),
+                localUserRepository = FakeLocalUserRepository(
+                    mutableListOf(
+                        userWithAllSubscriptionData
+                    )
+                )
+            )
+            modifyAccountViewmodel.saveUserChanges(
+                isDifferentEmail = true,
+                isDifferentImage = false,
+                user = user,
+                currentPassword = userPwd,
+                updatedPassword = "123456",
+                shouldUpdateNotificationArea = false,
+                previousNotificationArea = user.subscriptions[0].topic,
+                updatedNotificationArea = user.subscriptions[0].topic
+            )
+            modifyAccountViewmodel.uiState.test {
+                assertTrue { awaitItem() is UiState.Idle }
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Success }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given a registered user_when that user modifies their account but the local repository fails_then it displays an error`() =
+        runTest {
+            val modifyAccountViewmodel = getModifyAccountViewmodel(
+                authRepository = FakeAuthRepository(
+                    authUser = authUser.copy(photoUrl = user.image),
+                    authEmail = user.email,
+                    authPassword = userPwd
+                ),
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
+                    mutableListOf(user.toData())
+                )
+            )
+            modifyAccountViewmodel.saveUserChanges(
+                isDifferentEmail = false,
+                isDifferentImage = false,
+                user = user,
+                currentPassword = userPwd,
+                shouldUpdateNotificationArea = false,
+                previousNotificationArea = user.subscriptions[0].topic,
+                updatedNotificationArea = user.subscriptions[0].topic
+            )
+            modifyAccountViewmodel.uiState.test {
+                assertTrue { awaitItem() is UiState.Idle }
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Error }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `given a registered user_when that user logs out_then the user cache is modified`() =
+        runTest {
+            val fakeLocalCacheRepository = FakeLocalCacheRepository(
+                mutableListOf(
+                    localCache.copy(section = Section.USERS).toEntity()
+                )
+            )
+
+            val modifyAccountViewmodel = getModifyAccountViewmodel(
+                authRepository = FakeAuthRepository(
+                    authUser = authUser.copy(photoUrl = user.image),
+                    authEmail = user.email,
+                    authPassword = userPwd
+                ),
+                localUserRepository = FakeLocalUserRepository(
+                    mutableListOf(userWithAllSubscriptionData)
+                ),
+                localCacheRepository = fakeLocalCacheRepository
+            )
+            modifyAccountViewmodel.logOut()
+
+            runCurrent()
+
+            val actualFakeLocalCacheEntity =
+                fakeLocalCacheRepository.getLocalCacheEntity(user.uid, Section.USERS)
+
+            assertNotEquals(localCache.toEntity(), actualFakeLocalCacheEntity)
+        }
+
+    @Test
+    fun `given an image to discard_when the user clicks on the delete button_then the image is discarded`() =
+        runTest {
+            val storageRepository = FakeStorageRepository(
+                localDatasourceList = mutableListOf(
+                    Pair(
+                        "local_path",
+                        user.image
+                    )
+                )
+            )
+            val modifyAccountViewmodel = getModifyAccountViewmodel(
+                storageRepository = storageRepository
+            )
+            modifyAccountViewmodel.deleteLocalImage(user.image)
+
+            assertTrue { storageRepository.localDatasourceList.isEmpty() }
+        }
+}

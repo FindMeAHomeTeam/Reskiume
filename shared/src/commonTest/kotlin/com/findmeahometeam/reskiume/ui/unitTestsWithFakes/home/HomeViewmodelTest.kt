@@ -1,0 +1,72 @@
+package com.findmeahometeam.reskiume.ui.unitTestsWithFakes.home
+
+import app.cash.turbine.test
+import com.findmeahometeam.reskiume.CoroutineTestDispatcher
+import com.findmeahometeam.reskiume.authUser
+import com.findmeahometeam.reskiume.data.util.log.Log
+import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
+import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
+import com.findmeahometeam.reskiume.ui.core.components.UiState
+import com.findmeahometeam.reskiume.ui.home.HomeViewmodel
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeAuthRepository
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeLocalUserRepository
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeLog
+import com.findmeahometeam.reskiume.userWithAllSubscriptionData
+import kotlinx.coroutines.test.runTest
+import kotlin.test.Test
+import kotlin.test.assertTrue
+
+class HomeViewmodelTest : CoroutineTestDispatcher() {
+
+    private val log: Log = FakeLog()
+
+    private fun getHomeViewmodel(
+        authRepository: AuthRepository = FakeAuthRepository(),
+        localUserRepository: LocalUserRepository = FakeLocalUserRepository()
+    ): HomeViewmodel {
+        val observeAuthStateInAuthDataSource = ObserveAuthStateInAuthDataSource(authRepository)
+        val getUserFromLocalDataSource = GetUserFromLocalDataSource(localUserRepository)
+        return HomeViewmodel(
+            observeAuthStateInAuthDataSource,
+            log,
+            getUserFromLocalDataSource
+        )
+    }
+
+    @Test
+    fun `given a registered user_when the user opens the app_then that user can see the chats section`() =
+        runTest {
+            val authRepository: AuthRepository = FakeAuthRepository(authUser = authUser)
+            val localUserRepository: LocalUserRepository =
+                FakeLocalUserRepository(mutableListOf(userWithAllSubscriptionData))
+            getHomeViewmodel(authRepository, localUserRepository).userState.test {
+                assertTrue { awaitItem() is UiState.Success }
+                awaitComplete()
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given a registered user on auth but not on the local data source_when the user opens the app_then that user will see the default sections`() =
+        runTest {
+            val authRepository: AuthRepository =
+                FakeAuthRepository(authUser = authUser.copy(uid = "wrongUid"))
+            getHomeViewmodel(authRepository).userState.test {
+                assertTrue { awaitItem() is UiState.Idle }
+                awaitComplete()
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given an unregistered user_when the user opens the app_then that user will see the default sections`() =
+        runTest {
+            getHomeViewmodel().userState.test {
+                assertTrue { awaitItem() is UiState.Idle }
+                awaitComplete()
+                ensureAllEventsConsumed()
+            }
+        }
+}

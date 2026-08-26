@@ -1,0 +1,54 @@
+package com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes
+
+import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
+import com.findmeahometeam.reskiume.data.remote.response.remoterUser.RemoteUser
+import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
+
+class FakeRealtimeDatabaseRemoteUserRepository(
+    private val remoteUserList: MutableList<RemoteUser> = mutableListOf()
+) : RealtimeDatabaseRemoteUserRepository {
+
+    override suspend fun insertRemoteUser(
+        remoteUser: RemoteUser,
+        onInsertRemoteUser: (result: DatabaseResult) -> Unit
+    ) {
+        val storedRemoteUser = remoteUserList.firstOrNull{ it.uid == remoteUser.uid }
+        if (storedRemoteUser == null) {
+            remoteUserList.add(remoteUser)
+            onInsertRemoteUser(DatabaseResult.Success)
+        } else {
+            onInsertRemoteUser(DatabaseResult.Error("User already exists"))
+        }
+    }
+
+    override fun getRemoteUser(uid: String): Flow<RemoteUser?> =
+        flowOf(remoteUserList.firstOrNull{ it.uid == uid })
+
+    override suspend fun updateRemoteUser(
+        remoteUser: RemoteUser,
+        onUpdateRemoteUser: (result: DatabaseResult) -> Unit
+    ) {
+        val user = remoteUserList.firstOrNull{ it.uid == remoteUser.uid }
+        if (user == null) {
+            onUpdateRemoteUser(DatabaseResult.Error("User not found"))
+        } else {
+            remoteUserList[remoteUserList.indexOf(user)] = remoteUser
+            onUpdateRemoteUser(DatabaseResult.Success)
+        }
+    }
+
+    override fun deleteRemoteUser(
+        uid: String,
+        onDeleteRemoteUser: (result: DatabaseResult) -> Unit
+    ) {
+        val remoteUser = remoteUserList.firstOrNull{ it.uid == uid }
+        if (remoteUser == null) {
+            onDeleteRemoteUser(DatabaseResult.Error("User not deleted"))
+        } else {
+            remoteUserList.remove(remoteUser)
+            onDeleteRemoteUser(DatabaseResult.Success)
+        }
+    }
+}

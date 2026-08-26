@@ -1,0 +1,417 @@
+package com.findmeahometeam.reskiume.ui.unitTestsWithFakes.profile
+
+import app.cash.turbine.test
+import com.findmeahometeam.reskiume.CoroutineTestDispatcher
+import com.findmeahometeam.reskiume.authUser
+import com.findmeahometeam.reskiume.author
+import com.findmeahometeam.reskiume.data.util.Section
+import com.findmeahometeam.reskiume.data.util.log.Log
+import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalReviewRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteReview.RealtimeDatabaseRemoteReviewRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteUser.RealtimeDatabaseRemoteUserRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
+import com.findmeahometeam.reskiume.domain.repository.util.fcm.FCMSubscriberRepository
+import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
+import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.review.GetReviewsFromRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.review.InsertReviewInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInLocalDataSource
+import com.findmeahometeam.reskiume.localCache
+import com.findmeahometeam.reskiume.review
+import com.findmeahometeam.reskiume.ui.core.components.UiState
+import com.findmeahometeam.reskiume.ui.core.navigation.CheckAllReviews
+import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeAuthRepository
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeFCMSubscriberRepository
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeKonnectivity
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeLocalCacheRepository
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeLocalReviewRepository
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeLocalUserRepository
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeLog
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeManageImagePath
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeRealtimeDatabaseRemoteReviewRepository
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeRealtimeDatabaseRemoteUserRepository
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeSaveStateHandleProvider
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeStorageRepository
+import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckActivistUtilImpl
+import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckAllReviewsViewmodel
+import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsUtilImpl
+import com.findmeahometeam.reskiume.ui.util.ManageImagePath
+import com.findmeahometeam.reskiume.userPwd
+import com.findmeahometeam.reskiume.userWithAllSubscriptionData
+import com.plusmobileapps.konnectivity.Konnectivity
+import kotlinx.coroutines.test.runTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
+
+class CheckReviewsViewmodelTest : CoroutineTestDispatcher() {
+
+    private fun getCheckReviewsViewmodel(
+        saveStateHandleProvider: SaveStateHandleProvider = FakeSaveStateHandleProvider(),
+        authRepository: AuthRepository = FakeAuthRepository(),
+        localCacheRepository: LocalCacheRepository = FakeLocalCacheRepository(),
+        log: Log = FakeLog(),
+        realtimeDatabaseRemoteReviewRepository: RealtimeDatabaseRemoteReviewRepository = FakeRealtimeDatabaseRemoteReviewRepository(),
+        localReviewRepository: LocalReviewRepository = FakeLocalReviewRepository(),
+        localUserRepository: LocalUserRepository = FakeLocalUserRepository(),
+        realtimeDatabaseRemoteUserRepository: RealtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(),
+        storageRepository: StorageRepository = FakeStorageRepository(),
+        konnectivity: Konnectivity = FakeKonnectivity(),
+        manageImagePath: ManageImagePath = FakeManageImagePath(),
+        fcmSubscriberRepository: FCMSubscriberRepository = FakeFCMSubscriberRepository()
+    ): CheckAllReviewsViewmodel {
+
+        val observeAuthStateInAuthDataSource =
+            ObserveAuthStateInAuthDataSource(authRepository)
+
+        val getDataByManagingObjectLocalCacheTimestamp =
+            GetDataByManagingObjectLocalCacheTimestamp(localCacheRepository, log, konnectivity)
+
+        val getReviewsFromRemoteRepository =
+            GetReviewsFromRemoteRepository(realtimeDatabaseRemoteReviewRepository)
+
+        val getReviewsFromLocalRepository =
+            GetReviewsFromLocalRepository(localReviewRepository)
+
+        val insertReviewInLocalRepository =
+            InsertReviewInLocalRepository(localReviewRepository, authRepository)
+
+        val getUserFromRemoteDataSource =
+            GetUserFromRemoteDataSource(realtimeDatabaseRemoteUserRepository)
+
+        val getUserFromLocalDataSource =
+            GetUserFromLocalDataSource(localUserRepository)
+
+        val downloadImageToLocalDataSource =
+            DownloadImageToLocalDataSource(storageRepository)
+
+        val insertUserInLocalDataSource =
+            InsertUserInLocalDataSource(
+                authRepository,
+                manageImagePath,
+                localUserRepository,
+                fcmSubscriberRepository,
+                log
+            )
+
+        val modifyUserInLocalDataSource =
+            ModifyUserInLocalDataSource(
+                manageImagePath,
+                fcmSubscriberRepository,
+                localUserRepository,
+                authRepository,
+                log
+            )
+
+        val getImagePathForFileNameFromLocalDataSource =
+            GetImagePathForFileNameFromLocalDataSource(manageImagePath)
+
+        val checkActivistUtil = CheckActivistUtilImpl(
+            getDataByManagingObjectLocalCacheTimestamp,
+            getUserFromRemoteDataSource,
+            getUserFromLocalDataSource,
+            downloadImageToLocalDataSource,
+            insertUserInLocalDataSource,
+            modifyUserInLocalDataSource,
+            getImagePathForFileNameFromLocalDataSource,
+            log
+        )
+
+        val checkReviewsUtilImpl = CheckReviewsUtilImpl(
+            observeAuthStateInAuthDataSource,
+            getDataByManagingObjectLocalCacheTimestamp,
+            getReviewsFromRemoteRepository,
+            getReviewsFromLocalRepository,
+            insertReviewInLocalRepository,
+            checkActivistUtil,
+            log
+        )
+
+        return CheckAllReviewsViewmodel(
+            saveStateHandleProvider,
+            checkReviewsUtilImpl,
+            observeAuthStateInAuthDataSource,
+            checkActivistUtil
+        )
+    }
+
+    @Test
+    fun `given a registered user_when the user opens their reviews section_then their profile is not displayed`() =
+        runTest {
+            getCheckReviewsViewmodel(
+                authRepository = FakeAuthRepository(authUser = authUser)
+            ).userDataIfNotMine.test {
+                assertEquals(null, awaitItem())
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given a user with empty cache_when the user clicks on a review_then the reviewed user profile is saved in local cache and displayed`() =
+        runTest {
+            getCheckReviewsViewmodel(
+                saveStateHandleProvider = FakeSaveStateHandleProvider(CheckAllReviews(author.uid)),
+                authRepository = FakeAuthRepository(
+                    authUser = authUser,
+                    authEmail = authUser.email,
+                    authPassword = userPwd
+                ),
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
+                    remoteUserList = mutableListOf(author.toData())
+                )
+            ).userDataIfNotMine.test {
+                assertEquals(null, awaitItem())
+                assertEquals(author.copy(savedBy = "", email = null), awaitItem())
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given a user with empty cache and no avatar_when the user clicks on a review but have an error saving the reviewed user locally_then the reviewed user profile is displayed but not saved in local cache`() =
+        runTest {
+            getCheckReviewsViewmodel(
+                saveStateHandleProvider = FakeSaveStateHandleProvider(CheckAllReviews(author.uid)),
+                authRepository = FakeAuthRepository(
+                    authUser = authUser,
+                    authEmail = authUser.email,
+                    authPassword = userPwd
+                ),
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
+                    remoteUserList = mutableListOf(author.copy(image = "").toData())
+                ),
+                localUserRepository = FakeLocalUserRepository(
+                    mutableListOf(
+                        userWithAllSubscriptionData.copy(
+                            userEntity = author.copy(image = "").toEntity()
+                        )
+                    )
+                )
+            ).userDataIfNotMine.test {
+                assertEquals(null, awaitItem())
+                assertEquals(author.copy(image = "", savedBy = "", email = null), awaitItem())
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given a user with an old local cache_when the user clicks on a review_then the reviewed user profile is modified in local cache and displayed`() =
+        runTest {
+            getCheckReviewsViewmodel(
+                saveStateHandleProvider = FakeSaveStateHandleProvider(CheckAllReviews(author.uid)),
+                authRepository = FakeAuthRepository(
+                    authUser = authUser,
+                    authEmail = authUser.email,
+                    authPassword = userPwd
+                ),
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
+                    remoteUserList = mutableListOf(author.toData())
+                ),
+                localUserRepository = FakeLocalUserRepository(
+                    mutableListOf(
+                        userWithAllSubscriptionData.copy(userEntity = author.toEntity())
+                    )
+                ),
+                localCacheRepository = FakeLocalCacheRepository(
+                    localCacheList = mutableListOf(
+                        localCache.copy(
+                            cachedObjectId = author.uid,
+                            section = Section.USERS,
+                            timestamp = 123L
+                        ).toEntity()
+                    )
+                )
+            ).userDataIfNotMine.test {
+                assertEquals(null, awaitItem())
+                assertEquals(author.copy(savedBy = "", email = null), awaitItem())
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given a user with an outdated local cache and no avatar_when the user clicks on a review but there is an error modifying the retrieved user locally_then the reviewed user is displayed but not modified`() =
+        runTest {
+            getCheckReviewsViewmodel(
+                saveStateHandleProvider = FakeSaveStateHandleProvider(CheckAllReviews(author.uid)),
+                authRepository = FakeAuthRepository(
+                    authUser = authUser,
+                    authEmail = authUser.email,
+                    authPassword = userPwd
+                ),
+                realtimeDatabaseRemoteUserRepository = FakeRealtimeDatabaseRemoteUserRepository(
+                    remoteUserList = mutableListOf(author.copy(image = "").toData())
+                ),
+                localCacheRepository = FakeLocalCacheRepository(
+                    localCacheList = mutableListOf(
+                        localCache.copy(
+                            cachedObjectId = author.uid,
+                            section = Section.USERS,
+                            timestamp = 123L
+                        ).toEntity()
+                    )
+                )
+            ).userDataIfNotMine.test {
+                assertEquals(null, awaitItem())
+                assertEquals(author.copy(image = "", savedBy = "", email = null), awaitItem())
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given a user with recent local cache_when the user clicks on a review_then the reviewed user profile is retrieved from local cache and displayed`() =
+        runTest {
+            getCheckReviewsViewmodel(
+                saveStateHandleProvider = FakeSaveStateHandleProvider(CheckAllReviews(author.uid)),
+                authRepository = FakeAuthRepository(
+                    authUser = authUser,
+                    authEmail = authUser.email,
+                    authPassword = userPwd
+                ),
+                localUserRepository = FakeLocalUserRepository(
+                    localUserWithAllSubscriptionDataList = mutableListOf(
+                        userWithAllSubscriptionData.copy(
+                            userEntity = author.toEntity(),
+                            allSubscriptions = emptyList()
+                        )
+                    )
+                ),
+                localCacheRepository = FakeLocalCacheRepository(
+                    localCacheList = mutableListOf(
+                        localCache.copy(
+                            cachedObjectId = author.uid,
+                            section = Section.USERS
+                        ).toEntity()
+                    )
+                )
+            ).userDataIfNotMine.test {
+                assertEquals(null, awaitItem())
+                assertEquals(author.copy(email = null), awaitItem())
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given a registered user with an empty cache_when the user opens the reviews section_then that user will see the review section populated`() =
+        runTest {
+            getCheckReviewsViewmodel(
+                authRepository = FakeAuthRepository(
+                    authUser = authUser,
+                    authEmail = authUser.email,
+                    authPassword = userPwd
+                ),
+                realtimeDatabaseRemoteReviewRepository = FakeRealtimeDatabaseRemoteReviewRepository(
+                    remoteReviews = mutableListOf(review.toData())
+                ),
+                localCacheRepository = FakeLocalCacheRepository(
+                    localCacheList = mutableListOf(
+                        localCache.copy(
+                            section = Section.USERS
+                        ).toEntity(),
+                        localCache.copy(
+                            cachedObjectId = author.uid,
+                            section = Section.USERS
+                        ).toEntity()
+                    )
+                ),
+                localUserRepository = FakeLocalUserRepository(
+                    localUserWithAllSubscriptionDataList = mutableListOf(
+                        userWithAllSubscriptionData.copy(
+                            userEntity = author.toEntity()
+                        )
+                    )
+                )
+            ).reviewListState.test {
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Success }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given a registered user with an outdated cache_when the user opens the reviews section but there is an error inserting reviews in local repository_then the review section is populated but not updated`() =
+        runTest {
+            getCheckReviewsViewmodel(
+                authRepository = FakeAuthRepository(
+                    authUser = authUser,
+                    authEmail = authUser.email,
+                    authPassword = userPwd
+                ),
+                realtimeDatabaseRemoteReviewRepository = FakeRealtimeDatabaseRemoteReviewRepository(
+                    remoteReviews = mutableListOf(review.toData())
+                ),
+                localReviewRepository = FakeLocalReviewRepository(
+                    reviews = mutableListOf(review.toEntity())
+                ),
+                localCacheRepository = FakeLocalCacheRepository(
+                    localCacheList = mutableListOf(
+                        localCache.copy(
+                            section = Section.USERS,
+                            timestamp = 123L
+                        ).toEntity(),
+                        localCache.copy(
+                            cachedObjectId = author.uid,
+                            section = Section.USERS
+                        ).toEntity()
+                    )
+                ),
+                localUserRepository = FakeLocalUserRepository(
+                    localUserWithAllSubscriptionDataList = mutableListOf(
+                        userWithAllSubscriptionData.copy(
+                            userEntity = author.toEntity()
+                        )
+                    )
+                )
+            ).reviewListState.test {
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Success }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given a registered user with recent cache_when the user opens the reviews section_then the user will see them`() =
+        runTest {
+            getCheckReviewsViewmodel(
+                authRepository = FakeAuthRepository(
+                    authUser = authUser,
+                    authEmail = authUser.email,
+                    authPassword = userPwd
+                ),
+                localReviewRepository = FakeLocalReviewRepository(
+                    reviews = mutableListOf(review.toEntity())
+                ),
+                localCacheRepository = FakeLocalCacheRepository(
+                    localCacheList = mutableListOf(
+                        localCache.toEntity(),
+                        localCache.copy(
+                            section = Section.USERS
+                        ).toEntity(),
+                        localCache.copy(
+                            cachedObjectId = author.uid,
+                            section = Section.USERS
+                        ).toEntity()
+                    )
+                ),
+                localUserRepository = FakeLocalUserRepository(
+                    localUserWithAllSubscriptionDataList = mutableListOf(
+                        userWithAllSubscriptionData.copy(
+                            userEntity = author.toEntity()
+                        )
+                    )
+                )
+            ).reviewListState.test {
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Success }
+                ensureAllEventsConsumed()
+            }
+        }
+}

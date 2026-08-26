@@ -1,0 +1,396 @@
+package com.findmeahometeam.reskiume.ui.unitTestsWithFakes.rescueEvents
+
+import app.cash.turbine.test
+import com.findmeahometeam.reskiume.CoroutineTestDispatcher
+import com.findmeahometeam.reskiume.authUser
+import com.findmeahometeam.reskiume.data.util.Section
+import com.findmeahometeam.reskiume.data.util.log.Log
+import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalChatRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalRescueEventRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.chat.FireStoreRemoteChatRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteRescueEvent.FireStoreRemoteRescueEventRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
+import com.findmeahometeam.reskiume.domain.repository.util.location.LocationRepository
+import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.chat.GetNonHumanAnimalInfoInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.InsertChatInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.chat.InsertChatInRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.InsertRescueEventInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.InsertRescueEventInRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.util.location.GetLocationFromLocationRepository
+import com.findmeahometeam.reskiume.domain.usecases.util.location.ObserveIfLocationEnabledFromLocationRepository
+import com.findmeahometeam.reskiume.domain.usecases.util.location.RequestEnableLocationFromLocationRepository
+import com.findmeahometeam.reskiume.rescueEvent
+import com.findmeahometeam.reskiume.localCache
+import com.findmeahometeam.reskiume.nonHumanAnimal
+import com.findmeahometeam.reskiume.rescueEventWithAllNeedsAndNonHumanAnimalData
+import com.findmeahometeam.reskiume.ui.core.components.UiState
+import com.findmeahometeam.reskiume.ui.rescueEvents.createRescueEvent.CreateRescueEventViewmodel
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeAuthRepository
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeCheckNonHumanAnimalUtil
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeDeleteNonHumanAnimalUtil
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeFireStoreRemoteChatRepository
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeFireStoreRemoteRescueEventRepository
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeLocalCacheRepository
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeLocalChatRepository
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeLocalRescueEventRepository
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeLocalNonHumanAnimalRepository
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeLocalUserRepository
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeLocationRepository
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeLog
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeManageImagePath
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeRealtimeDatabaseRemoteNonHumanAnimalRepository
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeStorageRepository
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeStringProvider
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeSubscriptionManagerUtil
+import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
+import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.DeleteNonHumanAnimalUtil
+import com.findmeahometeam.reskiume.ui.util.ManageImagePath
+import com.findmeahometeam.reskiume.ui.util.StringProvider
+import com.findmeahometeam.reskiume.ui.util.fcm.SubscriptionManagerUtil
+import com.findmeahometeam.reskiume.user
+import com.findmeahometeam.reskiume.userPwd
+import com.findmeahometeam.reskiume.userWithAllSubscriptionData
+import kotlinx.coroutines.test.runTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
+
+class CreateRescueEventViewmodelTest : CoroutineTestDispatcher() {
+
+    @OptIn(ExperimentalTime::class)
+    private val createdRescueEventId = Clock.System.now().epochSeconds.toString() + user.uid
+
+    private fun getCreateRescueEventViewmodel(
+        localNonHumanAnimalRepository: LocalNonHumanAnimalRepository = FakeLocalNonHumanAnimalRepository(),
+        localChatRepository: LocalChatRepository = FakeLocalChatRepository(),
+        locationRepository: LocationRepository = FakeLocationRepository(
+            Pair(
+                rescueEvent.longitude,
+                rescueEvent.latitude
+            )
+        ),
+        storageRepository: StorageRepository = FakeStorageRepository(),
+        authRepository: AuthRepository = FakeAuthRepository(
+            authUser = authUser,
+            authEmail = user.email,
+            authPassword = userPwd
+        ),
+        deleteNonHumanAnimalUtil: DeleteNonHumanAnimalUtil = FakeDeleteNonHumanAnimalUtil(),
+        fireStoreRemoteRescueEventRepository: FireStoreRemoteRescueEventRepository = FakeFireStoreRemoteRescueEventRepository(),
+        realtimeDatabaseRemoteNonHumanAnimalRepository: RealtimeDatabaseRemoteNonHumanAnimalRepository = FakeRealtimeDatabaseRemoteNonHumanAnimalRepository(),
+        localRescueEventRepository: LocalRescueEventRepository = FakeLocalRescueEventRepository(),
+        localCacheRepository: LocalCacheRepository = FakeLocalCacheRepository(),
+        fireStoreRemoteChatRepository: FireStoreRemoteChatRepository = FakeFireStoreRemoteChatRepository(),
+        manageImagePath: ManageImagePath = FakeManageImagePath(),
+        checkNonHumanAnimalUtil: CheckNonHumanAnimalUtil = FakeCheckNonHumanAnimalUtil(
+            mutableListOf(nonHumanAnimal, nonHumanAnimal.copy(id = nonHumanAnimal.id + "second"))
+        ),
+        stringProvider: StringProvider = FakeStringProvider("Text to display"),
+        localUserRepository: LocalUserRepository = FakeLocalUserRepository(
+            mutableListOf(userWithAllSubscriptionData)
+        ),
+        subscriptionManagerUtil: SubscriptionManagerUtil = FakeSubscriptionManagerUtil(),
+        log: Log = FakeLog()
+    ): CreateRescueEventViewmodel {
+
+        val getAllNonHumanAnimalsFromLocalRepository =
+            GetAllNonHumanAnimalsFromLocalRepository(localNonHumanAnimalRepository)
+
+        val getNonHumanAnimalInfoInLocalRepository =
+            GetNonHumanAnimalInfoInLocalRepository(localChatRepository)
+
+        val observeIfLocationEnabledFromLocationRepository =
+            ObserveIfLocationEnabledFromLocationRepository(locationRepository)
+
+        val requestEnableLocationFromLocationRepository =
+            RequestEnableLocationFromLocationRepository(locationRepository)
+
+        val getLocationFromLocationRepository =
+            GetLocationFromLocationRepository(locationRepository)
+
+        val observeAuthStateInAuthDataSource =
+            ObserveAuthStateInAuthDataSource(authRepository)
+
+        val uploadImageToRemoteDataSource =
+            UploadImageToRemoteDataSource(storageRepository)
+
+        val insertRescueEventInRemoteRepository =
+            InsertRescueEventInRemoteRepository(
+                authRepository,
+                fireStoreRemoteRescueEventRepository,
+                realtimeDatabaseRemoteNonHumanAnimalRepository,
+                deleteNonHumanAnimalUtil,
+                log
+            )
+
+        val insertRescueEventInLocalRepository =
+            InsertRescueEventInLocalRepository(
+                checkNonHumanAnimalUtil,
+                localRescueEventRepository,
+                localNonHumanAnimalRepository,
+                manageImagePath,
+                authRepository,
+                log
+            )
+
+        val insertCacheInLocalRepository =
+            InsertCacheInLocalRepository(localCacheRepository)
+
+        val insertChatInRemoteRepository =
+            InsertChatInRemoteRepository(fireStoreRemoteChatRepository)
+
+        val insertChatInLocalRepository =
+            InsertChatInLocalRepository(
+                localChatRepository,
+                authRepository,
+                log
+            )
+
+        val getUserFromLocalDataSource =
+            GetUserFromLocalDataSource(localUserRepository)
+
+        val deleteImageFromLocalDataSource =
+            DeleteImageFromLocalDataSource(storageRepository)
+
+        return CreateRescueEventViewmodel(
+            getAllNonHumanAnimalsFromLocalRepository,
+            getNonHumanAnimalInfoInLocalRepository,
+            observeIfLocationEnabledFromLocationRepository,
+            requestEnableLocationFromLocationRepository,
+            getLocationFromLocationRepository,
+            observeAuthStateInAuthDataSource,
+            stringProvider,
+            uploadImageToRemoteDataSource,
+            insertRescueEventInRemoteRepository,
+            insertRescueEventInLocalRepository,
+            insertCacheInLocalRepository,
+            insertChatInRemoteRepository,
+            insertChatInLocalRepository,
+            getUserFromLocalDataSource,
+            subscriptionManagerUtil,
+            deleteImageFromLocalDataSource,
+            log
+        )
+    }
+
+    @Test
+    fun `given my rescue event to create_when I want to add non human animals to rescue_then rescue event list available non human animals`() =
+        runTest {
+            getCreateRescueEventViewmodel(
+                localNonHumanAnimalRepository = FakeLocalNonHumanAnimalRepository(
+                    mutableListOf(
+                        nonHumanAnimal.toEntity()
+                    )
+                )
+            ).allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow.test {
+                assertEquals(listOf(nonHumanAnimal), awaitItem())
+                awaitComplete()
+            }
+        }
+
+    @Test
+    fun `given my rescue event to create_when I add needs to cover and non human animals to rescue with my rescue event location_then I click to create my rescue event and subscribed to my subscriptions`() =
+        runTest {
+            val createRescueEventViewmodel = getCreateRescueEventViewmodel(
+                realtimeDatabaseRemoteNonHumanAnimalRepository = FakeRealtimeDatabaseRemoteNonHumanAnimalRepository(
+                    mutableListOf(
+                        nonHumanAnimal.toData(),
+                        nonHumanAnimal.copy(id = nonHumanAnimal.id + "second").toData()
+                    )
+                ),
+                localNonHumanAnimalRepository = FakeLocalNonHumanAnimalRepository(
+                    mutableListOf(
+                        nonHumanAnimal.toEntity(),
+                        nonHumanAnimal.copy(id = nonHumanAnimal.id + "second").toEntity()
+                    )
+                )
+            )
+
+            createRescueEventViewmodel.updateLocation()
+
+            createRescueEventViewmodel.createRescueEvent(rescueEvent)
+
+            createRescueEventViewmodel.saveChangesUiState.test {
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Success }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given my rescue event to create_when I add needs to cover and non human animals to rescue without my rescue event location_then an error is displayed`() =
+        runTest {
+            val createRescueEventViewmodel = getCreateRescueEventViewmodel(
+                stringProvider = FakeStringProvider("Please, turn on the location to get your position and try again"),
+                locationRepository = FakeLocationRepository(Pair(0.0, 0.0))
+            )
+
+            createRescueEventViewmodel.createRescueEvent(rescueEvent)
+
+            createRescueEventViewmodel.saveChangesUiState.test {
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Error }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given my rescue event to create_when I add my rescue event data but there is no rescue event image_then the rescue event is created and subscribed to my subscriptions`() =
+        runTest {
+            val createRescueEventViewmodel = getCreateRescueEventViewmodel(
+                realtimeDatabaseRemoteNonHumanAnimalRepository = FakeRealtimeDatabaseRemoteNonHumanAnimalRepository(
+                    mutableListOf(
+                        nonHumanAnimal.toData(),
+                        nonHumanAnimal.copy(id = nonHumanAnimal.id + "second").toData()
+                    )
+                ),
+                localNonHumanAnimalRepository = FakeLocalNonHumanAnimalRepository(
+                    mutableListOf(
+                        nonHumanAnimal.toEntity(),
+                        nonHumanAnimal.copy(id = nonHumanAnimal.id + "second").toEntity()
+                    )
+                )
+            )
+
+            createRescueEventViewmodel.updateLocation()
+
+            createRescueEventViewmodel.createRescueEvent(rescueEvent.copy(imageUrl = ""))
+
+            createRescueEventViewmodel.saveChangesUiState.test {
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Success }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given my rescue event to create_when I add my rescue event data but fails creating the rescue event in the remote repo_then the app retrieves an error`() =
+        runTest {
+            val createRescueEventViewmodel = getCreateRescueEventViewmodel(
+                realtimeDatabaseRemoteNonHumanAnimalRepository = FakeRealtimeDatabaseRemoteNonHumanAnimalRepository(
+                    mutableListOf(
+                        nonHumanAnimal.toData(),
+                        nonHumanAnimal.copy(id = nonHumanAnimal.id + "second").toData()
+                    )
+                ),
+                fireStoreRemoteRescueEventRepository = FakeFireStoreRemoteRescueEventRepository(
+                    remoteRescueEventList = mutableListOf(
+                        rescueEvent.copy(id = createdRescueEventId).toData()
+                    )
+                )
+            )
+
+            createRescueEventViewmodel.updateLocation()
+
+            createRescueEventViewmodel.createRescueEvent(rescueEvent)
+
+            createRescueEventViewmodel.saveChangesUiState.test {
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Error }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given my rescue event to create_when I add my rescue event data but fails creating the rescue event in the local repo_then the app retrieves an error`() =
+        runTest {
+            val createRescueEventViewmodel = getCreateRescueEventViewmodel(
+                realtimeDatabaseRemoteNonHumanAnimalRepository = FakeRealtimeDatabaseRemoteNonHumanAnimalRepository(
+                    mutableListOf(
+                        nonHumanAnimal.toData(),
+                        nonHumanAnimal.copy(id = nonHumanAnimal.id + "second").toData()
+                    )
+                ),
+                localNonHumanAnimalRepository = FakeLocalNonHumanAnimalRepository(
+                    mutableListOf(
+                        nonHumanAnimal.toEntity(),
+                        nonHumanAnimal.copy(id = nonHumanAnimal.id + "second").toEntity()
+                    )
+                ),
+                localRescueEventRepository = FakeLocalRescueEventRepository(
+                    localRescueEventWithAllNeedsAndNonHumanAnimalDataList = mutableListOf(
+                        rescueEventWithAllNeedsAndNonHumanAnimalData
+                    )
+                )
+            )
+
+            createRescueEventViewmodel.updateLocation()
+
+            createRescueEventViewmodel.createRescueEvent(rescueEvent)
+
+            createRescueEventViewmodel.saveChangesUiState.test {
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Error }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given my rescue event to create_when I add my rescue event data but fails inserting the rescue event cache_then the rescue event is created and subscribed to my subscriptions`() =
+        runTest {
+            val createRescueEventViewmodel = getCreateRescueEventViewmodel(
+                realtimeDatabaseRemoteNonHumanAnimalRepository = FakeRealtimeDatabaseRemoteNonHumanAnimalRepository(
+                    mutableListOf(
+                        nonHumanAnimal.toData(),
+                        nonHumanAnimal.copy(id = nonHumanAnimal.id + "second").toData()
+                    )
+                ),
+                localNonHumanAnimalRepository = FakeLocalNonHumanAnimalRepository(
+                    mutableListOf(
+                        nonHumanAnimal.toEntity(),
+                        nonHumanAnimal.copy(id = nonHumanAnimal.id + "second").toEntity()
+                    )
+                ),
+                localCacheRepository = FakeLocalCacheRepository(
+                    localCacheList = mutableListOf(
+                        localCache.copy(
+                            cachedObjectId = createdRescueEventId,
+                            section = Section.RESCUE_EVENTS
+                        ).toEntity()
+                    )
+                )
+            )
+
+            createRescueEventViewmodel.updateLocation()
+
+            createRescueEventViewmodel.createRescueEvent(rescueEvent)
+
+            createRescueEventViewmodel.saveChangesUiState.test {
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Success }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given an image to discard_when the user clicks on the delete button_then the image is discarded`() =
+        runTest {
+            val storageRepository = FakeStorageRepository(
+                localDatasourceList = mutableListOf(
+                    Pair(
+                        "local_path",
+                        rescueEvent.imageUrl
+                    )
+                )
+            )
+            val createRescueEventViewmodel = getCreateRescueEventViewmodel(
+                storageRepository = storageRepository
+            )
+            createRescueEventViewmodel.deleteLocalImage(rescueEvent.imageUrl)
+
+            assertTrue { storageRepository.localDatasourceList.isEmpty() }
+        }
+}

@@ -1,0 +1,352 @@
+package com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fosterHomes
+
+import app.cash.turbine.test
+import com.findmeahometeam.reskiume.CoroutineTestDispatcher
+import com.findmeahometeam.reskiume.authUser
+import com.findmeahometeam.reskiume.data.util.Section
+import com.findmeahometeam.reskiume.data.util.log.Log
+import com.findmeahometeam.reskiume.domain.repository.local.LocalCacheRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalChatRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalFosterHomeRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
+import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.database.remoteNonHumanAnimal.RealtimeDatabaseRemoteNonHumanAnimalRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.fireStore.remoteFosterHome.FireStoreRemoteFosterHomeRepository
+import com.findmeahometeam.reskiume.domain.repository.remote.storage.StorageRepository
+import com.findmeahometeam.reskiume.domain.repository.util.location.LocationRepository
+import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.chat.GetNonHumanAnimalInfoInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.fosterHome.InsertFosterHomeInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.fosterHome.InsertFosterHomeInRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
+import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.util.location.GetLocationFromLocationRepository
+import com.findmeahometeam.reskiume.domain.usecases.util.location.ObserveIfLocationEnabledFromLocationRepository
+import com.findmeahometeam.reskiume.domain.usecases.util.location.RequestEnableLocationFromLocationRepository
+import com.findmeahometeam.reskiume.fosterHome
+import com.findmeahometeam.reskiume.fosterHomeWithAllNonHumanAnimalData
+import com.findmeahometeam.reskiume.localCache
+import com.findmeahometeam.reskiume.nonHumanAnimal
+import com.findmeahometeam.reskiume.ui.core.components.UiState
+import com.findmeahometeam.reskiume.ui.fosterHomes.createFosterHome.CreateFosterHomeViewmodel
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeAuthRepository
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeCheckNonHumanAnimalUtil
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeDeleteNonHumanAnimalUtil
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeFireStoreRemoteFosterHomeRepository
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeLocalCacheRepository
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeLocalChatRepository
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeLocalFosterHomeRepository
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeLocalNonHumanAnimalRepository
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeLocalUserRepository
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeLocationRepository
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeLog
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeManageImagePath
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeRealtimeDatabaseRemoteNonHumanAnimalRepository
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeStorageRepository
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeStringProvider
+import com.findmeahometeam.reskiume.ui.unitTestsWithFakes.fakes.FakeSubscriptionManagerUtil
+import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
+import com.findmeahometeam.reskiume.ui.profile.modifyNonHumanAnimal.DeleteNonHumanAnimalUtil
+import com.findmeahometeam.reskiume.ui.util.ManageImagePath
+import com.findmeahometeam.reskiume.ui.util.StringProvider
+import com.findmeahometeam.reskiume.ui.util.fcm.SubscriptionManagerUtil
+import com.findmeahometeam.reskiume.user
+import com.findmeahometeam.reskiume.userPwd
+import com.findmeahometeam.reskiume.userWithAllSubscriptionData
+import kotlinx.coroutines.test.runTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
+
+class CreateFosterHomeViewmodelTest : CoroutineTestDispatcher() {
+
+    @OptIn(ExperimentalTime::class)
+    private val createdFosterHomeId = Clock.System.now().epochSeconds.toString() + user.uid
+
+    private fun getCreateFosterHomeViewmodel(
+        localNonHumanAnimalRepository: LocalNonHumanAnimalRepository = FakeLocalNonHumanAnimalRepository(),
+        locationRepository: LocationRepository = FakeLocationRepository(
+            Pair(
+                fosterHome.longitude,
+                fosterHome.latitude
+            )
+        ),
+        storageRepository: StorageRepository = FakeStorageRepository(),
+        localChatRepository: LocalChatRepository = FakeLocalChatRepository(),
+        authRepository: AuthRepository = FakeAuthRepository(
+            authUser = authUser,
+            authEmail = user.email,
+            authPassword = userPwd
+        ),
+        deleteNonHumanAnimalUtil: DeleteNonHumanAnimalUtil = FakeDeleteNonHumanAnimalUtil(),
+        fireStoreRemoteFosterHomeRepository: FireStoreRemoteFosterHomeRepository = FakeFireStoreRemoteFosterHomeRepository(),
+        realtimeDatabaseRemoteNonHumanAnimalRepository: RealtimeDatabaseRemoteNonHumanAnimalRepository = FakeRealtimeDatabaseRemoteNonHumanAnimalRepository(),
+        localFosterHomeRepository: LocalFosterHomeRepository = FakeLocalFosterHomeRepository(),
+        localCacheRepository: LocalCacheRepository = FakeLocalCacheRepository(),
+        manageImagePath: ManageImagePath = FakeManageImagePath(),
+        checkNonHumanAnimalUtil: CheckNonHumanAnimalUtil = FakeCheckNonHumanAnimalUtil(),
+        stringProvider: StringProvider = FakeStringProvider("Text to display"),
+        localUserRepository: LocalUserRepository = FakeLocalUserRepository(
+            mutableListOf(
+                userWithAllSubscriptionData
+            )
+        ),
+        subscriptionManagerUtil: SubscriptionManagerUtil = FakeSubscriptionManagerUtil(),
+        log: Log = FakeLog()
+    ): CreateFosterHomeViewmodel {
+
+        val getAllNonHumanAnimalsFromLocalRepository =
+            GetAllNonHumanAnimalsFromLocalRepository(localNonHumanAnimalRepository)
+
+        val observeIfLocationEnabledFromLocationRepository =
+            ObserveIfLocationEnabledFromLocationRepository(locationRepository)
+
+        val requestEnableLocationFromLocationRepository =
+            RequestEnableLocationFromLocationRepository(locationRepository)
+
+        val getLocationFromLocationRepository =
+            GetLocationFromLocationRepository(locationRepository)
+
+        val observeAuthStateInAuthDataSource =
+            ObserveAuthStateInAuthDataSource(authRepository)
+
+        val uploadImageToRemoteDataSource =
+            UploadImageToRemoteDataSource(storageRepository)
+
+        val insertFosterHomeInRemoteRepository =
+            InsertFosterHomeInRemoteRepository(
+                authRepository,
+                deleteNonHumanAnimalUtil,
+                fireStoreRemoteFosterHomeRepository,
+                realtimeDatabaseRemoteNonHumanAnimalRepository,
+                log
+            )
+
+        val insertFosterHomeInLocalRepository =
+            InsertFosterHomeInLocalRepository(
+                localFosterHomeRepository,
+                manageImagePath,
+                localNonHumanAnimalRepository,
+                checkNonHumanAnimalUtil,
+                authRepository,
+                log
+            )
+
+        val insertCacheInLocalRepository =
+            InsertCacheInLocalRepository(localCacheRepository)
+
+        val getUserFromLocalDataSource =
+            GetUserFromLocalDataSource(localUserRepository)
+
+        val deleteImageFromLocalDataSource =
+            DeleteImageFromLocalDataSource(storageRepository)
+
+        val getNonHumanAnimalInfoInLocalRepository =
+            GetNonHumanAnimalInfoInLocalRepository(localChatRepository)
+
+        return CreateFosterHomeViewmodel(
+            getAllNonHumanAnimalsFromLocalRepository,
+            observeIfLocationEnabledFromLocationRepository,
+            requestEnableLocationFromLocationRepository,
+            getLocationFromLocationRepository,
+            observeAuthStateInAuthDataSource,
+            stringProvider,
+            uploadImageToRemoteDataSource,
+            insertFosterHomeInRemoteRepository,
+            insertFosterHomeInLocalRepository,
+            insertCacheInLocalRepository,
+            getUserFromLocalDataSource,
+            subscriptionManagerUtil,
+            deleteImageFromLocalDataSource,
+            getNonHumanAnimalInfoInLocalRepository,
+            log
+        )
+    }
+
+    @Test
+    fun `given my foster home to create_when I want to add residents_then foster home list available non human animals`() =
+        runTest {
+            getCreateFosterHomeViewmodel(
+                localNonHumanAnimalRepository = FakeLocalNonHumanAnimalRepository(
+                    mutableListOf(
+                        nonHumanAnimal.toEntity()
+                    )
+                )
+            ).allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow.test {
+                assertEquals(listOf(nonHumanAnimal), awaitItem())
+                awaitComplete()
+            }
+        }
+
+    @Test
+    fun `given my foster home to create_when I add accepted and resident non human animals with my foster home location_then I click to create my foster home and subscribed to my subscriptions`() =
+        runTest {
+            val createFosterHomeViewmodel = getCreateFosterHomeViewmodel(
+                realtimeDatabaseRemoteNonHumanAnimalRepository = FakeRealtimeDatabaseRemoteNonHumanAnimalRepository(
+                    mutableListOf(nonHumanAnimal.toData())
+                ),
+                localNonHumanAnimalRepository = FakeLocalNonHumanAnimalRepository(
+                    mutableListOf(nonHumanAnimal.toEntity())
+                )
+            )
+
+            createFosterHomeViewmodel.updateLocation()
+
+            createFosterHomeViewmodel.createFosterHome(fosterHome)
+
+            createFosterHomeViewmodel.saveChangesUiState.test {
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Success }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given my foster home to create_when I add accepted and resident non human animals without my foster home location_then an error is displayed`() =
+        runTest {
+            val createFosterHomeViewmodel = getCreateFosterHomeViewmodel(
+                stringProvider = FakeStringProvider("Please, turn on the location to get your position and try again"),
+                locationRepository = FakeLocationRepository(Pair(0.0, 0.0))
+            )
+
+            createFosterHomeViewmodel.createFosterHome(fosterHome)
+
+            createFosterHomeViewmodel.saveChangesUiState.test {
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Error }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given my foster home to create_when I add my foster home data but there is no foster home image_then the foster home is created and subscribed to my subscriptions`() =
+        runTest {
+            val createFosterHomeViewmodel = getCreateFosterHomeViewmodel(
+                realtimeDatabaseRemoteNonHumanAnimalRepository = FakeRealtimeDatabaseRemoteNonHumanAnimalRepository(
+                    mutableListOf(nonHumanAnimal.toData())
+                ),
+                localNonHumanAnimalRepository = FakeLocalNonHumanAnimalRepository(
+                    mutableListOf(nonHumanAnimal.toEntity())
+                )
+            )
+
+            createFosterHomeViewmodel.updateLocation()
+
+            createFosterHomeViewmodel.createFosterHome(fosterHome.copy(imageUrl = ""))
+
+            createFosterHomeViewmodel.saveChangesUiState.test {
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Success }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given my foster home to create_when I add my foster home data but fails creating the foster home in the remote repo_then the app retrieves an error`() =
+        runTest {
+            val createFosterHomeViewmodel = getCreateFosterHomeViewmodel(
+                realtimeDatabaseRemoteNonHumanAnimalRepository = FakeRealtimeDatabaseRemoteNonHumanAnimalRepository(
+                    mutableListOf(nonHumanAnimal.toData())
+                ),
+                fireStoreRemoteFosterHomeRepository = FakeFireStoreRemoteFosterHomeRepository(
+                    remoteFosterHomeList = mutableListOf(
+                        fosterHome.copy(id = createdFosterHomeId).toData()
+                    )
+                )
+            )
+
+            createFosterHomeViewmodel.updateLocation()
+
+            createFosterHomeViewmodel.createFosterHome(fosterHome)
+
+            createFosterHomeViewmodel.saveChangesUiState.test {
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Error }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given my foster home to create_when I add my foster home data but fails creating the foster home in the local repo_then the app retrieves an error`() =
+        runTest {
+            val createFosterHomeViewmodel = getCreateFosterHomeViewmodel(
+                realtimeDatabaseRemoteNonHumanAnimalRepository = FakeRealtimeDatabaseRemoteNonHumanAnimalRepository(
+                    mutableListOf(nonHumanAnimal.toData())
+                ),
+                localNonHumanAnimalRepository = FakeLocalNonHumanAnimalRepository(
+                    mutableListOf(nonHumanAnimal.toEntity())
+                ),
+                localFosterHomeRepository = FakeLocalFosterHomeRepository(
+                    localFosterHomeWithAllNonHumanAnimalDataList = mutableListOf(
+                        fosterHomeWithAllNonHumanAnimalData
+                    )
+                )
+            )
+
+            createFosterHomeViewmodel.updateLocation()
+
+            createFosterHomeViewmodel.createFosterHome(fosterHome)
+
+            createFosterHomeViewmodel.saveChangesUiState.test {
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Error }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given my foster home to create_when I add my foster home data but fails inserting the foster home cache_then the foster home is created and subscribed to my subscriptions`() =
+        runTest {
+            val createFosterHomeViewmodel = getCreateFosterHomeViewmodel(
+                realtimeDatabaseRemoteNonHumanAnimalRepository = FakeRealtimeDatabaseRemoteNonHumanAnimalRepository(
+                    mutableListOf(nonHumanAnimal.toData())
+                ),
+                localNonHumanAnimalRepository = FakeLocalNonHumanAnimalRepository(
+                    mutableListOf(nonHumanAnimal.toEntity())
+                ),
+                localCacheRepository = FakeLocalCacheRepository(
+                    localCacheList = mutableListOf(
+                        localCache.copy(
+                            cachedObjectId = createdFosterHomeId,
+                            section = Section.FOSTER_HOMES
+                        ).toEntity()
+                    )
+                )
+            )
+
+            createFosterHomeViewmodel.updateLocation()
+
+            createFosterHomeViewmodel.createFosterHome(fosterHome)
+
+            createFosterHomeViewmodel.saveChangesUiState.test {
+                assertTrue { awaitItem() is UiState.Loading }
+                assertTrue { awaitItem() is UiState.Success }
+                ensureAllEventsConsumed()
+            }
+        }
+
+    @Test
+    fun `given an image to discard_when the user clicks on the delete button_then the image is discarded`() =
+        runTest {
+            val storageRepository = FakeStorageRepository(
+                localDatasourceList = mutableListOf(
+                    Pair(
+                        "local_path",
+                        fosterHome.imageUrl
+                    )
+                )
+            )
+            val createFosterHomeViewmodel = getCreateFosterHomeViewmodel(
+                storageRepository = storageRepository
+            )
+            createFosterHomeViewmodel.deleteLocalImage(fosterHome.imageUrl)
+
+            assertTrue { storageRepository.localDatasourceList.isEmpty() }
+        }
+}

@@ -44,12 +44,10 @@ import com.findmeahometeam.reskiume.ui.core.components.RmScaffold
 import com.findmeahometeam.reskiume.ui.core.components.RmSecondaryText
 import com.findmeahometeam.reskiume.ui.core.components.RmText
 import com.findmeahometeam.reskiume.ui.core.components.UiState
-import com.findmeahometeam.reskiume.ui.fosterHomes.checkAllFosterHomes.PlaceUtil
 import com.findmeahometeam.reskiume.ui.fosterHomes.checkAllFosterHomes.SearchOption
 import com.findmeahometeam.reskiume.ui.fosterHomes.checkAllFosterHomes.isScrollingUp
 import com.findmeahometeam.reskiume.ui.profile.checkAllMyRescueEvents.UiRescueEvent
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import reskiume.shared.generated.resources.Res
 import reskiume.shared.generated.resources.check_all_rescue_events_screen_no_rescue_event_found
@@ -72,8 +70,6 @@ fun CheckAllRescueEventsScreen(
 ) {
     val checkAllRescueEventsViewmodel: CheckAllRescueEventsViewmodel =
         koinViewModel<CheckAllRescueEventsViewmodel>()
-
-    val placeUtil: PlaceUtil = koinInject<PlaceUtil>()
 
     var selectedCountry: Country by rememberSaveable { mutableStateOf(Country.UNSELECTED) }
     var selectedCity: City by rememberSaveable { mutableStateOf(City.UNSELECTED) }
@@ -183,7 +179,6 @@ fun CheckAllRescueEventsScreen(
                 AnimatedVisibility(visible = searchOption == SearchOption.COUNTRY_CITY) {
 
                     RmCountryAndCitySelectors(
-                        placeUtil = placeUtil,
                         selectedCountry = selectedCountry,
                         selectedCity = selectedCity,
                         onSelectedCountry = {

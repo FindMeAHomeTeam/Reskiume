@@ -48,9 +48,7 @@ import com.findmeahometeam.reskiume.ui.core.components.RmScaffold
 import com.findmeahometeam.reskiume.ui.core.components.RmText
 import com.findmeahometeam.reskiume.ui.core.components.RmTextField
 import com.findmeahometeam.reskiume.ui.core.components.UiState
-import com.findmeahometeam.reskiume.ui.fosterHomes.checkAllFosterHomes.PlaceUtil
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import reskiume.shared.generated.resources.Res
 import reskiume.shared.generated.resources.create_rescue_event_screen_create_a_rescue_event_button
@@ -59,9 +57,9 @@ import reskiume.shared.generated.resources.create_rescue_event_screen_rescue_eve
 import reskiume.shared.generated.resources.create_rescue_event_screen_rescue_event_title
 import reskiume.shared.generated.resources.create_rescue_event_screen_title
 import reskiume.shared.generated.resources.manage_location_permission_message
-import reskiume.shared.generated.resources.rescue_event
 import reskiume.shared.generated.resources.manage_location_permission_turn_on_location_message
 import reskiume.shared.generated.resources.non_human_animal_list_creator_save_title
+import reskiume.shared.generated.resources.rescue_event
 
 @Composable
 fun CreateRescueEventScreen(
@@ -69,8 +67,6 @@ fun CreateRescueEventScreen(
 ) {
     val createRescueEventViewmodel: CreateRescueEventViewmodel =
         koinViewModel<CreateRescueEventViewmodel>()
-
-    val placeUtil: PlaceUtil = koinInject<PlaceUtil>()
 
     val allAvailableNonHumanAnimals: List<NonHumanAnimal> by createRescueEventViewmodel.allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow.collectAsStateWithLifecycle(
         initialValue = emptyList()
@@ -155,7 +151,6 @@ fun CreateRescueEventScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
             RmCountryAndCitySelectors(
-                placeUtil = placeUtil,
                 selectedCountry = selectedCountry,
                 onSelectedCountry = {
                     selectedCountry = it

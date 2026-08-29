@@ -22,18 +22,20 @@ import com.findmeahometeam.reskiume.domain.model.fosterHome.Country
 import com.findmeahometeam.reskiume.domain.model.fosterHome.toStringResource
 import com.findmeahometeam.reskiume.ui.fosterHomes.checkAllFosterHomes.PlaceUtil
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import reskiume.shared.generated.resources.Res
 import reskiume.shared.generated.resources.country_city_selector_city
 import reskiume.shared.generated.resources.country_city_selector_country
 
 @Composable
 fun RmCountryAndCitySelectors(
-    placeUtil: PlaceUtil,
     selectedCountry: Country,
     selectedCity: City = City.UNSELECTED,
     onSelectedCountry: (country: Country) -> Unit = {},
     onSelectedCity: (city: City) -> Unit = {}
 ) {
+    val placeUtil: PlaceUtil = koinInject<PlaceUtil>()
+
     var isCountryVisible: Boolean by rememberSaveable { mutableStateOf(true) }
     val countryFieldState = rememberTextFieldState(if (selectedCountry == Country.UNSELECTED) {
         ""
@@ -71,6 +73,10 @@ fun RmCountryAndCitySelectors(
                     textFieldState = countryFieldState,
                     placeholder = stringResource(Res.string.country_city_selector_country),
                     items = countryItems,
+                    onQueryChange = {
+                        onSelectedCity(City.UNSELECTED)
+                        cityFieldState.setTextAndPlaceCursorAtEnd("")
+                    },
                     onSearch = { country: Country? ->
                         country?.let { onSelectedCountry(it) }
                         if (country == null) {

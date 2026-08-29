@@ -48,6 +48,7 @@ fun <T : Enum<T>> RmSearchBarWithSuggestions(
     modifier: Modifier = Modifier,
     onFocusChanged: (FocusState) -> Unit = {},
     items: List<Pair<T, String>>,
+    onQueryChange: () -> Unit = {},
     onSearch: (T?) -> Unit
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
@@ -75,10 +76,14 @@ fun <T : Enum<T>> RmSearchBarWithSuggestions(
             inputField = {
                 SearchBarDefaults.InputField(
                     query = textFieldState.text.toString(),
-                    onQueryChange = { textFieldState.edit { replace(0, length, it) } },
+                    onQueryChange = {
+                        textFieldState.edit { replace(0, length, it) }
+                        onQueryChange()
+                    },
                     onSearch = {
                         val searchText = textFieldState.text.toString()
-                        val selectedItem: Pair<T, String>? = filteredItems.find { it.second == searchText }
+                        val selectedItem: Pair<T, String>? =
+                            filteredItems.find { it.second == searchText }
                         if (selectedItem != null) {
                             onSearch(selectedItem.first)
                             expanded = false

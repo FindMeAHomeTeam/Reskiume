@@ -48,9 +48,7 @@ import com.findmeahometeam.reskiume.ui.core.components.RmScaffold
 import com.findmeahometeam.reskiume.ui.core.components.RmText
 import com.findmeahometeam.reskiume.ui.core.components.RmTextField
 import com.findmeahometeam.reskiume.ui.core.components.UiState
-import com.findmeahometeam.reskiume.ui.fosterHomes.checkAllFosterHomes.PlaceUtil
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import reskiume.shared.generated.resources.Res
 import reskiume.shared.generated.resources.create_foster_home_screen_create_a_foster_home_button
@@ -70,8 +68,6 @@ fun CreateFosterHomeScreen(
 ) {
     val createFosterHomeViewmodel: CreateFosterHomeViewmodel =
         koinViewModel<CreateFosterHomeViewmodel>()
-
-    val placeUtil: PlaceUtil = koinInject<PlaceUtil>()
 
     val allAvailableUiNonHumanAnimals: List<NonHumanAnimal> by createFosterHomeViewmodel.allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow.collectAsStateWithLifecycle(
         initialValue = emptyList()
@@ -159,7 +155,6 @@ fun CreateFosterHomeScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
             RmCountryAndCitySelectors(
-                placeUtil = placeUtil,
                 selectedCountry = selectedCountry,
                 onSelectedCountry = {
                     selectedCountry = it

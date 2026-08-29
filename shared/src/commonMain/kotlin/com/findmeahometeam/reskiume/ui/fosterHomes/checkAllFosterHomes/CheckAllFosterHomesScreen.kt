@@ -50,7 +50,6 @@ import com.findmeahometeam.reskiume.ui.core.components.RmSecondaryText
 import com.findmeahometeam.reskiume.ui.core.components.RmText
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import reskiume.shared.generated.resources.Res
 import reskiume.shared.generated.resources.check_all_foster_homes_screen_no_foster_home_found
@@ -74,8 +73,6 @@ fun CheckAllFosterHomesScreen(
 ) {
     val checkAllFosterHomesViewmodel: CheckAllFosterHomesViewmodel =
         koinViewModel<CheckAllFosterHomesViewmodel>()
-
-    val placeUtil: PlaceUtil = koinInject<PlaceUtil>()
 
     var selectedCountry: Country by rememberSaveable { mutableStateOf(Country.UNSELECTED) }
     var selectedCity: City by rememberSaveable { mutableStateOf(City.UNSELECTED) }
@@ -189,7 +186,6 @@ fun CheckAllFosterHomesScreen(
                 AnimatedVisibility(visible = searchOption == SearchOption.COUNTRY_CITY) {
 
                     RmCountryAndCitySelectors(
-                        placeUtil = placeUtil,
                         selectedCountry = selectedCountry,
                         selectedCity = selectedCity,
                         onSelectedCountry = {

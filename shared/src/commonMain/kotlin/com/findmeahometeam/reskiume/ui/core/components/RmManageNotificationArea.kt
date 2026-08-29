@@ -24,15 +24,13 @@ import com.findmeahometeam.reskiume.domain.model.fosterHome.Country
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.primaryGreen
 import com.findmeahometeam.reskiume.ui.core.tertiaryGreen
-import com.findmeahometeam.reskiume.ui.fosterHomes.checkAllFosterHomes.PlaceUtil
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 import reskiume.shared.generated.resources.Res
 import reskiume.shared.generated.resources.ic_notifications
-import reskiume.shared.generated.resources.manage_notification_area_notification_area
 import reskiume.shared.generated.resources.manage_notification_area_disabled
 import reskiume.shared.generated.resources.manage_notification_area_enabled
 import reskiume.shared.generated.resources.manage_notification_area_get_rescue_events_notifications
+import reskiume.shared.generated.resources.manage_notification_area_notification_area
 
 @Composable
 fun RmManageNotificationArea(
@@ -42,8 +40,6 @@ fun RmManageNotificationArea(
     cityForRescueEventNotifications: City,
     onSelectedNotificationArea: (selectedCountry: Country, selectedCity: City) -> Unit
 ) {
-    val placeUtil: PlaceUtil = koinInject<PlaceUtil>()
-
     var receiveNotifications: Boolean by rememberSaveable { mutableStateOf(receiveRescueNotifications) }
     var selectedCountry: Country by rememberSaveable(countryForRescueEventNotifications) { mutableStateOf(countryForRescueEventNotifications) }
     var selectedCity: City by rememberSaveable(cityForRescueEventNotifications) { mutableStateOf(cityForRescueEventNotifications) }
@@ -82,7 +78,6 @@ fun RmManageNotificationArea(
                 fontWeight = FontWeight.ExtraBold
             )
             RmCountryAndCitySelectors(
-                placeUtil = placeUtil,
                 selectedCountry = selectedCountry,
                 selectedCity = selectedCity,
                 onSelectedCountry = { country ->

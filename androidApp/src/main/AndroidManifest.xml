@@ -11,6 +11,9 @@
             <data android:mimeType="text/plain" />
             <category android:name="android.intent.category.DEFAULT" />
         </intent>
+        <intent>
+            <action android:name="android.media.action.IMAGE_CAPTURE"/>
+        </intent>
     </queries>
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -32,6 +35,9 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="reskiume_channel_id"/>
+        <meta-data
+            android:name="firebase_messaging_installation_id_enabled"
+            android:value="true" />
         <activity
             android:name="reskiume.MainActivity"
             android:windowSoftInputMode="adjustResize"

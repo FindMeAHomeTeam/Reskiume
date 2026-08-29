@@ -1,5 +1,6 @@
 package com.findmeahometeam.reskiume.ui.core.components
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,9 +21,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,18 +37,19 @@ import com.findmeahometeam.reskiume.ui.core.primaryGreen
 import com.findmeahometeam.reskiume.ui.core.primaryRed
 import com.findmeahometeam.reskiume.ui.core.secondaryRed
 import com.findmeahometeam.reskiume.ui.core.tertiaryGreen
-import io.github.ismoy.imagepickerkmp.domain.config.CameraCaptureConfig
-import io.github.ismoy.imagepickerkmp.domain.config.ImagePickerConfig
-import io.github.ismoy.imagepickerkmp.domain.config.PermissionAndConfirmationConfig
-import io.github.ismoy.imagepickerkmp.domain.models.CompressionLevel
-import io.github.ismoy.imagepickerkmp.domain.models.GalleryPhotoResult
-import io.github.ismoy.imagepickerkmp.domain.models.MimeType
-import io.github.ismoy.imagepickerkmp.domain.models.PhotoResult
-import io.github.ismoy.imagepickerkmp.presentation.ui.components.GalleryPickerLauncher
-import io.github.ismoy.imagepickerkmp.presentation.ui.components.ImagePickerLauncher
+import io.github.ismoy.imagepickerkmp.config.CameraCaptureConfig
+import io.github.ismoy.imagepickerkmp.config.PermissionAndConfirmationConfig
+import io.github.ismoy.imagepickerkmp.picker.CompressionLevel
+import io.github.ismoy.imagepickerkmp.picker.ImagePickerKMPConfig
+import io.github.ismoy.imagepickerkmp.picker.ImagePickerResult
+import io.github.ismoy.imagepickerkmp.picker.MimeType
+import io.github.ismoy.imagepickerkmp.picker.rememberImagePickerKMP
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import reskiume.shared.generated.resources.Res
+import reskiume.shared.generated.resources.add_photo_screen_no_camera_message
+import reskiume.shared.generated.resources.add_photo_screen_no_camera_ok_button
+import reskiume.shared.generated.resources.add_photo_screen_no_camera_title
 import reskiume.shared.generated.resources.add_photo_screen_selected_photo_content_description
 import reskiume.shared.generated.resources.camera_picker_go_to_settings_title
 import reskiume.shared.generated.resources.camera_picker_grant_in_settings_message
@@ -68,7 +72,6 @@ fun RmAddPhoto(
     onUriRetrieved: (String) -> Unit,
     onDeleteDiscardedImage: (String) -> Unit
 ) {
-
     var showAddPhoto by remember { mutableStateOf(currentImageUri.isBlank()) }
     var showGallery by remember { mutableStateOf(false) }
     var showCamera by remember { mutableStateOf(false) }
@@ -79,8 +82,7 @@ fun RmAddPhoto(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-
-        if (showAddPhoto) {
+        AnimatedVisibility(showAddPhoto) {
             Column(
                 modifier = Modifier.wrapContentSize()
                     .background(color = tertiaryGreen, shape = RoundedCornerShape(15.dp))
@@ -123,8 +125,10 @@ fun RmAddPhoto(
 
         if (showGallery) {
             InvokeGalleryPicker(pickMultiplePhotosFromGallery) { shouldShowGallery, uriProvided ->
+
                 showGallery = shouldShowGallery
                 if (uriProvided.isNotBlank()) {
+
                     showAddPhoto = false
                     uri = uriProvided
                     onUriRetrieved(uriProvided)
@@ -133,62 +137,63 @@ fun RmAddPhoto(
         }
 
         if (showCamera) {
-            showAddPhoto = false
             InvokeCameraPicker { shouldShowCamera, uriProvided ->
+
                 showCamera = shouldShowCamera
                 if (uriProvided.isNotBlank()) {
+
                     showAddPhoto = false
-                    onDeleteDiscardedImage(uriProvided.replace("compressed_", "")) // delete the uncompressed file
                     uri = uriProvided
                     onUriRetrieved(uriProvided)
-                } else {
-                    showAddPhoto = true
                 }
             }
         }
 
-        if (uri.isNotBlank()) {
+        AnimatedVisibility(uri.isNotBlank()) {
             Card(
                 shape = RoundedCornerShape(20.dp),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
             ) {
-                Box(contentAlignment = Alignment.TopEnd) {
-                    RmImage(
-                        imagePath = uri,
-                        contentDescription = stringResource(Res.string.add_photo_screen_selected_photo_content_description),
-                        modifier = Modifier.fillMaxSize()
-                    )
-                    Row(
-                        modifier = Modifier.wrapContentSize()
-                            .padding(16.dp)
-                            .background(color = secondaryRed, shape = RoundedCornerShape(15.dp))
-                            .padding(8.dp)
-                            .clickable {
-                                showAddPhoto = true
-                                if (uri.contains("file:///")) {
-                                    onDeleteDiscardedImage(uri) // delete the discarded image if cached
-                                }
-                                uri = ""
-                                onUriRetrieved(uri)
-                            },
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Icon(
-                            modifier = Modifier.size(30.dp),
-                            painter = painterResource(Res.drawable.ic_close),
-                            contentDescription = "remove photo",
-                            tint = primaryRed
+                if (uri.isNotBlank()) { // It avoids a visual glitch for the delete button when the image is deleted
+
+                    Box(contentAlignment = Alignment.TopEnd) {
+                        RmImage(
+                            imagePath = uri,
+                            contentDescription = stringResource(Res.string.add_photo_screen_selected_photo_content_description),
+                            modifier = Modifier.fillMaxSize()
                         )
-                        Spacer(modifier = Modifier.width(3.dp))
-                        RmText(
-                            text = stringResource(Res.string.create_account_screen_delete_message),
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 20.sp,
-                            color = primaryRed
-                        )
+                        Row(
+                            modifier = Modifier.wrapContentSize()
+                                .padding(16.dp)
+                                .background(color = secondaryRed, shape = RoundedCornerShape(15.dp))
+                                .padding(8.dp)
+                                .clickable {
+                                    showAddPhoto = true
+                                    if (uri.contains("file:///")) {
+                                        onDeleteDiscardedImage(uri) // delete the discarded image if cached
+                                    }
+                                    uri = ""
+                                    onUriRetrieved(uri)
+                                },
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Icon(
+                                modifier = Modifier.size(30.dp),
+                                painter = painterResource(Res.drawable.ic_close),
+                                contentDescription = "remove photo",
+                                tint = primaryRed
+                            )
+                            Spacer(modifier = Modifier.width(3.dp))
+                            RmText(
+                                text = stringResource(Res.string.create_account_screen_delete_message),
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 20.sp,
+                                color = primaryRed
+                            )
+                        }
                     }
                 }
             }
@@ -197,49 +202,36 @@ fun RmAddPhoto(
 }
 
 @Composable
-fun InvokeGalleryPicker(
+private fun InvokeGalleryPicker(
     pickMultiplePhotosFromGallery: Boolean,
     onGalleryPickerResult: (Boolean, String) -> Unit
 ) {
-    GalleryPickerLauncher(
-        onPhotosSelected = { photos: List<GalleryPhotoResult> ->
-            onGalleryPickerResult(false, photos.first().uri)
-        },
-        onError = { onGalleryPickerResult(false, "") },
-        onDismiss = { onGalleryPickerResult(false, "") },
-        allowMultiple = pickMultiplePhotosFromGallery,
-        mimeTypes = listOf(MimeType.IMAGE_JPEG, MimeType.IMAGE_PNG),
-        cameraCaptureConfig = CameraCaptureConfig(
-            permissionAndConfirmationConfig = PermissionAndConfirmationConfig(
-                customConfirmationView = { photoResult: PhotoResult, onConfirm: (PhotoResult) -> Unit, _: () -> Unit ->
-                    onConfirm(photoResult)
-                }
-            ),
+    val picker = rememberImagePickerKMP()
+    LaunchedEffect(Unit) {
+        picker.launchGallery(
+            allowMultiple = pickMultiplePhotosFromGallery,
+            mimeTypes = listOf(MimeType.IMAGE_ALL),
             compressionLevel = CompressionLevel.HIGH
         )
-    )
+    }
+    when (val result = picker.result) {
+        ImagePickerResult.Idle, ImagePickerResult.Loading -> Unit
+
+        is ImagePickerResult.Success -> onGalleryPickerResult(false, result.first?.uri ?: "")
+
+        is ImagePickerResult.Error, ImagePickerResult.Dismissed -> onGalleryPickerResult(false, "")
+    }
 }
 
 @Composable
-fun InvokeCameraPicker(onCameraPickerResult: (Boolean, String) -> Unit) {
-    ImagePickerLauncher(
-        config = ImagePickerConfig(
-            onPhotoCaptured = { result: PhotoResult ->
-                onCameraPickerResult(false, result.uri)
-            },
-            onError = {
-                onCameraPickerResult(false, "")
-            },
-            onDismiss = {
-                onCameraPickerResult(false, "")
-            },
+private fun InvokeCameraPicker(onCameraPickerResult: (Boolean, String) -> Unit) {
+
+    val picker = rememberImagePickerKMP(
+        config = ImagePickerKMPConfig(
             cameraCaptureConfig = CameraCaptureConfig(
                 compressionLevel = CompressionLevel.HIGH,
                 permissionAndConfirmationConfig = PermissionAndConfirmationConfig(
-                    customConfirmationView = { photoResult, onConfirm: (PhotoResult) -> Unit, _: () -> Unit ->
-                        onConfirm(photoResult)
-                    },
-                    customDeniedDialog = { onRetry: () -> Unit ->
+                    customDeniedDialog = { onRetry: () -> Unit, onDismiss: () -> Unit ->
                         RmDialog(
                             emoji = "📸",
                             title = stringResource(Res.string.camera_picker_permission_title),
@@ -248,11 +240,12 @@ fun InvokeCameraPicker(onCameraPickerResult: (Boolean, String) -> Unit) {
                             denyMessage = stringResource(Res.string.camera_picker_permission_do_not_grant_permission_button),
                             onClickAllow = onRetry,
                             onClickDeny = {
+                                onDismiss()
                                 onCameraPickerResult(false, "")
                             }
                         )
                     },
-                    customSettingsDialog = { onOpenSettings: () -> Unit ->
+                    customSettingsDialog = { onOpenSettings: () -> Unit, onDismiss: () -> Unit ->
                         RmDialog(
                             emoji = "⚙️",
                             title = stringResource(Res.string.camera_picker_go_to_settings_title),
@@ -261,6 +254,7 @@ fun InvokeCameraPicker(onCameraPickerResult: (Boolean, String) -> Unit) {
                             denyMessage = stringResource(Res.string.camera_picker_permission_do_not_grant_permission_button),
                             onClickAllow = onOpenSettings,
                             onClickDeny = {
+                                onDismiss()
                                 onCameraPickerResult(false, "")
                             }
                         )
@@ -269,5 +263,49 @@ fun InvokeCameraPicker(onCameraPickerResult: (Boolean, String) -> Unit) {
             )
         )
     )
-    Spacer(modifier = Modifier.height(80.dp))
+    LaunchedEffect(Unit) {
+        picker.launchCamera(cameraCaptureConfig = CameraCaptureConfig(compressionLevel = CompressionLevel.HIGH))
+    }
+
+    when (val result = picker.result) {
+        ImagePickerResult.Idle, ImagePickerResult.Loading -> Unit
+
+        is ImagePickerResult.Success -> onCameraPickerResult(false, result.first?.uri ?: "")
+
+        ImagePickerResult.Dismissed -> onCameraPickerResult(false, "")
+
+        is ImagePickerResult.Error -> {
+
+            var displayNoCameraError by rememberSaveable { mutableStateOf(true) }
+            var fallbackToGallery by rememberSaveable { mutableStateOf(false) }
+
+            if (displayNoCameraError) {
+
+                RmDialog(
+                    emoji = "📸",
+                    title = stringResource(Res.string.add_photo_screen_no_camera_title),
+                    message = stringResource(Res.string.add_photo_screen_no_camera_message),
+                    allowMessage = stringResource(Res.string.add_photo_screen_no_camera_ok_button),
+                    onClickAllow = {
+                        displayNoCameraError = false
+                        fallbackToGallery = true
+                    },
+                    onClickDeny = {
+                        displayNoCameraError = false
+                        onCameraPickerResult(false, "")
+                    }
+                )
+            }
+            if (fallbackToGallery) {
+
+                LaunchedEffect(Unit) {
+                    picker.launchGallery(
+                        allowMultiple = false,
+                        mimeTypes = listOf(MimeType.IMAGE_ALL),
+                        compressionLevel = CompressionLevel.HIGH
+                    )
+                }
+            }
+        }
+    }
 }

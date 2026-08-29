@@ -82,6 +82,9 @@
 
     <!-- Add photo -->
     <string name="add_photo_screen_selected_photo_content_description">Selected photo</string>
+    <string name="add_photo_screen_no_camera_title">You have no camera app installed</string>
+    <string name="add_photo_screen_no_camera_message">I'll open the gallery instead</string>
+    <string name="add_photo_screen_no_camera_ok_button">Ok</string>
 
     <!-- Login account screen -->
     <string name="login_account_screen_log_in_title">Log in to your account</string>

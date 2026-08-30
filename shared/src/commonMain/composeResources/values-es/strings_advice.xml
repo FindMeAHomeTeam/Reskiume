@@ -1,0 +1,48 @@
+<resources>
+    <!-- Advice: Rescue -->
+    <string name="advice_rescue_non_human_animal_title">¿Qué significan “animal no humano” y “demás animales”?</string>
+    <string name="advice_rescue_non_human_animal_description">Significan animales que no son personas como, por ejemplo, un cerdo o un gato. Su uso puntualiza que las personas también somos animales.
+        \nA pesar de ser un hecho, hay quienes prefieren diferenciarse para justificar su conducta hacia los demás animales y dañarlos.
+        \nPor lo que su uso tiene como objetivo el concienciar el respeto hacia los demás animales independientemente de su especie.</string>
+    <string name="advice_rescue_found_non_human_animal_title">He encontrado un animal no humano en la calle. ¿Qué puedo hacer?</string>
+    <string name="advice_rescue_found_non_human_animal_description">Lo primero que debes comprobar es si el animal no humano muestra señales de haber sido abandonado. Un pelaje sucio y la falta de microchip indican que el animal no humano está abandonado o vive en el lugar donde lo has encontrado.
+\nSi muestra señales de angustia o vulnerabilidad, recógelo y llévalo a la clínica veterinaria más cercana para solicitar una prueba de identificación. ¡Los veterinarios están obligados por ley a ofrecer este servicio de forma gratuita! También te informarán sobre tus opciones para asegurar que el animal no humano reciba los cuidados necesarios en el futuro.
+\nSi el animal no humano puede ser identificado, la clínica contactará con sus cuidadores para organizar la recogida. El caso más habitual es que lo hagan ellos, pero también pueden negarse porque ya no pueden cuidar de él o ella.
+\nSi el animal no humano no puede ser identificado, tendrás que encontrarle un hogar. ¡Reskiume, las redes sociales y colgar carteles en la calle son tus mejores aliados!</string>
+    <string name="advice_rescue_pick_non_human_animal_title">¿Cómo debo recoger a un animal no humano?</string>
+    <string name="advice_rescue_pick_non_human_animal_description">Cada animal no humano se comporta de forma diferente, por lo que no existen reglas generales. Sentirse perdido o abandonado o haber sufrido un accidente puede influir mucho en su comportamiento.
+\nTen en cuenta que:
+\nPuede que necesites ayuda para rescatar a un animal no humano, especialmente si es de gran tamaño.
+\nEl animal no humano puede asustarse y tratar de escapar o defenderse si siente que lo van a atrapar.
+\nSi el animal no humano huye, puede poner en peligro su propia vida y la de las personas que le rodean.
+\nNo intentes engañarle ni atraparlo por la fuerza. Mejor tómate tu tiempo para ganarte su confianza con comida y palabras en tono suave. Evita movimientos bruscos o mirar directamente a sus ojos.
+\nPor ejemplo, los gatos son especialmente difíciles de rescatar, por lo que muchos refugios cuentan con jaulas trampa especiales para esta situación.
+\nSi llevas al animal no humano en tu coche, asegúrate de que no tenga acceso a la zona del conductor. Aunque esté tranquilo y se porte bien, podría provocar un accidente.
+</string>
+    <string name="advice_rescue_rejected_non_human_animal_title">¿Qué ocurre si un animal no humano identificado es rechazado por sus cuidadores?</string>
+    <string name="advice_rescue_rejected_non_human_animal_description">Desafortunadamente, esto ocurre a veces. En ese caso, tendrás que buscar un hogar para el animal no humano.
+        \nAquí te ayudamos: busca en Reskiume un hogar de acogida que pueda cuidar al animal no humano de inmediato o atenderle mientras encuentras un hogar de adopción permanente.</string>
+
+    <!-- Advice: Rehome -->
+    <string name="advice_rehome_find_a_home_non_human_animal_title">¿Cuáles son los pasos para encontrar un hogar para mi animal no humano usando Reskiume?</string>
+    <string name="advice_rehome_find_a_home_non_human_animal_description">En la página de inicio puedes navegar por los hogares de tu zona que pueden cuidar a tu animal no humano.
+    \nIntenta encontrar un hogar de acogida para el animal no humano. En un hogar de acogida, un voluntario experimentado se encargará de él o ella. Usa los filtros y los hogares de la lista para ver una vista detallada con una foto y una descripción. Pulsa “Empezar Conversación” para enviar un mensaje a la persona propietaria y organizar la acogida.
+    </string>
+    <string name="advice_rehome_visit_non_human_animal_title">¿Podré visitar al animal no humano después de que sea adoptado?</string>
+    <string name="advice_rehome_visit_non_human_animal_description">¡Claro! Las visitas deben organizarse directamente entre la acogida y tú.
+        \nCuando les contactes, intenta organizar un par de visitas para comprobar si el animal no humano está recibiendo los cuidados adecuados. </string>
+
+    <!-- Advice: Care -->
+    <string name="advice_care_feed_non_human_animal_title">¿Qué debo darle de comer?</string>
+    <string name="advice_care_feed_non_human_animal_description">La mayoría de los animales no humanos abandonados o perdidos se encuentran deshidratados por el estrés y la nutrición deficiente.
+        \nSin embargo, algunos rechazan comer o beber por estrés, por lo que es importante ofrecerles comida y agua, especialmente por la noche, cuando el entorno está más tranquilo. En el caso de animales no humanos bebés, consulta a la persona profesional veterinaria.</string>
+    <string name="advice_care_bloat_torsion_non_human_animal_title">¿Qué provoca la dilatación y la torsión?</string>
+    <string name="advice_care_bloat_torsion_non_human_animal_description">La causa exacta es desconocida. Es más habitual en perros grandes y gigantes con tórax profundo. Se cree que la dilatación y la torsión están relacionadas con comer grandes cantidades, hacer ejercicio justo antes o después de comer y engullir grandes cantidades de comida o agua.
+        \nNo existe una forma infalible de prevenir la dilatación, pero estas medidas pueden ayudar:
+        \n- Alimenta a tu perro más de una vez al día (dos comidas del mismo tamaño).
+        \n- No permitas que tu perro haga ejercicio justo antes o después de comer.
+        \n- No dejes que tu perro acceda a fuentes de alimento grandes.
+        \n- No permitas que tu perro beba grandes cantidades de agua a la vez.
+        \nSe necesita una cirugía urgente para cualquier perro con el estómago girado, una vez que el animal esté estable.</string>
+
+</resources>

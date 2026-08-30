@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Reskiume</string>
+    <string name="notification_rescue_event_title">¡Nuevo evento de rescate!</string>
+    <string name="notification_rescue_event_body">Involúcrate y salva una vida 🦸</string>
+    <string name="notification_rescue_event_channel">Canal de eventos de rescate</string>
+</resources>

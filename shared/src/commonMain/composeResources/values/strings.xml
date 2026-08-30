@@ -2,7 +2,7 @@
     <!-- Bottom Navigation Bar Items -->
     <string name="bottom_bar_item_foster_homes">Homes</string>
     <string name="bottom_bar_item_foster_homes_content_description">Foster homes tab</string>
-    <string name="bottom_bar_item_rescue">Rescue</string>
+    <string name="bottom_bar_item_rescue">Rescues</string>
     <string name="bottom_bar_item_rescue_content_description">Rescue events tab</string>
     <string name="bottom_bar_item_chats">Chats</string>
     <string name="bottom_bar_item_chats_content_description">Chat list tab</string>

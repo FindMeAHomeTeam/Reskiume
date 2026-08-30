@@ -1,0 +1,518 @@
+<resources>
+    <!-- Bottom Navigation Bar Items -->
+    <string name="bottom_bar_item_foster_homes">Casas</string>
+    <string name="bottom_bar_item_foster_homes_content_description">Pestaña de casas de acogida</string>
+    <string name="bottom_bar_item_rescue">Rescates</string>
+    <string name="bottom_bar_item_rescue_content_description">Pestaña de eventos de rescate</string>
+    <string name="bottom_bar_item_chats">Chats</string>
+    <string name="bottom_bar_item_chats_content_description">Pestaña de la lista de chats</string>
+    <string name="bottom_bar_item_profile">Perfil</string>
+    <string name="bottom_bar_item_profile_content_description">Pestaña del perfil de usuario</string>
+
+    <!-- Profile -->
+    <string name="profile_screen_profile_image_content_description">Imagen de perfil</string>
+    <string name="profile_screen_activist_title">Activista</string>
+    <string name="profile_screen_available_label">Disponible</string>
+    <string name="profile_screen_unavailable_label">No disponible</string>
+    <string name="profile_screen_indicator_content_description">Indicador de disponibilidad</string>
+    <string name="profile_screen_my_account_section">Mi cuenta</string>
+    <string name="profile_screen_my_activism_section">Mi activismo</string>
+    <string name="profile_screen_settings_section">Ajustes</string>
+    <string name="profile_screen_modify_account_title">Información personal</string>
+    <string name="profile_screen_modify_account_description">Gestiona tu información personal</string>
+    <string name="profile_screen_personal_create_account_title">Crear una cuenta</string>
+    <string name="profile_screen_personal_create_account_description">Regístrate para usar la aplicación por completo</string>
+    <string name="profile_screen_reviews_title">Reseñas</string>
+    <string name="profile_screen_reviews_description">Consulta tus reseñas</string>
+    <string name="profile_screen_rescue_notifications_title">Notificaciones de rescate cercanas</string>
+    <string name="profile_screen_rescue_notifications_description">Recibe alertas cuando se reporta un caso de rescate cerca de ti</string>
+    <string name="profile_screen_non_human_animals_title">Animales no humanos registrados</string>
+    <string name="profile_screen_non_human_animals_description">Gestiona los animales no humanos registrados</string>
+    <string name="profile_screen_my_foster_homes_title">Mis casas de acogida</string>
+    <string name="profile_screen_my_foster_homes_description">Gestiona tus casas de acogida</string>
+    <string name="profile_screen_my_rescue_events_title">Mis eventos de rescate</string>
+    <string name="profile_screen_my_rescue_events_description">Gestiona tus eventos de rescate</string>
+    <string name="profile_screen_get_advice_title">Obtener consejos</string>
+    <string name="profile_screen_get_advice_description">Aprende cómo ayudar a animales no humanos</string>
+    <string name="profile_screen_feedback_title">Enviar comentarios por correo</string>
+    <string name="profile_screen_feedback_description">Ayuda a mejorar la aplicación</string>
+    <string name="profile_screen_delete_account_title">Eliminar cuenta</string>
+    <string name="profile_screen_delete_account_description">Esta acción no se puede deshacer</string>
+
+    <!-- Rating bar -->
+    <string name="rating_bar_rated_content_description">Estrella valorada</string>
+    <string name="rating_bar_unrated_content_description">Estrella sin valorar</string>
+
+    <!-- Create account screen -->
+    <string name="create_account_screen_create_account_title">Crear una cuenta</string>
+    <string name="create_account_screen_add_photo_message">Añadir una foto</string>
+    <string name="create_account_screen_from_gallery_message">Galería</string>
+    <string name="create_account_screen_from_camera_message">Cámara</string>
+    <string name="create_account_screen_delete_message">Eliminar</string>
+    <string name="create_account_screen_name_field_label">Nombre</string>
+    <string name="create_account_screen_describe_yourself_field_label">Descríbete</string>
+    <string name="create_account_screen_email_field_label">Correo electrónico</string>
+    <string name="create_account_screen_create_account_button">Crear cuenta</string>
+    <string name="create_account_screen_already_have_an_account">¿Ya tienes una cuenta? Inicia sesión</string>
+    <string name="create_account_screen_log_in">Inicia sesión</string>
+
+    <!-- Manage notification permission -->
+    <string name="manage_notification_permission_title">Permiso de notificaciones</string>
+    <string name="manage_notification_permission_message">Por favor, concede el permiso de notificaciones para avisarte cuando llegue un nuevo mensaje del chat.</string>
+    <string name="manage_notification_permission_grant_permission_button">Conceder permiso</string>
+    <string name="manage_notification_permission_do_not_grant_permission_button">Más tarde</string>
+    <string name="manage_notification_permission_go_to_settings_title">Ir a ajustes</string>
+    <string name="manage_notification_permission_grant_in_settings_message">Los permisos de notificaciones se pueden activar en ajustes. Recuerda que es importante avisarte cuando llega un nuevo mensaje.</string>
+    <string name="manage_notification_permission_open_settings_button">Abrir ajustes</string>
+
+    <!-- Manage notification area -->
+    <string name="manage_notification_area_enabled">Activado</string>
+    <string name="manage_notification_area_disabled">Desactivado</string>
+    <string name="manage_notification_area_get_rescue_events_notifications">Recibir notificaciones de eventos de rescate cerca de ti</string>
+    <string name="manage_notification_area_notification_area">Área de notificaciones</string>
+
+    <!-- Camera picker permission -->
+    <string name="camera_picker_permission_title">Se requiere permiso de cámara</string>
+    <string name="camera_picker_permission_message">Esta aplicación necesita acceder a la cámara para tomar fotos</string>
+    <string name="camera_picker_permission_grant_permission_button">Conceder permiso</string>
+    <string name="camera_picker_permission_do_not_grant_permission_button">Más tarde</string>
+    <string name="camera_picker_go_to_settings_title">Ir a ajustes</string>
+    <string name="camera_picker_grant_in_settings_message">Se requiere permiso de cámara para capturar fotos. Por favor, concédelo en ajustes</string>
+    <string name="camera_picker_open_settings_button">Abrir ajustes</string>
+
+    <!-- Add photo -->
+    <string name="add_photo_screen_selected_photo_content_description">Foto seleccionada</string>
+    <string name="add_photo_screen_no_camera_title">No tienes ninguna aplicación de cámara instalada</string>
+    <string name="add_photo_screen_no_camera_message">Abriré la galería en su lugar</string>
+    <string name="add_photo_screen_no_camera_ok_button">Aceptar</string>
+
+    <!-- Login account screen -->
+    <string name="login_account_screen_log_in_title">Inicia sesión en tu cuenta</string>
+    <string name="login_account_screen_email_field_label">Correo electrónico</string>
+    <string name="login_account_screen_log_in_button">Iniciar sesión</string>
+
+    <!-- Password text field -->
+    <string name="password_text_field_label">Contraseña</string>
+    <string name="create_password_text_field_label">Contraseña (6 o más caracteres)</string>
+    <string name="password_text_field_show_password_content_description">Mostrar contraseña</string>
+    <string name="password_text_field_hide_password_content_description">Ocultar contraseña</string>
+
+    <!-- Back arrow -->
+    <string name="back_arrow_content_description">Volver a la pantalla anterior</string>
+
+    <!-- Modify account screen -->
+    <string name="modify_account_user_account_title">Cuenta de %1$s</string>
+    <string name="modify_account_screen_notification_area">Lugar para recibir notificaciones de eventos de rescate</string>
+    <string name="modify_account_log_out_account_message">Cerrar sesión en tu cuenta</string>
+    <string name="modify_account_log_out_text">Cerrar sesión</string>
+    <string name="modify_account_name_field_label">Nombre</string>
+    <string name="modify_account_describe_yourself_field_label">Descríbete</string>
+    <string name="modify_account_email_field_label">Correo electrónico</string>
+    <string name="modify_account_verify_email_label">Después de guardar los cambios, revisa tu nuevo correo, incluida la carpeta de spam, y acepta la solicitud. Luego, vuelve a iniciar sesión en la aplicación para confirmar el cambio.</string>
+    <string name="modify_account_notifications_on">Activar notificaciones de rescate</string>
+    <string name="modify_account_notifications_off">Desactivar notificaciones de rescate</string>
+    <string name="modify_account_turn_rescue_notifications_on_off">Activar o desactivar notificaciones de rescate</string>
+    <string name="modify_account_change_your_password_checkbox_label">Quiero cambiar mi contraseña</string>
+    <string name="modify_account_current_password_field_label">Contraseña actual</string>
+    <string name="modify_account_new_password_field_label">Nueva contraseña</string>
+    <string name="modify_account_save_changes_button">Guardar cambios</string>
+
+    <!-- Delete account screen -->
+    <string name="delete_account_screen_delete_account_title">Eliminar tu cuenta</string>
+    <string name="delete_account_screen_are_you_sure_delete_account_message">¿Seguro que quieres eliminar tu cuenta?</string>
+    <string name="delete_account_screen_explanation_delete_account_message">Esta acción es irreversible. Esto significa que tus datos, los animales no humanos que gestionas, tus chats, tus casas de acogida y tus eventos de rescate se eliminarán permanentemente. Para continuar, añade tu contraseña</string>
+    <string name="delete_account_screen_finish_exit_chats">Por favor, antes de eliminar tu cuenta, termina o sal primero de tus chats.</string>
+    <string name="delete_account_screen_delete_account_button">Eliminar cuenta</string>
+    <string name="delete_account_screen_delete_error_message">Error al eliminar la cuenta de usuario. Por favor, desinstala la aplicación para eliminarla</string>
+
+    <!-- General error messages -->
+    <string name="general_error_network_message">Error de red. Comprueba tu conexión a Internet e inténtalo de nuevo</string>
+    <string name="general_error_unknown_message">Se ha producido un error desconocido. Inténtalo de nuevo más tarde</string>
+    <string name="general_error_invalid_deep_link">Este enlace no es válido. Pide otro o busca %1$ss en la aplicación</string>
+
+    <!-- Check reviews screen -->
+    <string name="check_reviews_screen_my_reviews_title">Mis reseñas</string>
+    <string name="check_reviews_screen_user_profile_title">Perfil de %1$s</string>
+    <string name="check_reviews_screen_user_reviews_title">Reseñas</string>
+    <string name="check_reviews_screen_no_reviews">No hay reseñas por el momento</string>
+    <string name="check_reviews_screen_user_deleted">Usuario eliminado</string>
+
+    <!-- Create review screen -->
+    <string name="create_review_screen_title">Valora tu experiencia</string>
+    <string name="create_review_screen_description">¡Eres increíble! ¡Gracias por ayudar a los animales no humanos 🎉🎉!</string>
+    <string name="create_review_screen_activist_avatar_content_description">Avatar de %1$s</string>
+    <string name="create_review_screen_submit_reviews_button">Enviar reseñas</string>
+
+    <!-- Review activist list item -->
+    <string name="review_activist_list_item_leave_review">Deja un comentario para %1$s</string>
+
+    <!-- Check all non-human animals -->
+    <string name="check_all_non_human_animals_screen_registered_non_human_animals_title">Animales no humanos registrados</string>
+    <string name="check_all_non_human_animals_screen_no_non_human_animals">No hay animales no humanos registrados</string>
+    <string name="check_all_non_human_animals_screen_register_non_human_animal">+ Registrar un animal no humano</string>
+
+    <!-- Check non-human animal -->
+    <string name="check_non_human_animal_screen_non_human_animal_profile_title">Perfil de %1$s</string>
+    <string name="check_non_human_animal_screen_non_human_animal_avatar_content_description">Avatar de %1$s</string>
+    <string name="check_non_human_animal_screen_non_human_animal_description">Descripción</string>
+
+    <!-- Modify non-human animal -->
+    <string name="modify_non_human_animal_screen_non_human_animal_profile_title">Perfil de %1$s %2$s</string>
+    <string name="modify_non_human_animal_screen_non_human_animal_name">Nombre</string>
+    <string name="modify_non_human_animal_screen_non_human_animal_type">Tipo</string>
+    <string name="modify_non_human_animal_screen_non_human_animal_gender">Género</string>
+    <string name="modify_non_human_animal_screen_non_human_animal_age_category">Categoría de edad</string>
+    <string name="modify_non_human_animal_screen_non_human_animal_description">descripción</string>
+    <string name="modify_non_human_animal_screen_delete_non_human_animal_text">Eliminar perfil de %1$s</string>
+    <string name="modify_non_human_animal_screen_delete_non_human_animal_button">Eliminar</string>
+    <string name="modify_non_human_animal_screen_dismiss_delete_non_human_animal_button">Descartar</string>
+    <string name="modify_non_human_animal_screen_delete_non_human_animal_title">¿Quieres eliminar el perfil de %1$s?</string>
+    <string name="modify_non_human_animal_screen_delete_non_human_animal_message">Esta acción no se puede deshacer</string>
+    <string name="modify_non_human_animal_screen_save_non_human_animal_changes_button">Guardar cambios de %1$s</string>
+    <string name="modify_non_human_animal_screen_non_human_animal_in_foster_home_rescue_event_title">%1$s está en un %2$s</string>
+    <string name="modify_non_human_animal_screen_non_human_animal_in_foster_home_rescue_event_message">Por favor, termina primero el proceso con %1$s en el %2$s</string>
+    <string name="modify_non_human_animal_screen_non_human_animal_in_foster_home_ok_button">Aceptar</string>
+
+    <!-- No human animal types -->
+    <string name="non_human_animal_type_unselected">No seleccionado</string>
+    <string name="non_human_animal_type_dog">Perro</string>
+    <string name="non_human_animal_type_cat">Gato</string>
+    <string name="non_human_animal_type_bird">Pájaro</string>
+    <string name="non_human_animal_type_rabbit">Conejo</string>
+    <string name="non_human_animal_type_rodent">Roedor</string>
+    <string name="non_human_animal_type_ferret">Hurón</string>
+    <string name="non_human_animal_type_reptile">Reptil</string>
+    <string name="non_human_animal_type_fish">Pez</string>
+    <string name="non_human_animal_type_equid">Equino</string>
+    <string name="non_human_animal_type_hog">Cerdo</string>
+    <string name="non_human_animal_type_ovine">Ovino</string>
+    <string name="non_human_animal_type_bobine">Vacuno</string>
+    <string name="non_human_animal_type_other">Otro</string>
+
+    <!-- No human animal genders -->
+    <string name="non_human_animal_gender_unselected">No seleccionado</string>
+    <string name="non_human_animal_gender_female">Hembra</string>
+    <string name="non_human_animal_gender_male">Macho</string>
+
+    <!-- No human animal age category -->
+    <string name="non_human_animal_age_category_unselected">No seleccionado</string>
+    <string name="non_human_animal_age_category_baby">Cachorro</string>
+    <string name="non_human_animal_age_category_young">Joven</string>
+    <string name="non_human_animal_age_category_adult">Adulto</string>
+    <string name="non_human_animal_age_category_senior">Mayor</string>
+
+    <!-- Non-human animal state -->
+    <string name="non_human_animal_needs_to_be_rehomed">🩷 Necesita ser reubicado</string>
+    <string name="non_human_animal_needs_to_be_rescued">🦸 Necesita ser rescatado</string>
+    <string name="non_human_animal_rehomed">🏠 Reubicado</string>
+    <string name="non_human_animal_saved">🎉 Salvado</string>
+
+    <!-- Create a non-human animal -->
+    <string name="create_non_human_animal_screen_title">Crear un animal no humano</string>
+    <string name="create_non_human_animal_screen_non_human_animal_name">Nombre</string>
+    <string name="create_non_human_animal_screen_non_human_animal_type">Tipo</string>
+    <string name="create_non_human_animal_screen_non_human_animal_gender">Género</string>
+    <string name="create_non_human_animal_screen_non_human_animal_age_category">Categoría de edad</string>
+    <string name="create_non_human_animal_screen_non_human_animal_description">descripción</string>
+    <string name="create_non_human_animal_screen_create_non_human_animal_profile_button">Crear perfil de animal no humano</string>
+    <string name="create_non_human_animal_screen_create_non_human_animal_profile_named_button">Crear perfil de %1$s</string>
+
+    <!-- Give feedback -->
+    <string name="give_feedback_subject">Feedback para Reskiume</string>
+    <string name="give_feedback_body">Mi nombre: \n\n¿Por qué es importante este feedback? \n\nDescripción: </string>
+
+    <!-- No email dialog -->
+    <string name="dialog_no_email_app_dialog_title">No tienes ninguna aplicación de correo instalada</string>
+    <string name="dialog_no_email_app_dialog_message">Por favor, ve a la tienda e instala una</string>
+    <string name="dialog_no_email_app_dialog_ok_button">Aceptar</string>
+
+    <!-- Check all foster homes -->
+    <string name="check_all_foster_homes_screen_title">Buscar casas de acogida por</string>
+    <string name="check_all_foster_homes_screen_place_search_option">🌐 lugar</string>
+    <string name="check_all_foster_homes_screen_location_search_option">📍 ubicación</string>
+    <string name="check_all_foster_homes_screen_non_human_animal_type_label">🐷🐱 Tipo de animal no humano</string>
+    <string name="check_all_foster_homes_screen_search_foster_homes_button">🔎 Buscar casas de acogida %1$s</string>
+    <string name="check_all_foster_homes_screen_search_by_place">por lugar</string>
+    <string name="check_all_foster_homes_screen_search_by_location">por ubicación</string>
+    <string name="check_all_foster_homes_screen_search_available_foster_homes">%1$d casas de acogida disponibles</string>
+    <string name="check_all_foster_homes_screen_no_foster_home_found">⚠️ No se ha encontrado ninguna casa de acogida, pero considera crear un evento de rescate o buscar en redes sociales.</string>
+    <string name="check_all_foster_homes_screen_turn_on_location">Por favor, activa la ubicación para obtener tu posición</string>
+    <string name="check_all_foster_homes_screen_register_foster_home">Añadir casa de acogida</string>
+
+    <!-- Foster home list item -->
+    <string name="foster_home_list_item_accepted_non_human_animal">Acepta: </string>
+    <string name="foster_home_list_item_accepted_both_genders_non_human_animal">hembra &amp; macho</string>
+    <string name="foster_home_list_item_more_non_human_animal">➕ Y más</string>
+    <string name="foster_home_list_item_residents_non_human_animal">Residentes</string>
+    <string name="foster_home_list_item_disabled_foster_home">Desactivado</string>
+    <string name="foster_home_list_item_km">%1$d km · %2$s</string>
+
+    <!-- Check all my foster homes -->
+    <string name="check_all_my_foster_homes_screen_title">Revisa mis casas de acogida</string>
+    <string name="check_all_my_foster_homes_screen_no_foster_homes">🏠 No tienes ninguna casa de acogida, pero puedes considerar crear una.</string>
+    <string name="check_all_my_foster_homes_screen_register_foster_home">+ Registrar una casa de acogida</string>
+
+    <!-- Modify foster home -->
+    <string name="modify_foster_home_screen_title">Modificar %1$s de %2$s (%3$s)</string>
+    <string name="modify_foster_home_screen_foster_home_title">Título</string>
+    <string name="modify_foster_home_screen_foster_home_description">Descripción</string>
+    <string name="modify_foster_home_screen_foster_home_conditions">Condiciones</string>
+    <string name="modify_foster_home_screen_delete_foster_home_text">Eliminar %1$s</string>
+    <string name="modify_foster_home_screen_delete_foster_home_button">Eliminar</string>
+    <string name="modify_foster_home_screen_dismiss_delete_foster_home_button">Descartar</string>
+    <string name="modify_foster_home_screen_delete_foster_home_title">¿Quieres eliminar %1$s?</string>
+    <string name="modify_foster_home_screen_delete_foster_home_message">Esta acción no se puede deshacer</string>
+    <string name="modify_foster_home_screen_save_foster_home_changes_button">Guardar cambios de %1$s</string>
+    <string name="modify_foster_home_screen_available_label">Disponible</string>
+    <string name="modify_foster_home_screen_unavailable_label">No disponible</string>
+    <string name="modify_foster_home_availability_description">Actualiza la disponibilidad de esta casa de acogida para recibir solicitudes de reubicación</string>
+    <string name="modify_foster_home_screen_foster_home_started_title">Esta casa de acogida ya ha empezado</string>
+    <string name="modify_foster_home_screen_foster_home_started_message">Por favor, termina primero su chat antes de eliminar la casa de acogida</string>
+    <string name="modify_foster_home_screen_foster_home_started_ok_button">Aceptar</string>
+    <string name="modify_foster_home_screen_warning_foster_home_with_residents_title">Esta casa de acogida tiene %1$d residentes</string>
+    <string name="modify_foster_home_screen_warning_foster_home_with_residents_message">Para eliminar esta casa de acogida primero debes dar de baja a todos los residentes</string>
+    <string name="modify_foster_home_screen_warning_foster_home_with_residents_ok_button">Aceptar</string>
+
+    <!-- Create a foster home -->
+    <string name="create_foster_home_screen_title">Crear una casa de acogida</string>
+    <string name="create_foster_home_screen_foster_home_title">Título</string>
+    <string name="create_foster_home_screen_foster_home_description">Descripción</string>
+    <string name="create_foster_home_screen_foster_home_conditions">Condiciones</string>
+    <string name="create_foster_home_screen_foster_home_accepted_non_human_animals">Animales no humanos aceptados</string>
+    <string name="create_foster_home_screen_foster_home_resident_non_human_animals">Animales no humanos residentes</string>
+    <string name="create_foster_home_screen_foster_home_longitude">Longitud</string>
+    <string name="create_foster_home_screen_foster_home_latitude">Latitud</string>
+    <string name="create_foster_home_screen_create_a_foster_home_button">Crear una casa de acogida</string>
+    <string name="create_foster_home_screen_create_the_foster_home_button">Crear la casa de acogida %1$s</string>
+    <string name="create_foster_home_screen_turn_on_location">Por favor, activa la ubicación para obtener tu posición</string>
+
+    <!-- Country and city selector -->
+    <string name="country_city_selector_country">País</string>
+    <string name="country_city_selector_city">Ciudad</string>
+
+    <!-- element types -->
+    <string name="foster_home">casa de acogida</string>
+    <string name="rescue_event">evento de rescate</string>
+    <string name="chat">chat</string>
+
+    <!-- Manage location permission for a foster home and a rescue event -->
+    <string name="manage_location_permission_title">Permiso de ubicación</string>
+    <string name="manage_location_permission_message_check_all">Puedes conceder el permiso de ubicación para mostrar %1$ss cerca de ti. Nunca rastrearemos tu ubicación.</string>
+    <string name="manage_location_permission_message">Por favor, concede el permiso de ubicación para acceder a la ubicación aproximada de tu %1$s. Los usuarios pueden ver la distancia entre %1$ss cercanos usando su ubicación actual. Además, nunca rastrearemos ni revelaremos tu ubicación.</string>
+    <string name="manage_location_permission_grant_permission_button">Conceder permiso</string>
+    <string name="manage_location_permission_do_not_grant_permission_button">Más tarde</string>
+    <string name="manage_location_permission_go_to_settings_title">Ir a ajustes</string>
+    <string name="manage_location_permission_grant_in_settings_message">Los permisos de ubicación se pueden activar en ajustes. Recuerda que nunca rastrearemos ni revelaremos tu ubicación.</string>
+    <string name="manage_location_permission_open_settings_button">Abrir ajustes</string>
+    <string name="manage_location_permission_turn_on_location_title">Activa los servicios de ubicación manualmente</string>
+    <string name="manage_location_permission_turn_on_location_message_check_all">Por favor, activa los servicios de ubicación manualmente para poder determinar dónde estás y mostrar %1$ss cercanos después de hacer clic en buscar.</string>
+    <string name="manage_location_permission_turn_on_location_message">Por favor, activa los servicios de ubicación manualmente para poder determinar la ubicación aproximada de tu %1$s.</string>
+    <string name="manage_location_permission_turn_on_location_open_settings_button">Abrir ajustes</string>
+    <string name="manage_location_permission_turn_on_later_location_button">Más tarde</string>
+
+    <!-- Accepted non-human animal list creator -->
+    <string name="accepted_non_human_animal_list_creator_title">Añadir animales no humanos aceptados:</string>
+    <string name="accepted_non_human_animal_list_creator_non_human_animal_type_label">Tipo</string>
+    <string name="accepted_non_human_animal_list_creator_non_human_animal_gender_label">Género</string>
+    <string name="accepted_non_human_animal_list_creator_add_content_description">Añadir un tipo y género de animal no humano</string>
+    <string name="accepted_non_human_animal_list_creator_delete_content_description">Eliminar un tipo y género de animal no humano</string>
+
+    <!-- Non-human animal list creator -->
+    <string name="non_human_animal_list_creator_resident_title">Añadir animales no humanos residentes:</string>
+    <string name="non_human_animal_list_creator_save_title">Añadir animales no humanos para guardar:</string>
+    <string name="non_human_animal_list_creator_non_human_animal_label">Animal no humano</string>
+    <string name="non_human_animal_list_creator_unselected_non_human_animal_label">No seleccionado</string>
+    <string name="non_human_animal_list_creator_add_content_description">Añadir un animal no humano</string>
+    <string name="non_human_animal_list_creator_delete_content_description">Eliminar un animal no humano</string>
+
+    <!-- Check foster home -->
+    <string name="check_foster_home_screen_title">%1$s de %2$s (%3$s)</string>
+    <string name="check_foster_home_screen_share_content_description">Compartir esta casa de acogida</string>
+    <string name="check_foster_home_screen_accepted_both_genders_non_human_animal">hembra &amp; macho</string>
+    <string name="check_foster_home_screen_accepted_non_human_animals">%1$s y %2$s</string>
+    <string name="check_foster_home_screen_foster_home_avatar_content_description">Avatar de %1$s</string>
+    <string name="check_foster_home_screen_owner_avatar_content_description">Avatar de %1$s</string>
+    <string name="check_foster_home_screen_foster_home_description_label">Descripción</string>
+    <string name="check_foster_home_screen_foster_home_conditions_label">Condiciones</string>
+    <string name="check_foster_home_screen_foster_home_accepted_non_human_animals_label">Animales no humanos aceptados</string>
+    <string name="check_foster_home_screen_foster_home_resident_non_human_animals_label">Animales no humanos residentes</string>
+    <string name="check_foster_home_screen_owner_reviews_label">Reseñas</string>
+    <string name="check_foster_home_screen_no_account_label">Crea una cuenta para registrar un animal no humano para acogida y hablar con %1$s</string>
+    <string name="check_foster_home_screen_no_account_button">Crea una cuenta</string>
+    <string name="check_foster_home_screen_register_non_human_animal_to_talk_to_owner_label">Primero registra un animal no humano para acogida y luego habla con %1$s</string>
+    <string name="check_foster_home_screen_register_non_human_animal_button">Primero registra un animal no humano</string>
+    <string name="check_foster_home_screen_register_other_non_human_animal_to_foster_label">Registrar otro animal no humano para acogida</string>
+    <string name="check_foster_home_screen_register_other_non_human_animal_button">Registrar otro animal no humano</string>
+    <string name="check_foster_home_screen_talk_to_owner_label">Habla con %1$s para acoger a un animal no humano</string>
+    <string name="check_foster_home_screen_keep_talking_to_owner_label">Sigue hablando con %1$s</string>
+    <string name="check_foster_home_screen_start_chat_button">Iniciar chat</string>
+    <string name="check_foster_home_screen_continue_chat_button">Volver al chat</string>
+    <string name="check_foster_home_screen_share_foster_home_title">¿Necesitas acoger a un animal no humano? La casa de acogida %1$s puede cuidar de: %2$s. Encuéntralo en la aplicación Reskiume con este enlace %3$s</string>
+    <string name="check_foster_home_screen_add_non_human_animals_to_foster_title">Añadir animales no humanos para acogida</string>
+    <string name="check_foster_home_screen_ok_button">Aceptar</string>
+    <string name="check_foster_home_screen_foster_home_not_available_title">Esta casa de acogida no está disponible</string>
+    <string name="check_foster_home_screen_look_for_foster_homes_message">Por favor, sigue buscando otras casas de acogida</string>
+
+    <!-- Check all my rescue events -->
+    <string name="check_all_my_rescue_events_screen_title">Revisa mis eventos de rescate</string>
+    <string name="check_all_my_rescue_events_screen_no_rescue_events">🦸 No tienes ningún evento de rescate, pero puedes considerar crear uno.</string>
+    <string name="check_all_my_rescue_events_screen_register_rescue_event">+ Registrar un evento de rescate</string>
+
+    <!-- Rescue event list item -->
+    <string name="rescue_event_list_item_non_human_animal_to_rescue">Necesita rescate: </string>
+    <string name="rescue_event_list_item_more_non_human_animal">➕ Y más</string>
+    <string name="rescue_event_list_item_needs_to_cover">Necesita cubrir: </string>
+    <string name="rescue_event_list_item_km">%1$d km · %2$s</string>
+
+    <!-- Need to cover-->
+    <string name="need_to_cover_unselected">No seleccionado</string>
+    <string name="need_to_cover_rescuers">🦸 Rescatistas</string>
+    <string name="need_to_cover_foster_home">🏠 casa de acogida</string>
+
+    <!-- Create a rescue event -->
+    <string name="create_rescue_event_screen_title">Crear un evento de rescate</string>
+    <string name="create_rescue_event_screen_rescue_event_title">Título</string>
+    <string name="create_rescue_event_screen_rescue_event_description">Descripción</string>
+    <string name="create_rescue_event_screen_rescue_event_non_human_animals_to_rescue">Animales no humanos a rescatar</string>
+    <string name="create_rescue_event_screen_rescue_event_needs_to_cover">Necesita cubrir</string>
+    <string name="create_rescue_event_screen_rescue_event_longitude">Longitud</string>
+    <string name="create_rescue_event_screen_rescue_event_latitude">Latitud</string>
+    <string name="create_rescue_event_screen_rescue_event_country">País</string>
+    <string name="create_rescue_event_screen_rescue_event_city">Ciudad</string>
+    <string name="create_rescue_event_screen_create_a_rescue_event_button">Crear un evento de rescate</string>
+    <string name="create_rescue_event_screen_create_the_rescue_event_button">Crear el evento de rescate %1$s</string>
+    <string name="create_rescue_event_screen_turn_on_location">Por favor, activa la ubicación para obtener tu posición y vuelve a intentarlo</string>
+
+    <!-- Need to cover list creator -->
+    <string name="need_to_cover_list_creator_title">Selecciona las necesidades a cubrir:</string>
+
+    <!-- Modify a rescue event -->
+    <string name="modify_rescue_event_screen_title">Modificar %1$s - %2$s (%3$s)</string>
+    <string name="modify_rescue_event_screen_rescue_event_title">Título</string>
+    <string name="modify_rescue_event_screen_rescue_event_description">Descripción</string>
+    <string name="modify_rescue_event_screen_delete_rescue_event_text">Eliminar %1$s</string>
+    <string name="modify_rescue_event_screen_delete_rescue_event_button">Eliminar</string>
+    <string name="modify_rescue_event_screen_dismiss_delete_rescue_event_button">Descartar</string>
+    <string name="modify_rescue_event_screen_delete_rescue_event_title">¿Quieres eliminar %1$s?</string>
+    <string name="modify_rescue_event_screen_delete_rescue_event_message">Esta acción no se puede deshacer</string>
+    <string name="modify_rescue_event_screen_save_rescue_event_changes_button">Guardar cambios de %1$s</string>
+    <string name="modify_rescue_event_screen_rescue_event_started_title">Este evento de rescate ya ha empezado</string>
+    <string name="modify_rescue_event_screen_rescue_event_started_message">Por favor, termina primero su chat antes de eliminar el evento de rescate</string>
+    <string name="modify_rescue_event_screen_rescue_event_started_ok_button">Aceptar</string>
+
+    <!-- Check all rescue events -->
+    <string name="check_all_rescue_events_screen_title">Buscar eventos de rescate por</string>
+    <string name="check_all_rescue_events_screen_search_rescue_events_button">🔎 Buscar eventos de rescate %1$s</string>
+    <string name="check_all_rescue_events_screen_search_by_place">por lugar</string>
+    <string name="check_all_rescue_events_screen_search_by_location">por ubicación</string>
+    <string name="check_all_rescue_events_screen_search_available_rescue_events">%1$d eventos de rescate disponibles</string>
+    <string name="check_all_rescue_events_screen_no_rescue_event_found">⚠️ No se ha encontrado ningún evento de rescate.</string>
+    <string name="check_all_rescue_events_screen_turn_on_location">Por favor, activa la ubicación para obtener tu posición</string>
+    <string name="check_all_rescue_events_screen_register_rescue_event">Añadir evento de rescate</string>
+
+    <!-- Check rescue event -->
+    <string name="check_rescue_event_screen_title">%1$s - %2$s (%3$s)</string>
+    <string name="check_rescue_event_screen_share_content_description">Compartir este evento de rescate</string>
+    <string name="check_rescue_event_screen_non_human_animals_to_rescue">%1$s y %2$s</string>
+    <string name="check_rescue_event_screen_rescue_event_avatar_content_description">Avatar de %1$s</string>
+    <string name="check_rescue_event_screen_creator_avatar_content_description">Avatar de %1$s</string>
+    <string name="check_rescue_event_screen_rescue_event_description_label">Descripción</string>
+    <string name="check_rescue_event_screen_rescue_event_needs_to_cover_label">Necesita cubrir</string>
+    <string name="check_rescue_event_screen_rescue_event_non_human_animals_to_rescue_label">Animales no humanos a rescatar</string>
+    <string name="check_rescue_event_screen_no_account_label">Crea una cuenta para unirte al evento de rescate %1$s</string>
+    <string name="check_rescue_event_screen_no_account_button">Crea una cuenta</string>
+    <string name="check_rescue_event_screen_join_the_rescue_event_label">Únete al evento de rescate %1$s</string>
+    <string name="check_rescue_event_screen_come_back_to_the_rescue_event_label">Vuelve al evento de rescate %1$s</string>
+    <string name="check_rescue_event_screen_start_chat_button">Iniciar chat</string>
+    <string name="check_rescue_event_screen_keep_chatting_button">Seguir chateando</string>
+    <string name="check_rescue_event_screen_share_rescue_event_title">Únete al evento de rescate %1$s para rescatar %2$s. Encuéntralo en la aplicación Reskiume con este enlace %3$s</string>
+    <string name="check_rescue_event_screen_ok_button">Aceptar</string>
+    <string name="check_rescue_event_screen_rescue_event_finished_title">Este evento de rescate ha terminado</string>
+    <string name="check_rescue_event_screen_rescue_event_message">Por favor, sigue buscando nuevos eventos de rescate. Tu ayuda es valiosa.</string>
+
+    <!-- Check all my chats -->
+    <string name="check_all_my_chats_screen_title">Chats</string>
+    <string name="check_all_my_chats_screen_no_chats">💬 No tienes ningún chat.</string>
+    <string name="check_all_my_chats_screen_chat_message_sent_just_now_timestamp">Ahora mismo</string>
+    <string name="check_all_my_chats_screen_chat_message_sent_minutes_ago_timestamp">Hace %1$d minutos</string>
+    <string name="check_all_my_chats_screen_chat_message_sent_hours_ago_timestamp">Hace %1$d horas</string>
+    <string name="check_all_my_chats_screen_chat_message_sent_days_ago_timestamp">Hace %1$d días</string>
+
+    <!-- Check chat -->
+    <string name="check_chat_screen_no_messages">Sé amable, respetuoso y da respuestas buenas, sinceras y útiles. Si el animal no humano no está contigo, nunca reveles su ubicación exacta hasta que os reunáis.</string>
+    <string name="check_chat_screen_chat_message_date_today">Hoy</string>
+    <string name="check_chat_screen_chat_message_date_yesterday">Ayer</string>
+    <string name="check_chat_screen_chat_message_date_monday">Lunes</string>
+    <string name="check_chat_screen_chat_message_date_tuesday">Martes</string>
+    <string name="check_chat_screen_chat_message_date_wednesday">Miércoles</string>
+    <string name="check_chat_screen_chat_message_date_thursday">Jueves</string>
+    <string name="check_chat_screen_chat_message_date_friday">Viernes</string>
+    <string name="check_chat_screen_chat_message_date_saturday">Sábado</string>
+    <string name="check_chat_screen_chat_message_date_sunday">Domingo</string>
+    <string name="check_chat_screen_write_a_message_description">Escribe un mensaje...</string>
+    <string name="check_chat_screen_send_content_description">Enviar un mensaje</string>
+    <string name="check_chat_screen_image_content_description">Imagen de %1$s</string>
+    <string name="check_chat_screen_foster_action">acoger</string>
+    <string name="check_chat_screen_rescue_action">rescatar</string>
+    <string name="check_chat_screen_non_human_animal_name">a %1$s %2$s</string>
+    <string name="check_chat_screen_quantity_of_non_human_animals">a %1$s %2$d animales no humanos</string>
+    <string name="check_chat_screen_more_options_content_description">Más opciones</string>
+    <string name="check_chat_screen_leave_chat_option">Salir del chat</string>
+    <string name="check_chat_screen_leave_review_chat_option">🎉 Salir del chat y añadir una reseña</string>
+    <string name="check_chat_screen_leave_chat_message">¿Seguro que quieres salir del chat?</string>
+    <string name="check_chat_screen_yes_button">Sí</string>
+    <string name="check_chat_screen_no_button">No</string>
+    <string name="check_chat_screen_user_left_chat_message">%1$s salió del chat</string>
+    <string name="check_chat_screen_check_all_activists_option">Ver todos los activistas</string>
+    <string name="check_chat_screen_decline_to_foster_button">❌ Rechazar</string>
+    <string name="check_chat_screen_foster_button">✅ Acoger</string>
+    <string name="check_chat_screen_finish_foster_and_evaluate_button">🎉 Finalizar acogida y valorar</string>
+    <string name="check_chat_screen_finish_rescue_event_button">Finalizar evento de rescate</string>
+    <string name="check_chat_screen_finish_rescue_event_and_evaluate_button">🎉 Finalizar rescate y valorar</string>
+    <string name="check_chat_screen_some_non_human_animals">%1$s y %2$s</string>
+    <string name="check_chat_screen_about_non_human_animal">Sobre %1$s</string>
+    <string name="check_chat_screen_need_to_be_rehomed">¿%1$s necesitan ser reubicados?</string>
+    <string name="check_chat_screen_rescued_non_human_animal">¿Rescataste a %1$s?</string>
+    <string name="check_chat_screen_chat_finished">%1$s terminó el chat</string>
+    <string name="check_chat_screen_accepted_foster">🎊 ¡Genial! %1$s aceptó acoger a %2$s</string>
+    <string name="check_chat_screen_title_after_clicking_decline_option">Vas a rechazar la acogida</string>
+    <string name="check_chat_screen_title_after_clicking_accept_option">🎉 Vas a aceptar la acogida</string>
+    <string name="check_chat_screen_title_after_clicking_finish_option">🥳 Vas a finalizar la %1$s y valorar a los activistas</string>
+    <string name="check_chat_screen_title_after_clicking_finish_rescue_without_activist_option">Vas a finalizar el rescate</string>
+    <string name="check_chat_screen_message_after_clicking_option">¿Estás seguro?</string>
+
+    <!-- Share service -->
+    <string name="share_service_install_title">No tienes ninguna aplicación para compartir instalada</string>
+    <string name="share_service_install_message">Por favor, ve a la tienda e instala una</string>
+    <string name="share_service_ok_button">Aceptar</string>
+
+    <!-- Report -->
+    <string name="report_element_link">Reportar este %1$s</string>
+    <string name="report_subject">Reportar el %1$s %2$s (%3$s)</string>
+    <string name="report_body">Mi nombre: \n\nEstoy reportando el %1$s %2$s (%3$s) porque: </string>
+
+    <!-- Check all advice -->
+    <string name="check_all_advice_screen_title">Consultar todos los consejos</string>
+    <string name="check_all_advice_screen_seek_advice">Buscar consejo</string>
+    <string name="check_all_advice_screen_no_advice_found">🙈 No se ha encontrado ningún consejo</string>
+    <string name="check_all_advice_screen_option_rescue">Rescate</string>
+    <string name="check_all_advice_screen_option_rehome">Reubicación</string>
+    <string name="check_all_advice_screen_option_care">Cuidado</string>
+    <string name="check_all_advice_screen_option_all">Todo</string>
+    <string name="check_all_advice_screen_option_send_advice_button">Enviar consejo por correo</string>
+    <string name="check_all_advice_screen_option_advice_mail_subject">Mi consejo para Reskiume</string>
+    <string name="check_all_advice_screen_option_advice_mail_body">Mi nombre: \n\n¿Por qué es importante este consejo? \n\nTítulo del consejo: \n\nDescripción del consejo: </string>
+
+    <!-- Search bar -->
+    <string name="search_bar_search_icon_content_description">Buscar</string>
+    <string name="search_bar_erase_input_content_description">Borrar texto de búsqueda</string>
+
+    <!-- Check advice -->
+    <string name="check_advice_screen_title">Consultar consejo</string>
+    <string name="check_advice_screen_author">Autor del consejo: %1$s</string>
+    <string name="check_advice_screen_author_image_content_description">Imagen de %1$s</string>
+
+    <!-- Button -->
+    <string name="button_please_wait">Espera, por favor</string>
+
+</resources>

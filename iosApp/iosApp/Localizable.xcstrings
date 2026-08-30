@@ -9,6 +9,12 @@
             "state" : "translated",
             "value" : "Get involved and save a life 🦸"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Involúcrate y salva una vida 🦸"
+          }
         }
       }
     },
@@ -19,6 +25,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "New rescue event!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Nuevo evento de rescate!"
           }
         }
       }

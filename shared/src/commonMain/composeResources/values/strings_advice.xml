@@ -1,5 +1,9 @@
 <resources>
     <!-- Advice: Rescue -->
+    <string name="advice_rescue_non_human_animal_title">What do “non-human animal” and “other animals” mean?</string>
+    <string name="advice_rescue_non_human_animal_description">They mean animals that are not people, such as a pig or a cat. Their use emphasizes that humans are also animals.
+\nDespite this being a fact, some people prefer to differentiate themselves to justify their behavior towards other animals and harm them.
+\nTherefore, their use aims to raise awareness of the importance of respecting other animals, regardless of their species.</string>
     <string name="advice_rescue_found_non_human_animal_title">I found a non-human animal in the street. What can I do?</string>
     <string name="advice_rescue_found_non_human_animal_description">The first thing you need to establish is if the non-human animal displays signs of being abandoned. A dirty coat and a lack of an identification chip indicate that the non-human animal is abandoned or lives where you found him/her.
 \nIf he/she shows signs of distress or vulnerability, pick him/her up and take him/her to the nearest veterinary clinic to ask for an identification test. Vets are forced by law to provide this service for free! They will also inform you about your options to ensure that the non-human animal gets taken care of in the future.
@@ -22,8 +26,8 @@
     <!-- Advice: Rehome -->
     <string name="advice_rehome_find_a_home_non_human_animal_title">What are the steps to find a home for my non-human animal using Reskiume?</string>
     <string name="advice_rehome_find_a_home_non_human_animal_description">On the front page, you can browse homes in your area that can provide care for your non-human animal.
-\nTry to find a foster home for the non-human animal first. In a foster home, an experienced volunteer will take care of him/her. Use the filters and the homes in the list to see a detailed view with more photos and a description. Tap “Contact” to send a message to the owner and arrange the pick up.
-\nOnce your non-human animal is safely placed in a foster home, you can collaborate with the foster home volunteer to find a permanent adoption family within the app. Additionally, share your non-human animal’s profile on social networks to reach even more people who may be willing to adopt him/her. </string>
+    \nTry to find a foster home for the non-human animal first. In a foster home, an experienced volunteer will take care of him/her. Use the filters and the homes in the list to see a detailed view with more photos and a description. Tap “Contact” to send a message to the owner and arrange the pick up.
+    </string>
     <string name="advice_rehome_visit_non_human_animal_title">Will I be able to visit the non-human animal after he/she is adopted? </string>
     <string name="advice_rehome_visit_non_human_animal_description">Of course! Visits should be arranged between you and the adoption or foster home directly.
         \nWhen you contact them, try to arrange a couple of visits to monitor whether the non-human animal is being correctly taken care of. </string>

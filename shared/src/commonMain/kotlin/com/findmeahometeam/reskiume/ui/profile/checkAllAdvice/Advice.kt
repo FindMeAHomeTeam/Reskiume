@@ -3,6 +3,8 @@ package com.findmeahometeam.reskiume.ui.profile.checkAllAdvice
 import com.findmeahometeam.reskiume.domain.model.Advice
 import com.findmeahometeam.reskiume.domain.model.AdviceImage
 import reskiume.shared.generated.resources.Res
+import reskiume.shared.generated.resources.advice_rescue_non_human_animal_title
+import reskiume.shared.generated.resources.advice_rescue_non_human_animal_description
 import reskiume.shared.generated.resources.advice_care_bloat_torsion_non_human_animal_description
 import reskiume.shared.generated.resources.advice_care_bloat_torsion_non_human_animal_title
 import reskiume.shared.generated.resources.advice_care_feed_non_human_animal_description
@@ -19,6 +21,11 @@ import reskiume.shared.generated.resources.advice_rescue_rejected_non_human_anim
 import reskiume.shared.generated.resources.advice_rescue_rejected_non_human_animal_title
 
 val rescueAdviceList = listOf(
+    Advice(
+        title = Res.string.advice_rescue_non_human_animal_title,
+        description = Res.string.advice_rescue_non_human_animal_description,
+        image = AdviceImage.RESCUE
+    ),
     Advice(
         title = Res.string.advice_rescue_found_non_human_animal_title,
         description = Res.string.advice_rescue_found_non_human_animal_description,

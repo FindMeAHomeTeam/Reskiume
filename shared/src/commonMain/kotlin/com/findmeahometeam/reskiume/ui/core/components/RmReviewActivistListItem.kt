@@ -1,6 +1,5 @@
 package com.findmeahometeam.reskiume.ui.core.components
 
-import RmRatingBar
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

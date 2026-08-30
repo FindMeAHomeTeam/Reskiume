@@ -1,3 +1,5 @@
+package com.findmeahometeam.reskiume.ui.core.components
+
 import androidx.annotation.FloatRange
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures

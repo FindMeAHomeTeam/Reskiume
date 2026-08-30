@@ -30,6 +30,8 @@ fun RmTextLink(
     onClick: () -> Unit
 ) {
     val startIndex = text.indexOf(textToLink)
+    if (startIndex == -1) return
+
     val endIndex = startIndex + textToLink.length
     val debouncedOnClick: () -> Unit = rmDebouncer(onClick)
     val annotatedLinkString: AnnotatedString = buildAnnotatedString {

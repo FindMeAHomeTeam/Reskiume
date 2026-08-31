@@ -21,6 +21,8 @@ import kotlinx.datetime.format.char
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
+private const val TIME_BEFORE_EXPIRING_CACHE: Long = 5 * 60 // 5 min
+
 class CheckReviewsUtilImpl (
     private val observeAuthStateInAuthDataSource: ObserveAuthStateInAuthDataSource,
     private val getDataByManagingObjectLocalCacheTimestamp: GetDataByManagingObjectLocalCacheTimestamp,
@@ -39,6 +41,7 @@ class CheckReviewsUtilImpl (
                 cachedObjectId = reviewedUid,
                 savedBy = authUser?.uid ?: " ",
                 section = Section.REVIEWS,
+                timeBeforeExpiringCache = TIME_BEFORE_EXPIRING_CACHE,
                 onCompletionInsertCache = {
                     getReviewsFromRemoteRepository(reviewedUid).insertRemoteReviewsInLocalRepositoryAndMapThemToUiReview(
                         authUser?.uid ?: " "

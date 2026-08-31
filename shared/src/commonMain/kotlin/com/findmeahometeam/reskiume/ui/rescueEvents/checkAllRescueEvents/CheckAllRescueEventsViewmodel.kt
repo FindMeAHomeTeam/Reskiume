@@ -36,10 +36,10 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import reskiume.shared.generated.resources.Res
 import reskiume.shared.generated.resources.check_all_rescue_events_screen_turn_on_location
 import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -50,7 +50,8 @@ import kotlin.math.sqrt
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
-private const val WAITING_TIME: Int = 2 * 60 // 2 min
+private const val WAITING_TIME_BEFORE_CHECKING_LOCATION_AGAIN: Int = 2 * 60 // 2 min
+private const val TIME_BEFORE_EXPIRING_CACHE: Long = 5 * 60 // 5 min
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CheckAllRescueEventsViewmodel(
@@ -155,7 +156,7 @@ class CheckAllRescueEventsViewmodel(
 
     suspend fun requestEnableLocation(): Boolean {
 
-        return suspendCoroutine { continuation ->
+        return suspendCancellableCoroutine { continuation ->
             requestEnableLocationFromLocationRepository { isEnabled: Boolean ->
                 continuation.resume(isEnabled)
             }
@@ -181,7 +182,7 @@ class CheckAllRescueEventsViewmodel(
         viewModelScope.launch {
 
             val currentTime: Long = Clock.System.now().epochSeconds
-            if (currentTime - locationTimestamp >= WAITING_TIME) {
+            if (currentTime - locationTimestamp >= WAITING_TIME_BEFORE_CHECKING_LOCATION_AGAIN) {
 
                 // Init values
                 activistLongitude = 0.0
@@ -217,6 +218,7 @@ class CheckAllRescueEventsViewmodel(
                     cachedObjectId = country + city,
                     savedBy = myUid,
                     section = Section.RESCUE_EVENTS,
+                    timeBeforeExpiringCache = TIME_BEFORE_EXPIRING_CACHE,
                     onCompletionInsertCache = {
                         val allRescueEventsFlow: Flow<List<RescueEvent>> =
                             getAllRescueEventsByCountryAndCityFromRemoteRepository(
@@ -293,6 +295,7 @@ class CheckAllRescueEventsViewmodel(
                     cachedObjectId = "$activistLongitude$activistLatitude",
                     savedBy = myUid,
                     section = Section.RESCUE_EVENTS,
+                    timeBeforeExpiringCache = TIME_BEFORE_EXPIRING_CACHE,
                     onCompletionInsertCache = {
                         val allRescueEventsFlow: Flow<List<RescueEvent>> =
                             getAllRescueEventsByLocationFromRemoteRepository(

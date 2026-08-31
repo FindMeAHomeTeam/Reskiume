@@ -9,6 +9,7 @@ import com.plusmobileapps.konnectivity.Konnectivity
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
+private const val TIME_BEFORE_EXPIRING_CACHE: Long = 24 * 60 * 60 // 24 hours
 
 // Use case to manage local cache based on timestamp for a specific managing object.
 // It checks if the cache exists and whether it is older than 24 hours,
@@ -23,6 +24,7 @@ class GetDataByManagingObjectLocalCacheTimestamp(
         cachedObjectId: String,
         savedBy: String = " ",
         section: Section,
+        timeBeforeExpiringCache: Long = TIME_BEFORE_EXPIRING_CACHE,
         onCompletionInsertCache: suspend () -> T,
         onCompletionUpdateCache: suspend () -> T,
         onVerifyCacheIsRecent: suspend () -> T
@@ -67,8 +69,11 @@ class GetDataByManagingObjectLocalCacheTimestamp(
 
                 else -> {
 
-                    if (hasPassed24Hours(localCacheEntity.timestamp)) {
-
+                    if (isCacheExpired(
+                            timeBeforeExpiringCache = timeBeforeExpiringCache,
+                            savedEpochSecondsFromCache = localCacheEntity.timestamp
+                        )
+                    ) {
                         repository.modifyLocalCacheEntity(
                             LocalCache(
                                 id = localCacheEntity.id,
@@ -105,8 +110,11 @@ class GetDataByManagingObjectLocalCacheTimestamp(
     }
 
     @OptIn(ExperimentalTime::class)
-    private fun hasPassed24Hours(savedEpochSeconds: Long): Boolean {
+    private fun isCacheExpired(
+        timeBeforeExpiringCache: Long,
+        savedEpochSecondsFromCache: Long
+    ): Boolean {
         val nowEpoch: Long = Clock.System.now().epochSeconds
-        return (nowEpoch - savedEpochSeconds) >= 24 * 60 * 60
+        return (nowEpoch - savedEpochSecondsFromCache) >= timeBeforeExpiringCache
     }
 }

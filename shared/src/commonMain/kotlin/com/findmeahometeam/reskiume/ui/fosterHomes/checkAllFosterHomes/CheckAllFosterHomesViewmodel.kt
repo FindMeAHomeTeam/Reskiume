@@ -7,8 +7,8 @@ import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
-import com.findmeahometeam.reskiume.domain.model.user.User
 import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
+import com.findmeahometeam.reskiume.domain.model.user.User
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllFosterHomesByCountryAndCityFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.GetAllFosterHomesByCountryAndCityFromRemoteRepository
@@ -38,13 +38,13 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import org.jetbrains.compose.resources.StringResource
 import reskiume.shared.generated.resources.Res
 import reskiume.shared.generated.resources.check_all_foster_homes_screen_location_search_option
 import reskiume.shared.generated.resources.check_all_foster_homes_screen_place_search_option
 import reskiume.shared.generated.resources.check_all_foster_homes_screen_turn_on_location
 import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -55,7 +55,8 @@ import kotlin.math.sqrt
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
-private const val WAITING_TIME: Int = 2 * 60 // 2 min
+private const val WAITING_TIME_BEFORE_CHECKING_LOCATION_AGAIN: Int = 2 * 60 // 2 min
+private const val TIME_BEFORE_EXPIRING_CACHE: Long = 5 * 60 // 5 min
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CheckAllFosterHomesViewmodel(
@@ -165,7 +166,7 @@ class CheckAllFosterHomesViewmodel(
 
     suspend fun requestEnableLocation(): Boolean {
 
-        return suspendCoroutine { continuation ->
+        return suspendCancellableCoroutine { continuation ->
             requestEnableLocationFromLocationRepository { isEnabled: Boolean ->
                 continuation.resume(isEnabled)
             }
@@ -191,7 +192,7 @@ class CheckAllFosterHomesViewmodel(
         viewModelScope.launch {
 
             val currentTime: Long = Clock.System.now().epochSeconds
-            if (currentTime - locationTimestamp >= WAITING_TIME) {
+            if (currentTime - locationTimestamp >= WAITING_TIME_BEFORE_CHECKING_LOCATION_AGAIN) {
 
                 // Init values
                 activistLongitude = 0.0
@@ -228,6 +229,7 @@ class CheckAllFosterHomesViewmodel(
                     cachedObjectId = country + city,
                     savedBy = myUid,
                     section = Section.FOSTER_HOMES,
+                    timeBeforeExpiringCache = TIME_BEFORE_EXPIRING_CACHE,
                     onCompletionInsertCache = {
                         val allFosterHomesFlow: Flow<List<FosterHome>> =
                             getAllFosterHomesByCountryAndCityFromRemoteRepository(
@@ -315,6 +317,7 @@ class CheckAllFosterHomesViewmodel(
                     cachedObjectId = "$activistLongitude$activistLatitude",
                     savedBy = myUid,
                     section = Section.FOSTER_HOMES,
+                    timeBeforeExpiringCache = TIME_BEFORE_EXPIRING_CACHE,
                     onCompletionInsertCache = {
                         val allFosterHomesFlow: Flow<List<FosterHome>> =
                             getAllFosterHomesByLocationFromRemoteRepository(

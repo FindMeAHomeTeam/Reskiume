@@ -19,6 +19,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.map
 
+private const val TIME_BEFORE_EXPIRING_CACHE: Long = 5 * 60 // 5 min
+
 class CheckRescueEventUtilImpl(
     private val observeAuthStateInAuthDataSource: ObserveAuthStateInAuthDataSource,
     private val getDataByManagingObjectLocalCacheTimestamp: GetDataByManagingObjectLocalCacheTimestamp,
@@ -45,6 +47,7 @@ class CheckRescueEventUtilImpl(
                 cachedObjectId = rescueEventId,
                 savedBy = myUid,
                 section = Section.RESCUE_EVENTS,
+                timeBeforeExpiringCache = TIME_BEFORE_EXPIRING_CACHE,
                 onCompletionInsertCache = {
                     getRescueEventFromRemoteRepository(
                         rescueEventId

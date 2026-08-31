@@ -14,7 +14,6 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -28,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
 import com.findmeahometeam.reskiume.domain.model.fosterHome.City
@@ -79,7 +79,7 @@ fun CheckAllFosterHomesScreen(
 
     var searchOption: SearchOption by rememberSaveable { mutableStateOf(SearchOption.COUNTRY_CITY) }
     val isLocationEnabledState: State<Boolean> =
-        checkAllFosterHomesViewmodel.observeIfLocationEnabled().collectAsState(initial = false)
+        checkAllFosterHomesViewmodel.observeIfLocationEnabled().collectAsStateWithLifecycle(initialValue = false)
     var nonHumanAnimalType: NonHumanAnimalType by rememberSaveable {
         mutableStateOf(NonHumanAnimalType.UNSELECTED)
     }
@@ -88,16 +88,16 @@ fun CheckAllFosterHomesScreen(
             ManagePermissionState.IDLE
         )
     }
-    var displayDialogToRequestLocationActivation: Boolean by rememberSaveable { mutableStateOf(false) }
 
-    val authState: AuthUser? by checkAllFosterHomesViewmodel.authState.collectAsState(initial = null)
-    val uiFosterHomeListState: UiState<List<UiFosterHome>> by checkAllFosterHomesViewmodel.allFosterHomesState.collectAsState()
+    val authState: AuthUser? by checkAllFosterHomesViewmodel.authState.collectAsStateWithLifecycle(initialValue = null)
+    val uiFosterHomeListState: UiState<List<UiFosterHome>> by checkAllFosterHomesViewmodel.allFosterHomesState.collectAsStateWithLifecycle()
     val isSearchButtonEnabled: Boolean by remember(
         selectedCountry,
         selectedCity,
         permissionState,
         nonHumanAnimalType,
-        uiFosterHomeListState
+        uiFosterHomeListState,
+        isLocationEnabledState.value
     ) {
         derivedStateOf {
             nonHumanAnimalType != NonHumanAnimalType.UNSELECTED &&
@@ -108,7 +108,6 @@ fun CheckAllFosterHomesScreen(
                     } else {
                         permissionState == ManagePermissionState.PERMISSION_GRANTED
                                 && isLocationEnabledState.value
-                                && !displayDialogToRequestLocationActivation
                     }
         }
     }
@@ -151,7 +150,6 @@ fun CheckAllFosterHomesScreen(
                     if (searchOption == SearchOption.LOCATION) {
 
                         permissionState = ManagePermissionState.CHECK_PERMISSION
-                        displayDialogToRequestLocationActivation = !isLocationEnabledState.value
                     }
                 }
 

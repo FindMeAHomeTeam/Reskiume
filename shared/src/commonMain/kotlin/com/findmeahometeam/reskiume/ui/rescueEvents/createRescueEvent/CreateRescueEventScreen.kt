@@ -13,7 +13,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -71,7 +70,7 @@ fun CreateRescueEventScreen(
     val allAvailableNonHumanAnimals: List<NonHumanAnimal> by createRescueEventViewmodel.allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow.collectAsStateWithLifecycle(
         initialValue = emptyList()
     )
-    val manageChangesUiState: UiState<Unit> by createRescueEventViewmodel.saveChangesUiState.collectAsState()
+    val manageChangesUiState: UiState<Unit> by createRescueEventViewmodel.saveChangesUiState.collectAsStateWithLifecycle()
 
     var title: String by rememberSaveable { mutableStateOf("") }
     var description: String by rememberSaveable { mutableStateOf("") }
@@ -92,7 +91,7 @@ fun CreateRescueEventScreen(
         mutableStateOf(ManagePermissionState.CHECK_PERMISSION)
     }
     val isLocationEnabledState: State<Boolean> =
-        createRescueEventViewmodel.observeIfLocationEnabled().collectAsState(initial = false)
+        createRescueEventViewmodel.observeIfLocationEnabled().collectAsStateWithLifecycle(initialValue = false)
 
     val isCreateRescueEventButtonEnabled by remember(
         title,
@@ -104,7 +103,7 @@ fun CreateRescueEventScreen(
         selectedCity,
         locationPermissionState,
         notificationPermissionState,
-        isLocationEnabledState
+        isLocationEnabledState.value
     ) {
         derivedStateOf {
             imageUrl.isNotBlank()

@@ -19,7 +19,7 @@ import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManaging
 import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.util.location.GetLocationFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.ObserveIfLocationEnabledFromLocationRepository
-import com.findmeahometeam.reskiume.domain.usecases.util.location.RequestEnableLocationFromLocationRepository
+import com.findmeahometeam.reskiume.domain.usecases.util.location.ObserveRequestEnableLocationFromLocationRepository
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.components.UiState.Error
 import com.findmeahometeam.reskiume.ui.core.components.UiState.Idle
@@ -36,15 +36,14 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
 import org.jetbrains.compose.resources.StringResource
 import reskiume.shared.generated.resources.Res
 import reskiume.shared.generated.resources.check_all_foster_homes_screen_location_search_option
 import reskiume.shared.generated.resources.check_all_foster_homes_screen_place_search_option
 import reskiume.shared.generated.resources.check_all_foster_homes_screen_turn_on_location
-import kotlin.coroutines.resume
 import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -72,7 +71,7 @@ class CheckAllFosterHomesViewmodel(
     private val getAllFosterHomesByLocationFromRemoteRepository: GetAllFosterHomesByLocationFromRemoteRepository,
     private val getAllFosterHomesByLocationFromLocalRepository: GetAllFosterHomesByLocationFromLocalRepository,
     private val observeIfLocationEnabledFromLocationRepository: ObserveIfLocationEnabledFromLocationRepository,
-    private val requestEnableLocationFromLocationRepository: RequestEnableLocationFromLocationRepository,
+    private val observeRequestEnableLocationFromLocationRepository: ObserveRequestEnableLocationFromLocationRepository,
     private val getLocationFromLocationRepository: GetLocationFromLocationRepository,
     private val log: Log
 ) : ViewModel() {
@@ -164,13 +163,8 @@ class CheckAllFosterHomesViewmodel(
 
     fun observeIfLocationEnabled(): Flow<Boolean> = observeIfLocationEnabledFromLocationRepository()
 
-    suspend fun requestEnableLocation(): Boolean {
-
-        return suspendCancellableCoroutine { continuation ->
-            requestEnableLocationFromLocationRepository { isEnabled: Boolean ->
-                continuation.resume(isEnabled)
-            }
-        }
+    fun requestEnableLocation() {
+        observeRequestEnableLocationFromLocationRepository().launchIn(viewModelScope)
     }
 
     @OptIn(ExperimentalTime::class)

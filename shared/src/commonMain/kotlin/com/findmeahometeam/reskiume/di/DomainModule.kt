@@ -104,7 +104,7 @@ import com.findmeahometeam.reskiume.domain.usecases.util.fcm.SubscribeToAllTopic
 import com.findmeahometeam.reskiume.domain.usecases.util.fcm.UnsubscribeFromAllTopicsFromSubscriberRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.GetLocationFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.ObserveIfLocationEnabledFromLocationRepository
-import com.findmeahometeam.reskiume.domain.usecases.util.location.RequestEnableLocationFromLocationRepository
+import com.findmeahometeam.reskiume.domain.usecases.util.location.ObserveRequestEnableLocationFromLocationRepository
 import com.plusmobileapps.konnectivity.Konnectivity
 import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
@@ -234,7 +234,7 @@ val domainModule = module {
 
     // util translator
     factoryOf(::ObserveIfLocationEnabledFromLocationRepository)
-    factoryOf(::RequestEnableLocationFromLocationRepository)
+    factoryOf(::ObserveRequestEnableLocationFromLocationRepository)
     factoryOf(::GetLocationFromLocationRepository)
 
     // util

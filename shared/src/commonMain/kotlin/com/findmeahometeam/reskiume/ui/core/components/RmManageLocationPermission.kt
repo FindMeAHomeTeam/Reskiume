@@ -27,7 +27,7 @@ fun RmManageLocationPermission(
     explainingLocationActivationMessage: String,
     permissionState: ManagePermissionState,
     isLocationEnabledState: State<Boolean>,
-    onRequestEnableLocation: suspend () -> Boolean,
+    onRequestEnableLocation: () -> Unit,
     onUpdateLocation: suspend () -> Unit,
     onBackPressed: () -> Unit,
     onUpdatePermissionState: (ManagePermissionState) -> Unit
@@ -80,10 +80,9 @@ fun RmManageLocationPermission(
             LaunchedEffect(isAllowClicked) {
 
                 if (isAllowClicked) {
-                    val isEnabled: Boolean = onRequestEnableLocation()
-                    if (isEnabled) {
-                        displayDialogToRequestLocationActivation = false
-                    }
+                    isAllowClicked = false
+
+                    onRequestEnableLocation()
                 }
             }
         } else {

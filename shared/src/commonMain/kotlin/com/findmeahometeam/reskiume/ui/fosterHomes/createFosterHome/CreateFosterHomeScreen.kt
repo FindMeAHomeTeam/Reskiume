@@ -13,7 +13,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -72,7 +71,7 @@ fun CreateFosterHomeScreen(
     val allAvailableUiNonHumanAnimals: List<NonHumanAnimal> by createFosterHomeViewmodel.allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow.collectAsStateWithLifecycle(
         initialValue = emptyList()
     )
-    val manageChangesUiState: UiState<Unit> by createFosterHomeViewmodel.saveChangesUiState.collectAsState()
+    val manageChangesUiState: UiState<Unit> by createFosterHomeViewmodel.saveChangesUiState.collectAsStateWithLifecycle()
 
     var title: String by rememberSaveable { mutableStateOf("") }
     var description: String by rememberSaveable { mutableStateOf("") }
@@ -93,7 +92,7 @@ fun CreateFosterHomeScreen(
         mutableStateOf(ManagePermissionState.CHECK_PERMISSION)
     }
     val isLocationEnabledState: State<Boolean> =
-        createFosterHomeViewmodel.observeIfLocationEnabled().collectAsState(initial = false)
+        createFosterHomeViewmodel.observeIfLocationEnabled().collectAsStateWithLifecycle(initialValue = false)
     var notificationPermissionState: ManagePermissionState by rememberSaveable {
         mutableStateOf(ManagePermissionState.CHECK_PERMISSION)
     }
@@ -108,7 +107,7 @@ fun CreateFosterHomeScreen(
         selectedCity,
         locationPermissionState,
         notificationPermissionState,
-        isLocationEnabledState
+        isLocationEnabledState.value
     ) {
         derivedStateOf {
             imageUrl.isNotBlank()

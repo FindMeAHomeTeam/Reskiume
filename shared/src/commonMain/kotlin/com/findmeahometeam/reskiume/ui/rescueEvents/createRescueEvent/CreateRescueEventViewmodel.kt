@@ -24,7 +24,7 @@ import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHuma
 import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.util.location.GetLocationFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.ObserveIfLocationEnabledFromLocationRepository
-import com.findmeahometeam.reskiume.domain.usecases.util.location.RequestEnableLocationFromLocationRepository
+import com.findmeahometeam.reskiume.domain.usecases.util.location.ObserveRequestEnableLocationFromLocationRepository
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.util.StringProvider
 import com.findmeahometeam.reskiume.ui.util.fcm.SubscriptionManagerUtil
@@ -34,14 +34,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
 import reskiume.shared.generated.resources.Res
 import reskiume.shared.generated.resources.create_rescue_event_screen_turn_on_location
 import kotlin.collections.map
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -49,7 +47,7 @@ class CreateRescueEventViewmodel(
     getAllNonHumanAnimalsFromLocalRepository: GetAllNonHumanAnimalsFromLocalRepository,
     private val getNonHumanAnimalInfoInLocalRepository: GetNonHumanAnimalInfoInLocalRepository,
     private val observeIfLocationEnabledFromLocationRepository: ObserveIfLocationEnabledFromLocationRepository,
-    private val requestEnableLocationFromLocationRepository: RequestEnableLocationFromLocationRepository,
+    private val observeRequestEnableLocationFromLocationRepository: ObserveRequestEnableLocationFromLocationRepository,
     private val getLocationFromLocationRepository: GetLocationFromLocationRepository,
     private val observeAuthStateInAuthDataSource: ObserveAuthStateInAuthDataSource,
     private val getStringProvider: StringProvider,
@@ -88,13 +86,8 @@ class CreateRescueEventViewmodel(
 
     fun observeIfLocationEnabled(): Flow<Boolean> = observeIfLocationEnabledFromLocationRepository()
 
-    suspend fun requestEnableLocation(): Boolean {
-
-        return suspendCancellableCoroutine { continuation ->
-            requestEnableLocationFromLocationRepository { isEnabled: Boolean ->
-                continuation.resume(isEnabled)
-            }
-        }
+    fun requestEnableLocation() {
+        observeRequestEnableLocationFromLocationRepository().launchIn(viewModelScope)
     }
 
     @OptIn(ExperimentalTime::class)

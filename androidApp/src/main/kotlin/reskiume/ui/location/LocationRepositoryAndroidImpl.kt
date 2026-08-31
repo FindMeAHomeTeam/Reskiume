@@ -70,15 +70,15 @@ class LocationRepositoryAndroidImpl : LocationRepository {
                 locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
     }
 
-    override fun requestEnableLocation(onResult: (isEnabled: Boolean) -> Unit) {
+    override fun observeRequestEnableLocation(): Flow<Boolean>  = callbackFlow {
         val componentActivity = componentActivity ?: run {
-            onResult(false)
-            return
+            trySend(false)
+            return@callbackFlow
         }
 
         if (isLocationEnabled(componentActivity)) {
-            onResult(true)
-            return
+            trySend(true)
+            return@callbackFlow
         }
 
         // Open location settings
@@ -87,11 +87,15 @@ class LocationRepositoryAndroidImpl : LocationRepository {
             contract = ActivityResultContracts.StartActivityForResult(),
             callback = {
                 val current = this@LocationRepositoryAndroidImpl.componentActivity ?: return@registerActivityResultLauncher
-                onResult(isLocationEnabled(current))
+                trySend(isLocationEnabled(current))
                 launcher?.unregister()
             }
         )
         launcher.launch(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+
+        awaitClose {
+            launcher.unregister()
+        }
     }
 
     private fun <I, O> ComponentActivity.registerActivityResultLauncher(

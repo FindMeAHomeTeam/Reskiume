@@ -65,7 +65,7 @@ class LocationRepositoryIosImpl : LocationRepository {
         }
     }
 
-    override fun requestEnableLocation(onResult: (isEnabled: Boolean) -> Unit) {
+    override fun observeRequestEnableLocation(): Flow<Boolean> = callbackFlow {
         val locationManager = CLLocationManager()
 
         // Check authorization status
@@ -83,7 +83,7 @@ class LocationRepositoryIosImpl : LocationRepository {
                     ) {
                         val isAuthorized = didChangeAuthorizationStatus == kCLAuthorizationStatusAuthorizedWhenInUse ||
                                 didChangeAuthorizationStatus == kCLAuthorizationStatusAuthorizedAlways
-                        onResult(isAuthorized)
+                        trySend(isAuthorized)
                     }
                 }
                 locationManager.requestWhenInUseAuthorization()
@@ -91,13 +91,17 @@ class LocationRepositoryIosImpl : LocationRepository {
 
             kCLAuthorizationStatusAuthorizedWhenInUse,
             kCLAuthorizationStatusAuthorizedAlways -> {
-                onResult(true)
+                trySend(true)
             }
 
             else -> {
                 // Denied or restricted - user must enable in Settings manually
-                onResult(false)
+                trySend(false)
             }
+        }
+
+        awaitClose {
+            locationManager.delegate = null
         }
     }
 

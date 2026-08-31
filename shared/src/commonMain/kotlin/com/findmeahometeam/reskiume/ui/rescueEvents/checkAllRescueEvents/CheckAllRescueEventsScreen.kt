@@ -14,7 +14,6 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.domain.model.fosterHome.City
 import com.findmeahometeam.reskiume.domain.model.fosterHome.Country
@@ -76,21 +76,21 @@ fun CheckAllRescueEventsScreen(
 
     var searchOption: SearchOption by rememberSaveable { mutableStateOf(SearchOption.COUNTRY_CITY) }
     val isLocationEnabledState: State<Boolean> =
-        checkAllRescueEventsViewmodel.observeIfLocationEnabled().collectAsState(initial = false)
+        checkAllRescueEventsViewmodel.observeIfLocationEnabled().collectAsStateWithLifecycle(initialValue = false)
     var permissionState: ManagePermissionState by rememberSaveable {
         mutableStateOf(
             ManagePermissionState.IDLE
         )
     }
-    var displayDialogToRequestLocationActivation: Boolean by rememberSaveable { mutableStateOf(false) }
 
-    val authState: AuthUser? by checkAllRescueEventsViewmodel.authState.collectAsState(initial = null)
-    val uiRescueEventListState: UiState<List<UiRescueEvent>> by checkAllRescueEventsViewmodel.allRescueEventsState.collectAsState()
+    val authState: AuthUser? by checkAllRescueEventsViewmodel.authState.collectAsStateWithLifecycle(initialValue = null)
+    val uiRescueEventListState: UiState<List<UiRescueEvent>> by checkAllRescueEventsViewmodel.allRescueEventsState.collectAsStateWithLifecycle()
 
     val isSearchButtonEnabled: Boolean by remember(
         selectedCountry,
         selectedCity,
         permissionState,
+        isLocationEnabledState.value,
         uiRescueEventListState
     ) {
         derivedStateOf {
@@ -101,7 +101,6 @@ fun CheckAllRescueEventsScreen(
                     } else {
                         permissionState == ManagePermissionState.PERMISSION_GRANTED
                                 && isLocationEnabledState.value
-                                && !displayDialogToRequestLocationActivation
                     }
         }
     }
@@ -144,7 +143,6 @@ fun CheckAllRescueEventsScreen(
                     if (searchOption == SearchOption.LOCATION) {
 
                         permissionState = ManagePermissionState.CHECK_PERMISSION
-                        displayDialogToRequestLocationActivation = !isLocationEnabledState.value
                     }
                 }
 

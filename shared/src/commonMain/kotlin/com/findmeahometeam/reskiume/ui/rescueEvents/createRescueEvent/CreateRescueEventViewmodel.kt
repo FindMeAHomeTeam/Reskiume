@@ -36,6 +36,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import reskiume.shared.generated.resources.Res
 import reskiume.shared.generated.resources.create_rescue_event_screen_turn_on_location
 import kotlin.collections.map
@@ -89,7 +90,7 @@ class CreateRescueEventViewmodel(
 
     suspend fun requestEnableLocation(): Boolean {
 
-        return suspendCoroutine { continuation ->
+        return suspendCancellableCoroutine { continuation ->
             requestEnableLocationFromLocationRepository { isEnabled: Boolean ->
                 continuation.resume(isEnabled)
             }

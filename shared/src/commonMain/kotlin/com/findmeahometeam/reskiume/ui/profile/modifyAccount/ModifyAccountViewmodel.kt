@@ -325,19 +325,20 @@ class ModifyAccountViewmodel(
             section = Section.USERS,
             imageUri = user.image
         ) { imageDownloadUri: String ->
-            val userWithPossibleImageDownloadUri: User = if (imageDownloadUri.isBlank()) {
+            val imageUri: String = if (imageDownloadUri.isBlank()) {
                 log.d(
                     "ModifyAccountViewmodel",
                     "uploadNewImageToRemoteDataSource: Download URI is blank"
                 )
-                user
+                ""
             } else {
                 log.d(
                     "ModifyAccountViewmodel",
                     "uploadNewImageToRemoteDataSource: Download URI saved successfully"
                 )
-                user.copy(image = imageDownloadUri)
+                imageDownloadUri
             }
+            val userWithPossibleImageDownloadUri: User = user.copy(image = imageUri)
             viewModelScope.launch {
                 onSuccess(userWithPossibleImageDownloadUri)
             }

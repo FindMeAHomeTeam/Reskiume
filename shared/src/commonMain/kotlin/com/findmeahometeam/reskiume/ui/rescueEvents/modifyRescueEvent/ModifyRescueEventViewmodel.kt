@@ -252,20 +252,21 @@ class ModifyRescueEventViewmodel(
             imageUri = modifiedRescueEvent.imageUrl
         ) { imageDownloadUri: String ->
 
+            val imageUri: String = if (imageDownloadUri.isBlank()) {
+                log.d(
+                    "ModifyRescueEventViewModel",
+                    "uploadNewImageToRemoteDataSource: the download URI from the rescue event ${modifiedRescueEvent.id} is blank"
+                )
+                ""
+            } else {
+                log.d(
+                    "ModifyRescueEventViewModel",
+                    "uploadNewImageToRemoteDataSource: the download URI from the rescue event ${modifiedRescueEvent.id} was saved successfully"
+                )
+                imageDownloadUri
+            }
             val rescueEventWithPossibleImageDownloadUri: RescueEvent =
-                if (imageDownloadUri.isBlank()) {
-                    log.d(
-                        "ModifyRescueEventViewModel",
-                        "uploadNewImageToRemoteDataSource: the download URI from the rescue event ${modifiedRescueEvent.id} is blank"
-                    )
-                    modifiedRescueEvent
-                } else {
-                    log.d(
-                        "ModifyRescueEventViewModel",
-                        "uploadNewImageToRemoteDataSource: the download URI from the rescue event ${modifiedRescueEvent.id} was saved successfully"
-                    )
-                    modifiedRescueEvent.copy(imageUrl = imageDownloadUri)
-                }
+                modifiedRescueEvent.copy(imageUrl = imageUri)
             onComplete(rescueEventWithPossibleImageDownloadUri)
         }
     }

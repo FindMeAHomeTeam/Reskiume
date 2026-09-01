@@ -180,20 +180,21 @@ class CreateRescueEventViewmodel(
             imageUri = createdRescueEvent.imageUrl
         ) { imageDownloadUri: String ->
 
+            val imageUri = if (imageDownloadUri.isBlank()) {
+                log.d(
+                    "CreateRescueEventViewmodel",
+                    "uploadNewImageToRemoteDataSource: the download URI from the rescue event ${createdRescueEvent.id} is blank"
+                )
+                ""
+            } else {
+                log.d(
+                    "CreateRescueEventViewmodel",
+                    "uploadNewImageToRemoteDataSource: the download URI from the rescue event ${createdRescueEvent.id} was saved successfully"
+                )
+                imageDownloadUri
+            }
             val rescueEventWithPossibleImageDownloadUri: RescueEvent =
-                if (imageDownloadUri.isBlank()) {
-                    log.d(
-                        "CreateRescueEventViewmodel",
-                        "uploadNewImageToRemoteDataSource: the download URI from the rescue event ${createdRescueEvent.id} is blank"
-                    )
-                    createdRescueEvent
-                } else {
-                    log.d(
-                        "CreateRescueEventViewmodel",
-                        "uploadNewImageToRemoteDataSource: the download URI from the rescue event ${createdRescueEvent.id} was saved successfully"
-                    )
-                    createdRescueEvent.copy(imageUrl = imageDownloadUri)
-                }
+                createdRescueEvent.copy(imageUrl = imageUri)
             onComplete(rescueEventWithPossibleImageDownloadUri)
         }
     }
@@ -369,7 +370,11 @@ class CreateRescueEventViewmodel(
 
             val creatorId = observeAuthStateInAuthDataSource().first()!!.uid
             val creator = getUserFromLocalDataSource(creatorId).first()!!
-            subscriptionManagerUtil.subscribeToTopic(creator, rescueEventId + creatorId, viewModelScope) {
+            subscriptionManagerUtil.subscribeToTopic(
+                creator,
+                rescueEventId + creatorId,
+                viewModelScope
+            ) {
 
                 _saveChangesUiState.value = UiState.Success(Unit)
             }

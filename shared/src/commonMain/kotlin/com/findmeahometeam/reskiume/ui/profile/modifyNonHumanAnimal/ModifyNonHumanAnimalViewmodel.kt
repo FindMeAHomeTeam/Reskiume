@@ -199,20 +199,21 @@ class ModifyNonHumanAnimalViewmodel(
             imageUri = modifiedNonHumanAnimal.imageUrl
         ) { imageDownloadUri: String ->
 
+            val imageUri = if (imageDownloadUri.isBlank()) {
+                log.d(
+                    "ModifyNonHumanAnimalViewModel",
+                    "uploadNewImageToRemoteDataSource: the download URI from the non human animal ${modifiedNonHumanAnimal.id} is blank"
+                )
+                ""
+            } else {
+                log.d(
+                    "ModifyNonHumanAnimalViewModel",
+                    "uploadNewImageToRemoteDataSource: the download URI from the non human animal ${modifiedNonHumanAnimal.id} was saved successfully"
+                )
+                imageDownloadUri
+            }
             val nonHumanAnimalWithPossibleImageDownloadUri: NonHumanAnimal =
-                if (imageDownloadUri.isBlank()) {
-                    log.d(
-                        "ModifyNonHumanAnimalViewModel",
-                        "uploadNewImageToRemoteDataSource: the download URI from the non human animal ${modifiedNonHumanAnimal.id} is blank"
-                    )
-                    modifiedNonHumanAnimal
-                } else {
-                    log.d(
-                        "ModifyNonHumanAnimalViewModel",
-                        "uploadNewImageToRemoteDataSource: the download URI from the non human animal ${modifiedNonHumanAnimal.id} was saved successfully"
-                    )
-                    modifiedNonHumanAnimal.copy(imageUrl = imageDownloadUri)
-                }
+                modifiedNonHumanAnimal.copy(imageUrl = imageUri)
             onSuccess(nonHumanAnimalWithPossibleImageDownloadUri)
         }
     }

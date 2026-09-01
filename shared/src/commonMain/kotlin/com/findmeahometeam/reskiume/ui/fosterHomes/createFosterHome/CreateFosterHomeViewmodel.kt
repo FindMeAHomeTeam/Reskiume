@@ -170,20 +170,21 @@ class CreateFosterHomeViewmodel(
             imageUri = createdFosterHome.imageUrl
         ) { imageDownloadUri: String ->
 
+            val imageUri: String = if (imageDownloadUri.isBlank()) {
+                log.d(
+                    "CreateFosterHomeViewmodel",
+                    "uploadNewImageToRemoteDataSource: the download URI from the foster home ${createdFosterHome.id} is blank"
+                )
+                ""
+            } else {
+                log.d(
+                    "CreateFosterHomeViewmodel",
+                    "uploadNewImageToRemoteDataSource: the download URI from the foster home ${createdFosterHome.id} was saved successfully"
+                )
+                imageDownloadUri
+            }
             val fosterHomeWithPossibleImageDownloadUri: FosterHome =
-                if (imageDownloadUri.isBlank()) {
-                    log.d(
-                        "CreateFosterHomeViewmodel",
-                        "uploadNewImageToRemoteDataSource: the download URI from the foster home ${createdFosterHome.id} is blank"
-                    )
-                    createdFosterHome
-                } else {
-                    log.d(
-                        "CreateFosterHomeViewmodel",
-                        "uploadNewImageToRemoteDataSource: the download URI from the foster home ${createdFosterHome.id} was saved successfully"
-                    )
-                    createdFosterHome.copy(imageUrl = imageDownloadUri)
-                }
+                createdFosterHome.copy(imageUrl = imageUri)
             onComplete(fosterHomeWithPossibleImageDownloadUri)
         }
     }

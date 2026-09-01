@@ -74,20 +74,21 @@ class CreateNonHumanAnimalViewmodel(
             imageUri = nonHumanAnimal.imageUrl
         ) { imageDownloadUri: String ->
 
+            val imageUri = if (imageDownloadUri.isBlank()) {
+                log.d(
+                    "CreateNonHumanAnimalViewModel",
+                    "uploadNewImageToRemoteDataSource: the download URI from the non human animal ${nonHumanAnimal.id} is blank"
+                )
+                ""
+            } else {
+                log.d(
+                    "CreateNonHumanAnimalViewModel",
+                    "uploadNewImageToRemoteDataSource: the download URI from the non human animal ${nonHumanAnimal.id} was saved successfully"
+                )
+                imageDownloadUri
+            }
             val nonHumanAnimalWithPossibleImageDownloadUri: NonHumanAnimal =
-                if (imageDownloadUri.isBlank()) {
-                    log.d(
-                        "CreateNonHumanAnimalViewModel",
-                        "uploadNewImageToRemoteDataSource: the download URI from the non human animal ${nonHumanAnimal.id} is blank"
-                    )
-                    nonHumanAnimal
-                } else {
-                    log.d(
-                        "CreateNonHumanAnimalViewModel",
-                        "uploadNewImageToRemoteDataSource: the download URI from the non human animal ${nonHumanAnimal.id} was saved successfully"
-                    )
-                    nonHumanAnimal.copy(imageUrl = imageDownloadUri)
-                }
+                nonHumanAnimal.copy(imageUrl = imageUri)
             onSuccess(nonHumanAnimalWithPossibleImageDownloadUri)
         }
     }

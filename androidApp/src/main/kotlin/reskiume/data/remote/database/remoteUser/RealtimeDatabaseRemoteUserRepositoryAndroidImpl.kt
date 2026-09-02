@@ -45,7 +45,7 @@ class RealtimeDatabaseRemoteUserRepositoryAndroidImpl(
 
             override fun onCancelled(databaseError: DatabaseError) {
                 log.e(
-                    "RealtimeDatabaseRepositoryAndroid",
+                    "RealtimeDatabaseRemoteUserRepositoryAndroidImpl",
                     "getRemoteUser:onCancelled ${databaseError.toException()}"
                 )
             }
@@ -77,7 +77,7 @@ class RealtimeDatabaseRemoteUserRepositoryAndroidImpl(
             if (error == null) {
                 onDeleteRemoteUser(DatabaseResult.Success)
             } else {
-                log.e("RealtimeDatabaseRemoteUserRepositoryAndroidImpl", "deleteRemoteUser: Error deleting the user $uid")
+                log.e("RealtimeDatabaseRemoteUserRepositoryAndroidImpl", "deleteRemoteUser: Error deleting the user $uid: ${error.message}")
                 onDeleteRemoteUser(DatabaseResult.Error())
             }
         }

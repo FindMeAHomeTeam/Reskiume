@@ -17,7 +17,7 @@ import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDa
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromLocalRepository
-import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.util.location.GetLocationFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.ObserveIfLocationEnabledFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.ObserveRequestEnableLocationFromLocationRepository
@@ -49,7 +49,7 @@ class CreateFosterHomeViewmodel(
     private val insertFosterHomeInRemoteRepository: InsertFosterHomeInRemoteRepository,
     private val insertFosterHomeInLocalRepository: InsertFosterHomeInLocalRepository,
     private val insertCacheInLocalRepository: InsertCacheInLocalRepository,
-    private val getUserFromLocalDataSource: GetUserFromLocalDataSource,
+    private val getUserFromRemoteDataSource: GetUserFromRemoteDataSource,
     private val subscriptionManagerUtil: SubscriptionManagerUtil,
     private val deleteImageFromLocalDataSource: DeleteImageFromLocalDataSource,
     private val getNonHumanAnimalInfoInLocalRepository: GetNonHumanAnimalInfoInLocalRepository,
@@ -281,7 +281,7 @@ class CreateFosterHomeViewmodel(
         viewModelScope.launch {
 
             val ownerId = observeAuthStateInAuthDataSource().first()!!.uid
-            val owner = getUserFromLocalDataSource(ownerId).first()!!
+            val owner = getUserFromRemoteDataSource(ownerId).first()!!
             subscriptionManagerUtil.subscribeToTopic(owner, fosterHomeId, viewModelScope) {
 
                 _saveChangesUiState.value = UiState.Success(Unit)

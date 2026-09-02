@@ -33,6 +33,7 @@ import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetNonHumanAn
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.ModifyNonHumanAnimalInRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetRescueEventFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.ModifyRescueEventInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.ui.chats.checkAllMyChats.ManageChatUtil
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.components.toUiState
@@ -112,6 +113,7 @@ class CheckChatViewmodel(
     private val modifyFosterHomeInRemoteRepository: ModifyFosterHomeInRemoteRepository,
     private val getRescueEventFromLocalRepository: GetRescueEventFromLocalRepository,
     private val modifyRescueEventInLocalRepository: ModifyRescueEventInLocalRepository,
+    private val getUserFromRemoteDataSource: GetUserFromRemoteDataSource,
     private val log: Log
 ) : ViewModel() {
 
@@ -158,7 +160,7 @@ class CheckChatViewmodel(
                     )
                 }
 
-                // In case the collect function is emits multiple times
+                // In case the collect function emits multiple times
                 when {
                     lastTimestamp != updatedChat.timestamp -> {
                         lastTimestamp = updatedChat.timestamp
@@ -443,10 +445,7 @@ class CheckChatViewmodel(
 
     private suspend fun subscribeToChatIfNecessary(onComplete: () -> Unit) {
 
-        val myUser = checkActivistUtil.getUser(
-            activistUid = myUid,
-            myUserUid = myUid
-        )!!
+        val myUser = getUserFromRemoteDataSource(myUid).first()!!
         if (!myUser.subscriptions.any { it.topic == chatId }) {
 
             subscriptionManagerUtil.subscribeToTopic(
@@ -587,10 +586,7 @@ class CheckChatViewmodel(
     fun unsubscribeFromTopic(onComplete: () -> Unit = {}) {
         viewModelScope.launch {
 
-            val myUser = checkActivistUtil.getUser(
-                activistUid = myUid,
-                myUserUid = myUid
-            )!!
+            val myUser = getUserFromRemoteDataSource(myUid).first()!!
             subscriptionManagerUtil.unsubscribeFromTopic(
                 myUser,
                 chatId,
@@ -1254,7 +1250,7 @@ class CheckChatViewmodel(
             ).first()!!
         }
 
-        // Update the forster home with the last non human animal state
+        // Update the foster home with the last non-human animal state
         modifyFosterHomeInLocalRepo(
             fosterHomeId = fosterHomeId,
             allNonHumanAnimals = allRemoteNonHumanAnimals,

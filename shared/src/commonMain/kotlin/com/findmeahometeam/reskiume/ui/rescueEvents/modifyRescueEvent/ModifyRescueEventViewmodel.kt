@@ -21,7 +21,7 @@ import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetRescueEventFr
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetRescueEventFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.ModifyRescueEventInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.ModifyRescueEventInRemoteRepository
-import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.components.toUiState
 import com.findmeahometeam.reskiume.ui.core.navigation.ModifyRescueEvent
@@ -56,7 +56,7 @@ class ModifyRescueEventViewmodel(
     private val modifyCacheInLocalRepository: ModifyCacheInLocalRepository,
     private val deleteRescueEventUtil: DeleteRescueEventUtil,
     private val observeAuthStateInAuthDataSource: ObserveAuthStateInAuthDataSource,
-    private val getUserFromLocalDataSource: GetUserFromLocalDataSource,
+    private val getUserFromRemoteDataSource: GetUserFromRemoteDataSource,
     private val subscriptionManagerUtil: SubscriptionManagerUtil,
     private val log: Log
 ) : ViewModel() {
@@ -384,7 +384,7 @@ class ModifyRescueEventViewmodel(
         viewModelScope.launch {
 
             val creatorId = observeAuthStateInAuthDataSource().first()!!.uid
-            val creator = getUserFromLocalDataSource(creatorId).first()!!
+            val creator = getUserFromRemoteDataSource(creatorId).first()!!
             subscriptionManagerUtil.unsubscribeFromTopic(
                 user = creator,
                 topicToUnsubscribe = rescueEventId,

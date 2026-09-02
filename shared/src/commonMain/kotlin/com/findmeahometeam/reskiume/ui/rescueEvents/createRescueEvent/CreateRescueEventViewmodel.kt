@@ -5,23 +5,23 @@ import androidx.lifecycle.viewModelScope
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.LocalCache
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.chat.Chat
 import com.findmeahometeam.reskiume.domain.model.chat.NonHumanAnimalInfo
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueEvent
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.chat.GetNonHumanAnimalInfoInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.chat.InsertChatInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.chat.InsertChatInRemoteRepository
-import com.findmeahometeam.reskiume.domain.usecases.chat.GetNonHumanAnimalInfoInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
-import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.InsertRescueEventInLocalRepository
-import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.InsertRescueEventInRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromLocalRepository
-import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.InsertRescueEventInLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.InsertRescueEventInRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.util.location.GetLocationFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.ObserveIfLocationEnabledFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.ObserveRequestEnableLocationFromLocationRepository
@@ -39,7 +39,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import reskiume.shared.generated.resources.Res
 import reskiume.shared.generated.resources.create_rescue_event_screen_turn_on_location
-import kotlin.collections.map
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -57,7 +56,7 @@ class CreateRescueEventViewmodel(
     private val insertCacheInLocalRepository: InsertCacheInLocalRepository,
     private val insertChatInRemoteRepository: InsertChatInRemoteRepository,
     private val insertChatInLocalRepository: InsertChatInLocalRepository,
-    private val getUserFromLocalDataSource: GetUserFromLocalDataSource,
+    private val getUserFromRemoteDataSource: GetUserFromRemoteDataSource,
     private val subscriptionManagerUtil: SubscriptionManagerUtil,
     private val deleteImageFromLocalDataSource: DeleteImageFromLocalDataSource,
     private val log: Log
@@ -369,7 +368,7 @@ class CreateRescueEventViewmodel(
         viewModelScope.launch {
 
             val creatorId = observeAuthStateInAuthDataSource().first()!!.uid
-            val creator = getUserFromLocalDataSource(creatorId).first()!!
+            val creator = getUserFromRemoteDataSource(creatorId).first()!!
             subscriptionManagerUtil.subscribeToTopic(
                 creator,
                 rescueEventId + creatorId,

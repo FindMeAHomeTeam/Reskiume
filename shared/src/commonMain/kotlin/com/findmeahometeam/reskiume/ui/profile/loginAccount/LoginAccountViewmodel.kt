@@ -38,89 +38,139 @@ class LoginAccountViewmodel(
     val state: StateFlow<UiState<Unit>> = _state.asStateFlow()
 
     fun signInUsingEmail(email: String, password: String) {
+
+        _state.value = UiState.Loading()
+        signIn(email, password) { authUser ->
+
+            updateLocalUser(
+                uid = authUser.uid,
+                onCompletionInsertCache = {
+                    retrieveUserFromRemoteDataSourceAndSaveItsAvatarIfNeeded(authUser.uid) { collectedUser: User ->
+
+                        insertUserInLocalRepo(collectedUser)
+                    }
+                },
+                onCompletionUpdateCache = {
+                    retrieveUserFromRemoteDataSourceAndSaveItsAvatarIfNeeded(authUser.uid) { collectedUser: User ->
+
+                        modifyUserInLocalRepo(collectedUser) {
+                            viewModelScope.launch {
+
+                                subscriptionManagerUtil.subscribeToAllTopicsAfterLogin(collectedUser)
+                                _state.value = UiState.Success(Unit)
+                            }
+                        }
+                    }
+                },
+                onCacheRecent = { user ->
+                    modifyUserInLocalRepo(user) {
+                        viewModelScope.launch {
+
+                            subscriptionManagerUtil.subscribeToAllTopicsAfterLogin(user)
+                            _state.value = UiState.Success(Unit)
+                        }
+                    }
+                }
+            )
+        }
+    }
+
+    private fun signIn(
+        email: String,
+        password: String,
+        onSuccess: (AuthUser) -> Unit
+    ) {
         viewModelScope.launch {
-            _state.value = UiState.Loading()
             when (val authResult = signInWithEmailAndPasswordFromAuthDataSource(email, password)) {
                 is AuthResult.Error -> {
                     _state.value = UiState.Error(authResult.message)
                 }
 
                 is AuthResult.Success -> {
-                    updateLocalUser(authResult.user)
+                    onSuccess(authResult.user)
                 }
             }
         }
     }
 
-    private fun updateLocalUser(authUser: AuthUser) {
+    private fun updateLocalUser(
+        uid: String,
+        onCompletionInsertCache: suspend () -> Unit,
+        onCompletionUpdateCache: suspend () -> Unit,
+        onCacheRecent: suspend (User) -> Unit
+    ) {
         viewModelScope.launch {
 
             getDataByManagingObjectLocalCacheTimestamp(
-                cachedObjectId = authUser.uid,
+                cachedObjectId = uid,
                 section = Section.USERS,
-                onCompletionInsertCache = {
-
-                    getUserFromRemoteDataSourceAndSaveItsAvatarIfNeeded(authUser.uid) { collectedUser: User ->
-
-                        viewModelScope.launch {
-                            insertUserInLocalDataSource(collectedUser) { isSuccess ->
-
-                                if (isSuccess) {
-                                    log.d(
-                                        "LoginAccountViewmodel",
-                                        "updateLocalUser: Inserted user with uid ${collectedUser.uid} into the local data source."
-                                    )
-                                    _state.value = UiState.Success(Unit)
-                                } else {
-                                    log.e(
-                                        "LoginAccountViewmodel",
-                                        "updateLocalUser: Failed to insert user with uid ${collectedUser.uid} into the local data source."
-                                    )
-                                    _state.value = UiState.Error()
-                                }
-                            }
-                        }
-                    }
-                },
-                onCompletionUpdateCache = {
-
-                    getUserFromRemoteDataSourceAndSaveItsAvatarIfNeeded(authUser.uid) { collectedUser: User ->
-
-                        modifyUserInLocalRepo(collectedUser)
-                    }
-                },
+                onCompletionInsertCache = onCompletionInsertCache,
+                onCompletionUpdateCache = onCompletionUpdateCache,
                 onVerifyCacheIsRecent = {
-
-                    val user = getUserFromLocalDataSource(authUser.uid).first()!!
-                    modifyUserInLocalRepo(user.copy(isLoggedIn = true))
                     log.d(
                         "LoginAccountViewmodel",
-                        "updateLocalUser: User with uid ${authUser.uid} is up-to-date in local data source."
+                        "updateLocalUser: User with uid $uid is up-to-date in local data source."
                     )
+                    val user = getUserFromLocalDataSource(uid).first()!!
+                    onCacheRecent(user.copy(isLoggedIn = true))
                 }
             )
         }
     }
 
-    private fun modifyUserInLocalRepo(collectedUser: User) {
+    private fun retrieveUserFromRemoteDataSourceAndSaveItsAvatarIfNeeded(
+        userUid: String,
+        onSavedAvatar: (collectedUser: User) -> Unit
+    ) {
         viewModelScope.launch {
 
-            modifyUserInLocalDataSource(collectedUser) { isUpdated ->
-
-                if (isUpdated) {
+            val collectedUser: User? = getUserFromRemoteDataSource(userUid).firstOrNull()
+            when {
+                collectedUser == null -> {
                     log.d(
                         "LoginAccountViewmodel",
-                        "modifyUserInLocalRepo: Modified user with uid ${collectedUser.uid} in the local data source."
+                        "retrieveUserFromRemoteDataSourceAndSaveItsAvatarIfNeeded: the user $userUid was not found in the remote data source despite successful authentication."
                     )
-                    viewModelScope.launch {
+                }
+                collectedUser.image.isNotBlank() -> {
 
-                        subscriptionManagerUtil.subscribeToAllTopicsAfterLogin(collectedUser)
-                        _state.value = UiState.Success(Unit)
-                    }
+                    val localImagePath: String = downloadImageToLocalDataSource(
+                        userUid = collectedUser.uid,
+                        extraId = "",
+                        section = Section.USERS
+                    )
+                    onSavedAvatar(
+                        collectedUser.copy(
+                            image = localImagePath.ifBlank { collectedUser.image },
+                            isLoggedIn = true
+                        )
+                    )
+                }
+                else -> {
+                    log.d(
+                        "LoginAccountViewmodel",
+                        "retrieveUserFromRemoteDataSourceAndSaveItsAvatarIfNeeded: User ${collectedUser.uid} has no avatar image to save locally."
+                    )
+                    onSavedAvatar(collectedUser.copy(isLoggedIn = true))
+                }
+            }
+        }
+    }
+
+    private fun insertUserInLocalRepo(collectedUser: User) {
+        viewModelScope.launch {
+            insertUserInLocalDataSource(collectedUser) { isSuccess ->
+
+                if (isSuccess) {
+                    log.d(
+                        "LoginAccountViewmodel",
+                        "insertUserInLocalRepo: Inserted user with uid ${collectedUser.uid} into the local data source."
+                    )
+                    _state.value = UiState.Success(Unit)
                 } else {
                     log.e(
                         "LoginAccountViewmodel",
-                        "modifyUserInLocalRepo: Failed to modify user with uid ${collectedUser.uid} in the local data source."
+                        "insertUserInLocalRepo: Failed to insert user with uid ${collectedUser.uid} into the local data source."
                     )
                     _state.value = UiState.Error()
                 }
@@ -128,38 +178,26 @@ class LoginAccountViewmodel(
         }
     }
 
-    private fun getUserFromRemoteDataSourceAndSaveItsAvatarIfNeeded(
-        userUid: String,
-        onSavedAvatar: (collectedUser: User) -> Unit
+    private fun modifyUserInLocalRepo(
+        collectedUser: User,
+        onSuccess: () -> Unit
     ) {
         viewModelScope.launch {
+            modifyUserInLocalDataSource(collectedUser) { isUpdated ->
 
-            val collectedUser: User? = getUserFromRemoteDataSource(userUid).firstOrNull()
-
-            if (collectedUser == null) {
-                log.d(
-                    "LoginAccountViewmodel",
-                    "Unless it is the default collectedUser value, it seems that the user $userUid was not found in the remote data source despite successful authentication."
-                )
-            } else if (collectedUser.image.isNotBlank()) {
-
-                val localImagePath: String = downloadImageToLocalDataSource(
-                    userUid = collectedUser.uid,
-                    extraId = "",
-                    section = Section.USERS
-                )
-                onSavedAvatar(
-                    collectedUser.copy(
-                        image = localImagePath.ifBlank { collectedUser.image },
-                        isLoggedIn = true
+                if (isUpdated) {
+                    log.d(
+                        "LoginAccountViewmodel",
+                        "modifyUserInLocalRepo: Modified user with uid ${collectedUser.uid} in the local data source."
                     )
-                )
-            } else {
-                log.d(
-                    "LoginAccountViewmodel",
-                    "User ${collectedUser.uid} has no avatar image to save locally."
-                )
-                onSavedAvatar(collectedUser.copy(isLoggedIn = true))
+                    onSuccess()
+                } else {
+                    log.e(
+                        "LoginAccountViewmodel",
+                        "modifyUserInLocalRepo: Failed to modify user with uid ${collectedUser.uid} in the local data source."
+                    )
+                    _state.value = UiState.Error()
+                }
             }
         }
     }

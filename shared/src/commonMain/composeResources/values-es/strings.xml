@@ -128,7 +128,7 @@
     <!-- General error messages -->
     <string name="general_error_network_message">Error de red. Comprueba tu conexión a Internet e inténtalo de nuevo</string>
     <string name="general_error_unknown_message">Se ha producido un error desconocido. Inténtalo de nuevo más tarde</string>
-    <string name="general_error_invalid_deep_link">Este enlace no es válido. Pide otro o busca %1$ss en la aplicación</string>
+    <string name="general_error_invalid_deep_link">Se ha producido un error inesperado. Busca otro %1$s en la aplicación</string>
 
     <!-- Check reviews screen -->
     <string name="check_reviews_screen_my_reviews_title">Mis reseñas</string>
@@ -359,7 +359,7 @@
     <string name="check_all_my_rescue_events_screen_register_rescue_event">+ Registrar un evento de rescate</string>
 
     <!-- Rescue event list item -->
-    <string name="rescue_event_list_item_non_human_animal_to_rescue">Necesita rescate: </string>
+    <string name="rescue_event_list_item_non_human_animal_to_rescue">Necesita rescatar: </string>
     <string name="rescue_event_list_item_more_non_human_animal">➕ Y más</string>
     <string name="rescue_event_list_item_needs_to_cover">Necesita cubrir: </string>
     <string name="rescue_event_list_item_km">%1$d km · %2$s</string>
@@ -454,8 +454,8 @@
     <string name="check_chat_screen_image_content_description">Imagen de %1$s</string>
     <string name="check_chat_screen_foster_action">acoger</string>
     <string name="check_chat_screen_rescue_action">rescatar</string>
-    <string name="check_chat_screen_non_human_animal_name">a %1$s %2$s</string>
-    <string name="check_chat_screen_quantity_of_non_human_animals">a %1$s %2$d animales no humanos</string>
+    <string name="check_chat_screen_non_human_animal_name">%1$s a %2$s</string>
+    <string name="check_chat_screen_quantity_of_non_human_animals">%1$s a %2$d animales no humanos</string>
     <string name="check_chat_screen_more_options_content_description">Más opciones</string>
     <string name="check_chat_screen_leave_chat_option">Salir del chat</string>
     <string name="check_chat_screen_leave_review_chat_option">🎉 Salir del chat y añadir una reseña</string>

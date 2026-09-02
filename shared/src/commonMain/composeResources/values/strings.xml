@@ -336,7 +336,7 @@
     <string name="check_foster_home_screen_foster_home_conditions_label">Conditions</string>
     <string name="check_foster_home_screen_foster_home_accepted_non_human_animals_label">Accepted non-human animals</string>
     <string name="check_foster_home_screen_foster_home_resident_non_human_animals_label">Resident non-human animals</string>
-    <string name="check_foster_home_screen_owner_reviews_label">Reviews</string>
+    <string name="check_foster_home_screen_owner_reviews_label">Last reviews</string>
     <string name="check_foster_home_screen_no_account_label">Create an account to register a non-human animal to foster and talk to %1$s</string>
     <string name="check_foster_home_screen_no_account_button">Create an account</string>
     <string name="check_foster_home_screen_register_non_human_animal_to_talk_to_owner_label">Register first a non-human animal to foster and then talk to %1$s</string>

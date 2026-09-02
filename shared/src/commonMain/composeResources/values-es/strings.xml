@@ -336,7 +336,7 @@
     <string name="check_foster_home_screen_foster_home_conditions_label">Condiciones</string>
     <string name="check_foster_home_screen_foster_home_accepted_non_human_animals_label">Animales no humanos aceptados</string>
     <string name="check_foster_home_screen_foster_home_resident_non_human_animals_label">Animales no humanos residentes</string>
-    <string name="check_foster_home_screen_owner_reviews_label">Reseñas</string>
+    <string name="check_foster_home_screen_owner_reviews_label">Últimas reseñas</string>
     <string name="check_foster_home_screen_no_account_label">Crea una cuenta para registrar un animal no humano para acogida y hablar con %1$s</string>
     <string name="check_foster_home_screen_no_account_button">Crea una cuenta</string>
     <string name="check_foster_home_screen_register_non_human_animal_to_talk_to_owner_label">Primero registra un animal no humano para acogida y luego habla con %1$s</string>

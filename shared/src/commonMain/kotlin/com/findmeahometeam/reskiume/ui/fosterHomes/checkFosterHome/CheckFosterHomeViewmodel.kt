@@ -157,7 +157,10 @@ class CheckFosterHomeViewmodel(
         )
 
     val reviewListFlowState: Flow<UiState<List<UiReview>>> =
-        checkReviewsUtil.getReviewListFlow(ownerId).toUiState()
+        checkReviewsUtil
+            .getReviewListFlow(ownerId)
+            .map { uiReviews -> uiReviews.takeLast(5) }
+            .toUiState()
 
     fun isLoggedIn(): Boolean = myUser?.isLoggedIn == true
 

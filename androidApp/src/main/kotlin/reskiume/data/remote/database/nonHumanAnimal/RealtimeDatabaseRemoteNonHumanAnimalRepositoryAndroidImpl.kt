@@ -160,7 +160,7 @@ class RealtimeDatabaseRemoteNonHumanAnimalRepositoryAndroidImpl(
             databaseRef
                 .child(Section.NON_HUMAN_ANIMALS.path)
                 .child(caregiverId)
-                .addListenerForSingleValueEvent(nonHumanAnimalListener)
+                .addValueEventListener(nonHumanAnimalListener)
 
             awaitClose {
                 databaseRef

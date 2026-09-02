@@ -50,9 +50,15 @@ class RealtimeDatabaseRemoteUserRepositoryAndroidImpl(
                 )
             }
         }
-        databaseRef.child(Section.USERS.path).child(uid).addListenerForSingleValueEvent(userListener)
+        databaseRef
+            .child(Section.USERS.path)
+            .child(uid)
+            .addValueEventListener(userListener)
         awaitClose {
-            databaseRef.child(Section.USERS.path).child(uid).removeEventListener(userListener)
+            databaseRef
+                .child(Section.USERS.path)
+                .child(uid)
+                .removeEventListener(userListener)
         }
     }
 

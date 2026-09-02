@@ -1,8 +1,7 @@
-import Shared
-import FirebaseDatabaseInternal
 import FirebaseCore
+import FirebaseDatabaseInternal
 import KMPNativeCoroutinesAsync
-
+import Shared
 
 class RealtimeDatabaseRemoteReviewRepositoryForIosDelegateImpl: RealtimeDatabaseRemoteReviewRepositoryForIosDelegate {
 
@@ -11,8 +10,8 @@ class RealtimeDatabaseRemoteReviewRepositoryForIosDelegateImpl: RealtimeDatabase
     private let reviewUidTaskHandle: Task<(), Never>?
     
     private var log: Log
-            
-    init (
+    
+    init(
         realtimeDatabaseRemoteReviewFlowsRepositoryForIosDelegate: RealtimeDatabaseRemoteReviewFlowsRepositoryForIosDelegate,
         log: Log
     ) {
@@ -26,7 +25,7 @@ class RealtimeDatabaseRemoteReviewRepositoryForIosDelegateImpl: RealtimeDatabase
                 for try await reviewedUid in emittedValues {
                     
                     if reviewedUid != "" {
-                        database.reference().child(Section.reviews.path).child(reviewedUid).observeSingleEvent (of: .value, with: { snapshot in
+                        database.reference().child(Section.reviews.path).child(reviewedUid).observe (.value, with: { snapshot in
                             var remoteReviews: [RemoteReview] = []
 
                             for review in snapshot.children {
@@ -89,7 +88,7 @@ class RealtimeDatabaseRemoteReviewRepositoryForIosDelegateImpl: RealtimeDatabase
     
     func deleteRemoteReviews(reviewedUid: String, onDeletedRemoteReviews: @escaping (DatabaseResult) -> Void) {
         databaseReference!.child(Section.reviews.path).child(reviewedUid).removeValue { error, _ in
-            if (error == nil) {
+            if error == nil {
                 onDeletedRemoteReviews(DatabaseResult.Success())
             } else {
                 self.log.e(tag: "RealtimeDatabaseRemoteReviewRepositoryForIosDelegateImpl", message: "Error deleting the remote review from the user \(reviewedUid): \(String(describing: error))", throwable: nil)

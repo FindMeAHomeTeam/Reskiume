@@ -26,7 +26,7 @@ class RealtimeDatabaseRemoteUserRepositoryForIosDelegateImpl: RealtimeDatabaseRe
                 for try await userUid in emittedValues {
                     
                     if userUid != "" {
-                        database.reference().child(Section.users.path).child(userUid).observeSingleEvent (of: .value, with: { snapshot in
+                        database.reference().child(Section.users.path).child(userUid).observe (.value, with: { snapshot in
                             let nSDictionary: NSDictionary? = snapshot.value as? NSDictionary
 
                             let parsedSubscriptions: [RemoteSubscription]

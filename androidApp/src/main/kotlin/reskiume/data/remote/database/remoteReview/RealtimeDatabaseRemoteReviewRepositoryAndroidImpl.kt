@@ -64,10 +64,14 @@ class RealtimeDatabaseRemoteReviewRepositoryAndroidImpl(
                     )
                 }
             }
-            databaseRef.child(Section.REVIEWS.path).child(reviewedUid)
-                .addListenerForSingleValueEvent(reviewListener)
+            databaseRef
+                .child(Section.REVIEWS.path)
+                .child(reviewedUid)
+                .addValueEventListener(reviewListener)
             awaitClose {
-                databaseRef.child(Section.REVIEWS.path).child(reviewedUid)
+                databaseRef
+                    .child(Section.REVIEWS.path)
+                    .child(reviewedUid)
                     .removeEventListener(reviewListener)
             }
         }

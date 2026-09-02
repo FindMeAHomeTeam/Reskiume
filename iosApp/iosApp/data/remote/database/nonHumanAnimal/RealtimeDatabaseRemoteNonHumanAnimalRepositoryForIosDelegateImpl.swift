@@ -1,8 +1,7 @@
-import Shared
-import FirebaseDatabaseInternal
 import FirebaseCore
+import FirebaseDatabaseInternal
 import KMPNativeCoroutinesAsync
-
+import Shared
 
 class RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateImpl: RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegate {
 
@@ -11,8 +10,8 @@ class RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateImpl: Realtime
     private let NonHumanAnimalUidTaskHandle: Task<(), Never>?
     
     private var log: Log
-            
-    init (
+    
+    init(
         realtimeDatabaseRemoteNonHumanAnimalFlowsRepositoryForIosDelegate: RealtimeDatabaseRemoteNonHumanAnimalFlowsRepositoryForIosDelegate,
         log: Log
     ) {
@@ -33,7 +32,7 @@ class RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateImpl: Realtime
                         database.reference()
                             .child(Section.nonHumanAnimals.path)
                             .child(caregiverId)
-                            .observeSingleEvent (of: .value, with: { snapshot in
+                            .observe (.value, with: { snapshot in
                                 
                                 var remoteNonHumanAnimals: [RemoteNonHumanAnimal] = []
                                 
@@ -163,17 +162,17 @@ class RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateImpl: Realtime
             .child(caregiverId)
             .child(id)
             .removeValue { error, _ in
-            if (error == nil) {
-                onDeleteRemoteNonHumanAnimal(DatabaseResult.Success())
-            } else {
-                self.log.e(
-                    tag: "RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateImpl",
-                    message: "Error deleting the remote non human animal \(id) from the caregiver \(caregiverId): \(String(describing: error))",
-                    throwable: nil
-                )
-                onDeleteRemoteNonHumanAnimal(DatabaseResult.Error(message: String(describing: error)))
+                if error == nil {
+                    onDeleteRemoteNonHumanAnimal(DatabaseResult.Success())
+                } else {
+                    self.log.e(
+                        tag: "RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateImpl",
+                        message: "Error deleting the remote non human animal \(id) from the caregiver \(caregiverId): \(String(describing: error))",
+                        throwable: nil
+                    )
+                    onDeleteRemoteNonHumanAnimal(DatabaseResult.Error(message: String(describing: error)))
+                }
             }
-        }
     }
     
     func deleteAllRemoteNonHumanAnimals(caregiverId: String, onDeleteAllRemoteNonHumanAnimals: @escaping (DatabaseResult) -> Void) {
@@ -181,16 +180,16 @@ class RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateImpl: Realtime
             .child(Section.nonHumanAnimals.path)
             .child(caregiverId)
             .removeValue { error, _ in
-            if (error == nil) {
-                onDeleteAllRemoteNonHumanAnimals(DatabaseResult.Success())
-            } else {
-                self.log.e(
-                    tag: "RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateImpl",
-                    message: "Error deleting the remote non human animals from the caregiver \(caregiverId): \(String(describing: error))",
-                    throwable: nil
-                )
-                onDeleteAllRemoteNonHumanAnimals(DatabaseResult.Error(message: String(describing: error)))
+                if error == nil {
+                    onDeleteAllRemoteNonHumanAnimals(DatabaseResult.Success())
+                } else {
+                    self.log.e(
+                        tag: "RealtimeDatabaseRemoteNonHumanAnimalRepositoryForIosDelegateImpl",
+                        message: "Error deleting the remote non human animals from the caregiver \(caregiverId): \(String(describing: error))",
+                        throwable: nil
+                    )
+                    onDeleteAllRemoteNonHumanAnimals(DatabaseResult.Error(message: String(describing: error)))
+                }
             }
-        }
     }
 }

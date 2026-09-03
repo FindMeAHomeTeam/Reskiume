@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -17,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.findmeahometeam.reskiume.domain.model.fosterHome.City
 import com.findmeahometeam.reskiume.domain.model.fosterHome.Country
 import com.findmeahometeam.reskiume.domain.model.fosterHome.toStringResource
@@ -36,23 +37,47 @@ fun RmCountryAndCitySelectors(
 ) {
     val placeUtil: PlaceUtil = koinInject<PlaceUtil>()
 
+    // Country
     var isCountryVisible: Boolean by rememberSaveable { mutableStateOf(true) }
-    val countryFieldState = rememberTextFieldState(if (selectedCountry == Country.UNSELECTED) {
-        ""
-    } else {
-        stringResource(selectedCountry.toStringResource())
-    })
+    val countryFieldState = rememberTextFieldState(
+        if (selectedCountry == Country.UNSELECTED) {
+            ""
+        } else {
+            stringResource(selectedCountry.toStringResource())
+        }
+    )
     val countryItems: List<Pair<Country, String>> by placeUtil.allCountryItems()
-        .collectAsState(initial = emptyList())
-    var isCityVisible: Boolean by rememberSaveable { mutableStateOf(selectedCountry != Country.UNSELECTED) }
-    val cityFieldState = rememberTextFieldState(if (selectedCity == City.UNSELECTED) {
-        ""
-    } else {
-        stringResource(selectedCity.toStringResource())
-    })
-    val cityItems: List<Pair<City, String>> by placeUtil.allCityItems(
-        selectedCountry
-    ).collectAsState(initial = emptyList())
+        .collectAsStateWithLifecycle(initialValue = emptyList())
+
+    LaunchedEffect(selectedCountry, countryItems) {
+        if (selectedCountry != Country.UNSELECTED) {
+            val label: String? = countryItems.find { it.first == selectedCountry }?.second
+            if (label != null && countryFieldState.text.toString() != label) {
+                countryFieldState.setTextAndPlaceCursorAtEnd(label)
+            }
+        }
+    }
+
+    // City
+    val cityFieldState = rememberTextFieldState(
+        if (selectedCity == City.UNSELECTED) {
+            ""
+        } else {
+            stringResource(selectedCity.toStringResource())
+        }
+    )
+    var isCityVisible: Boolean by rememberSaveable(selectedCountry) { mutableStateOf(selectedCountry != Country.UNSELECTED) }
+    val cityItems: List<Pair<City, String>> by placeUtil.allCityItems(selectedCountry)
+        .collectAsStateWithLifecycle(initialValue = emptyList())
+
+    LaunchedEffect(selectedCity, cityItems) {
+        if (selectedCity != City.UNSELECTED) {
+            val label: String? = cityItems.find { it.first == selectedCity }?.second
+            if (label != null && cityFieldState.text.toString() != label) {
+                cityFieldState.setTextAndPlaceCursorAtEnd(label)
+            }
+        }
+    }
 
     Column(
         modifier = Modifier.heightIn(max = 300.dp),

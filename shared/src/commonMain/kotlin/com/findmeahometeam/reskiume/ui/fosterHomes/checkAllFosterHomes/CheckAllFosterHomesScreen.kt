@@ -28,13 +28,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
 import com.findmeahometeam.reskiume.domain.model.fosterHome.City
 import com.findmeahometeam.reskiume.domain.model.fosterHome.Country
 import com.findmeahometeam.reskiume.domain.model.fosterHome.toStringResource
 import com.findmeahometeam.reskiume.domain.model.toEmoji
 import com.findmeahometeam.reskiume.domain.model.toStringResource
+import com.findmeahometeam.reskiume.domain.model.user.User
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.components.ManagePermissionState
 import com.findmeahometeam.reskiume.ui.core.components.RmButton
@@ -74,12 +74,33 @@ fun CheckAllFosterHomesScreen(
     val checkAllFosterHomesViewmodel: CheckAllFosterHomesViewmodel =
         koinViewModel<CheckAllFosterHomesViewmodel>()
 
-    var selectedCountry: Country by rememberSaveable { mutableStateOf(Country.UNSELECTED) }
-    var selectedCity: City by rememberSaveable { mutableStateOf(City.UNSELECTED) }
+    val user: User? by checkAllFosterHomesViewmodel.userState.collectAsStateWithLifecycle(
+        initialValue = null
+    )
+
+    var selectedCountry: Country by rememberSaveable(user) {
+        mutableStateOf(
+            if (user == null) {
+                Country.UNSELECTED
+            } else {
+                Country.valueOf(user!!.countryForRescueEventNotifications)
+            }
+        )
+    }
+    var selectedCity: City by rememberSaveable(user) {
+        mutableStateOf(
+            if (user == null) {
+                City.UNSELECTED
+            } else {
+                City.valueOf(user!!.cityForRescueEventNotifications)
+            }
+        )
+    }
 
     var searchOption: SearchOption by rememberSaveable { mutableStateOf(SearchOption.COUNTRY_CITY) }
     val isLocationEnabledState: State<Boolean> =
-        checkAllFosterHomesViewmodel.observeIfLocationEnabled().collectAsStateWithLifecycle(initialValue = false)
+        checkAllFosterHomesViewmodel.observeIfLocationEnabled()
+            .collectAsStateWithLifecycle(initialValue = false)
     var nonHumanAnimalType: NonHumanAnimalType by rememberSaveable {
         mutableStateOf(NonHumanAnimalType.UNSELECTED)
     }
@@ -89,7 +110,6 @@ fun CheckAllFosterHomesScreen(
         )
     }
 
-    val authState: AuthUser? by checkAllFosterHomesViewmodel.authState.collectAsStateWithLifecycle(initialValue = null)
     val uiFosterHomeListState: UiState<List<UiFosterHome>> by checkAllFosterHomesViewmodel.allFosterHomesState.collectAsStateWithLifecycle()
     val isSearchButtonEnabled: Boolean by remember(
         selectedCountry,
@@ -118,7 +138,7 @@ fun CheckAllFosterHomesScreen(
         title = stringResource(Res.string.check_all_foster_homes_screen_title),
         floatingActionButton = {
             DisplayExtendedFloatingActionButtonToCreateFosterHomeIfLoggedIn(
-                authState,
+                user?.uid,
                 lazyListState.isScrollingUp(),
                 onCreateFosterHome
             )
@@ -294,7 +314,7 @@ fun CheckAllFosterHomesScreen(
                                 .toStringResource()
                         ).substring(5),
                         onClick = {
-                            if (authState?.uid == uiFosterHome.fosterHome.ownerId) {
+                            if (user?.uid == uiFosterHome.fosterHome.ownerId) {
                                 onModifyFosterHome(uiFosterHome.fosterHome.id)
                             } else {
                                 onCheckFosterHome(
@@ -313,18 +333,18 @@ fun CheckAllFosterHomesScreen(
 
 @Composable
 private fun DisplayExtendedFloatingActionButtonToCreateFosterHomeIfLoggedIn(
-    authState: AuthUser?,
+    uid: String?,
     expanded: Boolean,
     onCreateFosterHome: (ownerId: String) -> Unit
 ) {
-    if (authState != null) {
+    if (uid != null) {
 
         RmExtendedFloatingActionButton(
             drawableResource = Res.drawable.ic_add,
             text = stringResource(Res.string.check_all_foster_homes_screen_register_foster_home),
             expanded = expanded,
             onClick = {
-                onCreateFosterHome(authState.uid)
+                onCreateFosterHome(uid)
             }
         )
     }

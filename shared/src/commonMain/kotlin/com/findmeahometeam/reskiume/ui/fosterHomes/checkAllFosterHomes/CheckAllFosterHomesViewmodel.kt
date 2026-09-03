@@ -2,7 +2,6 @@ package com.findmeahometeam.reskiume.ui.fosterHomes.checkAllFosterHomes
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
@@ -90,7 +89,7 @@ class CheckAllFosterHomesViewmodel(
     val allFosterHomesState: StateFlow<UiState<List<UiFosterHome>>> =
         _allFosterHomesState.asStateFlow()
 
-    val authState: Flow<AuthUser?> = observeAuthStateInAuthDataSource().map { authUser ->
+    val userState: Flow<User?> = observeAuthStateInAuthDataSource().map { authUser ->
 
         val user = if (authUser != null) getUserFromLocalDataSource(authUser.uid).firstOrNull() else null
 
@@ -99,7 +98,7 @@ class CheckAllFosterHomesViewmodel(
             null
         } else {
             myUid = user.uid
-            authUser
+            user
         }
     }
 

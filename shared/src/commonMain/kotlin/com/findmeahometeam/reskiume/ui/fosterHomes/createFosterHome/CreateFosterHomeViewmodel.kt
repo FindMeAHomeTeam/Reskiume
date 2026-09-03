@@ -9,6 +9,7 @@ import com.findmeahometeam.reskiume.domain.model.LocalCache
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
+import com.findmeahometeam.reskiume.domain.model.user.User
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.chat.GetNonHumanAnimalInfoInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.fosterHome.InsertFosterHomeInLocalRepository
@@ -17,6 +18,7 @@ import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDa
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromLocalRepository
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.util.location.GetLocationFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.ObserveIfLocationEnabledFromLocationRepository
@@ -53,6 +55,7 @@ class CreateFosterHomeViewmodel(
     private val subscriptionManagerUtil: SubscriptionManagerUtil,
     private val deleteImageFromLocalDataSource: DeleteImageFromLocalDataSource,
     private val getNonHumanAnimalInfoInLocalRepository: GetNonHumanAnimalInfoInLocalRepository,
+    private val getUserFromLocalDataSource: GetUserFromLocalDataSource,
     private val log: Log
 ) : ViewModel() {
 
@@ -76,6 +79,16 @@ class CreateFosterHomeViewmodel(
     private val _saveChangesUiState: MutableStateFlow<UiState<Unit>> =
         MutableStateFlow(UiState.Idle())
     val saveChangesUiState: StateFlow<UiState<Unit>> = _saveChangesUiState.asStateFlow()
+
+    val userState: Flow<User?> = observeAuthStateInAuthDataSource().map { authUser ->
+
+        val user = if (authUser != null) getUserFromLocalDataSource(authUser.uid).firstOrNull() else null
+        if (user == null || !user.isLoggedIn) {
+            null
+        } else {
+            user
+        }
+    }
 
     fun observeIfLocationEnabled(): Flow<Boolean> = observeIfLocationEnabledFromLocationRepository()
 

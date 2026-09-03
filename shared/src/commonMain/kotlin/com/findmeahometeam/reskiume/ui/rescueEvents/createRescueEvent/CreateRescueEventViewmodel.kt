@@ -11,6 +11,7 @@ import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.chat.Chat
 import com.findmeahometeam.reskiume.domain.model.chat.NonHumanAnimalInfo
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueEvent
+import com.findmeahometeam.reskiume.domain.model.user.User
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.chat.GetNonHumanAnimalInfoInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.chat.InsertChatInLocalRepository
@@ -21,6 +22,7 @@ import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLoca
 import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.InsertRescueEventInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.InsertRescueEventInRemoteRepository
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.util.location.GetLocationFromLocationRepository
 import com.findmeahometeam.reskiume.domain.usecases.util.location.ObserveIfLocationEnabledFromLocationRepository
@@ -59,6 +61,7 @@ class CreateRescueEventViewmodel(
     private val getUserFromRemoteDataSource: GetUserFromRemoteDataSource,
     private val subscriptionManagerUtil: SubscriptionManagerUtil,
     private val deleteImageFromLocalDataSource: DeleteImageFromLocalDataSource,
+    private val getUserFromLocalDataSource: GetUserFromLocalDataSource,
     private val log: Log
 ) : ViewModel() {
 
@@ -82,6 +85,16 @@ class CreateRescueEventViewmodel(
     private val _saveChangesUiState: MutableStateFlow<UiState<Unit>> =
         MutableStateFlow(UiState.Idle())
     val saveChangesUiState: StateFlow<UiState<Unit>> = _saveChangesUiState.asStateFlow()
+
+    val userState: Flow<User?> = observeAuthStateInAuthDataSource().map { authUser ->
+
+        val user = if (authUser != null) getUserFromLocalDataSource(authUser.uid).firstOrNull() else null
+        if (user == null || !user.isLoggedIn) {
+            null
+        } else {
+            user
+        }
+    }
 
     fun observeIfLocationEnabled(): Flow<Boolean> = observeIfLocationEnabledFromLocationRepository()
 

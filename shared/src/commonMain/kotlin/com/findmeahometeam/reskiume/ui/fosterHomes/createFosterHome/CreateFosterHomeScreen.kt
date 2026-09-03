@@ -32,6 +32,7 @@ import com.findmeahometeam.reskiume.domain.model.fosterHome.City
 import com.findmeahometeam.reskiume.domain.model.fosterHome.Country
 import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
 import com.findmeahometeam.reskiume.domain.model.fosterHome.ResidentNonHumanAnimalForFosterHome
+import com.findmeahometeam.reskiume.domain.model.user.User
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.components.ManagePermissionState
 import com.findmeahometeam.reskiume.ui.core.components.MaxCharacters
@@ -85,9 +86,27 @@ fun CreateFosterHomeScreen(
     var allResidentUiNonHumanAnimals: List<NonHumanAnimal> by rememberSaveable(stateSaver = NonHumanAnimalListSaver) {
         mutableStateOf(emptyList())
     }
-    var selectedCountry: Country by rememberSaveable { mutableStateOf(Country.UNSELECTED) }
-    var selectedCity: City by rememberSaveable { mutableStateOf(City.UNSELECTED) }
-
+    val user: User? by createFosterHomeViewmodel.userState.collectAsStateWithLifecycle(
+        initialValue = null
+    )
+    var selectedCountry: Country by rememberSaveable(user) {
+        mutableStateOf(
+            if (user == null) {
+                Country.UNSELECTED
+            } else {
+                Country.valueOf(user!!.countryForRescueEventNotifications)
+            }
+        )
+    }
+    var selectedCity: City by rememberSaveable(user) {
+        mutableStateOf(
+            if (user == null) {
+                City.UNSELECTED
+            } else {
+                City.valueOf(user!!.cityForRescueEventNotifications)
+            }
+        )
+    }
     var locationPermissionState: ManagePermissionState by rememberSaveable {
         mutableStateOf(ManagePermissionState.CHECK_PERMISSION)
     }
@@ -155,6 +174,7 @@ fun CreateFosterHomeScreen(
             Spacer(modifier = Modifier.height(8.dp))
             RmCountryAndCitySelectors(
                 selectedCountry = selectedCountry,
+                selectedCity = selectedCity,
                 onSelectedCountry = {
                     selectedCountry = it
                 },

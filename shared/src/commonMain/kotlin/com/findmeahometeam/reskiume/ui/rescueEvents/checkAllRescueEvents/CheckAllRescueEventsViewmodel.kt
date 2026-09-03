@@ -2,10 +2,10 @@ package com.findmeahometeam.reskiume.ui.rescueEvents.checkAllRescueEvents
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueEvent
+import com.findmeahometeam.reskiume.domain.model.user.User
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.GetDataByManagingObjectLocalCacheTimestamp
@@ -85,7 +85,7 @@ class CheckAllRescueEventsViewmodel(
     val allRescueEventsState: StateFlow<UiState<List<UiRescueEvent>>> =
         _allRescueEventsState.asStateFlow()
 
-    val authState: Flow<AuthUser?> = observeAuthStateInAuthDataSource().map { authUser ->
+    val userState: Flow<User?> = observeAuthStateInAuthDataSource().map { authUser ->
 
         val user = if (authUser != null) getUserFromLocalDataSource(authUser.uid).firstOrNull() else null
 
@@ -94,7 +94,7 @@ class CheckAllRescueEventsViewmodel(
             null
         } else {
             myUid = user.uid
-            authUser
+            user
         }
     }
 

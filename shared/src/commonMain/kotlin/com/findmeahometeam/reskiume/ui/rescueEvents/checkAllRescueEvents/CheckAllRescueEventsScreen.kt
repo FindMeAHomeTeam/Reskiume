@@ -27,10 +27,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.domain.model.fosterHome.City
 import com.findmeahometeam.reskiume.domain.model.fosterHome.Country
 import com.findmeahometeam.reskiume.domain.model.fosterHome.toStringResource
+import com.findmeahometeam.reskiume.domain.model.user.User
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
 import com.findmeahometeam.reskiume.ui.core.components.ManagePermissionState
 import com.findmeahometeam.reskiume.ui.core.components.RmButton
@@ -71,9 +71,27 @@ fun CheckAllRescueEventsScreen(
     val checkAllRescueEventsViewmodel: CheckAllRescueEventsViewmodel =
         koinViewModel<CheckAllRescueEventsViewmodel>()
 
-    var selectedCountry: Country by rememberSaveable { mutableStateOf(Country.UNSELECTED) }
-    var selectedCity: City by rememberSaveable { mutableStateOf(City.UNSELECTED) }
-
+    val user: User? by checkAllRescueEventsViewmodel.userState.collectAsStateWithLifecycle(
+        initialValue = null
+    )
+    var selectedCountry: Country by rememberSaveable(user) {
+        mutableStateOf(
+            if (user == null) {
+                Country.UNSELECTED
+            } else {
+                Country.valueOf(user!!.countryForRescueEventNotifications)
+            }
+        )
+    }
+    var selectedCity: City by rememberSaveable(user) {
+        mutableStateOf(
+            if (user == null) {
+                City.UNSELECTED
+            } else {
+                City.valueOf(user!!.cityForRescueEventNotifications)
+            }
+        )
+    }
     var searchOption: SearchOption by rememberSaveable { mutableStateOf(SearchOption.COUNTRY_CITY) }
     val isLocationEnabledState: State<Boolean> =
         checkAllRescueEventsViewmodel.observeIfLocationEnabled().collectAsStateWithLifecycle(initialValue = false)
@@ -82,8 +100,6 @@ fun CheckAllRescueEventsScreen(
             ManagePermissionState.IDLE
         )
     }
-
-    val authState: AuthUser? by checkAllRescueEventsViewmodel.authState.collectAsStateWithLifecycle(initialValue = null)
     val uiRescueEventListState: UiState<List<UiRescueEvent>> by checkAllRescueEventsViewmodel.allRescueEventsState.collectAsStateWithLifecycle()
 
     val isSearchButtonEnabled: Boolean by remember(
@@ -111,7 +127,7 @@ fun CheckAllRescueEventsScreen(
         title = stringResource(Res.string.check_all_rescue_events_screen_title),
         floatingActionButton = {
             DisplayExtendedFloatingActionButtonToCreateRescueEventIfLoggedIn(
-                authState,
+                user?.uid,
                 lazyListState.isScrollingUp(),
                 onCreateRescueEvent
             )
@@ -268,7 +284,7 @@ fun CheckAllRescueEventsScreen(
                                 .toStringResource()
                         ).substring(5),
                         onClick = {
-                            if (authState?.uid == uiRescueEvent.rescueEvent.creatorId) {
+                            if (user?.uid == uiRescueEvent.rescueEvent.creatorId) {
                                 onModifyRescueEvent(uiRescueEvent.rescueEvent.id)
                             } else {
                                 onCheckRescueEvent(
@@ -287,18 +303,18 @@ fun CheckAllRescueEventsScreen(
 
 @Composable
 private fun DisplayExtendedFloatingActionButtonToCreateRescueEventIfLoggedIn(
-    authState: AuthUser?,
+    uid: String?,
     expanded: Boolean,
     onCreateRescueEvent: (creatorId: String) -> Unit
 ) {
-    if (authState != null) {
+    if (uid != null) {
 
         RmExtendedFloatingActionButton(
             drawableResource = Res.drawable.ic_add,
             text = stringResource(Res.string.check_all_rescue_events_screen_register_rescue_event),
             expanded = expanded,
             onClick = {
-                onCreateRescueEvent(authState.uid)
+                onCreateRescueEvent(uid)
             }
         )
     }

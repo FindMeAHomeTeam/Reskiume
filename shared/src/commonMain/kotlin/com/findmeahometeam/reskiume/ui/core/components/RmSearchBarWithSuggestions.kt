@@ -60,8 +60,8 @@ fun <T : Enum<T>> RmSearchBarWithSuggestions(
             if (query.isBlank()) {
                 items
             } else {
-                val q = query.trim().lowercase()
-                items.filter { (_, label) -> label.lowercase().contains(q) }
+                val q = query.trim().removeAccents().lowercase()
+                items.filter { (_, label) -> label.removeAccents().lowercase().contains(q) }
             }
         }
     }
@@ -149,4 +149,13 @@ fun <T : Enum<T>> RmSearchBarWithSuggestions(
             }
         }
     }
+}
+
+private fun String.removeAccents(): String {
+    val accentsMap = mapOf(
+        'á' to 'a', 'é' to 'e', 'í' to 'i', 'ó' to 'o', 'ú' to 'u',
+        'Á' to 'A', 'É' to 'E', 'Í' to 'I', 'Ó' to 'O', 'Ú' to 'U',
+        'ü' to 'u', 'Ü' to 'U', 'ñ' to 'n', 'Ñ' to 'N'
+    )
+    return this.map { accentsMap[it] ?: it }.joinToString("")
 }

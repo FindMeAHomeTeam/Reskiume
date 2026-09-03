@@ -269,9 +269,6 @@
     <string name="modify_foster_home_screen_foster_home_started_title">This foster home has started</string>
     <string name="modify_foster_home_screen_foster_home_started_message">Please finish its chat first before deleting the foster home</string>
     <string name="modify_foster_home_screen_foster_home_started_ok_button">Ok</string>
-    <string name="modify_foster_home_screen_warning_foster_home_with_residents_title">This foster home has %1$d residents</string>
-    <string name="modify_foster_home_screen_warning_foster_home_with_residents_message">To delete this foster home you must first unregister all residents</string>
-    <string name="modify_foster_home_screen_warning_foster_home_with_residents_ok_button">Ok</string>
 
     <!-- Create a foster home -->
     <string name="create_foster_home_screen_title">Create a foster home</string>

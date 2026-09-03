@@ -72,9 +72,6 @@ import reskiume.shared.generated.resources.modify_foster_home_screen_foster_home
 import reskiume.shared.generated.resources.modify_foster_home_screen_save_foster_home_changes_button
 import reskiume.shared.generated.resources.modify_foster_home_screen_title
 import reskiume.shared.generated.resources.modify_foster_home_screen_unavailable_label
-import reskiume.shared.generated.resources.modify_foster_home_screen_warning_foster_home_with_residents_message
-import reskiume.shared.generated.resources.modify_foster_home_screen_warning_foster_home_with_residents_ok_button
-import reskiume.shared.generated.resources.modify_foster_home_screen_warning_foster_home_with_residents_title
 import reskiume.shared.generated.resources.non_human_animal_list_creator_resident_title
 
 @Composable
@@ -162,11 +159,6 @@ fun ModifyFosterHomeScreen(
                     )
                 }
                 var displayDeleteDialog: Boolean by rememberSaveable { mutableStateOf(false) }
-                var displayFosterHomeWithResidentsDialog: Boolean by rememberSaveable {
-                    mutableStateOf(
-                        false
-                    )
-                }
 
                 val isUpdateFosterHomeButtonEnabled by remember(
                     title,
@@ -301,17 +293,11 @@ fun ModifyFosterHomeScreen(
                     ),
                     textToLink = stringResource(Res.string.modify_foster_home_screen_delete_foster_home_button),
                     onClick = {
-                        if (allResidentUiNonHumanAnimals.isEmpty()) {
-
-                            if (isFosterHomeOwnerChatting) {
-                                displayCanNotDeleteFosterHomeDialog = true
-                            } else {
-                                displayDeleteDialog = true
-                            }
+                        if (isFosterHomeOwnerChatting) {
+                            displayCanNotDeleteFosterHomeDialog = true
                         } else {
-                            displayFosterHomeWithResidentsDialog = true
+                            displayDeleteDialog = true
                         }
-
                     }
                 )
                 if (displayCanNotDeleteFosterHomeDialog) {
@@ -344,21 +330,6 @@ fun ModifyFosterHomeScreen(
                             displayDeleteDialog = false
                         },
                         onClickDeny = { displayDeleteDialog = false }
-                    )
-                }
-                if (displayFosterHomeWithResidentsDialog) {
-                    RmDialog(
-                        emoji = "🐷🐱",
-                        title = stringResource(
-                            Res.string.modify_foster_home_screen_warning_foster_home_with_residents_title,
-                            allResidentUiNonHumanAnimals.size
-                        ),
-                        message = stringResource(Res.string.modify_foster_home_screen_warning_foster_home_with_residents_message),
-                        allowMessage = stringResource(Res.string.modify_foster_home_screen_warning_foster_home_with_residents_ok_button),
-                        onClickAllow = {
-                            displayFosterHomeWithResidentsDialog = false
-                        },
-                        onClickDeny = { displayFosterHomeWithResidentsDialog = false }
                     )
                 }
 

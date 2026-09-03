@@ -268,10 +268,7 @@
     <string name="modify_foster_home_availability_description">Actualiza la disponibilidad de esta casa de acogida para recibir solicitudes de reubicación</string>
     <string name="modify_foster_home_screen_foster_home_started_title">Esta casa de acogida ya ha empezado</string>
     <string name="modify_foster_home_screen_foster_home_started_message">Por favor, termina primero su chat antes de eliminar la casa de acogida</string>
-    <string name="modify_foster_home_screen_foster_home_started_ok_button">Aceptar</string>
-    <string name="modify_foster_home_screen_warning_foster_home_with_residents_title">Esta casa de acogida tiene %1$d residentes</string>
-    <string name="modify_foster_home_screen_warning_foster_home_with_residents_message">Para eliminar esta casa de acogida primero debes dar de baja a todos los residentes</string>
-    <string name="modify_foster_home_screen_warning_foster_home_with_residents_ok_button">Aceptar</string>
+    <string name="modify_foster_home_screen_foster_home_started_ok_button">Ok</string>
 
     <!-- Create a foster home -->
     <string name="create_foster_home_screen_title">Crear una casa de acogida</string>

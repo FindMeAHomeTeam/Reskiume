@@ -84,7 +84,7 @@
     <string name="add_photo_screen_selected_photo_content_description">Foto seleccionada</string>
     <string name="add_photo_screen_no_camera_title">No tienes ninguna aplicación de cámara instalada</string>
     <string name="add_photo_screen_no_camera_message">Abriré la galería en su lugar</string>
-    <string name="add_photo_screen_no_camera_ok_button">Aceptar</string>
+    <string name="add_photo_screen_no_camera_ok_button">Ok</string>
 
     <!-- Login account screen -->
     <string name="login_account_screen_log_in_title">Inicia sesión en tu cuenta</string>
@@ -171,7 +171,7 @@
     <string name="modify_non_human_animal_screen_save_non_human_animal_changes_button">Guardar cambios de %1$s</string>
     <string name="modify_non_human_animal_screen_non_human_animal_in_foster_home_rescue_event_title">%1$s está en un %2$s</string>
     <string name="modify_non_human_animal_screen_non_human_animal_in_foster_home_rescue_event_message">Por favor, termina primero el proceso con %1$s en el %2$s</string>
-    <string name="modify_non_human_animal_screen_non_human_animal_in_foster_home_ok_button">Aceptar</string>
+    <string name="modify_non_human_animal_screen_non_human_animal_in_foster_home_ok_button">Ok</string>
 
     <!-- No human animal types -->
     <string name="non_human_animal_type_unselected">No seleccionado</string>
@@ -224,7 +224,7 @@
     <!-- No email dialog -->
     <string name="dialog_no_email_app_dialog_title">No tienes ninguna aplicación de correo instalada</string>
     <string name="dialog_no_email_app_dialog_message">Por favor, ve a la tienda e instala una</string>
-    <string name="dialog_no_email_app_dialog_ok_button">Aceptar</string>
+    <string name="dialog_no_email_app_dialog_ok_button">Ok</string>
 
     <!-- Check all foster homes -->
     <string name="check_all_foster_homes_screen_title">Buscar casas de acogida por</string>
@@ -346,7 +346,7 @@
     <string name="check_foster_home_screen_continue_chat_button">Volver al chat</string>
     <string name="check_foster_home_screen_share_foster_home_title">¿Necesitas acoger a un animal no humano? La casa de acogida %1$s puede cuidar de: %2$s. Encuéntralo en la aplicación Reskiume con este enlace %3$s</string>
     <string name="check_foster_home_screen_add_non_human_animals_to_foster_title">Añadir animales no humanos para acogida</string>
-    <string name="check_foster_home_screen_ok_button">Aceptar</string>
+    <string name="check_foster_home_screen_ok_button">Ok</string>
     <string name="check_foster_home_screen_foster_home_not_available_title">Esta casa de acogida no está disponible</string>
     <string name="check_foster_home_screen_look_for_foster_homes_message">Por favor, sigue buscando otras casas de acogida</string>
 
@@ -395,7 +395,7 @@
     <string name="modify_rescue_event_screen_save_rescue_event_changes_button">Guardar cambios de %1$s</string>
     <string name="modify_rescue_event_screen_rescue_event_started_title">Este evento de rescate ya ha empezado</string>
     <string name="modify_rescue_event_screen_rescue_event_started_message">Por favor, termina primero su chat antes de eliminar el evento de rescate</string>
-    <string name="modify_rescue_event_screen_rescue_event_started_ok_button">Aceptar</string>
+    <string name="modify_rescue_event_screen_rescue_event_started_ok_button">Ok</string>
 
     <!-- Check all rescue events -->
     <string name="check_all_rescue_events_screen_title">Buscar eventos de rescate por</string>
@@ -423,7 +423,7 @@
     <string name="check_rescue_event_screen_start_chat_button">Iniciar chat</string>
     <string name="check_rescue_event_screen_keep_chatting_button">Seguir chateando</string>
     <string name="check_rescue_event_screen_share_rescue_event_title">Únete al evento de rescate %1$s para rescatar %2$s. Encuéntralo en la aplicación Reskiume con este enlace %3$s</string>
-    <string name="check_rescue_event_screen_ok_button">Aceptar</string>
+    <string name="check_rescue_event_screen_ok_button">Ok</string>
     <string name="check_rescue_event_screen_rescue_event_finished_title">Este evento de rescate ha terminado</string>
     <string name="check_rescue_event_screen_rescue_event_message">Por favor, sigue buscando nuevos eventos de rescate. Tu ayuda es valiosa.</string>
 
@@ -481,7 +481,7 @@
     <!-- Share service -->
     <string name="share_service_install_title">No tienes ninguna aplicación para compartir instalada</string>
     <string name="share_service_install_message">Por favor, ve a la tienda e instala una</string>
-    <string name="share_service_ok_button">Aceptar</string>
+    <string name="share_service_ok_button">Ok</string>
 
     <!-- Report -->
     <string name="report_element_link">Reportar este %1$s</string>

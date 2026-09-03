@@ -120,9 +120,14 @@ fun NavigationWrapper() {
         }
 
         composable<ModifyRescueEvent> {
-            ModifyRescueEventScreen {
-                mainNavController.navigateUp()
-            }
+            ModifyRescueEventScreen(
+                onBackPressed = {
+                    mainNavController.navigateUp()
+                },
+                onChatClicked = { chatId, timestamp ->
+                    mainNavController.navigate(CheckChat(chatId, timestamp))
+                }
+            )
         }
 
         composable<CheckRescueEvent>(

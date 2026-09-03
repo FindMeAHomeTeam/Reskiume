@@ -37,7 +37,6 @@ import com.findmeahometeam.reskiume.ui.core.components.ManagePermissionState
 import com.findmeahometeam.reskiume.ui.core.components.MaxCharacters
 import com.findmeahometeam.reskiume.ui.core.components.RmAddPhoto
 import com.findmeahometeam.reskiume.ui.core.components.RmButton
-import com.findmeahometeam.reskiume.ui.core.components.RmDialog
 import com.findmeahometeam.reskiume.ui.core.components.RmManageNotificationPermission
 import com.findmeahometeam.reskiume.ui.core.components.RmNeedToCoverListCreator
 import com.findmeahometeam.reskiume.ui.core.components.RmNonHumanAnimalListCreator
@@ -51,15 +50,9 @@ import com.findmeahometeam.reskiume.ui.profile.checkAllMyRescueEvents.UiRescueEv
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import reskiume.shared.generated.resources.Res
-import reskiume.shared.generated.resources.modify_rescue_event_screen_delete_rescue_event_button
-import reskiume.shared.generated.resources.modify_rescue_event_screen_delete_rescue_event_message
-import reskiume.shared.generated.resources.modify_rescue_event_screen_delete_rescue_event_text
-import reskiume.shared.generated.resources.modify_rescue_event_screen_delete_rescue_event_title
-import reskiume.shared.generated.resources.modify_rescue_event_screen_dismiss_delete_rescue_event_button
+import reskiume.shared.generated.resources.modify_rescue_event_screen_delete_suggestion_button
+import reskiume.shared.generated.resources.modify_rescue_event_screen_delete_suggestion_text
 import reskiume.shared.generated.resources.modify_rescue_event_screen_rescue_event_description
-import reskiume.shared.generated.resources.modify_rescue_event_screen_rescue_event_started_message
-import reskiume.shared.generated.resources.modify_rescue_event_screen_rescue_event_started_ok_button
-import reskiume.shared.generated.resources.modify_rescue_event_screen_rescue_event_started_title
 import reskiume.shared.generated.resources.modify_rescue_event_screen_rescue_event_title
 import reskiume.shared.generated.resources.modify_rescue_event_screen_save_rescue_event_changes_button
 import reskiume.shared.generated.resources.modify_rescue_event_screen_title
@@ -67,7 +60,8 @@ import reskiume.shared.generated.resources.non_human_animal_list_creator_save_ti
 
 @Composable
 fun ModifyRescueEventScreen(
-    onBackPressed: () -> Unit
+    onBackPressed: () -> Unit,
+    onChatClicked: (chatId: String, timestamp: Long) -> Unit
 ) {
     val modifyRescueEventViewmodel: ModifyRescueEventViewmodel =
         koinViewModel<ModifyRescueEventViewmodel>()
@@ -139,12 +133,6 @@ fun ModifyRescueEventScreen(
                     )
                 }
                 var isRescueEventCreatorChatting: Boolean by rememberSaveable { mutableStateOf(false) }
-                var displayCanNotDeleteRescueEventDialog: Boolean by rememberSaveable {
-                    mutableStateOf(
-                        false
-                    )
-                }
-                var displayDeleteDialog: Boolean by rememberSaveable { mutableStateOf(false) }
 
                 val isUpdateRescueEventButtonEnabled by remember(
                     title,
@@ -238,54 +226,19 @@ fun ModifyRescueEventScreen(
                         allUiNonHumanAnimalsToRescue = it
                     }
                 }
-
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(16.dp))
                 RmTextLink(
                     text = stringResource(
-                        Res.string.modify_rescue_event_screen_delete_rescue_event_text,
+                        Res.string.modify_rescue_event_screen_delete_suggestion_text,
                         title
                     ),
-                    textToLink = stringResource(Res.string.modify_rescue_event_screen_delete_rescue_event_button),
+                    textToLink = stringResource(Res.string.modify_rescue_event_screen_delete_suggestion_button),
                     onClick = {
-                        if (isRescueEventCreatorChatting) {
-                            displayCanNotDeleteRescueEventDialog = true
-                        } else {
-                            displayDeleteDialog = true
+                        modifyRescueEventViewmodel.retrieveChatIdAndTimestamp { chatId, timestamp ->
+                            onChatClicked(chatId, timestamp)
                         }
                     }
                 )
-                if (displayCanNotDeleteRescueEventDialog) {
-                    RmDialog(
-                        emoji = "⚠️",
-                        title = stringResource(Res.string.modify_rescue_event_screen_rescue_event_started_title),
-                        message = stringResource(Res.string.modify_rescue_event_screen_rescue_event_started_message),
-                        allowMessage = stringResource(Res.string.modify_rescue_event_screen_rescue_event_started_ok_button),
-                        onClickAllow = {
-                            displayCanNotDeleteRescueEventDialog = false
-                        },
-                        onClickDeny = { displayCanNotDeleteRescueEventDialog = false }
-                    )
-                }
-                if (displayDeleteDialog) {
-                    RmDialog(
-                        emoji = "🗑️",
-                        title = stringResource(
-                            Res.string.modify_rescue_event_screen_delete_rescue_event_title,
-                            title
-                        ),
-                        message = stringResource(Res.string.modify_rescue_event_screen_delete_rescue_event_message),
-                        allowMessage = stringResource(Res.string.modify_rescue_event_screen_delete_rescue_event_button),
-                        denyMessage = stringResource(Res.string.modify_rescue_event_screen_dismiss_delete_rescue_event_button),
-                        onClickAllow = {
-                            modifyRescueEventViewmodel.deleteRescueEvent(
-                                uiRescueEvent.rescueEvent.id,
-                                uiRescueEvent.rescueEvent.creatorId
-                            )
-                            displayDeleteDialog = false
-                        },
-                        onClickDeny = { displayDeleteDialog = false }
-                    )
-                }
 
                 Spacer(modifier = Modifier.height(10.dp))
                 RmResultState(manageChangesUiState, onSuccess = { onBackPressed() })

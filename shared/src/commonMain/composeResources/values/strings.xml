@@ -387,15 +387,9 @@
     <string name="modify_rescue_event_screen_title">Modify %1$s - %2$s (%3$s)</string>
     <string name="modify_rescue_event_screen_rescue_event_title">Title</string>
     <string name="modify_rescue_event_screen_rescue_event_description">Description</string>
-    <string name="modify_rescue_event_screen_delete_rescue_event_text">Delete %1$s</string>
-    <string name="modify_rescue_event_screen_delete_rescue_event_button">Delete</string>
-    <string name="modify_rescue_event_screen_dismiss_delete_rescue_event_button">Dismiss</string>
-    <string name="modify_rescue_event_screen_delete_rescue_event_title">Do you want to delete %1$s?</string>
-    <string name="modify_rescue_event_screen_delete_rescue_event_message">This action can not be undone</string>
     <string name="modify_rescue_event_screen_save_rescue_event_changes_button">Save %1$s's changes</string>
-    <string name="modify_rescue_event_screen_rescue_event_started_title">This rescue event has started</string>
-    <string name="modify_rescue_event_screen_rescue_event_started_message">Please finish its chat first before deleting the rescue event</string>
-    <string name="modify_rescue_event_screen_rescue_event_started_ok_button">Ok</string>
+    <string name="modify_rescue_event_screen_delete_suggestion_text">To delete this rescue event, finish the chat</string>
+    <string name="modify_rescue_event_screen_delete_suggestion_button">finish the chat</string>
 
     <!-- Check all rescue events -->
     <string name="check_all_rescue_events_screen_title">Search rescue events by</string>

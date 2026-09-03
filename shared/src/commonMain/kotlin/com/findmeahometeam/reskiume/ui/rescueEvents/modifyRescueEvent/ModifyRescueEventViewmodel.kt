@@ -5,11 +5,12 @@ import androidx.lifecycle.viewModelScope
 import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.LocalCache
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
+import com.findmeahometeam.reskiume.domain.model.chat.Chat
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueEvent
-import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
+import com.findmeahometeam.reskiume.domain.usecases.chat.GetChatFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.chat.GetNonHumanAnimalInfoInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
@@ -21,14 +22,12 @@ import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetRescueEventFr
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetRescueEventFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.ModifyRescueEventInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.ModifyRescueEventInRemoteRepository
-import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSource
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.components.toUiState
 import com.findmeahometeam.reskiume.ui.core.navigation.ModifyRescueEvent
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
 import com.findmeahometeam.reskiume.ui.profile.checkAllMyRescueEvents.UiRescueEvent
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
-import com.findmeahometeam.reskiume.ui.util.fcm.SubscriptionManagerUtil
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -54,10 +53,7 @@ class ModifyRescueEventViewmodel(
     private val modifyRescueEventInRemoteRepository: ModifyRescueEventInRemoteRepository,
     private val modifyRescueEventInLocalRepository: ModifyRescueEventInLocalRepository,
     private val modifyCacheInLocalRepository: ModifyCacheInLocalRepository,
-    private val deleteRescueEventUtil: DeleteRescueEventUtil,
-    private val observeAuthStateInAuthDataSource: ObserveAuthStateInAuthDataSource,
-    private val getUserFromRemoteDataSource: GetUserFromRemoteDataSource,
-    private val subscriptionManagerUtil: SubscriptionManagerUtil,
+    private val getChatFromLocalRepository: GetChatFromLocalRepository,
     private val log: Log
 ) : ViewModel() {
 
@@ -361,36 +357,23 @@ class ModifyRescueEventViewmodel(
         }
     }
 
-    fun deleteRescueEvent(id: String, creatorId: String) {
-
-        _manageChangesUiState.value = UiState.Loading()
-
-        deleteRescueEventUtil.deleteRescueEvent(
-            id = id,
-            creatorId = creatorId,
-            coroutineScope = viewModelScope,
-            deleteOnLocal = true,
-            deleteOnRemote = true,
-            onError = {
-                _manageChangesUiState.value = UiState.Error()
-            },
-            onComplete = {
-                unsubscribeCreatorToTheirRescueEvent(id)
-            },
-        )
-    }
-
-    private fun unsubscribeCreatorToTheirRescueEvent(rescueEventId: String) {
+    fun retrieveChatIdAndTimestamp(onChatRetrieved: (chatId: String, timestamp: Long) -> Unit) {
         viewModelScope.launch {
+            val chatIdUiState = rescueEventFlow.first()
 
-            val creatorId = observeAuthStateInAuthDataSource().first()!!.uid
-            val creator = getUserFromRemoteDataSource(creatorId).first()!!
-            subscriptionManagerUtil.unsubscribeFromTopic(
-                user = creator,
-                topicToUnsubscribe = rescueEventId,
-                coroutineScope = viewModelScope
-            ) {
-                _manageChangesUiState.value = UiState.Success(Unit)
+            if (chatIdUiState is UiState.Success) {
+                val rescueEventId = chatIdUiState.data.rescueEvent.id
+                val creatorId = chatIdUiState.data.rescueEvent.creatorId
+                val chat: Chat? = getChatFromLocalRepository(rescueEventId + creatorId).first()
+
+                if (chat != null) {
+                    onChatRetrieved(chat.id, chat.timestamp)
+                }
+            } else {
+                log.e(
+                    "ModifyRescueEventViewModel",
+                    "retrieveChatIdAndTimestamp: failed to retrieve chat ID and timestamp for rescue event $rescueEventId"
+                )
             }
         }
     }

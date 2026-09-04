@@ -17,6 +17,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,18 +34,14 @@ import com.findmeahometeam.reskiume.domain.model.fosterHome.AcceptedNonHumanAnim
 import com.findmeahometeam.reskiume.domain.model.toEmoji
 import com.findmeahometeam.reskiume.domain.model.toStringResource
 import com.findmeahometeam.reskiume.ui.core.backgroundColorForItems
-import com.findmeahometeam.reskiume.ui.core.primaryGreen
 import com.findmeahometeam.reskiume.ui.core.primaryRed
-import com.findmeahometeam.reskiume.ui.core.tertiaryGreen
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import reskiume.shared.generated.resources.Res
-import reskiume.shared.generated.resources.accepted_non_human_animal_list_creator_add_content_description
 import reskiume.shared.generated.resources.accepted_non_human_animal_list_creator_delete_content_description
 import reskiume.shared.generated.resources.accepted_non_human_animal_list_creator_non_human_animal_gender_label
 import reskiume.shared.generated.resources.accepted_non_human_animal_list_creator_non_human_animal_type_label
 import reskiume.shared.generated.resources.accepted_non_human_animal_list_creator_title
-import reskiume.shared.generated.resources.ic_add
 import reskiume.shared.generated.resources.ic_delete
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -57,9 +54,7 @@ fun RmAcceptedNonHumanAnimalListCreator(
     onAddAcceptedNonHumanAnimal: (List<AcceptedNonHumanAnimalForFosterHome>) -> Unit
 ) {
     var itemsAdded: List<AcceptedNonHumanAnimalForFosterHome> by remember {
-        mutableStateOf(
-            allAcceptedNonHumanAnimals
-        )
+        mutableStateOf(allAcceptedNonHumanAnimals)
     }
     var nonHumanAnimalTypeString: String by rememberSaveable { mutableStateOf(NonHumanAnimalType.UNSELECTED.name) }
     var nonHumanAnimalType: NonHumanAnimalType by remember(nonHumanAnimalTypeString) {
@@ -125,38 +120,24 @@ fun RmAcceptedNonHumanAnimalListCreator(
                 }
             )
 
-            IconButton(
-                modifier = Modifier
-                    .padding(start = 16.dp, top = 8.dp)
-                    .size(32.dp),
-                onClick = {
-                    if (nonHumanAnimalType != NonHumanAnimalType.UNSELECTED && gender != Gender.UNSELECTED) {
+            LaunchedEffect(nonHumanAnimalType, gender) {
+                if (nonHumanAnimalType != NonHumanAnimalType.UNSELECTED && gender != Gender.UNSELECTED) {
 
-                        val existingItems = itemsAdded.filter {
-                            it.acceptedNonHumanAnimalType == nonHumanAnimalType
-                                    && it.acceptedNonHumanAnimalGender == gender
-                        }
-                        if (existingItems.isEmpty()) {
-                            val acceptedNonHumanAnimal = AcceptedNonHumanAnimalForFosterHome(
-                                acceptedNonHumanAnimalId = "${nonHumanAnimalType.name}${gender.name}${Clock.System.now().epochSeconds}",
-                                fosterHomeId = fosterHomeId,
-                                acceptedNonHumanAnimalType = nonHumanAnimalType,
-                                acceptedNonHumanAnimalGender = gender
-                            )
-                            itemsAdded += acceptedNonHumanAnimal
-                            onAddAcceptedNonHumanAnimal(itemsAdded)
+                    addNonHumanAnimalTypeAndGenderIfNotExists(
+                        nonHumanAnimalType = nonHumanAnimalType,
+                        gender = gender,
+                        itemsAdded = itemsAdded,
+                        fosterHomeId = fosterHomeId,
+                        onAddAcceptedNonHumanAnimal = { newItems ->
+                            itemsAdded = newItems
+                            onAddAcceptedNonHumanAnimal(newItems)
+                        },
+                        onUpdateNonHumanAnimalTypeAndGender = {
                             nonHumanAnimalTypeString = NonHumanAnimalType.UNSELECTED.name
                             genderString = Gender.UNSELECTED.name
                         }
-                    }
+                    )
                 }
-            ) {
-                Icon(
-                    painter = painterResource(Res.drawable.ic_add),
-                    contentDescription = stringResource(Res.string.accepted_non_human_animal_list_creator_add_content_description),
-                    tint = if (nonHumanAnimalType == NonHumanAnimalType.UNSELECTED || gender == Gender.UNSELECTED) tertiaryGreen else primaryGreen,
-                    modifier = Modifier.size(24.dp),
-                )
             }
         }
     }
@@ -212,5 +193,33 @@ fun RmAcceptedNonHumanAnimalListCreator(
                 }
             }
         }
+    }
+}
+
+private fun addNonHumanAnimalTypeAndGenderIfNotExists(
+    nonHumanAnimalType: NonHumanAnimalType,
+    gender: Gender,
+    itemsAdded: List<AcceptedNonHumanAnimalForFosterHome>,
+    fosterHomeId: String,
+    onAddAcceptedNonHumanAnimal: (List<AcceptedNonHumanAnimalForFosterHome>) -> Unit,
+    onUpdateNonHumanAnimalTypeAndGender: () -> Unit
+) {
+    val myItemsAdded: MutableList<AcceptedNonHumanAnimalForFosterHome> =
+        itemsAdded.toMutableList()
+
+    val existingItems = myItemsAdded.filter {
+        it.acceptedNonHumanAnimalType == nonHumanAnimalType
+                && it.acceptedNonHumanAnimalGender == gender
+    }
+    if (existingItems.isEmpty()) {
+        val acceptedNonHumanAnimal = AcceptedNonHumanAnimalForFosterHome(
+            acceptedNonHumanAnimalId = "${nonHumanAnimalType.name}${gender.name}${Clock.System.now().epochSeconds}",
+            fosterHomeId = fosterHomeId,
+            acceptedNonHumanAnimalType = nonHumanAnimalType,
+            acceptedNonHumanAnimalGender = gender
+        )
+        myItemsAdded.add(acceptedNonHumanAnimal)
+        onAddAcceptedNonHumanAnimal(myItemsAdded)
+        onUpdateNonHumanAnimalTypeAndGender()
     }
 }

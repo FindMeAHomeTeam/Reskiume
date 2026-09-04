@@ -31,18 +31,16 @@ import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalSaver
 import com.findmeahometeam.reskiume.domain.model.toEmoji
 import com.findmeahometeam.reskiume.domain.model.toStringResource
 import com.findmeahometeam.reskiume.ui.core.backgroundColorForItems
-import com.findmeahometeam.reskiume.ui.core.primaryGreen
 import com.findmeahometeam.reskiume.ui.core.primaryRed
-import com.findmeahometeam.reskiume.ui.core.tertiaryGreen
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import reskiume.shared.generated.resources.Res
-import reskiume.shared.generated.resources.ic_add
 import reskiume.shared.generated.resources.ic_delete
-import reskiume.shared.generated.resources.non_human_animal_list_creator_add_content_description
 import reskiume.shared.generated.resources.non_human_animal_list_creator_delete_content_description
 import reskiume.shared.generated.resources.non_human_animal_list_creator_non_human_animal_label
 import reskiume.shared.generated.resources.non_human_animal_list_creator_unselected_non_human_animal_label
+import kotlin.collections.minus
+import kotlin.collections.plus
 
 @Composable
 fun RmNonHumanAnimalListCreator(
@@ -109,7 +107,7 @@ fun RmNonHumanAnimalListCreator(
             verticalAlignment = Alignment.CenterVertically
         ) {
             RmDropDownMenu(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.fillMaxWidth(),
                 dropDownLabel = stringResource(Res.string.non_human_animal_list_creator_non_human_animal_label),
                 defaultElementText = if (nonHumanAnimalChoiceFromDropdown == null) {
                     stringResource(Res.string.non_human_animal_list_creator_unselected_non_human_animal_label)
@@ -122,31 +120,20 @@ fun RmNonHumanAnimalListCreator(
                 onClick = { nonHumanAnimalChoiceFromDropdown = it },
             )
 
-            IconButton(
-                modifier = Modifier
-                    .padding(start = 16.dp, top = 8.dp)
-                    .size(32.dp),
-                onClick = {
-                    if (nonHumanAnimalChoiceFromDropdown != null) {
+            LaunchedEffect(nonHumanAnimalChoiceFromDropdown) {
+                if (nonHumanAnimalChoiceFromDropdown != null) {
 
-                        val existingItems = selectedNonHumanAnimals.filter {
-                            it.id == nonHumanAnimalChoiceFromDropdown!!.id
-                        }
-                        if (existingItems.isEmpty()) {
-                            availableNonHumanAnimals -= nonHumanAnimalChoiceFromDropdown!!
-                            selectedNonHumanAnimals += nonHumanAnimalChoiceFromDropdown!!
-                            onAddNonHumanAnimal(selectedNonHumanAnimals)
-                            nonHumanAnimalChoiceFromDropdown = null
-                        }
+                    // Add a non-human animal to the list if it doesn't exist
+                    val existingItems = selectedNonHumanAnimals.filter {
+                        it.id == nonHumanAnimalChoiceFromDropdown!!.id
+                    }
+                    if (existingItems.isEmpty()) {
+                        availableNonHumanAnimals -= nonHumanAnimalChoiceFromDropdown!!
+                        selectedNonHumanAnimals += nonHumanAnimalChoiceFromDropdown!!
+                        onAddNonHumanAnimal(selectedNonHumanAnimals)
+                        nonHumanAnimalChoiceFromDropdown = null
                     }
                 }
-            ) {
-                Icon(
-                    painter = painterResource(Res.drawable.ic_add),
-                    contentDescription = stringResource(Res.string.non_human_animal_list_creator_add_content_description),
-                    tint = if (nonHumanAnimalChoiceFromDropdown == null) tertiaryGreen else primaryGreen,
-                    modifier = Modifier.size(24.dp),
-                )
             }
         }
     }

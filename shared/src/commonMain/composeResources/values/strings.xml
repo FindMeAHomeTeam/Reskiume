@@ -174,7 +174,7 @@
     <string name="modify_non_human_animal_screen_non_human_animal_in_foster_home_ok_button">Ok</string>
 
     <!-- No human animal types -->
-    <string name="non_human_animal_type_unselected">Unselected</string>
+    <string name="non_human_animal_type_unselected">--</string>
     <string name="non_human_animal_type_dog">Dog</string>
     <string name="non_human_animal_type_cat">Cat</string>
     <string name="non_human_animal_type_bird">Bird</string>
@@ -190,7 +190,7 @@
     <string name="non_human_animal_type_other">Other</string>
 
     <!-- No human animal genders -->
-    <string name="non_human_animal_gender_unselected">Unselected</string>
+    <string name="non_human_animal_gender_unselected">--</string>
     <string name="non_human_animal_gender_female">Female</string>
     <string name="non_human_animal_gender_male">Male</string>
 
@@ -318,7 +318,7 @@
     <string name="non_human_animal_list_creator_resident_title">Add resident non-human animals:</string>
     <string name="non_human_animal_list_creator_save_title">Add non-human animals to save:</string>
     <string name="non_human_animal_list_creator_non_human_animal_label">Non-human animal</string>
-    <string name="non_human_animal_list_creator_unselected_non_human_animal_label">Unselected</string>
+    <string name="non_human_animal_list_creator_unselected_non_human_animal_label">--</string>
     <string name="non_human_animal_list_creator_add_content_description">Add a non-human animal</string>
     <string name="non_human_animal_list_creator_delete_content_description">Delete a non-human animal</string>
 

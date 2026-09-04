@@ -56,9 +56,10 @@ fun NavigationWrapper() {
         }
 
         composable<CreateFosterHome> {
-            CreateFosterHomeScreen {
-                mainNavController.navigateUp()
-            }
+            CreateFosterHomeScreen(
+                onCreateNonHumanAnimal = { mainNavController.navigate(Routes.CREATE_NON_HUMAN_ANIMAL.route) },
+                onBackPressed = { mainNavController.navigateUp() }
+            )
         }
 
         composable<ModifyFosterHome> {
@@ -114,9 +115,10 @@ fun NavigationWrapper() {
         }
 
         composable<CreateRescueEvent> {
-            CreateRescueEventScreen {
-                mainNavController.navigateUp()
-            }
+            CreateRescueEventScreen (
+                onCreateNonHumanAnimal = { mainNavController.navigate(Routes.CREATE_NON_HUMAN_ANIMAL.route) },
+                onBackPressed = { mainNavController.navigateUp() }
+            )
         }
 
         composable<ModifyRescueEvent> {

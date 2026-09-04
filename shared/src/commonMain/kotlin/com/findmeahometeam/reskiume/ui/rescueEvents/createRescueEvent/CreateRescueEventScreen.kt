@@ -21,8 +21,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalListSaver
@@ -47,12 +49,16 @@ import com.findmeahometeam.reskiume.ui.core.components.RmResultState
 import com.findmeahometeam.reskiume.ui.core.components.RmScaffold
 import com.findmeahometeam.reskiume.ui.core.components.RmText
 import com.findmeahometeam.reskiume.ui.core.components.RmTextField
+import com.findmeahometeam.reskiume.ui.core.components.RmTextLink
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import reskiume.shared.generated.resources.Res
 import reskiume.shared.generated.resources.create_rescue_event_screen_create_a_rescue_event_button
 import reskiume.shared.generated.resources.create_rescue_event_screen_create_the_rescue_event_button
+import reskiume.shared.generated.resources.create_rescue_event_screen_can_register_non_human_animal_button
+import reskiume.shared.generated.resources.create_rescue_event_screen_can_register_non_human_animal_label
+import reskiume.shared.generated.resources.create_rescue_event_screen_must_register_non_human_animal_label
 import reskiume.shared.generated.resources.create_rescue_event_screen_rescue_event_description
 import reskiume.shared.generated.resources.create_rescue_event_screen_rescue_event_title
 import reskiume.shared.generated.resources.create_rescue_event_screen_title
@@ -63,7 +69,8 @@ import reskiume.shared.generated.resources.rescue_event
 
 @Composable
 fun CreateRescueEventScreen(
-    onBackPressed: () -> Unit
+    onBackPressed: () -> Unit,
+    onCreateNonHumanAnimal: () -> Unit
 ) {
     val createRescueEventViewmodel: CreateRescueEventViewmodel =
         koinViewModel<CreateRescueEventViewmodel>()
@@ -250,14 +257,32 @@ fun CreateRescueEventScreen(
                 allNeedsToCover = it
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
-            RmNonHumanAnimalListCreator(
-                title = stringResource(Res.string.non_human_animal_list_creator_save_title),
-                allAvailableNonHumanAnimals = allAvailableNonHumanAnimals,
-                allSelectedNonHumanAnimals = emptyList()
-            ) {
-                uiAllNonHumanAnimalsToRescue = it
+            if (allAvailableNonHumanAnimals.isNotEmpty()) {
+
+                Spacer(modifier = Modifier.height(16.dp))
+                RmNonHumanAnimalListCreator(
+                    title = stringResource(Res.string.non_human_animal_list_creator_save_title),
+                    allAvailableNonHumanAnimals = allAvailableNonHumanAnimals,
+                    allSelectedNonHumanAnimals = emptyList()
+                ) {
+                    uiAllNonHumanAnimalsToRescue = it
+                }
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+            RmTextLink(
+                modifier = Modifier.fillMaxWidth().padding(10.dp),
+                text = if (allAvailableNonHumanAnimals.isEmpty()) {
+                    stringResource(Res.string.create_rescue_event_screen_must_register_non_human_animal_label)
+                } else {
+                    stringResource(Res.string.create_rescue_event_screen_can_register_non_human_animal_label)
+                },
+                textToLink = stringResource(Res.string.create_rescue_event_screen_can_register_non_human_animal_button),
+                textAlign = TextAlign.Start,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.ExtraBold,
+                onClick = onCreateNonHumanAnimal
+            )
 
             Spacer(modifier = Modifier.height(10.dp))
             RmResultState(manageChangesUiState, onSuccess = { onBackPressed() })

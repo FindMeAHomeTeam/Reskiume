@@ -195,7 +195,7 @@
     <string name="non_human_animal_gender_male">Male</string>
 
     <!-- No human animal age category -->
-    <string name="non_human_animal_age_category_unselected">Unselected</string>
+    <string name="non_human_animal_age_category_unselected">--</string>
     <string name="non_human_animal_age_category_baby">Baby</string>
     <string name="non_human_animal_age_category_young">Young</string>
     <string name="non_human_animal_age_category_adult">Adult</string>
@@ -282,6 +282,8 @@
     <string name="create_foster_home_screen_create_a_foster_home_button">Create a foster home</string>
     <string name="create_foster_home_screen_create_the_foster_home_button">Create the foster home %1$s</string>
     <string name="create_foster_home_screen_turn_on_location">Please, turn on the location to get your position</string>
+    <string name="create_foster_home_screen_can_register_non_human_animal_label">You can register a non-human animal</string>
+    <string name="create_foster_home_screen_can_register_non_human_animal_button">non-human animal</string>
 
     <!-- Country and city selector -->
     <string name="country_city_selector_country">Country</string>
@@ -319,7 +321,6 @@
     <string name="non_human_animal_list_creator_save_title">Add non-human animals to save:</string>
     <string name="non_human_animal_list_creator_non_human_animal_label">Non-human animal</string>
     <string name="non_human_animal_list_creator_unselected_non_human_animal_label">--</string>
-    <string name="non_human_animal_list_creator_add_content_description">Add a non-human animal</string>
     <string name="non_human_animal_list_creator_delete_content_description">Delete a non-human animal</string>
 
     <!-- Check foster home -->
@@ -379,6 +380,9 @@
     <string name="create_rescue_event_screen_create_a_rescue_event_button">Create a rescue event</string>
     <string name="create_rescue_event_screen_create_the_rescue_event_button">Create the rescue event %1$s</string>
     <string name="create_rescue_event_screen_turn_on_location">Please, turn on the location to get your position and try again</string>
+    <string name="create_rescue_event_screen_can_register_non_human_animal_label">You can register another non-human animal</string>
+    <string name="create_rescue_event_screen_can_register_non_human_animal_button">non-human animal</string>
+    <string name="create_rescue_event_screen_must_register_non_human_animal_label">You must register the non-human animal before continuing.</string>
 
     <!-- Need to cover list creator -->
     <string name="need_to_cover_list_creator_title">Select needs to cover:</string>

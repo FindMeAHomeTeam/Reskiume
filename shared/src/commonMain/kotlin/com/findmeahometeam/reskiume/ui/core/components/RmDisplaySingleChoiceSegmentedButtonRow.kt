@@ -10,6 +10,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
 import com.findmeahometeam.reskiume.ui.core.secondaryGreen
 import com.findmeahometeam.reskiume.ui.core.tertiaryGreen
 
@@ -42,9 +45,13 @@ fun <T : Enum<T>> RmDisplaySingleChoiceSegmentedButtonRow(
                     inactiveBorderColor = Color.Black
                 ),
                 label = {
-                    RmText(
+                    RmBasicText(
                         text = element.second,
-                        color = Color.Black
+                        minFontSize = 8.sp,
+                        maxLines = 1,
+                        textStyle = TextStyle.Default.copy(
+                            textAlign = TextAlign.Center
+                        )
                     )
                 }
             )

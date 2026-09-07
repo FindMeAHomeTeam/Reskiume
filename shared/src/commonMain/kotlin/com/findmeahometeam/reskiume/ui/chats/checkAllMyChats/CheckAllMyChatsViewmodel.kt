@@ -2,25 +2,27 @@ package com.findmeahometeam.reskiume.ui.chats.checkAllMyChats
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.findmeahometeam.reskiume.data.remote.response.AuthUser
 import com.findmeahometeam.reskiume.domain.model.chat.Chat
 import com.findmeahometeam.reskiume.domain.model.chat.ChatMessage
+import com.findmeahometeam.reskiume.domain.model.user.User
 import com.findmeahometeam.reskiume.domain.usecases.authUser.ObserveAuthStateInAuthDataSource
 import com.findmeahometeam.reskiume.domain.usecases.chat.GetAllMyChatsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.chat.GetAllMyChatsFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.chat.GetChatFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
+import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromLocalDataSource
 import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.components.toUiState
 import com.findmeahometeam.reskiume.ui.fosterHomes.checkFosterHome.CheckFosterHomeUtil
 import com.findmeahometeam.reskiume.ui.rescueEvents.checkRescueEvent.CheckRescueEventUtil
 import com.findmeahometeam.reskiume.ui.util.StringProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -36,6 +38,7 @@ import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class CheckAllMyChatsViewmodel(
     observeAuthStateInAuthDataSource: ObserveAuthStateInAuthDataSource,
     private val getAllMyChatsFromLocalRepository: GetAllMyChatsFromLocalRepository,
@@ -45,22 +48,33 @@ class CheckAllMyChatsViewmodel(
     private val checkFosterHomeUtil: CheckFosterHomeUtil,
     private val checkRescueEventUtil: CheckRescueEventUtil,
     private val getImagePathForFileNameFromLocalDataSource: GetImagePathForFileNameFromLocalDataSource,
+    private val getUserFromLocalDataSource: GetUserFromLocalDataSource,
     private val getStringProvider: StringProvider
 ) : ViewModel() {
 
-    // The sync stream to write to room database
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val remoteSync: StateFlow<Unit> =
-        observeAuthStateInAuthDataSource()
-            .flatMapConcat { authUser: AuthUser? ->
-                val myUid = authUser?.uid ?: return@flatMapConcat flowOf(Unit)
+    private val currentUserState: Flow<User?> = observeAuthStateInAuthDataSource()
+        .flatMapLatest { authUser ->
+            if (authUser == null) {
+                flowOf(null)
+            } else {
+                getUserFromLocalDataSource(authUser.uid)
+            }
+        }
 
+    // The sync stream to write to room database
+    val remoteSync: StateFlow<Unit> =
+        currentUserState
+            .flatMapLatest { user: User? ->
+
+                if (user == null || !user.isLoggedIn) {
+                    return@flatMapLatest flowOf(Unit)
+                }
                 val lastChatTimestamp =
-                    getAllMyChatsFromLocalRepository(myUid).first().maxOfOrNull { it.timestamp }
+                    getAllMyChatsFromLocalRepository(user.uid).first().maxOfOrNull { it.timestamp }
                         ?: 0L
 
                 getAllMyChatsFromRemoteRepository(
-                    myUid,
+                    user.uid,
                     lastChatTimestamp
                 ).map { allChats ->
 
@@ -72,13 +86,13 @@ class CheckAllMyChatsViewmodel(
                         if (localChat == null) {
                             manageChatUtil.insertChatInLocalRepo(
                                 chat = chat,
-                                myUid = myUid
+                                myUid = user.uid
                             )
                         } else {
                             manageChatUtil.modifyChatInLocalRepo(
                                 updatedChat = chat,
                                 previousChat = localChat,
-                                myUid = myUid
+                                myUid = user.uid
                             )
                         }
                     }
@@ -91,13 +105,14 @@ class CheckAllMyChatsViewmodel(
             )
 
     // The read stream from room database
-    @OptIn(ExperimentalCoroutinesApi::class)
     val uiChatListState: StateFlow<UiState<List<UiChat>>> =
-        observeAuthStateInAuthDataSource()
-            .flatMapConcat { authUser: AuthUser? ->
+        currentUserState
+            .flatMapLatest { user: User? ->
 
-                val myUid = authUser?.uid ?: return@flatMapConcat flowOf()
-                getAllMyChatsFromLocalRepository(myUid).map { list ->
+                if (user == null || !user.isLoggedIn) {
+                    return@flatMapLatest flowOf()
+                }
+                getAllMyChatsFromLocalRepository(user.uid).map { list ->
                     list.map { chat ->
 
                         var avatar: String

@@ -44,6 +44,7 @@ fun RmRescueEventListItem(
     distance: Double?,
     city: String,
     containerColor: Color = backgroundColorForItems,
+    forceReloadImages: Boolean = false,
     onClick: () -> Unit
 ) {
     Card(
@@ -55,7 +56,10 @@ fun RmRescueEventListItem(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.Top
         ) {
-            RmAvatar(RmListAvatarType.Image(imageUrl, 120.dp))
+            RmAvatar(
+                listAvatarType = RmListAvatarType.Image(imageUrl, 120.dp),
+                forceReload = forceReloadImages
+            )
             Spacer(modifier = Modifier.width(5.dp))
 
             Column(modifier = Modifier.fillMaxWidth()) {

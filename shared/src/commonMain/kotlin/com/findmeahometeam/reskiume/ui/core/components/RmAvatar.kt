@@ -26,7 +26,10 @@ sealed class RmListAvatarType {
 }
 
 @Composable
-fun RmAvatar(listAvatarType: RmListAvatarType) {
+fun RmAvatar(
+    listAvatarType: RmListAvatarType,
+    forceReload: Boolean = false
+) {
 
     when (listAvatarType) {
         is RmListAvatarType.Icon ->
@@ -57,7 +60,8 @@ fun RmAvatar(listAvatarType: RmListAvatarType) {
             } else {
                 RmImage(
                     modifier = Modifier.size(listAvatarType.size).clip(RoundedCornerShape(15.dp)),
-                    imagePath = listAvatarType.resource
+                    imagePath = listAvatarType.resource,
+                    forceReload = forceReload
                 )
             }
         }

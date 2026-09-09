@@ -7,27 +7,42 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImagePainter
+import coil3.compose.LocalPlatformContext
 import coil3.compose.rememberAsyncImagePainter
+import coil3.request.CachePolicy
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 
 @Composable
 fun RmImage(
     imagePath: String,
     contentDescription: String? = null,
     contentScale: ContentScale = ContentScale.Crop,
-    progressIndicatorSize: Dp = 55.dp,
+    forceReload: Boolean = false,
     modifier: Modifier = Modifier
 ) {
-    val painter: AsyncImagePainter = rememberAsyncImagePainter(imagePath)
+    val context = LocalPlatformContext.current
+    val request = ImageRequest.Builder(context)
+        .data(imagePath)
+        .apply {
+            if (forceReload) {
+                memoryCachePolicy(CachePolicy.DISABLED)
+                diskCachePolicy(CachePolicy.DISABLED)
+            }
+        }
+        .crossfade(true)
+        .build()
+
+    val painter: AsyncImagePainter = rememberAsyncImagePainter(request)
     val state: AsyncImagePainter.State by painter.state.collectAsState()
 
     when (state) {
         is AsyncImagePainter.State.Empty,
         is AsyncImagePainter.State.Loading -> {
             RmCircularProgressIndicator(
-                modifier = Modifier.size(progressIndicatorSize)
+                modifier = Modifier.size(painter.intrinsicSize.width.dp)
             )
         }
 

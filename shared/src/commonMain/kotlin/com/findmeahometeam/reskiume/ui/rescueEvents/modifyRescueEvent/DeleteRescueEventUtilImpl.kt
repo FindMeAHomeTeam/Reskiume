@@ -82,10 +82,10 @@ class DeleteRescueEventUtilImpl(
         deleteOnRemote: Boolean,
         coroutineScope: CoroutineScope,
         onError: () -> Unit,
-        onSuccess: () -> Unit
+        onComplete: () -> Unit
     ) {
         if (!deleteOnRemote) {
-            onSuccess()
+            onComplete()
             return
         }
         coroutineScope.launch {
@@ -115,14 +115,13 @@ class DeleteRescueEventUtilImpl(
                         "DeleteRescueEventUtil",
                         "deleteCurrentImageFromRemoteDataSource: Image from the rescue event $rescueEventId was deleted successfully in the remote data source"
                     )
-                    onSuccess()
                 } else {
                     log.e(
                         "DeleteRescueEventUtil",
                         "deleteCurrentImageFromRemoteDataSource: failed to delete the image from the rescue event $rescueEventId in the remote data source"
                     )
-                    onError()
                 }
+                onComplete()
             }
         }
     }
@@ -132,10 +131,10 @@ class DeleteRescueEventUtilImpl(
         deleteOnLocal: Boolean,
         coroutineScope: CoroutineScope,
         onError: () -> Unit,
-        onSuccess: () -> Unit
+        onComplete: () -> Unit
     ) {
         if (!deleteOnLocal) {
-            onSuccess()
+            onComplete()
             return
         }
         coroutineScope.launch {
@@ -158,14 +157,13 @@ class DeleteRescueEventUtilImpl(
                         "DeleteRescueEventUtil",
                         "deleteCurrentImageFromLocalDataSource: Image from the rescue event $rescueEventId was deleted successfully in the local data source"
                     )
-                    onSuccess()
                 } else {
                     log.e(
                         "DeleteRescueEventUtil",
                         "deleteCurrentImageFromLocalDataSource: failed to delete the image from the rescue event $rescueEventId in the local data source"
                     )
-                    onError()
                 }
+                onComplete()
             }
         }
     }

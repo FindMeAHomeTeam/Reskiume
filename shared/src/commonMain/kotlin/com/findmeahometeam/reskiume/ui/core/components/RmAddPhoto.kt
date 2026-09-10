@@ -69,6 +69,7 @@ import reskiume.shared.generated.resources.ic_close
 fun RmAddPhoto(
     pickMultiplePhotosFromGallery: Boolean = false,
     currentImageUri: String = "",
+    forceReload: Boolean = false,
     onUriRetrieved: (String) -> Unit,
     onDeleteDiscardedImage: (String) -> Unit
 ) {
@@ -162,7 +163,8 @@ fun RmAddPhoto(
                         RmImage(
                             imagePath = uri,
                             contentDescription = stringResource(Res.string.add_photo_screen_selected_photo_content_description),
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier.fillMaxSize(),
+                            forceReload = forceReload
                         )
                         Row(
                             modifier = Modifier.wrapContentSize()

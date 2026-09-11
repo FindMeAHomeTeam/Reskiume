@@ -1,13 +1,12 @@
 package com.findmeahometeam.reskiume.ui.core.components
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImagePainter
 import coil3.compose.LocalPlatformContext
 import coil3.compose.rememberAsyncImagePainter
@@ -42,7 +41,7 @@ fun RmImage(
         is AsyncImagePainter.State.Empty,
         is AsyncImagePainter.State.Loading -> {
             RmCircularProgressIndicator(
-                modifier = Modifier.size(painter.intrinsicSize.width.dp)
+                modifier = Modifier.wrapContentSize()
             )
         }
 

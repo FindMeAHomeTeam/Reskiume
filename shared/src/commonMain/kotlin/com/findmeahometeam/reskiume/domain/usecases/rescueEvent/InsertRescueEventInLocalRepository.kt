@@ -3,7 +3,6 @@ package com.findmeahometeam.reskiume.domain.usecases.rescueEvent
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
-import com.findmeahometeam.reskiume.domain.model.rescueEvent.NeedToCover
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.NonHumanAnimalToRescue
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueEvent
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
@@ -12,7 +11,10 @@ import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flow
 
 class InsertRescueEventInLocalRepository(
     private val checkNonHumanAnimalUtil: CheckNonHumanAnimalUtil,
@@ -22,36 +24,30 @@ class InsertRescueEventInLocalRepository(
     private val authRepository: AuthRepository,
     private val log: Log
 ) {
-    suspend operator fun invoke(
+    operator fun invoke(
         rescueEvent: RescueEvent,
-        coroutineScope: CoroutineScope,
-        onInsertRescueEvent: suspend (isSuccess: Boolean) -> Unit
-    ) {
+        coroutineScope: CoroutineScope
+    ): Flow<Boolean> = flow {
         val imageFileName = manageImagePath.getFileNameFromLocalImagePath(rescueEvent.imageUrl)
         val createdRescueEvent = rescueEvent.copy(
             savedBy = getMyUid(),
             imageUrl = imageFileName
         )
-        localRescueEventRepository.insertRescueEvent(
-            createdRescueEvent.toEntity(),
-            onInsertRescueEvent = { rowId ->
-                if (rowId > 0) {
-                    var isSuccess = insertAllNonHumanAnimalsToRescue(createdRescueEvent, coroutineScope)
+        val isSuccess = localRescueEventRepository.upsertAllRescueEventData(
+            rescueEventEntity = createdRescueEvent.toEntity(),
+            allNonHumanAnimals = createdRescueEvent.allNonHumanAnimalsToRescue.map { it.toEntity() },
+            allNeedsToCover = createdRescueEvent.allNeedsToCover.map { it.toEntity() }
+        ).first()
 
-                    if (isSuccess) {
-                        isSuccess = insertAllNeedsToCover(createdRescueEvent)
-                    }
-                    onInsertRescueEvent(isSuccess)
-                } else {
-                    onInsertRescueEvent(false)
-                }
-            }
-        )
+        if (isSuccess) {
+            updateAllNonHumanAnimalsToRescue(createdRescueEvent, coroutineScope)
+        }
+        emit(isSuccess)
     }
 
     private suspend fun getMyUid(): String = authRepository.authState.firstOrNull()?.uid ?: ""
 
-    private suspend fun insertAllNonHumanAnimalsToRescue(
+    private suspend fun updateAllNonHumanAnimalsToRescue(
         rescueEvent: RescueEvent,
         coroutineScope: CoroutineScope
     ): Boolean {
@@ -69,76 +65,31 @@ class InsertRescueEventInLocalRepository(
                 if (nonHumanAnimal == null) {
                     log.d(
                         "InsertRescueEventInLocalRepository",
-                        "insertAllNonHumanAnimalsToRescue: Can not insert nor update the non human animal state for the non human animal id ${nonHumanAnimalToRescue.nonHumanAnimalId} in the rescue event id ${nonHumanAnimalToRescue.rescueEventId} in the local data source"
+                        "updateAllNonHumanAnimalsToRescue: Can not update the non human animal state for the non human animal id ${nonHumanAnimalToRescue.nonHumanAnimalId} in the rescue event id ${nonHumanAnimalToRescue.rescueEventId} in the local data source"
                     )
                 } else {
-                    localRescueEventRepository.insertNonHumanAnimalToRescueEntityForRescueEvent(
-                        nonHumanAnimalToRescue.toEntity(),
-                        onInsertNonHumanAnimalToRescueEntityForRescueEvent = { rowId ->
-                            if (rowId > 0) {
-                                log.d(
-                                    "InsertRescueEventInLocalRepository",
-                                    "insertAllNonHumanAnimalsToRescue: inserted the non human animal to rescue ${nonHumanAnimalToRescue.nonHumanAnimalId} in the rescue event ${nonHumanAnimalToRescue.rescueEventId} in the local data source"
-                                )
-                            } else {
-                                log.e(
-                                    "InsertRescueEventInLocalRepository",
-                                    "insertAllNonHumanAnimalsToRescue: failed to insert the non human animal to rescue ${nonHumanAnimalToRescue.nonHumanAnimalId} in the rescue event ${nonHumanAnimalToRescue.rescueEventId} in the local data source"
-                                )
-                                isSuccess = false
-                            }
-                        }
-                    )
-                    if (isSuccess) {
-                        localNonHumanAnimalRepository.modifyNonHumanAnimal(
-                            nonHumanAnimal
-                                .copy(
-                                    nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_RESCUED,
-                                    fosterHomeId = ""
-                                )
-                                .toEntity()
-                        ) { rowsUpdated ->
-                            if (rowsUpdated > 0) {
-                                log.d(
-                                    "InsertRescueEventInLocalRepository",
-                                    "insertAllNonHumanAnimalsToRescue: updated non human animal state ${NonHumanAnimalState.NEEDS_TO_BE_RESCUED} for the non human animal ${nonHumanAnimal.id} in the local data source"
-                                )
-                            } else {
-                                log.e(
-                                    "InsertRescueEventInLocalRepository",
-                                    "insertAllNonHumanAnimalsToRescue: failed to update the non human animal state ${NonHumanAnimalState.NEEDS_TO_BE_RESCUED} for the non human animal ${nonHumanAnimal.id} in the local data source"
-                                )
-                                isSuccess = false
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return isSuccess
-    }
-
-    private suspend fun insertAllNeedsToCover(rescueEvent: RescueEvent): Boolean {
-        var isSuccess = true
-        rescueEvent.allNeedsToCover.forEach { needToCover: NeedToCover ->
-            if (isSuccess) {
-                localRescueEventRepository.insertNeedToCoverEntityForRescueEvent(
-                    needToCover.toEntity(),
-                    onInsertNeedToCoverEntityForRescueEvent = { rowId ->
-                        if (rowId > 0) {
+                    localNonHumanAnimalRepository.modifyNonHumanAnimal(
+                        nonHumanAnimal
+                            .copy(
+                                nonHumanAnimalState = NonHumanAnimalState.NEEDS_TO_BE_RESCUED,
+                                fosterHomeId = ""
+                            )
+                            .toEntity()
+                    ) { rowsUpdated ->
+                        if (rowsUpdated > 0) {
                             log.d(
                                 "InsertRescueEventInLocalRepository",
-                                "insertAllNeedsToCover: inserted the need to cover ${needToCover.needToCoverId} in the rescue event ${needToCover.rescueEventId} in the local data source"
+                                "updateAllNonHumanAnimalsToRescue: updated non human animal state ${NonHumanAnimalState.NEEDS_TO_BE_RESCUED} for the non human animal ${nonHumanAnimal.id} in the local data source"
                             )
                         } else {
                             log.e(
                                 "InsertRescueEventInLocalRepository",
-                                "insertAllNeedsToCover: failed to insert the need to cover ${needToCover.needToCoverId} in the rescue event ${needToCover.rescueEventId} in the local data source"
+                                "updateAllNonHumanAnimalsToRescue: failed to update the non human animal state ${NonHumanAnimalState.NEEDS_TO_BE_RESCUED} for the non human animal ${nonHumanAnimal.id} in the local data source"
                             )
                             isSuccess = false
                         }
                     }
-                )
+                }
             }
         }
         return isSuccess

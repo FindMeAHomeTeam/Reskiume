@@ -70,7 +70,7 @@ class CheckAllMyChatsViewmodel(
                     return@flatMapLatest flowOf(Unit)
                 }
                 val lastChatTimestamp =
-                    getAllMyChatsFromLocalRepository(user.uid).first().maxOfOrNull { it.timestamp }
+                    getAllMyChatsFromLocalRepository(user.uid).first().minOfOrNull { it.timestamp }
                         ?: 0L
 
                 getAllMyChatsFromRemoteRepository(

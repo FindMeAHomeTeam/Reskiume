@@ -64,23 +64,25 @@ class ModifyRescueEventViewmodel(
         getRescueEventFromLocalRepository(
             rescueEventId
         ).map { rescueEvent: RescueEvent? ->
-            UiRescueEvent(
-                rescueEvent = rescueEvent!!.copy(
-                    imageUrl = if (rescueEvent.imageUrl.isEmpty()) {
-                        rescueEvent.imageUrl
-                    } else {
-                        getImagePathForFileNameFromLocalDataSource(rescueEvent.imageUrl)
-                    }
-                ),
-                allUiNonHumanAnimalsToRescue = rescueEvent.allNonHumanAnimalsToRescue.mapNotNull { nonHumanAnimalToRescue ->
+            rescueEvent?.let {
+                UiRescueEvent(
+                    rescueEvent = it.copy(
+                        imageUrl = if (it.imageUrl.isEmpty()) {
+                            it.imageUrl
+                        } else {
+                            getImagePathForFileNameFromLocalDataSource(it.imageUrl)
+                        }
+                    ),
+                    allUiNonHumanAnimalsToRescue = it.allNonHumanAnimalsToRescue.mapNotNull { nonHumanAnimalToRescue ->
 
-                    checkNonHumanAnimalUtil.getNonHumanAnimalFlow(
-                        nonHumanAnimalToRescue.nonHumanAnimalId,
-                        nonHumanAnimalToRescue.caregiverId,
-                        viewModelScope
-                    ).firstOrNull()
-                }
-            )
+                        checkNonHumanAnimalUtil.getNonHumanAnimalFlow(
+                            nonHumanAnimalToRescue.nonHumanAnimalId,
+                            nonHumanAnimalToRescue.caregiverId,
+                            viewModelScope
+                        ).firstOrNull()
+                    }
+                )
+            }
         }.toUiState()
 
     val allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow: Flow<List<NonHumanAnimal>> =

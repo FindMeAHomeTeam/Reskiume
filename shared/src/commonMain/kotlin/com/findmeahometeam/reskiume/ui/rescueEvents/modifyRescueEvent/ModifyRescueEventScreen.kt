@@ -79,6 +79,11 @@ fun ModifyRescueEventScreen(
     }
     val scrollState = rememberScrollState()
 
+    LaunchedEffect(uiRescueEventState) {
+        if (uiRescueEventState is UiState.Error) {
+            onBackPressed()
+        }
+    }
     RmScaffold(
         title =
             if (uiRescueEventState is UiState.Success) {

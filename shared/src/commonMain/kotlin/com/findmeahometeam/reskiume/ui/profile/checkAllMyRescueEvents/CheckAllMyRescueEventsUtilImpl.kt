@@ -7,47 +7,51 @@ import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueEvent
 import com.findmeahometeam.reskiume.domain.usecases.image.DownloadImageToLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.InsertCacheInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
-import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetRescueEventFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.InsertRescueEventInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.ModifyRescueEventInLocalRepository
+import com.findmeahometeam.reskiume.ui.rescueEvents.modifyRescueEvent.DeleteRescueEventUtil
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.first
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 class CheckAllMyRescueEventsUtilImpl(
     private val downloadImageToLocalDataSource: DownloadImageToLocalDataSource,
-    private val getRescueEventFromLocalRepository: GetRescueEventFromLocalRepository,
     private val insertRescueEventInLocalRepository: InsertRescueEventInLocalRepository,
     private val insertCacheInLocalRepository: InsertCacheInLocalRepository,
     private val modifyRescueEventInLocalRepository: ModifyRescueEventInLocalRepository,
     private val modifyCacheInLocalRepository: ModifyCacheInLocalRepository,
+    private val deleteRescueEventUtil: DeleteRescueEventUtil,
     private val log: Log
 ) : CheckAllMyRescueEventsUtil {
 
-    override fun downloadImageAndManageRescueEventsInLocalRepositoryFromFlow(
-        allRescueEventsFlow: Flow<List<RescueEvent>>,
+    override suspend fun updateLocalRepositoryWithRemoteRescueEvents(
+        allRemoteRescueEvents: Set<RescueEvent>,
+        allLocalRescueEvents: Set<RescueEvent>,
         myUid: String,
         coroutineScope: CoroutineScope
-    ): Flow<List<RescueEvent>> =
-        allRescueEventsFlow.map { rescueEventList ->
-            rescueEventList.map { rescueEvent ->
+    ) {
+        val allRescueEventIdsToManage: Set<String> =
+            allRemoteRescueEvents.map { it.id } union allLocalRescueEvents.map { it.id }
+        allRescueEventIdsToManage.forEach { rescueEventIdToManage ->
 
-                val localRescueEvent: RescueEvent? = getRescueEventFromLocalRepository(
-                    rescueEvent.id
-                ).firstOrNull()
+            val rescueEventToManage = allRemoteRescueEvents.find { it.id == rescueEventIdToManage }
+                ?: allLocalRescueEvents.find { it.id == rescueEventIdToManage }!!
 
-                if (rescueEvent.imageUrl.isNotBlank()) {
+            if (allRemoteRescueEvents.any { it.id == rescueEventToManage.id }) {
+
+                val localRescueEvent: RescueEvent? =
+                    allLocalRescueEvents.find { it.id == rescueEventToManage.id }
+
+                if (rescueEventToManage.imageUrl.isNotBlank()) {
 
                     val localImagePath: String = downloadImageToLocalDataSource(
-                        userUid = rescueEvent.creatorId,
-                        extraId = rescueEvent.id,
+                        userUid = rescueEventToManage.creatorId,
+                        extraId = rescueEventToManage.id,
                         section = Section.RESCUE_EVENTS
                     )
                     val rescueEventWithLocalImage =
-                        rescueEvent.copy(imageUrl = localImagePath.ifBlank { rescueEvent.imageUrl })
+                        rescueEventToManage.copy(imageUrl = localImagePath.ifBlank { rescueEventToManage.imageUrl })
 
                     if (localRescueEvent == null) {
                         insertRescueEventInLocalRepo(
@@ -63,31 +67,36 @@ class CheckAllMyRescueEventsUtilImpl(
                             myUid = myUid
                         )
                     }
-                    rescueEventWithLocalImage
                 } else {
                     log.d(
                         "CheckAllMyRescueEventsUtilImpl",
-                        "downloadImageAndManageRescueEventsInLocalRepositoryFromFlow: Rescue event ${rescueEvent.id} has no avatar image to save locally."
+                        "downloadImageAndManageRescueEventsInLocalRepositoryFromFlow: Rescue event ${rescueEventToManage.id} has no avatar image to save locally."
                     )
 
                     if (localRescueEvent == null) {
                         insertRescueEventInLocalRepo(
-                            rescueEvent = rescueEvent,
+                            rescueEvent = rescueEventToManage,
                             coroutineScope = coroutineScope,
                             myUid = myUid
                         )
                     } else {
                         modifyRescueEventInLocalRepo(
-                            updatedRescueEvent = rescueEvent,
+                            updatedRescueEvent = rescueEventToManage,
                             previousRescueEvent = localRescueEvent,
                             coroutineScope = coroutineScope,
                             myUid = myUid
                         )
                     }
-                    rescueEvent
                 }
+            } else {
+                deleteLocalRescueEvent(
+                    id = rescueEventToManage.id,
+                    creatorId = rescueEventToManage.creatorId,
+                    coroutineScope = coroutineScope
+                )
             }
         }
+    }
 
     @OptIn(ExperimentalTime::class)
     private suspend fun insertRescueEventInLocalRepo(
@@ -95,44 +104,43 @@ class CheckAllMyRescueEventsUtilImpl(
         coroutineScope: CoroutineScope,
         myUid: String
     ) {
-        insertRescueEventInLocalRepository(
+        val isSuccess = insertRescueEventInLocalRepository(
             rescueEvent,
             coroutineScope
-        ) { isSuccess ->
-            if (isSuccess) {
-                log.d(
-                    "CheckAllMyRescueEventsUtilImpl",
-                    "insertRescueEventInLocalRepo: Rescue event ${rescueEvent.id} added to local database"
+        ).first()
+
+        if (isSuccess) {
+            log.d(
+                "CheckAllMyRescueEventsUtilImpl",
+                "insertRescueEventInLocalRepo: Rescue event ${rescueEvent.id} added to local database"
+            )
+            insertCacheInLocalRepository(
+                LocalCache(
+                    cachedObjectId = rescueEvent.id,
+                    savedBy = myUid,
+                    section = Section.RESCUE_EVENTS,
+                    timestamp = Clock.System.now().epochSeconds
                 )
-                insertCacheInLocalRepository(
-                    LocalCache(
-                        cachedObjectId = rescueEvent.id,
-                        savedBy = myUid,
-                        section = Section.RESCUE_EVENTS,
-                        timestamp = Clock.System.now().epochSeconds
+            ) { rowId ->
+
+                if (rowId > 0) {
+                    log.d(
+                        "CheckAllMyRescueEventsUtilImpl",
+                        "insertRescueEventInLocalRepo: ${rescueEvent.id} added to local cache in section ${Section.RESCUE_EVENTS}"
                     )
-                ) { rowId ->
-
-                    if (rowId > 0) {
-                        log.d(
-                            "CheckAllMyRescueEventsUtilImpl",
-                            "insertRescueEventInLocalRepo: ${rescueEvent.id} added to local cache in section ${Section.RESCUE_EVENTS}"
-                        )
-                    } else {
-                        log.e(
-                            "CheckAllMyRescueEventsUtilImpl",
-                            "insertRescueEventInLocalRepo: Error adding ${rescueEvent.id} to local cache in section ${Section.RESCUE_EVENTS}"
-                        )
-                    }
+                } else {
+                    log.e(
+                        "CheckAllMyRescueEventsUtilImpl",
+                        "insertRescueEventInLocalRepo: Error adding ${rescueEvent.id} to local cache in section ${Section.RESCUE_EVENTS}"
+                    )
                 }
-            } else {
-                log.e(
-                    "CheckAllMyRescueEventsUtilImpl",
-                    "insertRescueEventInLocalRepo: Error adding the rescue event ${rescueEvent.id} to local database"
-                )
             }
+        } else {
+            log.e(
+                "CheckAllMyRescueEventsUtilImpl",
+                "insertRescueEventInLocalRepo: Error adding the rescue event ${rescueEvent.id} to local database"
+            )
         }
-
     }
 
     @OptIn(ExperimentalTime::class)
@@ -142,43 +150,69 @@ class CheckAllMyRescueEventsUtilImpl(
         coroutineScope: CoroutineScope,
         myUid: String
     ) {
-        modifyRescueEventInLocalRepository(
+        val isSuccess = modifyRescueEventInLocalRepository(
             updatedRescueEvent = updatedRescueEvent,
             previousRescueEvent = previousRescueEvent,
             coroutineScope = coroutineScope
-        ) { isSuccess ->
-            if (isSuccess) {
-                log.d(
-                    "CheckAllMyRescueEventsUtilImpl",
-                    "modifyRescueEventInLocalRepo: Rescue event ${updatedRescueEvent.id} modified in local database"
-                )
-                modifyCacheInLocalRepository(
-                    LocalCache(
-                        cachedObjectId = updatedRescueEvent.id,
-                        savedBy = myUid,
-                        section = Section.RESCUE_EVENTS,
-                        timestamp = Clock.System.now().epochSeconds
-                    )
-                ) { rowsUpdated ->
+        ).first()
 
-                    if (rowsUpdated > 0) {
-                        log.d(
-                            "CheckAllMyRescueEventsUtilImpl",
-                            "modifyRescueEventInLocalRepo: ${updatedRescueEvent.id} updated in local cache in section ${Section.RESCUE_EVENTS}"
-                        )
-                    } else {
-                        log.e(
-                            "CheckAllMyRescueEventsUtilImpl",
-                            "modifyRescueEventInLocalRepo: Error updating ${updatedRescueEvent.id} in local cache in section ${Section.RESCUE_EVENTS}"
-                        )
-                    }
+        if (isSuccess) {
+            log.d(
+                "CheckAllMyRescueEventsUtilImpl",
+                "modifyRescueEventInLocalRepo: Rescue event ${updatedRescueEvent.id} modified in local database"
+            )
+            modifyCacheInLocalRepository(
+                LocalCache(
+                    cachedObjectId = updatedRescueEvent.id,
+                    savedBy = myUid,
+                    section = Section.RESCUE_EVENTS,
+                    timestamp = Clock.System.now().epochSeconds
+                )
+            ) { rowsUpdated ->
+
+                if (rowsUpdated > 0) {
+                    log.d(
+                        "CheckAllMyRescueEventsUtilImpl",
+                        "modifyRescueEventInLocalRepo: ${updatedRescueEvent.id} updated in local cache in section ${Section.RESCUE_EVENTS}"
+                    )
+                } else {
+                    log.e(
+                        "CheckAllMyRescueEventsUtilImpl",
+                        "modifyRescueEventInLocalRepo: Error updating ${updatedRescueEvent.id} in local cache in section ${Section.RESCUE_EVENTS}"
+                    )
                 }
-            } else {
+            }
+        } else {
+            log.e(
+                "CheckAllMyRescueEventsUtilImpl",
+                "modifyRescueEventInLocalRepo: Error modifying the rescue event ${updatedRescueEvent.id} in local database"
+            )
+        }
+    }
+
+    private fun deleteLocalRescueEvent(
+        id: String,
+        creatorId: String,
+        coroutineScope: CoroutineScope
+    ) {
+        deleteRescueEventUtil.deleteRescueEvent(
+            id = id,
+            creatorId = creatorId,
+            coroutineScope = coroutineScope,
+            deleteOnLocal = true,
+            deleteOnRemote = false,
+            onError = {
                 log.e(
                     "CheckAllMyRescueEventsUtilImpl",
-                    "modifyRescueEventInLocalRepo: Error modifying the rescue event ${updatedRescueEvent.id} in local database"
+                    "deleteLocalRescueEvent: Error deleting the local rescue event $id after the chat has been finished"
+                )
+            },
+            onComplete = {
+                log.d(
+                    "CheckAllMyRescueEventsUtilImpl",
+                    "deleteLocalRescueEvent: Local rescue event $id deleted after the chat has been finished"
                 )
             }
-        }
+        )
     }
 }

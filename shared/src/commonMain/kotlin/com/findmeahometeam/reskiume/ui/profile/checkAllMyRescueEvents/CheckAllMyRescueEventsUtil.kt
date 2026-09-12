@@ -2,13 +2,13 @@ package com.findmeahometeam.reskiume.ui.profile.checkAllMyRescueEvents
 
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueEvent
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
 
 interface CheckAllMyRescueEventsUtil {
 
-    fun downloadImageAndManageRescueEventsInLocalRepositoryFromFlow(
-        allRescueEventsFlow: Flow<List<RescueEvent>>,
+    suspend fun updateLocalRepositoryWithRemoteRescueEvents(
+        allRemoteRescueEvents: Set<RescueEvent>,
+        allLocalRescueEvents: Set<RescueEvent>,
         myUid: String,
         coroutineScope: CoroutineScope
-    ): Flow<List<RescueEvent>>
+    )
 }

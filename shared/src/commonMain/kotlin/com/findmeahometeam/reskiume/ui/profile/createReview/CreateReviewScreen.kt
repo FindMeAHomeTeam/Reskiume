@@ -64,7 +64,7 @@ fun CreateReviewScreen(
         activistsReviewedSize
     ) {
         derivedStateOf {
-            activistsSize == activistsReviewedSize
+            activistsSize > 0 && activistsSize == activistsReviewedSize
         }
     }
 

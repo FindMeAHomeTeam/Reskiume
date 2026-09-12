@@ -163,7 +163,8 @@ fun CheckAllFosterHomesScreen(
                             it,
                             stringResource(it.stringResource)
                         )
-                    }
+                    },
+                    initialSelectedIndex = SearchOption.entries.indexOf(searchOption)
                 ) { searchOp ->
                     searchOption = searchOp
 

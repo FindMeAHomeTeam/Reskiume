@@ -19,10 +19,11 @@ import com.findmeahometeam.reskiume.ui.core.tertiaryGreen
 @Composable
 fun <T : Enum<T>> RmDisplaySingleChoiceSegmentedButtonRow(
     items: List<Pair<T, String>>,
+    initialSelectedIndex: Int = 0,
     modifier: Modifier = Modifier,
     onClick: (T) -> Unit
 ) {
-    var selectedIndex by rememberSaveable { mutableIntStateOf(0) }
+    var selectedIndex by rememberSaveable { mutableIntStateOf(initialSelectedIndex) }
 
     SingleChoiceSegmentedButtonRow {
 

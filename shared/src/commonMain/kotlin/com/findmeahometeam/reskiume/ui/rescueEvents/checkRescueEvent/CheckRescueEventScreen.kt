@@ -183,7 +183,8 @@ fun CheckRescueEventScreen(
                         stringResource(
                             Res.string.check_rescue_event_screen_rescue_event_avatar_content_description,
                             uiRescueEventDetail.rescueEvent.title
-                        )
+                        ),
+                    forceReload = true
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -391,7 +392,8 @@ fun DisplayCreator(
                 contentDescription = stringResource(
                     Res.string.check_rescue_event_screen_creator_avatar_content_description,
                     username
-                )
+                ),
+                forceReload = true
             )
         }
         Spacer(modifier = Modifier.width(8.dp))

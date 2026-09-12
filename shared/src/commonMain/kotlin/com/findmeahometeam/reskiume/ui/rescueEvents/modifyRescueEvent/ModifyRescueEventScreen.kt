@@ -177,7 +177,8 @@ fun ModifyRescueEventScreen(
                     },
                     onDeleteDiscardedImage = {
                         modifyRescueEventViewmodel.deleteLocalImage(it)
-                    }
+                    },
+                    forceReload = true
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))

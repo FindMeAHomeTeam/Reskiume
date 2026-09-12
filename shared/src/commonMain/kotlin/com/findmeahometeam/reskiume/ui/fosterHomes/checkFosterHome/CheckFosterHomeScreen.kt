@@ -204,7 +204,8 @@ fun CheckFosterHomeScreen(
                         stringResource(
                             Res.string.check_foster_home_screen_foster_home_avatar_content_description,
                             uiFosterHomeDetail.fosterHome.title
-                        )
+                        ),
+                    forceReload = true
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -453,7 +454,8 @@ fun DisplayOwner(
                 contentDescription = stringResource(
                     Res.string.check_foster_home_screen_owner_avatar_content_description,
                     username
-                )
+                ),
+                forceReload = true
             )
         }
         Spacer(modifier = Modifier.width(8.dp))

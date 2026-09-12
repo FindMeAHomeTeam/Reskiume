@@ -202,7 +202,8 @@ fun ModifyFosterHomeScreen(
                     },
                     onDeleteDiscardedImage = {
                         modifyFosterHomeViewmodel.deleteLocalImage(it)
-                    }
+                    },
+                    forceReload = true
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))

@@ -97,7 +97,8 @@ fun CheckNonHumanAnimalScreen(
                             stringResource(
                                 Res.string.check_non_human_animal_screen_non_human_animal_avatar_content_description,
                                 nonHumanAnimal.name
-                            )
+                            ),
+                        forceReload = true
                     )
                     Box(
                         modifier = Modifier.wrapContentSize()

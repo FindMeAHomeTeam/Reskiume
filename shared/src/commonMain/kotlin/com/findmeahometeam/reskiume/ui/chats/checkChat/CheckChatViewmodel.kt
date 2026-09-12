@@ -315,10 +315,10 @@ class CheckChatViewmodel(
                         )
                     }
                 }
-                val chatHolderId = checkActivistUtil.getUser(
+                val chatHolder = checkActivistUtil.getUser(
                     activistUid = chat.chatHolderId,
                     myUserUid = chat.savedBy
-                )?.uid ?: ""
+                )!!
 
                 val allActivists = chat.allActivistsInfo.mapNotNull {
 
@@ -331,13 +331,10 @@ class CheckChatViewmodel(
                         )
                     }
                 }.let {
-                    if (myUid == chatHolderId) {
+                    if (myUid == chatHolder.uid) {
                         it
                     } else {
-                        it + checkActivistUtil.getUser(
-                            activistUid = chatHolderId,
-                            myUserUid = chat.savedBy
-                        )!!
+                        it.plus(chatHolder)
                     }
                 }
                 val myUsername = checkActivistUtil.getUser(
@@ -356,14 +353,14 @@ class CheckChatViewmodel(
                             },
                             title = title,
                             allNonHumanAnimals = allNonHumanAnimals,
-                            chatHolderId = chatHolderId,
-                            amIChatHolder = chatHolderId == myUid,
+                            chatHolderId = chatHolder.uid,
+                            amIChatHolder = chatHolder.uid == myUid,
                             fosterHomeId = chat.fosterHomeId,
                             rescueEventId = chat.rescueEventId,
                             allActivists = allActivists,
                             myUsername = myUsername,
                             finished = if (chat.fosterHomeId.isNotEmpty()
-                                && chatHolderId == myUid
+                                && chatHolder.uid == myUid
                                 && allActivists.isEmpty()
                             ) {
                                 true

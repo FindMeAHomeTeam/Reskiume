@@ -5,7 +5,6 @@ import androidx.room3.Insert
 import androidx.room3.OnConflictStrategy.Companion.REPLACE
 import androidx.room3.Query
 import androidx.room3.Transaction
-import androidx.room3.Update
 import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.NeedToCoverEntityForRescueEvent
 import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.NonHumanAnimalToRescueEntityForRescueEvent
 import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.RescueEventEntity
@@ -26,8 +25,16 @@ interface RescueEventDao {
     @Insert(onConflict = REPLACE)
     suspend fun insertNeedToCoverEntityForRescueEvent(needToCoverEntityForRescueEvent: NeedToCoverEntityForRescueEvent): Long
 
-    @Update
-    suspend fun modifyRescueEvent(rescueEventEntity: RescueEventEntity): Int
+    @Transaction
+    suspend fun upsertAllRescueEventData(
+        rescueEventEntity: RescueEventEntity,
+        allNonHumanAnimals: List<NonHumanAnimalToRescueEntityForRescueEvent>,
+        allNeedsToCover: List<NeedToCoverEntityForRescueEvent>
+    ) {
+        insertRescueEvent(rescueEventEntity)
+        allNonHumanAnimals.forEach { insertNonHumanAnimalToRescueEntityForRescueEvent(it) }
+        allNeedsToCover.forEach { insertNeedToCoverEntityForRescueEvent(it) }
+    }
 
     @Query("DELETE FROM RescueEventEntity WHERE id = :id")
     suspend fun deleteRescueEvent(id: String): Int

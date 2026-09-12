@@ -8,25 +8,11 @@ import kotlinx.coroutines.flow.Flow
 
 interface LocalRescueEventRepository {
 
-    suspend fun insertRescueEvent(
+    suspend fun upsertAllRescueEventData(
         rescueEventEntity: RescueEventEntity,
-        onInsertRescueEvent: suspend (rowId: Long) -> Unit
-    )
-
-    suspend fun insertNonHumanAnimalToRescueEntityForRescueEvent(
-        nonHumanAnimalToRescueEntityForRescueEvent: NonHumanAnimalToRescueEntityForRescueEvent,
-        onInsertNonHumanAnimalToRescueEntityForRescueEvent: (rowId: Long) -> Unit
-    )
-
-    suspend fun insertNeedToCoverEntityForRescueEvent(
-        needToCoverEntityForRescueEvent: NeedToCoverEntityForRescueEvent,
-        onInsertNeedToCoverEntityForRescueEvent: (rowId: Long) -> Unit
-    )
-
-    suspend fun modifyRescueEvent(
-        rescueEventEntity: RescueEventEntity,
-        onModifyRescueEvent: suspend (rowsUpdated: Int) -> Unit
-    )
+        allNonHumanAnimals: List<NonHumanAnimalToRescueEntityForRescueEvent>,
+        allNeedsToCover: List<NeedToCoverEntityForRescueEvent>
+    ): Flow<Boolean>
 
     suspend fun deleteRescueEvent(
         id: String,

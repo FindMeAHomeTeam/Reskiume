@@ -6,50 +6,28 @@ import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.RescueEvent
 import com.findmeahometeam.reskiume.data.database.entity.rescueEvent.RescueEventWithAllNeedsAndNonHumanAnimalData
 import com.findmeahometeam.reskiume.domain.repository.local.LocalRescueEventRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
 
 class LocalRescueEventRepositoryImpl(
     private val reskiumeDatabase: ReskiumeDatabase
 ) : LocalRescueEventRepository {
 
-    override suspend fun insertRescueEvent(
+    override suspend fun upsertAllRescueEventData(
         rescueEventEntity: RescueEventEntity,
-        onInsertRescueEvent: suspend (rowId: Long) -> Unit
-    ) {
-        onInsertRescueEvent(
-            reskiumeDatabase.getRescueEventDao().insertRescueEvent(rescueEventEntity)
-        )
-    }
-
-    override suspend fun insertNonHumanAnimalToRescueEntityForRescueEvent(
-        nonHumanAnimalToRescueEntityForRescueEvent: NonHumanAnimalToRescueEntityForRescueEvent,
-        onInsertNonHumanAnimalToRescueEntityForRescueEvent: (rowId: Long) -> Unit
-    ) {
-        onInsertNonHumanAnimalToRescueEntityForRescueEvent(
-            reskiumeDatabase.getRescueEventDao()
-                .insertNonHumanAnimalToRescueEntityForRescueEvent(
-                    nonHumanAnimalToRescueEntityForRescueEvent
-                )
-        )
-    }
-
-    override suspend fun insertNeedToCoverEntityForRescueEvent(
-        needToCoverEntityForRescueEvent: NeedToCoverEntityForRescueEvent,
-        onInsertNeedToCoverEntityForRescueEvent: (rowId: Long) -> Unit
-    ) {
-        onInsertNeedToCoverEntityForRescueEvent(
-            reskiumeDatabase.getRescueEventDao()
-                .insertNeedToCoverEntityForRescueEvent(needToCoverEntityForRescueEvent)
-        )
-    }
-
-    override suspend fun modifyRescueEvent(
-        rescueEventEntity: RescueEventEntity,
-        onModifyRescueEvent: suspend (rowsUpdated: Int) -> Unit
-    ) {
-        onModifyRescueEvent(
-            reskiumeDatabase.getRescueEventDao().modifyRescueEvent(rescueEventEntity)
-        )
-    }
+        allNonHumanAnimals: List<NonHumanAnimalToRescueEntityForRescueEvent>,
+        allNeedsToCover: List<NeedToCoverEntityForRescueEvent>
+    ): Flow<Boolean> =
+        flow {
+            reskiumeDatabase.getRescueEventDao().upsertAllRescueEventData(
+                rescueEventEntity,
+                allNonHumanAnimals,
+                allNeedsToCover
+            )
+            emit(true)
+        }.catch {
+            emit(false)
+        }
 
     override suspend fun deleteRescueEvent(
         id: String,

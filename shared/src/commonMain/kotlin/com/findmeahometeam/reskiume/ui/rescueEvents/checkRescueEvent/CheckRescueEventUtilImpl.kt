@@ -134,21 +134,21 @@ class CheckRescueEventUtilImpl(
         rescueEvent: RescueEvent,
         coroutineScope: CoroutineScope
     ) {
-        insertRescueEventInLocalRepository(
+        val isSuccess = insertRescueEventInLocalRepository(
             rescueEvent,
             coroutineScope
-        ) { isSuccess ->
-            if (isSuccess) {
-                log.d(
-                    "CheckRescueEventUtilImpl",
-                    "insertRescueEventsInLocalRepository: Rescue event ${rescueEvent.id} added to local database"
-                )
-            } else {
-                log.e(
-                    "CheckRescueEventUtilImpl",
-                    "insertRescueEventsInLocalRepository: Error adding the Rescue event ${rescueEvent.id} to local database"
-                )
-            }
+        ).first()
+
+        if (isSuccess) {
+            log.d(
+                "CheckRescueEventUtilImpl",
+                "insertRescueEventsInLocalRepository: Rescue event ${rescueEvent.id} added to local database"
+            )
+        } else {
+            log.e(
+                "CheckRescueEventUtilImpl",
+                "insertRescueEventsInLocalRepository: Error adding the Rescue event ${rescueEvent.id} to local database"
+            )
         }
     }
 
@@ -192,22 +192,22 @@ class CheckRescueEventUtilImpl(
         val previousRescueEvent =
             getRescueEventFromLocalRepository(updatedRescueEvent.id).first()!!
 
-        modifyRescueEventInLocalRepository(
+        val isSuccess = modifyRescueEventInLocalRepository(
             updatedRescueEvent = updatedRescueEvent,
             previousRescueEvent = previousRescueEvent,
             coroutineScope = coroutineScope
-        ) { isSuccess ->
-            if (isSuccess) {
-                log.d(
-                    "CheckRescueEventUtilImpl",
-                    "modifyRescueEventsInLocalRepository: Rescue event ${updatedRescueEvent.id} modified in local database"
-                )
-            } else {
-                log.e(
-                    "CheckRescueEventUtilImpl",
-                    "modifyRescueEventsInLocalRepository: Error modifying the Rescue event ${updatedRescueEvent.id} in local database"
-                )
-            }
+        ).first()
+
+        if (isSuccess) {
+            log.d(
+                "CheckRescueEventUtilImpl",
+                "modifyRescueEventsInLocalRepository: Rescue event ${updatedRescueEvent.id} modified in local database"
+            )
+        } else {
+            log.e(
+                "CheckRescueEventUtilImpl",
+                "modifyRescueEventsInLocalRepository: Error modifying the Rescue event ${updatedRescueEvent.id} in local database"
+            )
         }
     }
 }

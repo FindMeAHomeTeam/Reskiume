@@ -192,7 +192,7 @@ class CheckChatViewmodel(
                     }
                 }
 
-                // TODO check if user is blocked
+                // TODO check if user is banned
 
                 if (updatedChat.fosterHomeId.isNotEmpty()) {
 
@@ -1372,7 +1372,8 @@ class CheckChatViewmodel(
     ) {
         val rescueEvent = getRescueEventFromLocalRepository(rescueEventId).first()!!
         val allNonHumanAnimalIds = allNonHumanAnimals.map { it.id }
-        modifyRescueEventInLocalRepository(
+
+        val isUpdated = modifyRescueEventInLocalRepository(
             isNonHumanAnimalSaved = nonHumanAnimalState == NonHumanAnimalState.SAVED,
             updatedRescueEvent = rescueEvent.copy(
                 allNonHumanAnimalsToRescue =
@@ -1383,22 +1384,21 @@ class CheckChatViewmodel(
                     }
             ),
             previousRescueEvent = rescueEvent,
-            viewModelScope
-        ) { isUpdated ->
+            coroutineScope = viewModelScope
+        ).first()
 
-            if (isUpdated) {
-                log.d(
-                    "CheckChatViewmodel",
-                    "modifyRescueEventWithFinalNonHumanAnimalStateInLocalRepo: Successfully modified the non human animals with state $nonHumanAnimalState in the rescue event id $rescueEventId in the local data source"
-                )
-                onSuccess()
-            } else {
-                log.e(
-                    "CheckChatViewmodel",
-                    "modifyRescueEventWithFinalNonHumanAnimalStateInLocalRepo: Something went wrong modifying the non human animals with state $nonHumanAnimalState in the rescue event id $rescueEventId in the local data source"
-                )
-                onError()
-            }
+        if (isUpdated) {
+            log.d(
+                "CheckChatViewmodel",
+                "modifyRescueEventWithFinalNonHumanAnimalStateInLocalRepo: Successfully modified the non human animals with state $nonHumanAnimalState in the rescue event id $rescueEventId in the local data source"
+            )
+            onSuccess()
+        } else {
+            log.e(
+                "CheckChatViewmodel",
+                "modifyRescueEventWithFinalNonHumanAnimalStateInLocalRepo: Something went wrong modifying the non human animals with state $nonHumanAnimalState in the rescue event id $rescueEventId in the local data source"
+            )
+            onError()
         }
     }
 }

@@ -88,7 +88,8 @@ class CreateRescueEventViewmodel(
 
     val userState: Flow<User?> = observeAuthStateInAuthDataSource().map { authUser ->
 
-        val user = if (authUser != null) getUserFromLocalDataSource(authUser.uid).firstOrNull() else null
+        val user =
+            if (authUser != null) getUserFromLocalDataSource(authUser.uid).firstOrNull() else null
         if (user == null || !user.isLoggedIn) {
             null
         } else {
@@ -245,24 +246,23 @@ class CreateRescueEventViewmodel(
     ) {
         viewModelScope.launch {
 
-            insertRescueEventInLocalRepository(
+            val isSuccess = insertRescueEventInLocalRepository(
                 updatedRescueEvent,
                 viewModelScope
-            ) { isUpdated: Boolean ->
+            ).first()
 
-                if (isUpdated) {
-                    log.d(
-                        "CreateRescueEventViewmodel",
-                        "createRescueEventInLocalDataSource: rescue event ${updatedRescueEvent.id} created successfully in the local data source"
-                    )
-                    onSuccess()
-                } else {
-                    log.e(
-                        "CreateRescueEventViewmodel",
-                        "createRescueEventInLocalDataSource: failed to create the rescue event ${updatedRescueEvent.id} in the local data source"
-                    )
-                    _saveChangesUiState.value = UiState.Error()
-                }
+            if (isSuccess) {
+                log.d(
+                    "CreateRescueEventViewmodel",
+                    "createRescueEventInLocalDataSource: rescue event ${updatedRescueEvent.id} created successfully in the local data source"
+                )
+                onSuccess()
+            } else {
+                log.e(
+                    "CreateRescueEventViewmodel",
+                    "createRescueEventInLocalDataSource: failed to create the rescue event ${updatedRescueEvent.id} in the local data source"
+                )
+                _saveChangesUiState.value = UiState.Error()
             }
         }
     }

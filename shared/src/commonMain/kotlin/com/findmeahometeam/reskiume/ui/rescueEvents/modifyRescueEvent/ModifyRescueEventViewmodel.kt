@@ -306,25 +306,24 @@ class ModifyRescueEventViewmodel(
             val previousRescueEvent =
                 getRescueEventFromLocalRepository(updatedRescueEvent.id).first()!!
 
-            modifyRescueEventInLocalRepository(
+            val isUpdated = modifyRescueEventInLocalRepository(
                 updatedRescueEvent = updatedRescueEvent,
                 previousRescueEvent = previousRescueEvent,
                 coroutineScope = viewModelScope
-            ) { isUpdated: Boolean ->
+            ).first()
 
-                if (isUpdated) {
-                    log.d(
-                        "ModifyRescueEventViewModel",
-                        "modifyRescueEventInLocalDataSource: rescue event ${updatedRescueEvent.id} updated successfully in the local data source"
-                    )
-                    onSuccess()
-                } else {
-                    log.e(
-                        "ModifyRescueEventViewModel",
-                        "modifyRescueEventInLocalDataSource: failed to update the rescue event ${updatedRescueEvent.id} in the local data source"
-                    )
-                    _manageChangesUiState.value = UiState.Error()
-                }
+            if (isUpdated) {
+                log.d(
+                    "ModifyRescueEventViewModel",
+                    "modifyRescueEventInLocalDataSource: rescue event ${updatedRescueEvent.id} updated successfully in the local data source"
+                )
+                onSuccess()
+            } else {
+                log.e(
+                    "ModifyRescueEventViewModel",
+                    "modifyRescueEventInLocalDataSource: failed to update the rescue event ${updatedRescueEvent.id} in the local data source"
+                )
+                _manageChangesUiState.value = UiState.Error()
             }
         }
     }

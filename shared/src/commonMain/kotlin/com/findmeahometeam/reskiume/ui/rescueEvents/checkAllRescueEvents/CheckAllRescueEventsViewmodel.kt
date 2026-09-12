@@ -24,12 +24,14 @@ import com.findmeahometeam.reskiume.ui.core.components.toUiState
 import com.findmeahometeam.reskiume.ui.profile.checkAllMyRescueEvents.CheckAllMyRescueEventsUtil
 import com.findmeahometeam.reskiume.ui.profile.checkAllMyRescueEvents.UiRescueEvent
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
+import com.findmeahometeam.reskiume.ui.rescueEvents.modifyRescueEvent.DeleteRescueEventUtil
 import com.findmeahometeam.reskiume.ui.util.StringProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flatMapLatest
@@ -68,6 +70,7 @@ class CheckAllRescueEventsViewmodel(
     private val observeIfLocationEnabledFromLocationRepository: ObserveIfLocationEnabledFromLocationRepository,
     private val observeRequestEnableLocationFromLocationRepository: ObserveRequestEnableLocationFromLocationRepository,
     private val getLocationFromLocationRepository: GetLocationFromLocationRepository,
+    private val deleteRescueEventUtil: DeleteRescueEventUtil,
     private val log: Log
 ) : ViewModel() {
 
@@ -79,6 +82,8 @@ class CheckAllRescueEventsViewmodel(
 
     private var locationTimestamp: Long = 0
 
+    private var isContentUpdated: Boolean = false
+
     private val _allRescueEventsState: MutableStateFlow<UiState<List<UiRescueEvent>>> =
         MutableStateFlow(Idle())
 
@@ -87,7 +92,8 @@ class CheckAllRescueEventsViewmodel(
 
     val userState: Flow<User?> = observeAuthStateInAuthDataSource().map { authUser ->
 
-        val user = if (authUser != null) getUserFromLocalDataSource(authUser.uid).firstOrNull() else null
+        val user =
+            if (authUser != null) getUserFromLocalDataSource(authUser.uid).firstOrNull() else null
 
         if (user == null || !user.isLoggedIn) {
             myUid = " "
@@ -214,46 +220,32 @@ class CheckAllRescueEventsViewmodel(
                     section = Section.RESCUE_EVENTS,
                     timeBeforeExpiringCache = TIME_BEFORE_EXPIRING_CACHE,
                     onCompletionInsertCache = {
-                        val allRescueEventsFlow: Flow<List<RescueEvent>> =
-                            getAllRescueEventsByCountryAndCityFromRemoteRepository(
-                                country,
-                                city
-                            )
-                        checkAllMyRescueEventsUtil.downloadImageAndManageRescueEventsInLocalRepositoryFromFlow(
-                            allRescueEventsFlow,
-                            myUid,
-                            viewModelScope
-                        ).flatMapConcat {
-
-                            getAllRescueEventsByCountryAndCityFromLocalRepository(
-                                country,
-                                city
-                            )
-                        }
+                        manageAllRescueEventsByCountryAndCity(
+                            country,
+                            city
+                        )
+                        getAllRescueEventsByCountryAndCityFromLocalRepository(
+                            country,
+                            city
+                        )
                     },
                     onCompletionUpdateCache = {
-                        val allRescueEventsFlow: Flow<List<RescueEvent>> =
-                            getAllRescueEventsByCountryAndCityFromRemoteRepository(
-                                country,
-                                city
-                            )
-                        checkAllMyRescueEventsUtil.downloadImageAndManageRescueEventsInLocalRepositoryFromFlow(
-                            allRescueEventsFlow,
-                            myUid,
-                            viewModelScope
-                        ).flatMapConcat {
 
-                            getAllRescueEventsByCountryAndCityFromLocalRepository(
-                                country,
-                                city
-                            )
-                        }
+                        isContentUpdated = true
+                        manageAllRescueEventsByCountryAndCity(
+                            country,
+                            city
+                        )
+                        getAllRescueEventsByCountryAndCityFromLocalRepository(
+                            country,
+                            city
+                        )
                     },
                     onVerifyCacheIsRecent = {
                         getAllRescueEventsByCountryAndCityFromLocalRepository(
                             country,
                             city
-                        )
+                        ).filterWrongRescueEvents()
                     }
                 ).map {
                     it.map { rescueEvent ->
@@ -272,11 +264,108 @@ class CheckAllRescueEventsViewmodel(
                                     nonHumanAnimalToRescue.caregiverId,
                                     viewModelScope
                                 ).firstOrNull()
-                            }
+                            },
+                            isContentUpdated = isContentUpdated
                         )
                     }.sortedBy { uiRescueEvent -> uiRescueEvent.rescueEvent.city }
                 }
-            }.toUiState()
+            }.toUiState().also {
+                isContentUpdated = false
+            }
+
+    private suspend fun manageAllRescueEventsByCountryAndCity(
+        country: String,
+        city: String
+    ) {
+        val allRemoteRescueEvents: List<RescueEvent> =
+            getAllRescueEventsByCountryAndCityFromRemoteRepository(
+                country,
+                city
+            ).first()
+        val allLocalRescueEvents: List<RescueEvent> =
+            getAllRescueEventsByCountryAndCityFromLocalRepository(
+                country,
+                city
+            ).first()
+        checkAllMyRescueEventsUtil.updateLocalRepositoryWithRemoteRescueEvents(
+            allRemoteRescueEvents.toSet(),
+            allLocalRescueEvents.toSet(),
+            myUid,
+            viewModelScope
+        )
+    }
+
+    private fun Flow<List<RescueEvent>>.filterWrongRescueEvents(): Flow<List<RescueEvent>> {
+        return this.map { list ->
+            list.mapNotNull { rescueEvent ->
+
+                if (rescueEvent.allNonHumanAnimalsToRescue.isEmpty()) {
+
+                    deleteLocalRescueEvent(
+                        id = rescueEvent.id,
+                        creatorId = rescueEvent.creatorId
+                    )
+                    null
+                } else {
+                    rescueEvent
+                }
+            }
+        }
+    }
+
+    private fun deleteLocalRescueEvent(
+        id: String,
+        creatorId: String
+    ) {
+        deleteRescueEventUtil.deleteRescueEvent(
+            id = id,
+            creatorId = creatorId,
+            coroutineScope = viewModelScope,
+            deleteOnLocal = true,
+            deleteOnRemote = false,
+            onError = {
+                log.e(
+                    "CheckAllRescueEventsViewmodel",
+                    "deleteLocalRescueEvent: Error deleting the local rescue event $id after the chat has been finished"
+                )
+            },
+            onComplete = {
+                log.d(
+                    "CheckAllRescueEventsViewmodel",
+                    "deleteLocalRescueEvent: Local rescue event $id deleted after the chat has been finished"
+                )
+            }
+        )
+    }
+
+    private suspend fun manageAllRescueEventsByLocation(
+        activistLongitude: Double,
+        activistLatitude: Double
+    ) {
+
+        val allRemoteRescueEvents: List<RescueEvent> =
+            getAllRescueEventsByLocationFromRemoteRepository(
+                activistLongitude = activistLongitude,
+                activistLatitude = activistLatitude,
+                rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
+                rangeLatitude = getRangeLat()
+            ).first()
+
+        val allLocalRescueEvents: List<RescueEvent> =
+            getAllRescueEventsByLocationFromLocalRepository(
+                activistLongitude = activistLongitude,
+                activistLatitude = activistLatitude,
+                rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
+                rangeLatitude = getRangeLat()
+            ).first()
+
+        checkAllMyRescueEventsUtil.updateLocalRepositoryWithRemoteRescueEvents(
+            allRemoteRescueEvents.toSet(),
+            allLocalRescueEvents.toSet(),
+            myUid,
+            viewModelScope
+        )
+    }
 
     private fun getFetchAllRescueEventsStateByLocationFlow(
         activistLongitude: Double,
@@ -291,48 +380,30 @@ class CheckAllRescueEventsViewmodel(
                     section = Section.RESCUE_EVENTS,
                     timeBeforeExpiringCache = TIME_BEFORE_EXPIRING_CACHE,
                     onCompletionInsertCache = {
-                        val allRescueEventsFlow: Flow<List<RescueEvent>> =
-                            getAllRescueEventsByLocationFromRemoteRepository(
-                                activistLongitude = activistLongitude,
-                                activistLatitude = activistLatitude,
-                                rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
-                                rangeLatitude = getRangeLat()
-                            )
-                        checkAllMyRescueEventsUtil.downloadImageAndManageRescueEventsInLocalRepositoryFromFlow(
-                            allRescueEventsFlow,
-                            myUid,
-                            viewModelScope
-                        ).flatMapConcat {
-
-                            getAllRescueEventsByLocationFromLocalRepository(
-                                activistLongitude = activistLongitude,
-                                activistLatitude = activistLatitude,
-                                rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
-                                rangeLatitude = getRangeLat()
-                            )
-                        }
+                        manageAllRescueEventsByLocation(
+                            activistLongitude,
+                            activistLatitude
+                        )
+                        getAllRescueEventsByLocationFromLocalRepository(
+                            activistLongitude = activistLongitude,
+                            activistLatitude = activistLatitude,
+                            rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
+                            rangeLatitude = getRangeLat()
+                        )
                     },
                     onCompletionUpdateCache = {
-                        val allRescueEventsFlow: Flow<List<RescueEvent>> =
-                            getAllRescueEventsByLocationFromRemoteRepository(
-                                activistLongitude = activistLongitude,
-                                activistLatitude = activistLatitude,
-                                rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
-                                rangeLatitude = getRangeLat()
-                            )
-                        checkAllMyRescueEventsUtil.downloadImageAndManageRescueEventsInLocalRepositoryFromFlow(
-                            allRescueEventsFlow,
-                            myUid,
-                            viewModelScope
-                        ).flatMapConcat {
 
-                            getAllRescueEventsByLocationFromLocalRepository(
-                                activistLongitude = activistLongitude,
-                                activistLatitude = activistLatitude,
-                                rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
-                                rangeLatitude = getRangeLat()
-                            )
-                        }
+                        isContentUpdated = true
+                        manageAllRescueEventsByLocation(
+                            activistLongitude,
+                            activistLatitude
+                        )
+                        getAllRescueEventsByLocationFromLocalRepository(
+                            activistLongitude = activistLongitude,
+                            activistLatitude = activistLatitude,
+                            rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
+                            rangeLatitude = getRangeLat()
+                        )
                     },
                     onVerifyCacheIsRecent = {
                         getAllRescueEventsByLocationFromLocalRepository(
@@ -340,7 +411,7 @@ class CheckAllRescueEventsViewmodel(
                             activistLatitude = activistLatitude,
                             rangeLongitude = getRangeLon(activistLatitude = activistLatitude),
                             rangeLatitude = getRangeLat()
-                        )
+                        ).filterWrongRescueEvents()
                     }
                 ).map {
                     it.map { rescueEvent ->
@@ -366,12 +437,15 @@ class CheckAllRescueEventsViewmodel(
                                 activistLongitude,
                                 rescueEvent.latitude,
                                 rescueEvent.longitude
-                            )
+                            ),
+                            isContentUpdated = isContentUpdated
                         )
                     }.sortedBy { uiRescueEvent -> uiRescueEvent.distance }
                 }
             }
-            .toUiState()
+            .toUiState().also {
+                isContentUpdated = false
+            }
 
 
     private fun getRangeLon(maxDistanceInKm: Double = 150.0, activistLatitude: Double): Double =

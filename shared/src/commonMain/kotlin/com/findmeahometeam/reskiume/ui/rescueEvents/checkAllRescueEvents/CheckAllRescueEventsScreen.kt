@@ -102,6 +102,7 @@ fun CheckAllRescueEventsScreen(
         )
     }
     val uiRescueEventListState: UiState<List<UiRescueEvent>> by checkAllRescueEventsViewmodel.allRescueEventsState.collectAsStateWithLifecycle()
+    var shouldForceReloadAllImages: MutableList<Boolean> by rememberSaveable { mutableStateOf(emptyList<Boolean>().toMutableList()) }
 
     val isSearchButtonEnabled: Boolean by remember(
         selectedCountry,
@@ -274,6 +275,8 @@ fun CheckAllRescueEventsScreen(
                     key = { uiRescueEvent -> uiRescueEvent.hashCode() }
                 ) { uiRescueEvent ->
 
+                    shouldForceReloadAllImages.add(rescueEventList.indexOf(uiRescueEvent), uiRescueEvent.isContentUpdated)
+
                     RmRescueEventListItem(
                         modifier = Modifier.animateItem(),
                         title = uiRescueEvent.rescueEvent.title,
@@ -286,6 +289,7 @@ fun CheckAllRescueEventsScreen(
                                 .valueOf(uiRescueEvent.rescueEvent.city)
                                 .toStringResource()
                         ).substring(5),
+                        forceReloadImages = shouldForceReloadAllImages[rescueEventList.indexOf(uiRescueEvent)],
                         onClick = {
                             if (user?.uid == uiRescueEvent.rescueEvent.creatorId) {
                                 onModifyRescueEvent(uiRescueEvent.rescueEvent.id)
@@ -298,6 +302,8 @@ fun CheckAllRescueEventsScreen(
                         }
                     )
                     Spacer(modifier = Modifier.height(8.dp))
+
+                    shouldForceReloadAllImages[rescueEventList.indexOf(uiRescueEvent)] = false
                 }
             }
         }

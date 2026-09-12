@@ -22,6 +22,7 @@ import com.findmeahometeam.reskiume.ui.core.navigation.CheckRescueEvent
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckActivistUtil
+import com.findmeahometeam.reskiume.ui.rescueEvents.modifyRescueEvent.DeleteRescueEventUtil
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -44,6 +45,7 @@ class CheckRescueEventViewmodel(
     private val insertChatInLocalRepository: InsertChatInLocalRepository,
     private val modifyOnlyActivistsInChatInRemoteRepository: ModifyOnlyActivistsInChatInRemoteRepository,
     private val insertCacheInLocalRepository: InsertCacheInLocalRepository,
+    private val deleteRescueEventUtil: DeleteRescueEventUtil,
     private val log: Log
 ) : ViewModel() {
 
@@ -158,7 +160,26 @@ class CheckRescueEventViewmodel(
                         }
                     }
                 } else {
-                    onChatFound("", 0)
+                    deleteRescueEventUtil.deleteRescueEvent(
+                        id = rescueEventId,
+                        creatorId = creatorId,
+                        coroutineScope = viewModelScope,
+                        deleteOnLocal = true,
+                        deleteOnRemote = false,
+                        onError = {
+                            log.e(
+                                "CheckRescueEventViewmodel",
+                                "findChat: Error deleting the local rescue event $rescueEventId after the chat has been finished"
+                            )
+                        },
+                        onComplete = {
+                            log.d(
+                                "CheckRescueEventViewmodel",
+                                "findChat: Local rescue event $rescueEventId deleted after the chat has been finished"
+                            )
+                            onChatFound("", 0)
+                        }
+                    )
                 }
             }
         }

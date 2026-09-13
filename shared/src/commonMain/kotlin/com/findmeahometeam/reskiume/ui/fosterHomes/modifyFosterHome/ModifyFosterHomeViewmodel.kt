@@ -315,25 +315,24 @@ class ModifyFosterHomeViewmodel(
             val previousFosterHome =
                 getFosterHomeFromLocalRepository(updatedFosterHome.id).first()!!
 
-            modifyFosterHomeInLocalRepository(
+            val isUpdated = modifyFosterHomeInLocalRepository(
                 updatedFosterHome = updatedFosterHome,
                 previousFosterHome = previousFosterHome,
                 coroutineScope = viewModelScope
-            ) { isUpdated: Boolean ->
+            ).first()
 
-                if (isUpdated) {
-                    log.d(
-                        "ModifyFosterHomeViewModel",
-                        "modifyFosterHomeInLocalDataSource: foster home ${updatedFosterHome.id} updated successfully in the local data source"
-                    )
-                    onSuccess()
-                } else {
-                    log.e(
-                        "ModifyFosterHomeViewModel",
-                        "modifyFosterHomeInLocalDataSource: failed to update the foster home ${updatedFosterHome.id} in the local data source"
-                    )
-                    _manageChangesUiState.value = UiState.Error()
-                }
+            if (isUpdated) {
+                log.d(
+                    "ModifyFosterHomeViewModel",
+                    "modifyFosterHomeInLocalDataSource: foster home ${updatedFosterHome.id} updated successfully in the local data source"
+                )
+                onSuccess()
+            } else {
+                log.e(
+                    "ModifyFosterHomeViewModel",
+                    "modifyFosterHomeInLocalDataSource: failed to update the foster home ${updatedFosterHome.id} in the local data source"
+                )
+                _manageChangesUiState.value = UiState.Error()
             }
         }
     }
@@ -376,10 +375,20 @@ class ModifyFosterHomeViewmodel(
             id = id,
             ownerId = ownerId,
             coroutineScope = viewModelScope,
+            deleteOnLocal = true,
+            deleteOnRemote = true,
             onError = {
+                log.e(
+                    "ModifyFosterHomeViewModel",
+                    "deleteFosterHome: failed to delete the foster home $id"
+                )
                 _manageChangesUiState.value = UiState.Error()
             },
             onComplete = {
+                log.d(
+                    "ModifyFosterHomeViewModel",
+                    "deleteFosterHome: foster home $id deleted successfully"
+                )
                 unsubscribeOwnerToTheirFosterHome(id)
             }
         )

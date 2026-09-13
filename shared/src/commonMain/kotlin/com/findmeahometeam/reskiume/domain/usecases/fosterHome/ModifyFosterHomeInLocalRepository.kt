@@ -1,10 +1,8 @@
 package com.findmeahometeam.reskiume.domain.usecases.fosterHome
 
 import com.findmeahometeam.reskiume.data.util.log.Log
-import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
-import com.findmeahometeam.reskiume.domain.model.Gender
 import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
-import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalType
+import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
 import com.findmeahometeam.reskiume.domain.repository.local.LocalFosterHomeRepository
 import com.findmeahometeam.reskiume.domain.repository.local.LocalNonHumanAnimalRepository
@@ -12,7 +10,10 @@ import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flow
 
 class ModifyFosterHomeInLocalRepository(
     private val manageImagePath: ManageImagePath,
@@ -22,121 +23,37 @@ class ModifyFosterHomeInLocalRepository(
     private val authRepository: AuthRepository,
     private val log: Log
 ) {
-    suspend operator fun invoke(
+    operator fun invoke(
         isNonHumanAnimalSaved: Boolean = false,
         updatedFosterHome: FosterHome,
         previousFosterHome: FosterHome,
-        coroutineScope: CoroutineScope,
-        onModifyFosterHome: suspend (isUpdated: Boolean) -> Unit
-    ) {
-        val imageFileName = manageImagePath.getFileNameFromLocalImagePath(updatedFosterHome.imageUrl)
+        coroutineScope: CoroutineScope
+    ): Flow<Boolean> = flow {
+
+        val imageFileName =
+            manageImagePath.getFileNameFromLocalImagePath(updatedFosterHome.imageUrl)
+
         val modifiedFosterHome = updatedFosterHome.copy(
             savedBy = getMyUid(),
             imageUrl = imageFileName
         )
-        localFosterHomeRepository.modifyFosterHome(
-            modifiedFosterHome.toEntity(),
-            onModifyFosterHome = { rowsUpdated ->
-                if (rowsUpdated > 0) {
-                    var isSuccess = manageAllAcceptedNonHumanAnimals(modifiedFosterHome, previousFosterHome)
+        val isSuccess = localFosterHomeRepository.upsertAllFosterHomeData(
+            fosterHomeEntity = modifiedFosterHome.toEntity(),
+            allAcceptedNonHumanAnimals = modifiedFosterHome.allAcceptedNonHumanAnimals.map { it.toEntity() },
+            allResidentNonHumanAnimalIds = modifiedFosterHome.allResidentNonHumanAnimals.map { it.toEntity() }
+        ).first()
 
-                    if (isSuccess) {
-                        isSuccess = manageAllResidentNonHumanAnimals(
-                            isNonHumanAnimalSaved,
-                            modifiedFosterHome,
-                            previousFosterHome,
-                            coroutineScope
-                        )
-                    }
-                    onModifyFosterHome(isSuccess)
-                } else {
-                    onModifyFosterHome(false)
-                }
-            }
-        )
-    }
-
-    private suspend fun manageAllAcceptedNonHumanAnimals(
-        updatedFosterHome: FosterHome,
-        previousFosterHome: FosterHome
-    ): Boolean {
-        var isSuccess = true
-
-        val previousAllAcceptedNonHumanAnimals =
-            previousFosterHome.allAcceptedNonHumanAnimals.map {
-                Pair(
-                    it.acceptedNonHumanAnimalType,
-                    it.acceptedNonHumanAnimalGender
-                )
-            }.toSet()
-
-        val updatedAllAcceptedNonHumanAnimals =
-            updatedFosterHome.allAcceptedNonHumanAnimals.map {
-                Pair(
-                    it.acceptedNonHumanAnimalType,
-                    it.acceptedNonHumanAnimalGender
-                )
-            }.toSet()
-
-        val acceptedNonHumanAnimalsToManage: Set<Pair<NonHumanAnimalType, Gender>> =
-            (previousAllAcceptedNonHumanAnimals - updatedAllAcceptedNonHumanAnimals) +
-                    (updatedAllAcceptedNonHumanAnimals - previousAllAcceptedNonHumanAnimals)
-
-        acceptedNonHumanAnimalsToManage.forEach { acceptedNonHumanAnimalToManage ->
-            if (isSuccess) {
-                if (updatedAllAcceptedNonHumanAnimals.contains(acceptedNonHumanAnimalToManage)) {
-
-                    val acceptedNonHumanAnimal =
-                        updatedFosterHome.allAcceptedNonHumanAnimals.first {
-                            it.acceptedNonHumanAnimalType == acceptedNonHumanAnimalToManage.first
-                                    && it.acceptedNonHumanAnimalGender == acceptedNonHumanAnimalToManage.second
-                        }.toEntity()
-
-                    localFosterHomeRepository.insertAcceptedNonHumanAnimalForFosterHome(
-                        acceptedNonHumanAnimal,
-                        onInsertAcceptedNonHumanAnimalType = { rowId ->
-                            if (rowId > 0) {
-                                log.d(
-                                    "ModifyFosterHomeInLocalRepository",
-                                    "manageAllAcceptedNonHumanAnimals: inserted the accepted non human animal ${acceptedNonHumanAnimal.acceptedNonHumanAnimalId} in the foster home ${acceptedNonHumanAnimal.fosterHomeId} in the local data source"
-                                )
-                            } else {
-                                log.e(
-                                    "ModifyFosterHomeInLocalRepository",
-                                    "manageAllAcceptedNonHumanAnimals: failed to insert the accepted non human animal ${acceptedNonHumanAnimal.acceptedNonHumanAnimalId} in the foster home ${acceptedNonHumanAnimal.fosterHomeId} in the local data source"
-                                )
-                                isSuccess = false
-                            }
-                        }
-                    )
-                } else {
-                    val acceptedNonHumanAnimal =
-                        previousFosterHome.allAcceptedNonHumanAnimals.first {
-                            it.acceptedNonHumanAnimalType == acceptedNonHumanAnimalToManage.first
-                                    && it.acceptedNonHumanAnimalGender == acceptedNonHumanAnimalToManage.second
-                        }
-
-                    localFosterHomeRepository.deleteAcceptedNonHumanAnimal(
-                        acceptedNonHumanAnimal.acceptedNonHumanAnimalId,
-                        onDeleteAcceptedNonHumanAnimal = { rowsDeleted ->
-                            if (rowsDeleted > 0) {
-                                log.d(
-                                    "ModifyFosterHomeInLocalRepository",
-                                    "manageAllAcceptedNonHumanAnimals: deleted the accepted non human animal ${acceptedNonHumanAnimal.acceptedNonHumanAnimalId} in the foster home ${acceptedNonHumanAnimal.fosterHomeId} in the local data source"
-                                )
-                            } else {
-                                log.e(
-                                    "ModifyFosterHomeInLocalRepository",
-                                    "manageAllAcceptedNonHumanAnimals: failed to delete the accepted non human animal ${acceptedNonHumanAnimal.acceptedNonHumanAnimalId} in the foster home ${acceptedNonHumanAnimal.fosterHomeId} in the local data source"
-                                )
-                                isSuccess = false
-                            }
-                        }
-                    )
-                }
-            }
+        if (isSuccess) {
+            val isUpdated = manageAllResidentNonHumanAnimals(
+                isNonHumanAnimalSaved,
+                modifiedFosterHome,
+                previousFosterHome,
+                coroutineScope
+            )
+            emit(isUpdated)
+        } else {
+            emit(false)
         }
-        return isSuccess
     }
 
     private suspend fun manageAllResidentNonHumanAnimals(
@@ -172,68 +89,31 @@ class ModifyFosterHomeInLocalRepository(
                     if (residentNonHumanAnimal == null) {
                         log.d(
                             "ModifyFosterHomeInLocalRepository",
-                            "manageAllResidentNonHumanAnimals: Can not insert the resident nor update the non human animal state for the resident id ${residentNonHumanAnimalToManage.nonHumanAnimalId} in the foster home ${residentNonHumanAnimalToManage.fosterHomeId} in the local data source"
+                            "manageAllResidentNonHumanAnimals: Can not update the non human animal state for the resident id ${residentNonHumanAnimalToManage.nonHumanAnimalId} in the foster home ${residentNonHumanAnimalToManage.fosterHomeId} in the local data source"
                         )
                     } else {
-                        localFosterHomeRepository.insertResidentNonHumanAnimalIdForFosterHome(
-                            residentNonHumanAnimalToManage.toEntity(),
-                            onInsertResidentNonHumanAnimalId = { rowId ->
-                                if (rowId > 0) {
-                                    log.d(
-                                        "ModifyFosterHomeInLocalRepository",
-                                        "manageAllResidentNonHumanAnimals: inserted the non human animal ${residentNonHumanAnimalToManage.nonHumanAnimalId} in the foster home ${residentNonHumanAnimalToManage.fosterHomeId} in the local data source"
-                                    )
-                                } else {
-                                    log.e(
-                                        "ModifyFosterHomeInLocalRepository",
-                                        "manageAllResidentNonHumanAnimals: failed to insert the non human animal ${residentNonHumanAnimalToManage.nonHumanAnimalId} in the foster home ${residentNonHumanAnimalToManage.fosterHomeId} in the local data source"
-                                    )
-                                    isSuccess = false
-                                }
-                            }
-                        )
-                        if (isSuccess) {
-                            localNonHumanAnimalRepository.modifyNonHumanAnimal(
-                                residentNonHumanAnimal
-                                    .copy(
-                                        nonHumanAnimalState = NonHumanAnimalState.REHOMED,
-                                        fosterHomeId = updatedFosterHome.id
-                                    ).toEntity()
-                            ) { rowsUpdated ->
-                                if (rowsUpdated > 0) {
-                                    log.d(
-                                        "ModifyFosterHomeInLocalRepository",
-                                        "manageAllResidentNonHumanAnimals: updated non human animal state for the non human animal ${residentNonHumanAnimal.id} in the local data source"
-                                    )
-                                } else {
-                                    log.e(
-                                        "ModifyFosterHomeInLocalRepository",
-                                        "manageAllResidentNonHumanAnimals: failed to update the non human animal state for the non human animal ${residentNonHumanAnimal.id} in the local data source"
-                                    )
-                                    isSuccess = false
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    localFosterHomeRepository.deleteResidentNonHumanAnimal(
-                        residentNonHumanAnimalToManage.nonHumanAnimalId,
-                        onDeleteResidentNonHumanAnimalId = { rowsDeleted ->
-                            if (rowsDeleted > 0) {
+                        localNonHumanAnimalRepository.modifyNonHumanAnimal(
+                            residentNonHumanAnimal
+                                .copy(
+                                    nonHumanAnimalState = NonHumanAnimalState.REHOMED,
+                                    fosterHomeId = updatedFosterHome.id
+                                ).toEntity()
+                        ) { rowsUpdated ->
+                            if (rowsUpdated > 0) {
                                 log.d(
                                     "ModifyFosterHomeInLocalRepository",
-                                    "manageAllResidentNonHumanAnimals: deleted resident ${residentNonHumanAnimalToManage.nonHumanAnimalId} in the foster home ${residentNonHumanAnimalToManage.fosterHomeId} in the local data source"
+                                    "manageAllResidentNonHumanAnimals: updated non human animal state for the non human animal ${residentNonHumanAnimal.id} in the local data source"
                                 )
                             } else {
                                 log.e(
                                     "ModifyFosterHomeInLocalRepository",
-                                    "manageAllResidentNonHumanAnimals: failed to delete resident ${residentNonHumanAnimalToManage.nonHumanAnimalId} in the foster home ${residentNonHumanAnimalToManage.fosterHomeId} in the local data source"
+                                    "manageAllResidentNonHumanAnimals: failed to update the non human animal state for the non human animal ${residentNonHumanAnimal.id} in the local data source"
                                 )
                                 isSuccess = false
                             }
                         }
-                    )
-
+                    }
+                } else {
                     if (!isSuccess || residentNonHumanAnimal == null) {
                         log.d(
                             "ModifyFosterHomeInLocalRepository",

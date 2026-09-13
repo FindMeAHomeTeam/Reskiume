@@ -30,36 +30,40 @@ class DeleteFosterHomeUtilImpl(
         id: String,
         ownerId: String,
         coroutineScope: CoroutineScope,
-        onlyDeleteOnLocal: Boolean,
+        deleteOnLocal: Boolean,
+        deleteOnRemote: Boolean,
         onError: () -> Unit,
         onComplete: () -> Unit
     ) {
         deleteCurrentImageFromRemoteDataSource(
             ownerId,
             id,
-            onlyDeleteOnLocal,
+            deleteOnRemote,
             coroutineScope,
             onError
         ) {
             deleteCurrentImageFromLocalDataSource(
                 id,
+                deleteOnLocal,
                 coroutineScope,
                 onError
             ) {
                 deleteFosterHomeFromRemoteDataSource(
                     id,
                     ownerId,
-                    onlyDeleteOnLocal,
+                    deleteOnRemote,
                     coroutineScope,
                     onError
                 ) {
                     deleteFosterHomeFromLocalDataSource(
                         id,
+                        deleteOnLocal,
                         coroutineScope,
                         onError
                     ) {
                         deleteFosterHomeCacheFromLocalDataSource(
                             id,
+                            coroutineScope,
                             onComplete
                         )
                     }
@@ -71,13 +75,13 @@ class DeleteFosterHomeUtilImpl(
     private fun deleteCurrentImageFromRemoteDataSource(
         ownerId: String,
         fosterHomeId: String,
-        onlyDeleteOnLocal: Boolean,
+        deleteOnRemote: Boolean,
         coroutineScope: CoroutineScope,
         onError: () -> Unit,
-        onSuccess: () -> Unit
+        onComplete: () -> Unit
     ) {
-        if (onlyDeleteOnLocal) {
-            onSuccess()
+        if (!deleteOnRemote) {
+            onComplete()
             return
         }
         coroutineScope.launch {
@@ -107,24 +111,28 @@ class DeleteFosterHomeUtilImpl(
                         "DeleteFosterHomeUtil",
                         "deleteCurrentImageFromRemoteDataSource: Image from the foster home $fosterHomeId was deleted successfully in the remote data source"
                     )
-                    onSuccess()
                 } else {
                     log.e(
                         "DeleteFosterHomeUtil",
                         "deleteCurrentImageFromRemoteDataSource: failed to delete the image from the foster home $fosterHomeId in the remote data source"
                     )
-                    onError()
                 }
+                onComplete()
             }
         }
     }
 
     private fun deleteCurrentImageFromLocalDataSource(
         fosterHomeId: String,
+        deleteOnLocal: Boolean,
         coroutineScope: CoroutineScope,
         onError: () -> Unit,
-        onSuccess: () -> Unit
+        onComplete: () -> Unit
     ) {
+        if (!deleteOnLocal) {
+            onComplete()
+            return
+        }
         coroutineScope.launch {
 
             val localFosterHome: FosterHome? =
@@ -145,14 +153,13 @@ class DeleteFosterHomeUtilImpl(
                         "DeleteFosterHomeUtil",
                         "deleteCurrentImageFromLocalDataSource: Image from the foster home $fosterHomeId was deleted successfully in the local data source"
                     )
-                    onSuccess()
                 } else {
                     log.e(
                         "DeleteFosterHomeUtil",
                         "deleteCurrentImageFromLocalDataSource: failed to delete the image from the foster home $fosterHomeId in the local data source"
                     )
-                    onError()
                 }
+                onComplete()
             }
         }
     }
@@ -160,12 +167,12 @@ class DeleteFosterHomeUtilImpl(
     private fun deleteFosterHomeFromRemoteDataSource(
         id: String,
         ownerId: String,
-        onlyDeleteOnLocal: Boolean,
+        deleteOnRemote: Boolean,
         coroutineScope: CoroutineScope,
         onError: () -> Unit,
         onSuccess: () -> Unit
     ) {
-        if (onlyDeleteOnLocal) {
+        if (!deleteOnRemote) {
             onSuccess()
             return
         }
@@ -196,10 +203,15 @@ class DeleteFosterHomeUtilImpl(
 
     private fun deleteFosterHomeFromLocalDataSource(
         id: String,
+        deleteOnLocal: Boolean,
         coroutineScope: CoroutineScope,
         onError: () -> Unit,
-        onSuccess: suspend () -> Unit
+        onSuccess: () -> Unit
     ) {
+        if (!deleteOnLocal) {
+            onSuccess()
+            return
+        }
         coroutineScope.launch {
 
             deleteMyFosterHomeFromLocalRepository(
@@ -224,24 +236,27 @@ class DeleteFosterHomeUtilImpl(
         }
     }
 
-    private suspend fun deleteFosterHomeCacheFromLocalDataSource(
+    private fun deleteFosterHomeCacheFromLocalDataSource(
         id: String,
+        coroutineScope: CoroutineScope,
         onComplete: () -> Unit
     ) {
-        deleteCacheFromLocalRepository(id) { rowsDeleted: Int ->
+        coroutineScope.launch {
+            deleteCacheFromLocalRepository(id) { rowsDeleted: Int ->
 
-            if (rowsDeleted > 0) {
-                log.d(
-                    "DeleteFosterHomeUtil",
-                    "deleteFosterHomeCacheFromLocalDataSource: Foster home $id deleted in the local cache in section ${Section.FOSTER_HOMES}"
-                )
-            } else {
-                log.e(
-                    "DeleteFosterHomeUtil",
-                    "deleteFosterHomeCacheFromLocalDataSource: Error deleting the foster home $id in the local cache in section ${Section.FOSTER_HOMES}"
-                )
+                if (rowsDeleted > 0) {
+                    log.d(
+                        "DeleteFosterHomeUtil",
+                        "deleteFosterHomeCacheFromLocalDataSource: Foster home $id deleted in the local cache in section ${Section.FOSTER_HOMES}"
+                    )
+                } else {
+                    log.e(
+                        "DeleteFosterHomeUtil",
+                        "deleteFosterHomeCacheFromLocalDataSource: Error deleting the foster home $id in the local cache in section ${Section.FOSTER_HOMES}"
+                    )
+                }
+                onComplete()
             }
-            onComplete()
         }
     }
 }

@@ -3,7 +3,7 @@ package com.findmeahometeam.reskiume.ui.profile.checkAllMyRescueEvents
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueEvent
 import kotlinx.coroutines.CoroutineScope
 
-interface CheckAllMyRescueEventsUtil {
+interface CheckAllRescueEventsUtil {
 
     suspend fun updateLocalRepositoryWithRemoteRescueEvents(
         allRemoteRescueEvents: Set<RescueEvent>,

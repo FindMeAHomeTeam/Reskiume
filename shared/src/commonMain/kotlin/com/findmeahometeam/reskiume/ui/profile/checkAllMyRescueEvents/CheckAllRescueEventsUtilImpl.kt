@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.first
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
-class CheckAllMyRescueEventsUtilImpl(
+class CheckAllRescueEventsUtilImpl(
     private val downloadImageToLocalDataSource: DownloadImageToLocalDataSource,
     private val insertRescueEventInLocalRepository: InsertRescueEventInLocalRepository,
     private val insertCacheInLocalRepository: InsertCacheInLocalRepository,
@@ -23,7 +23,7 @@ class CheckAllMyRescueEventsUtilImpl(
     private val modifyCacheInLocalRepository: ModifyCacheInLocalRepository,
     private val deleteRescueEventUtil: DeleteRescueEventUtil,
     private val log: Log
-) : CheckAllMyRescueEventsUtil {
+) : CheckAllRescueEventsUtil {
 
     override suspend fun updateLocalRepositoryWithRemoteRescueEvents(
         allRemoteRescueEvents: Set<RescueEvent>,
@@ -70,7 +70,7 @@ class CheckAllMyRescueEventsUtilImpl(
                 } else {
                     log.d(
                         "CheckAllMyRescueEventsUtilImpl",
-                        "downloadImageAndManageRescueEventsInLocalRepositoryFromFlow: Rescue event ${rescueEventToManage.id} has no avatar image to save locally."
+                        "updateLocalRepositoryWithRemoteRescueEvents: Rescue event ${rescueEventToManage.id} has no avatar image to save locally."
                     )
 
                     if (localRescueEvent == null) {

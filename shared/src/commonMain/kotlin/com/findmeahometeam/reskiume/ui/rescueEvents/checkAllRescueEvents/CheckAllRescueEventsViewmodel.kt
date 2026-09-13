@@ -21,7 +21,7 @@ import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.components.UiState.Error
 import com.findmeahometeam.reskiume.ui.core.components.UiState.Idle
 import com.findmeahometeam.reskiume.ui.core.components.toUiState
-import com.findmeahometeam.reskiume.ui.profile.checkAllMyRescueEvents.CheckAllMyRescueEventsUtil
+import com.findmeahometeam.reskiume.ui.profile.checkAllMyRescueEvents.CheckAllRescueEventsUtil
 import com.findmeahometeam.reskiume.ui.profile.checkAllMyRescueEvents.UiRescueEvent
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.rescueEvents.modifyRescueEvent.DeleteRescueEventUtil
@@ -61,7 +61,7 @@ class CheckAllRescueEventsViewmodel(
     private val getStringProvider: StringProvider,
     private val getDataByManagingObjectLocalCacheTimestamp: GetDataByManagingObjectLocalCacheTimestamp,
     private val getAllRescueEventsByCountryAndCityFromRemoteRepository: GetAllRescueEventsByCountryAndCityFromRemoteRepository,
-    private val checkAllMyRescueEventsUtil: CheckAllMyRescueEventsUtil,
+    private val checkAllRescueEventsUtil: CheckAllRescueEventsUtil,
     private val getAllRescueEventsByCountryAndCityFromLocalRepository: GetAllRescueEventsByCountryAndCityFromLocalRepository,
     private val checkNonHumanAnimalUtil: CheckNonHumanAnimalUtil,
     private val getImagePathForFileNameFromLocalDataSource: GetImagePathForFileNameFromLocalDataSource,
@@ -287,7 +287,7 @@ class CheckAllRescueEventsViewmodel(
                 country,
                 city
             ).first()
-        checkAllMyRescueEventsUtil.updateLocalRepositoryWithRemoteRescueEvents(
+        checkAllRescueEventsUtil.updateLocalRepositoryWithRemoteRescueEvents(
             allRemoteRescueEvents.toSet(),
             allLocalRescueEvents.toSet(),
             myUid,
@@ -359,7 +359,7 @@ class CheckAllRescueEventsViewmodel(
                 rangeLatitude = getRangeLat()
             ).first()
 
-        checkAllMyRescueEventsUtil.updateLocalRepositoryWithRemoteRescueEvents(
+        checkAllRescueEventsUtil.updateLocalRepositoryWithRemoteRescueEvents(
             allRemoteRescueEvents.toSet(),
             allLocalRescueEvents.toSet(),
             myUid,

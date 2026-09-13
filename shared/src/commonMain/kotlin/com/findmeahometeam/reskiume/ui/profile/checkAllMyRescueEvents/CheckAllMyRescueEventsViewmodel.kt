@@ -30,7 +30,7 @@ class CheckAllMyRescueEventsViewmodel(
     saveStateHandleProvider: SaveStateHandleProvider,
     private val getDataByManagingObjectLocalCacheTimestamp: GetDataByManagingObjectLocalCacheTimestamp,
     private val getAllMyRescueEventsFromRemoteRepository: GetAllMyRescueEventsFromRemoteRepository,
-    private val checkAllMyRescueEventsUtil: CheckAllMyRescueEventsUtil,
+    private val checkAllRescueEventsUtil: CheckAllRescueEventsUtil,
     private val getAllMyRescueEventsFromLocalRepository: GetAllMyRescueEventsFromLocalRepository,
     private val getImagePathForFileNameFromLocalDataSource: GetImagePathForFileNameFromLocalDataSource,
     private val checkNonHumanAnimalUtil: CheckNonHumanAnimalUtil,
@@ -119,7 +119,7 @@ class CheckAllMyRescueEventsViewmodel(
         val allLocalRescueEvents: List<RescueEvent> =
             getAllMyRescueEventsFromLocalRepository(myUid).first()
 
-        checkAllMyRescueEventsUtil.updateLocalRepositoryWithRemoteRescueEvents(
+        checkAllRescueEventsUtil.updateLocalRepositoryWithRemoteRescueEvents(
             allRemoteRescueEvents.toSet(),
             allLocalRescueEvents.toSet(),
             myUid,
@@ -133,7 +133,7 @@ class CheckAllMyRescueEventsViewmodel(
         deleteOnLocal: Boolean = true,
         deleteOnRemote: Boolean
     ) {
-        val environment = if(deleteOnLocal && deleteOnRemote) "both" else if (deleteOnRemote) "remote" else "local"
+        val environment = if(deleteOnLocal && deleteOnRemote) "local and remote" else if (deleteOnRemote) "remote" else "local"
 
         deleteRescueEventUtil.deleteRescueEvent(
             id = id,

@@ -110,6 +110,7 @@ fun CheckAllFosterHomesScreen(
             ManagePermissionState.IDLE
         )
     }
+    var shouldForceReloadAllImages: MutableList<Boolean> by rememberSaveable { mutableStateOf(mutableListOf()) }
 
     val uiFosterHomeListState: UiState<List<UiFosterHome>> by checkAllFosterHomesViewmodel.allFosterHomesState.collectAsStateWithLifecycle()
     val isSearchButtonEnabled: Boolean by remember(
@@ -136,7 +137,14 @@ fun CheckAllFosterHomesScreen(
     val lazyListState = remember { LazyListState() }
 
     RmScaffold(
-        title = stringResource(Res.string.check_all_foster_homes_screen_title),
+        title = stringResource(
+            Res.string.check_all_foster_homes_screen_title,
+            if (searchOption == SearchOption.COUNTRY_CITY) {
+                stringResource(Res.string.check_all_foster_homes_screen_search_by_place)
+            } else {
+                stringResource(Res.string.check_all_foster_homes_screen_search_by_location)
+            }
+        ),
         floatingActionButton = {
             DisplayExtendedFloatingActionButtonToCreateFosterHomeIfLoggedIn(
                 user?.uid,
@@ -304,6 +312,8 @@ fun CheckAllFosterHomesScreen(
                     key = { uiFosterHome -> uiFosterHome.hashCode() }
                 ) { uiFosterHome ->
 
+                    shouldForceReloadAllImages.add(fosterHomeList.indexOf(uiFosterHome), uiFosterHome.isContentUpdated)
+
                     RmFosterHomeListItem(
                         modifier = Modifier.animateItem(),
                         title = uiFosterHome.fosterHome.title,
@@ -311,6 +321,7 @@ fun CheckAllFosterHomesScreen(
                         allAcceptedNonHumanAnimals = uiFosterHome.fosterHome.allAcceptedNonHumanAnimals,
                         allResidentNonHumanAnimals = uiFosterHome.allResidentUiNonHumanAnimals,
                         distance = uiFosterHome.distance,
+                        forceReloadImages = uiFosterHome.isContentUpdated,
                         city = stringResource(
                             City
                                 .valueOf(uiFosterHome.fosterHome.city)
@@ -328,6 +339,8 @@ fun CheckAllFosterHomesScreen(
                         }
                     )
                     Spacer(modifier = Modifier.height(8.dp))
+
+                    shouldForceReloadAllImages[fosterHomeList.indexOf(uiFosterHome)] = false
                 }
             }
         }

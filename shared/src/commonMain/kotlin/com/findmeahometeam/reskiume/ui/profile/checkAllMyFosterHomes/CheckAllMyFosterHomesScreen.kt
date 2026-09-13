@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.findmeahometeam.reskiume.domain.model.fosterHome.City
 import com.findmeahometeam.reskiume.domain.model.fosterHome.toStringResource
 import com.findmeahometeam.reskiume.ui.core.backgroundColor
@@ -47,7 +47,7 @@ fun CheckAllMyFosterHomesScreen(
         koinViewModel<CheckAllMyFosterHomesViewmodel>()
 
     val uiFosterHomeListState: UiState<List<UiFosterHome>> by checkAllMyFosterHomesViewmodel.fetchAllMyFosterHomes()
-        .collectAsState(initial = UiState.Loading())
+        .collectAsStateWithLifecycle(initialValue = UiState.Loading())
 
     RmScaffold(
         onBackPressed = onBackPressed,

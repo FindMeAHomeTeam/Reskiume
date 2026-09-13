@@ -16,6 +16,7 @@ import com.findmeahometeam.reskiume.ui.fosterHomes.checkAllFosterHomes.UiFosterH
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flowOf
@@ -25,7 +26,7 @@ class CheckAllMyFosterHomesViewmodel(
     saveStateHandleProvider: SaveStateHandleProvider,
     private val getDataByManagingObjectLocalCacheTimestamp: GetDataByManagingObjectLocalCacheTimestamp,
     private val getAllMyFosterHomesFromRemoteRepository: GetAllMyFosterHomesFromRemoteRepository,
-    private val checkAllMyFosterHomesUtil: CheckAllMyFosterHomesUtil,
+    private val checkAllFosterHomesUtil: CheckAllFosterHomesUtil,
     private val getAllMyFosterHomesFromLocalRepository: GetAllMyFosterHomesFromLocalRepository,
     private val getImagePathForFileNameFromLocalDataSource: GetImagePathForFileNameFromLocalDataSource,
     private val checkNonHumanAnimalUtil: CheckNonHumanAnimalUtil
@@ -44,32 +45,20 @@ class CheckAllMyFosterHomesViewmodel(
                     savedBy = myUid,
                     section = Section.FOSTER_HOMES,
                     onCompletionInsertCache = {
-                        val allFosterHomesFlow: Flow<List<FosterHome>> =
-                            getAllMyFosterHomesFromRemoteRepository(
-                                myUid
-                            )
-                        checkAllMyFosterHomesUtil.downloadImageAndManageFosterHomesInLocalRepositoryFromFlow(
-                            allFosterHomesFlow,
-                            myUid,
-                            viewModelScope
-                        )
+
+                        manageAllMyFosterHomes()
+                        getAllMyFosterHomesFromLocalRepository(myUid)
                     },
                     onCompletionUpdateCache = {
-                        val allFosterHomesFlow: Flow<List<FosterHome>> =
-                            getAllMyFosterHomesFromRemoteRepository(
-                                myUid
-                            )
-                        checkAllMyFosterHomesUtil.downloadImageAndManageFosterHomesInLocalRepositoryFromFlow(
-                            allFosterHomesFlow,
-                            myUid,
-                            viewModelScope
-                        )
+
+                        manageAllMyFosterHomes()
+                        getAllMyFosterHomesFromLocalRepository(myUid)
                     },
                     onVerifyCacheIsRecent = {
                         getAllMyFosterHomesFromLocalRepository(myUid)
                     }
-                ).map {
-                    it.map { fosterHome ->
+                ).map { list ->
+                    list.map { fosterHome ->
                         UiFosterHome(
                             fosterHome = fosterHome.copy(
                                 imageUrl = if (fosterHome.imageUrl.isEmpty()) {
@@ -85,9 +74,24 @@ class CheckAllMyFosterHomesViewmodel(
                                     residentNonHumanAnimal.caregiverId,
                                     viewModelScope
                                 ).firstOrNull()
-                            }
+                            },
                         )
                     }.sortedBy { uiFosterHome -> uiFosterHome.fosterHome.available }
                 }
             }.toUiState()
+
+    private suspend fun manageAllMyFosterHomes() {
+        val allRemoteFosterHomes: List<FosterHome> =
+            getAllMyFosterHomesFromRemoteRepository(myUid).first()
+
+        val allLocalFosterHomes: List<FosterHome> =
+            getAllMyFosterHomesFromLocalRepository(myUid).first()
+
+        checkAllFosterHomesUtil.updateLocalRepositoryWithRemoteFosterHomes(
+            allRemoteFosterHomes.toSet(),
+            allLocalFosterHomes.toSet(),
+            myUid,
+            viewModelScope
+        )
+    }
 }

@@ -785,7 +785,7 @@ class CheckChatViewmodel(
 
         val nonHumanAnimalState = allNonHumanAnimals.first().nonHumanAnimalState
 
-        modifyFosterHomeInLocalRepository(
+        val isSuccess = modifyFosterHomeInLocalRepository(
             isNonHumanAnimalSaved = nonHumanAnimalState == NonHumanAnimalState.SAVED,
             updatedFosterHome = fosterHome.copy(
                 allResidentNonHumanAnimals = if (nonHumanAnimalState == NonHumanAnimalState.REHOMED) {
@@ -809,21 +809,20 @@ class CheckChatViewmodel(
             ),
             previousFosterHome = fosterHome,
             coroutineScope = viewModelScope
-        ) { isSuccess ->
+        ).first()
 
-            if (isSuccess) {
-                log.d(
-                    "CheckChatViewmodel",
-                    "modifyFosterHomeInLocalRepo: Successfully modified the foster home $fosterHomeId to modify the non human animals with state $nonHumanAnimalState in the local data source"
-                )
-                onSuccess()
-            } else {
-                log.e(
-                    "CheckChatViewmodel",
-                    "modifyFosterHomeInLocalRepo: Something went wrong modifying the foster home $fosterHomeId to modify the non human animals with state $nonHumanAnimalState in the local data source"
-                )
-                onError()
-            }
+        if (isSuccess) {
+            log.d(
+                "CheckChatViewmodel",
+                "modifyFosterHomeInLocalRepo: Successfully modified the foster home $fosterHomeId to modify the non human animals with state $nonHumanAnimalState in the local data source"
+            )
+            onSuccess()
+        } else {
+            log.e(
+                "CheckChatViewmodel",
+                "modifyFosterHomeInLocalRepo: Something went wrong modifying the foster home $fosterHomeId to modify the non human animals with state $nonHumanAnimalState in the local data source"
+            )
+            onError()
         }
     }
 
@@ -949,23 +948,22 @@ class CheckChatViewmodel(
             )
         }
 
-        modifyFosterHomeInLocalRepository(
+        val isUpdated = modifyFosterHomeInLocalRepository(
             updatedFosterHome = fosterHome.copy(allResidentNonHumanAnimals = allResidentNonHumanAnimals),
             previousFosterHome = fosterHome,
             coroutineScope = viewModelScope
-        ) { isUpdated ->
+        ).first()
 
-            if (isUpdated) {
-                log.d(
-                    "CheckChatViewmodel",
-                    "addFosterHomeResidentsInLocalRepo: Successfully added the non human animals in the foster home $fosterHomeId in the local data source"
-                )
-            } else {
-                log.e(
-                    "CheckChatViewmodel",
-                    "addFosterHomeResidentsInLocalRepo: Something went wrong adding the non human animals in the foster home $fosterHomeId in the local data source"
-                )
-            }
+        if (isUpdated) {
+            log.d(
+                "CheckChatViewmodel",
+                "addFosterHomeResidentsInLocalRepo: Successfully added the non human animals in the foster home $fosterHomeId in the local data source"
+            )
+        } else {
+            log.e(
+                "CheckChatViewmodel",
+                "addFosterHomeResidentsInLocalRepo: Something went wrong adding the non human animals in the foster home $fosterHomeId in the local data source"
+            )
         }
     }
 

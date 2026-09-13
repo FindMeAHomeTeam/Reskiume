@@ -92,6 +92,8 @@ fun ModifyFosterHomeScreen(
     var notificationPermissionState: ManagePermissionState by rememberSaveable {
         mutableStateOf(ManagePermissionState.CHECK_PERMISSION)
     }
+    var isPressedBack: Boolean by rememberSaveable { mutableStateOf(false) }
+
     val scrollState = rememberScrollState()
 
     RmScaffold(
@@ -274,7 +276,7 @@ fun ModifyFosterHomeScreen(
                     }
                 }
 
-                if (!isFosterHomeOwnerChatting) {
+                if (!isFosterHomeOwnerChatting && allAvailableNonHumanAnimals.isNotEmpty()) {
 
                     Spacer(modifier = Modifier.height(16.dp))
                     RmNonHumanAnimalListCreator(
@@ -335,7 +337,12 @@ fun ModifyFosterHomeScreen(
                 }
 
                 Spacer(modifier = Modifier.height(10.dp))
-                RmResultState(manageChangesUiState, onSuccess = { onBackPressed() })
+                RmResultState(manageChangesUiState, onSuccess = {
+                    if (!isPressedBack) {
+                        onBackPressed()
+                        isPressedBack = true
+                    }
+                })
                 Spacer(modifier = Modifier.height(10.dp))
 
                 Spacer(modifier = Modifier.weight(1f))

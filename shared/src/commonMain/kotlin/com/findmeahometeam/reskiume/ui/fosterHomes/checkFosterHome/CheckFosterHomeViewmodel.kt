@@ -27,6 +27,7 @@ import com.findmeahometeam.reskiume.ui.core.components.UiState
 import com.findmeahometeam.reskiume.ui.core.components.toUiState
 import com.findmeahometeam.reskiume.ui.core.navigation.CheckFosterHome
 import com.findmeahometeam.reskiume.ui.core.navigation.SaveStateHandleProvider
+import com.findmeahometeam.reskiume.ui.fosterHomes.modifyFosterHome.DeleteFosterHomeUtil
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalUtil
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckActivistUtil
 import com.findmeahometeam.reskiume.ui.profile.checkReviews.CheckReviewsUtil
@@ -61,6 +62,7 @@ class CheckFosterHomeViewmodel(
     private val insertChatInRemoteRepository: InsertChatInRemoteRepository,
     private val insertChatInLocalRepository: InsertChatInLocalRepository,
     private val insertCacheInLocalRepository: InsertCacheInLocalRepository,
+    private val deleteFosterHomeUtil: DeleteFosterHomeUtil,
     private val log: Log
 ) : ViewModel() {
 
@@ -188,7 +190,14 @@ class CheckFosterHomeViewmodel(
                 ).firstOrNull()
 
                 if (remoteFosterHome == null || !remoteFosterHome.available) {
-                    onChatFound("", 0)
+
+                    deleteLocalFosterHome(
+                        id = fosterHomeId,
+                        ownerId = ownerId,
+                        onComplete = {
+                            onChatFound("", 0)
+                        }
+                    )
                     return@launch
                 }
                 val chat = Chat(
@@ -235,6 +244,33 @@ class CheckFosterHomeViewmodel(
                 }
             }
         }
+    }
+
+    private fun deleteLocalFosterHome(
+        id: String,
+        ownerId: String,
+        onComplete: () -> Unit
+    ) {
+        deleteFosterHomeUtil.deleteFosterHome(
+            id = id,
+            ownerId = ownerId,
+            coroutineScope = viewModelScope,
+            deleteOnLocal = true,
+            deleteOnRemote = false,
+            onError = {
+                log.e(
+                    "CheckFosterHomeViewmodel",
+                    "deleteFosterHome: Error deleting the local foster home $id"
+                )
+            },
+            onComplete = {
+                log.d(
+                    "CheckFosterHomeViewmodel",
+                    "deleteFosterHome: Local foster home $id deleted"
+                )
+                onComplete()
+            }
+        )
     }
 
     @OptIn(ExperimentalTime::class)

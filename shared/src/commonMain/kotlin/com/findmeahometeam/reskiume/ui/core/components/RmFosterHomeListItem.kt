@@ -51,6 +51,7 @@ fun RmFosterHomeListItem(
     city: String,
     isEnabled: Boolean = true,
     containerColor: Color = backgroundColorForItems,
+    forceReloadImages: Boolean = false,
     onClick: () -> Unit
 ) {
     Card(
@@ -65,7 +66,10 @@ fun RmFosterHomeListItem(
             Box(
                 contentAlignment = Alignment.Center
             ) {
-                RmAvatar(RmListAvatarType.Image(imageUrl, 120.dp))
+                RmAvatar(
+                    listAvatarType = RmListAvatarType.Image(imageUrl, 120.dp),
+                    forceReload = forceReloadImages
+                )
                 if (!isEnabled) {
                     Box(
                         modifier = Modifier.wrapContentSize()

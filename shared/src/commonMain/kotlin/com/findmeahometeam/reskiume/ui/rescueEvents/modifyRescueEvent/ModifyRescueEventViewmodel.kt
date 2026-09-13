@@ -6,18 +6,14 @@ import com.findmeahometeam.reskiume.data.remote.response.DatabaseResult
 import com.findmeahometeam.reskiume.data.util.Section
 import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.LocalCache
-import com.findmeahometeam.reskiume.domain.model.NonHumanAnimal
-import com.findmeahometeam.reskiume.domain.model.NonHumanAnimalState
 import com.findmeahometeam.reskiume.domain.model.chat.Chat
 import com.findmeahometeam.reskiume.domain.model.rescueEvent.RescueEvent
 import com.findmeahometeam.reskiume.domain.usecases.chat.GetChatFromLocalRepository
-import com.findmeahometeam.reskiume.domain.usecases.chat.GetNonHumanAnimalInfoInLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.DeleteImageFromRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.GetImagePathForFileNameFromLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.image.UploadImageToRemoteDataSource
 import com.findmeahometeam.reskiume.domain.usecases.localCache.ModifyCacheInLocalRepository
-import com.findmeahometeam.reskiume.domain.usecases.nonHumanAnimal.GetAllNonHumanAnimalsFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetRescueEventFromLocalRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.GetRescueEventFromRemoteRepository
 import com.findmeahometeam.reskiume.domain.usecases.rescueEvent.ModifyRescueEventInLocalRepository
@@ -44,8 +40,6 @@ class ModifyRescueEventViewmodel(
     private val getRescueEventFromLocalRepository: GetRescueEventFromLocalRepository,
     private val getImagePathForFileNameFromLocalDataSource: GetImagePathForFileNameFromLocalDataSource,
     private val checkNonHumanAnimalUtil: CheckNonHumanAnimalUtil,
-    getAllNonHumanAnimalsFromLocalRepository: GetAllNonHumanAnimalsFromLocalRepository,
-    private val getNonHumanAnimalInfoInLocalRepository: GetNonHumanAnimalInfoInLocalRepository,
     private val getRescueEventFromRemoteRepository: GetRescueEventFromRemoteRepository,
     private val deleteImageFromRemoteDataSource: DeleteImageFromRemoteDataSource,
     private val deleteImageFromLocalDataSource: DeleteImageFromLocalDataSource,
@@ -84,19 +78,6 @@ class ModifyRescueEventViewmodel(
                 )
             }
         }.toUiState()
-
-    val allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow: Flow<List<NonHumanAnimal>> =
-        getAllNonHumanAnimalsFromLocalRepository().map {
-            it.mapNotNull { nonHumanAnimal ->
-                if (nonHumanAnimal.nonHumanAnimalState == NonHumanAnimalState.NEEDS_TO_BE_REHOMED
-                    && getNonHumanAnimalInfoInLocalRepository(nonHumanAnimal.id).firstOrNull() == null
-                ) {
-                    nonHumanAnimal
-                } else {
-                    null
-                }
-            }
-        }
 
     private val _manageChangesUiState: MutableStateFlow<UiState<Unit>> =
         MutableStateFlow(UiState.Idle())
@@ -394,23 +375,6 @@ class ModifyRescueEventViewmodel(
                     "deleteLocalImage: failed to delete the image $uriToDelete in the local data source"
                 )
             }
-        }
-    }
-
-    fun isUserChattingWithAnyOfTheseNonHumanAnimal(
-        nonHumanAnimalIds: List<String>,
-        onComplete: (Boolean) -> Unit,
-    ) {
-        viewModelScope.launch {
-
-            var isChatting = false
-            nonHumanAnimalIds.forEach {
-
-                if (!isChatting) {
-                    isChatting = getNonHumanAnimalInfoInLocalRepository(it).firstOrNull() != null
-                }
-            }
-            onComplete(isChatting)
         }
     }
 }

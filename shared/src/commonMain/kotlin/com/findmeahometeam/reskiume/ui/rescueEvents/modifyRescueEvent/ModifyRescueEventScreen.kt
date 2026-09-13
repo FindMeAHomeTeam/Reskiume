@@ -39,7 +39,6 @@ import com.findmeahometeam.reskiume.ui.core.components.RmAddPhoto
 import com.findmeahometeam.reskiume.ui.core.components.RmButton
 import com.findmeahometeam.reskiume.ui.core.components.RmManageNotificationPermission
 import com.findmeahometeam.reskiume.ui.core.components.RmNeedToCoverListCreator
-import com.findmeahometeam.reskiume.ui.core.components.RmNonHumanAnimalListCreator
 import com.findmeahometeam.reskiume.ui.core.components.RmResultState
 import com.findmeahometeam.reskiume.ui.core.components.RmScaffold
 import com.findmeahometeam.reskiume.ui.core.components.RmText
@@ -56,7 +55,6 @@ import reskiume.shared.generated.resources.modify_rescue_event_screen_rescue_eve
 import reskiume.shared.generated.resources.modify_rescue_event_screen_rescue_event_title
 import reskiume.shared.generated.resources.modify_rescue_event_screen_save_rescue_event_changes_button
 import reskiume.shared.generated.resources.modify_rescue_event_screen_title
-import reskiume.shared.generated.resources.non_human_animal_list_creator_save_title
 
 @Composable
 fun ModifyRescueEventScreen(
@@ -68,9 +66,6 @@ fun ModifyRescueEventScreen(
 
     val uiRescueEventState: UiState<UiRescueEvent> by modifyRescueEventViewmodel.rescueEventFlow.collectAsState(
         initial = UiState.Loading()
-    )
-    val allAvailableNonHumanAnimals: List<NonHumanAnimal> by modifyRescueEventViewmodel.allAvailableNonHumanAnimalsWhoNeedToBeRehomedFlow.collectAsState(
-        initial = emptyList()
     )
     val manageChangesUiState: UiState<Unit> by modifyRescueEventViewmodel.manageChangesUiState.collectAsState()
 
@@ -137,7 +132,6 @@ fun ModifyRescueEventScreen(
                         uiRescueEvent.allUiNonHumanAnimalsToRescue
                     )
                 }
-                var isRescueEventCreatorChatting: Boolean by rememberSaveable { mutableStateOf(false) }
 
                 val isUpdateRescueEventButtonEnabled by remember(
                     title,
@@ -213,25 +207,6 @@ fun ModifyRescueEventScreen(
                     allNeedsToCover = it
                 }
 
-                LaunchedEffect(Unit) {
-                    modifyRescueEventViewmodel.isUserChattingWithAnyOfTheseNonHumanAnimal(
-                        nonHumanAnimalIds = uiRescueEvent.allUiNonHumanAnimalsToRescue.map { it.id }
-                    ) {
-                        isRescueEventCreatorChatting = it
-                    }
-                }
-
-                if (!isRescueEventCreatorChatting) {
-
-                    Spacer(modifier = Modifier.height(16.dp))
-                    RmNonHumanAnimalListCreator(
-                        title = stringResource(Res.string.non_human_animal_list_creator_save_title),
-                        allAvailableNonHumanAnimals = allAvailableNonHumanAnimals,
-                        allSelectedNonHumanAnimals = allUiNonHumanAnimalsToRescue
-                    ) {
-                        allUiNonHumanAnimalsToRescue = it
-                    }
-                }
                 Spacer(modifier = Modifier.height(16.dp))
                 RmTextLink(
                     text = stringResource(

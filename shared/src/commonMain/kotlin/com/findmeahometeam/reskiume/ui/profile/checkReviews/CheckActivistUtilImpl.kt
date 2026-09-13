@@ -11,6 +11,7 @@ import com.findmeahometeam.reskiume.domain.usecases.user.GetUserFromRemoteDataSo
 import com.findmeahometeam.reskiume.domain.usecases.user.InsertUserInLocalDataSource
 import com.findmeahometeam.reskiume.domain.usecases.user.ModifyUserInLocalDataSource
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 
@@ -88,19 +89,17 @@ class CheckActivistUtilImpl(
 
     private suspend fun insertUserInLocalRepository(user: User) {
 
-        insertUserInLocalDataSource(user) { isSuccess ->
-
-            if (isSuccess) {
-                log.d(
-                    "CheckActivistUtil",
-                    "insertUserInLocalRepository: User ${user.uid} added to local database"
-                )
-            } else {
-                log.e(
-                    "CheckActivistUtil",
-                    "insertUserInLocalRepository: Error adding user ${user.uid} to local database"
-                )
-            }
+        val isSuccess = insertUserInLocalDataSource(user).first()
+        if (isSuccess) {
+            log.d(
+                "CheckActivistUtil",
+                "insertUserInLocalRepository: User ${user.uid} added to local database"
+            )
+        } else {
+            log.e(
+                "CheckActivistUtil",
+                "insertUserInLocalRepository: Error adding user ${user.uid} to local database"
+            )
         }
     }
 
@@ -134,19 +133,17 @@ class CheckActivistUtilImpl(
 
     private suspend fun modifyUserInLocalRepository(user: User) {
 
-        modifyUserInLocalDataSource(user) { isUpdated: Boolean ->
-
-            if (isUpdated) {
-                log.d(
-                    "CheckActivistUtil",
-                    "modifyUserInLocalRepository: Modified user with uid ${user.uid} into local data source."
-                )
-            } else {
-                log.e(
-                    "CheckActivistUtil",
-                    "modifyUserInLocalRepository: Failed to modify user with uid ${user.uid} in local data source."
-                )
-            }
+        val isUpdated = modifyUserInLocalDataSource(user).first()
+        if (isUpdated) {
+            log.d(
+                "CheckActivistUtil",
+                "modifyUserInLocalRepository: Modified user with uid ${user.uid} into local data source."
+            )
+        } else {
+            log.e(
+                "CheckActivistUtil",
+                "modifyUserInLocalRepository: Failed to modify user with uid ${user.uid} in local data source."
+            )
         }
     }
 }

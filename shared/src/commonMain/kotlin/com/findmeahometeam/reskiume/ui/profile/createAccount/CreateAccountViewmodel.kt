@@ -22,6 +22,7 @@ import com.findmeahometeam.reskiume.ui.core.components.UiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -278,20 +279,20 @@ class CreateAccountViewmodel(
         onError: () -> Unit
     ) {
         viewModelScope.launch {
-            insertUserInLocalDataSource(user) { isSuccess ->
-                if (isSuccess) {
-                    log.d(
-                        "CreateAccountViewmodel",
-                        "insertUserInLocalRepo: User ${user.uid} created successfully in the local repository"
-                    )
-                    onSuccess()
-                } else {
-                    log.e(
-                        "CreateAccountViewmodel",
-                        "insertUserInLocalRepo: failed to create the user ${user.uid} in the local repository"
-                    )
-                    onError()
-                }
+
+            val isSuccess = insertUserInLocalDataSource(user).first()
+            if (isSuccess) {
+                log.d(
+                    "CreateAccountViewmodel",
+                    "insertUserInLocalRepo: User ${user.uid} created successfully in the local repository"
+                )
+                onSuccess()
+            } else {
+                log.e(
+                    "CreateAccountViewmodel",
+                    "insertUserInLocalRepo: failed to create the user ${user.uid} in the local repository"
+                )
+                onError()
             }
         }
     }

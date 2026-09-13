@@ -367,24 +367,23 @@ class ModifyAccountViewmodel(
 
     private fun saveUserChangesInLocalDataSource(
         user: User,
-        onSuccess: () -> Unit
+        onSuccess: suspend () -> Unit
     ) {
         viewModelScope.launch {
 
-            modifyUserInLocalDataSource(user) { isUpdated ->
-                if (isUpdated) {
-                    log.d(
-                        "ModifyAccountViewmodel",
-                        "saveUserChangesInLocalDataSource: User ${user.uid} updated successfully in the local data source"
-                    )
-                    onSuccess()
-                } else {
-                    log.e(
-                        "ModifyAccountViewmodel",
-                        "saveUserChangesInLocalDataSource: failed to update user ${user.uid} in the local data source"
-                    )
-                    _uiState.value = UiState.Error()
-                }
+            val isUpdated = modifyUserInLocalDataSource(user).first()
+            if (isUpdated) {
+                log.d(
+                    "ModifyAccountViewmodel",
+                    "saveUserChangesInLocalDataSource: User ${user.uid} updated successfully in the local data source"
+                )
+                onSuccess()
+            } else {
+                log.e(
+                    "ModifyAccountViewmodel",
+                    "saveUserChangesInLocalDataSource: failed to update user ${user.uid} in the local data source"
+                )
+                _uiState.value = UiState.Error()
             }
         }
     }
@@ -395,11 +394,8 @@ class ModifyAccountViewmodel(
 
             saveUserChangesInLocalDataSource(user.copy(isLoggedIn = false)) {
 
-                viewModelScope.launch {
-
-                    subscriptionManagerUtil.unsubscribeFromAllTopicsAfterLogOut(user)
-                    signOutFromAuthDataSource()
-                }
+                subscriptionManagerUtil.unsubscribeFromAllTopicsAfterLogOut(user)
+                signOutFromAuthDataSource()
             }
         }
     }

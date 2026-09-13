@@ -6,16 +6,17 @@ import com.findmeahometeam.reskiume.data.database.entity.user.UserWithAllSubscri
 import kotlinx.coroutines.flow.Flow
 
 interface LocalUserRepository {
-    suspend fun insertUser(user: UserEntity, onInsertUser: suspend (rowId: Long) -> Unit)
+    suspend fun upsertUser(
+        user: UserEntity,
+        subscriptions: List<SubscriptionEntityForUser>
+    ): Flow<Boolean>
+
+    suspend fun deleteUsers(userUid: String, onDeletedUser: (rowsDeleted: Int) -> Unit)
 
     suspend fun insertSubscription(
         subscriptionEntityForUser: SubscriptionEntityForUser,
         onInsertSubscription: suspend (rowId: Long) -> Unit
     )
-
-    suspend fun modifyUser(user: UserEntity, onModifyUser: suspend (rowsUpdated: Int) -> Unit)
-
-    suspend fun deleteUsers(userUid: String, onDeletedUser: (rowsDeleted: Int) -> Unit)
 
     suspend fun deleteSubscription(
         subscriptionId: String,

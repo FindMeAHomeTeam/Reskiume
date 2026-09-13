@@ -5,16 +5,29 @@ import com.findmeahometeam.reskiume.data.database.entity.user.UserEntity
 import com.findmeahometeam.reskiume.data.database.entity.user.UserWithAllSubscriptionData
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
 
 class LocalUserRepositoryImpl(
     private val reskiumeDatabase: ReskiumeDatabase
 ) : LocalUserRepository {
 
-    override suspend fun insertUser(
+    override suspend fun upsertUser(
         user: UserEntity,
-        onInsertUser: suspend (rowId: Long) -> Unit
-    ) {
-        onInsertUser(reskiumeDatabase.getUserDao().insertUser(user))
+        subscriptions: List<SubscriptionEntityForUser>
+    ): Flow<Boolean> = flow {
+
+        reskiumeDatabase.getUserDao().upsertUser(
+            user,
+            subscriptions
+        )
+        emit(true)
+    }.catch {
+        emit(false)
+    }
+
+    override suspend fun deleteUsers(userUid: String, onDeletedUser: (Int) -> Unit) {
+        onDeletedUser(reskiumeDatabase.getUserDao().deleteUsers(userUid))
     }
 
     override suspend fun insertSubscription(
@@ -22,17 +35,6 @@ class LocalUserRepositoryImpl(
         onInsertSubscription: suspend (rowId: Long) -> Unit
     ) {
         onInsertSubscription(reskiumeDatabase.getUserDao().insertSubscription(subscriptionEntityForUser))
-    }
-
-    override suspend fun modifyUser(
-        user: UserEntity,
-        onModifyUser: suspend (rowsUpdated: Int) -> Unit
-    ) {
-        onModifyUser(reskiumeDatabase.getUserDao().modifyUser(user))
-    }
-
-    override suspend fun deleteUsers(userUid: String, onDeletedUser: (Int) -> Unit) {
-        onDeletedUser(reskiumeDatabase.getUserDao().deleteUsers(userUid))
     }
 
     override suspend fun deleteSubscription(

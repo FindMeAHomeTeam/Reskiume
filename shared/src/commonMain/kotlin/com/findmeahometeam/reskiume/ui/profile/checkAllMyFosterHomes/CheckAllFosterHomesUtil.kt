@@ -2,13 +2,13 @@ package com.findmeahometeam.reskiume.ui.profile.checkAllMyFosterHomes
 
 import com.findmeahometeam.reskiume.domain.model.fosterHome.FosterHome
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
 
-interface CheckAllMyFosterHomesUtil {
+interface CheckAllFosterHomesUtil {
 
-    fun downloadImageAndManageFosterHomesInLocalRepositoryFromFlow(
-        allFosterHomesFlow: Flow<List<FosterHome>>,
+    suspend fun updateLocalRepositoryWithRemoteFosterHomes(
+        allRemoteFosterHomes: Set<FosterHome>,
+        allLocalFosterHomes: Set<FosterHome>,
         myUid: String,
         coroutineScope: CoroutineScope
-    ): Flow<List<FosterHome>>
+    )
 }

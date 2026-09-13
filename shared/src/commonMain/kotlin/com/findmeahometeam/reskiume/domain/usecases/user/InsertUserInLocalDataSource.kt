@@ -6,8 +6,10 @@ import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.util.fcm.FCMSubscriberRepository
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flow
 
 class InsertUserInLocalDataSource(
     private val authRepository: AuthRepository,
@@ -16,70 +18,46 @@ class InsertUserInLocalDataSource(
     private val fCMSubscriberRepository: FCMSubscriberRepository,
     private val log: Log
 ) {
-    suspend operator fun invoke(
-        user: User,
-        onInsertUser: (isSuccess: Boolean) -> Unit
-    ) {
+    operator fun invoke(user: User): Flow<Boolean> = flow {
+
         val myUid = getMyUid()
         val imageFileName = manageImagePath.getFileNameFromLocalImagePath(user.image)
 
-        localUserRepository.insertUser(
-            user.copy(
+        var isSuccess = localUserRepository.upsertUser(
+            user = user.copy(
                 savedBy = myUid,
                 image = imageFileName
             ).toEntity(),
-            onInsertUser = { rowId ->
-                if (rowId > 0) {
-
-                    if (user.uid != myUid || user.subscriptions.isEmpty()) {
-                        onInsertUser(true)
-                    } else {
-                        insertAllSubscriptions(user) { isSuccess ->
-
-                            onInsertUser(isSuccess)
-                        }
-                    }
-                } else {
-                    onInsertUser(false)
-                }
+            subscriptions = if (user.uid == myUid && user.subscriptions.isNotEmpty()) {
+                user.subscriptions.map { it.toEntity() }
+            } else {
+                emptyList()
             }
-        )
+        ).first()
+
+        if (isSuccess) {
+
+            if (user.uid == myUid && user.subscriptions.isNotEmpty()) {
+                isSuccess = subscribeToAllTopics(user)
+            }
+            emit(isSuccess)
+        } else {
+            log.e(
+                "InsertUserInLocalDataSource",
+                "invoke: failed to insert the user ${user.uid} in the local data source"
+            )
+            emit(false)
+        }
     }
 
     private suspend fun getMyUid(): String = authRepository.authState.firstOrNull()?.uid ?: ""
 
-    private suspend fun insertAllSubscriptions(
-        user: User,
-        onComplete: (isSuccess: Boolean) -> Unit
-    ) {
-        user.subscriptions.forEachIndexed { index, subscription ->
+    private suspend fun subscribeToAllTopics(user: User): Boolean {
+        var isSuccess = false
+        user.subscriptions.forEach { subscription ->
 
-            val isSubscribed = fCMSubscriberRepository.subscribeToTopic(subscription.topic).first()
-            if (isSubscribed) {
-
-                localUserRepository.insertSubscription(
-                    subscription.toEntity(),
-                    onInsertSubscription = { rowId ->
-                        if (rowId > 0) {
-                            log.d(
-                                "InsertUserInLocalDataSource",
-                                "insertAllSubscriptions: inserted the subscription id ${subscription.subscriptionId} for the user ${subscription.uid} in the local data source"
-                            )
-                            if (user.subscriptions.size == index + 1) {
-                                onComplete(true)
-                            }
-                        } else {
-                            log.e(
-                                "InsertUserInLocalDataSource",
-                                "insertAllSubscriptions: failed to insert the subscription id ${subscription.subscriptionId} for the user ${subscription.uid} in the local data source"
-                            )
-                            onComplete(false)
-                        }
-                    }
-                )
-            } else {
-                onComplete(false)
-            }
+            isSuccess = fCMSubscriberRepository.subscribeToTopic(subscription.topic).first()
         }
+        return isSuccess
     }
 }

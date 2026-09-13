@@ -82,7 +82,8 @@ class CreateFosterHomeViewmodel(
 
     val userState: Flow<User?> = observeAuthStateInAuthDataSource().map { authUser ->
 
-        val user = if (authUser != null) getUserFromLocalDataSource(authUser.uid).firstOrNull() else null
+        val user =
+            if (authUser != null) getUserFromLocalDataSource(authUser.uid).firstOrNull() else null
         if (user == null || !user.isLoggedIn) {
             null
         } else {
@@ -236,24 +237,23 @@ class CreateFosterHomeViewmodel(
     ) {
         viewModelScope.launch {
 
-            insertFosterHomeInLocalRepository(
+            val isSuccess = insertFosterHomeInLocalRepository(
                 updatedFosterHome,
                 viewModelScope
-            ) { isUpdated: Boolean ->
+            ).first()
 
-                if (isUpdated) {
-                    log.d(
-                        "CreateFosterHomeViewmodel",
-                        "createFosterHomeInLocalDataSource: foster home ${updatedFosterHome.id} created successfully in the local data source"
-                    )
-                    onSuccess()
-                } else {
-                    log.e(
-                        "CreateFosterHomeViewmodel",
-                        "createFosterHomeInLocalDataSource: failed to create the foster home ${updatedFosterHome.id} in the local data source"
-                    )
-                    _saveChangesUiState.value = UiState.Error()
-                }
+            if (isSuccess) {
+                log.d(
+                    "CreateFosterHomeViewmodel",
+                    "createFosterHomeInLocalDataSource: foster home ${updatedFosterHome.id} created successfully in the local data source"
+                )
+                onSuccess()
+            } else {
+                log.e(
+                    "CreateFosterHomeViewmodel",
+                    "createFosterHomeInLocalDataSource: failed to create the foster home ${updatedFosterHome.id} in the local data source"
+                )
+                _saveChangesUiState.value = UiState.Error()
             }
         }
     }

@@ -227,7 +227,7 @@
     <string name="dialog_no_email_app_dialog_ok_button">Ok</string>
 
     <!-- Check all foster homes -->
-    <string name="check_all_foster_homes_screen_title">Search foster homes by</string>
+    <string name="check_all_foster_homes_screen_title">Search foster homes %1$s</string>
     <string name="check_all_foster_homes_screen_place_search_option">🌐 place</string>
     <string name="check_all_foster_homes_screen_location_search_option">📍 location</string>
     <string name="check_all_foster_homes_screen_non_human_animal_type_label">🐷🐱 Non-human animal type</string>
@@ -266,8 +266,8 @@
     <string name="modify_foster_home_screen_available_label">Available</string>
     <string name="modify_foster_home_screen_unavailable_label">Not available</string>
     <string name="modify_foster_home_availability_description">Update this foster home's availability to receive rehome requests</string>
-    <string name="modify_foster_home_screen_foster_home_started_title">This foster home has started</string>
-    <string name="modify_foster_home_screen_foster_home_started_message">Please finish its chat first before deleting the foster home</string>
+    <string name="modify_foster_home_screen_foster_home_started_title">This foster home has started a chat</string>
+    <string name="modify_foster_home_screen_foster_home_started_message">Please finish the chat first before deleting the foster home</string>
     <string name="modify_foster_home_screen_foster_home_started_ok_button">Ok</string>
 
     <!-- Create a foster home -->
@@ -396,7 +396,7 @@
     <string name="modify_rescue_event_screen_delete_suggestion_button">finish the chat</string>
 
     <!-- Check all rescue events -->
-    <string name="check_all_rescue_events_screen_title">Search rescue events by</string>
+    <string name="check_all_rescue_events_screen_title">Search rescue events %1$s</string>
     <string name="check_all_rescue_events_screen_search_rescue_events_button">🔎 Search rescue events %1$s</string>
     <string name="check_all_rescue_events_screen_search_by_place">by place</string>
     <string name="check_all_rescue_events_screen_search_by_location">by location</string>

@@ -227,7 +227,7 @@
     <string name="dialog_no_email_app_dialog_ok_button">Ok</string>
 
     <!-- Check all foster homes -->
-    <string name="check_all_foster_homes_screen_title">Buscar casas de acogida por</string>
+    <string name="check_all_foster_homes_screen_title">Buscar casas de acogida %1$d</string>
     <string name="check_all_foster_homes_screen_place_search_option">🌐 lugar</string>
     <string name="check_all_foster_homes_screen_location_search_option">📍 ubicación</string>
     <string name="check_all_foster_homes_screen_non_human_animal_type_label">🐷🐱 Tipo de animal no humano</string>
@@ -266,8 +266,8 @@
     <string name="modify_foster_home_screen_available_label">Disponible</string>
     <string name="modify_foster_home_screen_unavailable_label">No disponible</string>
     <string name="modify_foster_home_availability_description">Actualiza la disponibilidad de esta casa de acogida para recibir solicitudes de reubicación</string>
-    <string name="modify_foster_home_screen_foster_home_started_title">Esta casa de acogida ya ha empezado</string>
-    <string name="modify_foster_home_screen_foster_home_started_message">Por favor, termina primero su chat antes de eliminar la casa de acogida</string>
+    <string name="modify_foster_home_screen_foster_home_started_title">Esta casa de acogida ya ha empezado una conversación</string>
+    <string name="modify_foster_home_screen_foster_home_started_message">Por favor, termina primero la conversación antes de eliminar la casa de acogida</string>
     <string name="modify_foster_home_screen_foster_home_started_ok_button">Ok</string>
 
     <!-- Create a foster home -->
@@ -396,7 +396,7 @@
     <string name="modify_rescue_event_screen_delete_suggestion_button">finaliza el chat</string>
 
     <!-- Check all rescue events -->
-    <string name="check_all_rescue_events_screen_title">Buscar eventos de rescate por</string>
+    <string name="check_all_rescue_events_screen_title">Buscar eventos de rescate %1$s</string>
     <string name="check_all_rescue_events_screen_search_rescue_events_button">🔎 Buscar eventos de rescate %1$s</string>
     <string name="check_all_rescue_events_screen_search_by_place">por lugar</string>
     <string name="check_all_rescue_events_screen_search_by_location">por ubicación</string>

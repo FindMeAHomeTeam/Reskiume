@@ -1,48 +1,46 @@
 package com.findmeahometeam.reskiume.domain.usecases.user
 
-import com.findmeahometeam.reskiume.data.util.log.Log
 import com.findmeahometeam.reskiume.domain.model.user.Subscription
 import com.findmeahometeam.reskiume.domain.model.user.User
 import com.findmeahometeam.reskiume.domain.repository.local.LocalUserRepository
 import com.findmeahometeam.reskiume.domain.repository.remote.auth.AuthRepository
 import com.findmeahometeam.reskiume.domain.repository.util.fcm.FCMSubscriberRepository
 import com.findmeahometeam.reskiume.ui.util.ManageImagePath
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flow
 
 class ModifyUserInLocalDataSource(
     private val manageImagePath: ManageImagePath,
     private val fCMSubscriberRepository: FCMSubscriberRepository,
     private val localUserRepository: LocalUserRepository,
-    private val authRepository: AuthRepository,
-    private val log: Log
+    private val authRepository: AuthRepository
 ) {
-    suspend operator fun invoke(
-        updatedUser: User,
-        onModifyUser: (isUpdated: Boolean) -> Unit
-    ) {
+    operator fun invoke(updatedUser: User): Flow<Boolean> = flow {
+
         val myUid = getMyUid()
         val imageFileName = manageImagePath.getFileNameFromLocalImagePath(updatedUser.image)
 
-        localUserRepository.modifyUser(
+        var isSuccess = localUserRepository.upsertUser(
             updatedUser.copy(
                 savedBy = myUid,
                 image = imageFileName
             ).toEntity(),
-            onModifyUser = { rowsUpdated ->
-                if (rowsUpdated > 0) {
-
-                    if (updatedUser.uid != myUid) {
-                        onModifyUser(true)
-                    } else {
-                        val isSuccess = manageAllSubscriptions(updatedUser)
-                        onModifyUser(isSuccess)
-                    }
-                } else {
-                    onModifyUser(false)
-                }
+            subscriptions = if (updatedUser.uid == myUid && updatedUser.subscriptions.isNotEmpty()) {
+                updatedUser.subscriptions.map { it.toEntity() }
+            } else {
+                emptyList()
             }
-        )
+        ).first()
+
+        if (isSuccess) {
+
+            if (updatedUser.uid == myUid) {
+                isSuccess = manageAllSubscriptions(updatedUser)
+            }
+            emit(isSuccess)
+        }
     }
 
     private suspend fun manageAllSubscriptions(updatedUser: User): Boolean {
@@ -70,30 +68,8 @@ class ModifyUserInLocalDataSource(
                             it.subscriptionId == subscriptionToManage.subscriptionId
                         }.toEntity()
 
-                    val isSubscribed =
+                    isSuccess =
                         fCMSubscriberRepository.subscribeToTopic(subscriptionEntity.topic).first()
-                    if (isSubscribed) {
-
-                        localUserRepository.insertSubscription(
-                            subscriptionEntity,
-                            onInsertSubscription = { rowId ->
-                                if (rowId > 0) {
-                                    log.d(
-                                        "ModifyUserInLocalDataSource",
-                                        "manageAllSubscriptions: inserted the subscription id ${subscriptionEntity.subscriptionId} for the user ${subscriptionEntity.uid} in the local data source"
-                                    )
-                                } else {
-                                    log.e(
-                                        "ModifyUserInLocalDataSource",
-                                        "manageAllSubscriptions: failed to insert the subscription id ${subscriptionEntity.subscriptionId} for the user ${subscriptionEntity.uid} in the local data source"
-                                    )
-                                    isSuccess = false
-                                }
-                            }
-                        )
-                    } else {
-                        isSuccess = false
-                    }
                 } else {
 
                     val subscriptionEntity =
@@ -101,31 +77,9 @@ class ModifyUserInLocalDataSource(
                             it.subscriptionId == subscriptionToManage.subscriptionId
                         }
 
-                    val isUnsubscribed =
+                    isSuccess =
                         fCMSubscriberRepository.unsubscribeFromTopic(subscriptionEntity.topic)
                             .first()
-                    if (isUnsubscribed) {
-
-                        localUserRepository.deleteSubscription(
-                            subscriptionEntity.subscriptionId,
-                            onDeletedSubscription = { rowsDeleted ->
-                                if (rowsDeleted > 0) {
-                                    log.d(
-                                        "ModifyUserInLocalDataSource",
-                                        "manageAllSubscriptions: deleted the subscription id ${subscriptionEntity.subscriptionId} for the user ${subscriptionEntity.uid} in the local data source"
-                                    )
-                                } else {
-                                    log.e(
-                                        "ModifyUserInLocalDataSource",
-                                        "manageAllSubscriptions: failed to delete the subscription id ${subscriptionEntity.subscriptionId} for the user ${subscriptionEntity.uid} in the local data source"
-                                    )
-                                    isSuccess = false
-                                }
-                            }
-                        )
-                    } else {
-                        isSuccess = false
-                    }
                 }
             }
         }

@@ -102,7 +102,7 @@ fun CheckAllRescueEventsScreen(
         )
     }
     val uiRescueEventListState: UiState<List<UiRescueEvent>> by checkAllRescueEventsViewmodel.allRescueEventsState.collectAsStateWithLifecycle()
-    var shouldForceReloadAllImages: MutableList<Boolean> by rememberSaveable { mutableStateOf(emptyList<Boolean>().toMutableList()) }
+    var shouldForceReloadAllImages: MutableList<Boolean> by rememberSaveable { mutableStateOf(mutableListOf()) }
 
     val isSearchButtonEnabled: Boolean by remember(
         selectedCountry,
@@ -126,7 +126,14 @@ fun CheckAllRescueEventsScreen(
     val lazyListState = remember { LazyListState() }
 
     RmScaffold(
-        title = stringResource(Res.string.check_all_rescue_events_screen_title),
+        title = stringResource(
+            Res.string.check_all_rescue_events_screen_title,
+            if (searchOption == SearchOption.COUNTRY_CITY) {
+                stringResource(Res.string.check_all_rescue_events_screen_search_by_place)
+            } else {
+                stringResource(Res.string.check_all_rescue_events_screen_search_by_location)
+            }
+        ),
         floatingActionButton = {
             DisplayExtendedFloatingActionButtonToCreateRescueEventIfLoggedIn(
                 user?.uid,

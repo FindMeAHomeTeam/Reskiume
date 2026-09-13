@@ -18,11 +18,11 @@ import com.findmeahometeam.reskiume.ui.fosterHomes.modifyFosterHome.ModifyFoster
 import com.findmeahometeam.reskiume.ui.home.HomeViewmodel
 import com.findmeahometeam.reskiume.ui.profile.ProfileViewmodel
 import com.findmeahometeam.reskiume.ui.profile.checkAllAdvice.CheckAllAdviceViewmodel
-import com.findmeahometeam.reskiume.ui.profile.checkAllMyFosterHomes.CheckAllMyFosterHomesUtil
-import com.findmeahometeam.reskiume.ui.profile.checkAllMyFosterHomes.CheckAllMyFosterHomesUtilImpl
+import com.findmeahometeam.reskiume.ui.profile.checkAllMyFosterHomes.CheckAllFosterHomesUtil
+import com.findmeahometeam.reskiume.ui.profile.checkAllMyFosterHomes.CheckAllFosterHomesUtilImpl
 import com.findmeahometeam.reskiume.ui.profile.checkAllMyFosterHomes.CheckAllMyFosterHomesViewmodel
-import com.findmeahometeam.reskiume.ui.profile.checkAllMyRescueEvents.CheckAllMyRescueEventsUtil
-import com.findmeahometeam.reskiume.ui.profile.checkAllMyRescueEvents.CheckAllMyRescueEventsUtilImpl
+import com.findmeahometeam.reskiume.ui.profile.checkAllMyRescueEvents.CheckAllRescueEventsUtil
+import com.findmeahometeam.reskiume.ui.profile.checkAllMyRescueEvents.CheckAllRescueEventsUtilImpl
 import com.findmeahometeam.reskiume.ui.profile.checkAllMyRescueEvents.CheckAllMyRescueEventsViewmodel
 import com.findmeahometeam.reskiume.ui.profile.checkMyAllNonHumanAnimals.CheckAllMyNonHumanAnimalsViewmodel
 import com.findmeahometeam.reskiume.ui.profile.checkNonHumanAnimal.CheckNonHumanAnimalViewmodel
@@ -114,7 +114,7 @@ val uiModule = module {
     viewModelOf(::CheckAllAdviceViewmodel)
     viewModelOf(::CheckAllFosterHomesViewmodel)
     viewModelOf(::CheckAllMyFosterHomesViewmodel)
-    singleOf(::CheckAllMyFosterHomesUtilImpl) bind CheckAllMyFosterHomesUtil::class
+    singleOf(::CheckAllFosterHomesUtilImpl) bind CheckAllFosterHomesUtil::class
     viewModelOf(::ModifyFosterHomeViewmodel)
     singleOf(::DeleteFosterHomeUtilImpl) bind DeleteFosterHomeUtil::class
     singleOf(::PlaceUtil)
@@ -122,7 +122,7 @@ val uiModule = module {
     viewModelOf(::CheckFosterHomeViewmodel)
     singleOf(::CheckFosterHomeUtilImpl) bind CheckFosterHomeUtil::class
     viewModelOf(::CheckAllMyRescueEventsViewmodel)
-    singleOf(::CheckAllMyRescueEventsUtilImpl) bind CheckAllMyRescueEventsUtil::class
+    singleOf(::CheckAllRescueEventsUtilImpl) bind CheckAllRescueEventsUtil::class
     viewModelOf(::CreateRescueEventViewmodel)
     viewModelOf(::ModifyRescueEventViewmodel)
     singleOf(::DeleteRescueEventUtilImpl) bind DeleteRescueEventUtil::class

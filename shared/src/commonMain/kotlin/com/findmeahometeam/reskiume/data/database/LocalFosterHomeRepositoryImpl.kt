@@ -6,44 +6,28 @@ import com.findmeahometeam.reskiume.data.database.entity.fosterHome.FosterHomeWi
 import com.findmeahometeam.reskiume.data.database.entity.fosterHome.ResidentNonHumanAnimalIdEntityForFosterHome
 import com.findmeahometeam.reskiume.domain.repository.local.LocalFosterHomeRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
 
 class LocalFosterHomeRepositoryImpl(
     private val reskiumeDatabase: ReskiumeDatabase
 ) : LocalFosterHomeRepository {
 
-    override suspend fun insertFosterHome(
+    override suspend fun upsertAllFosterHomeData(
         fosterHomeEntity: FosterHomeEntity,
-        onInsertFosterHome: suspend (rowId: Long) -> Unit
-    ) {
-        onInsertFosterHome(reskiumeDatabase.getFosterHomeDao().insertFosterHome(fosterHomeEntity))
-    }
-
-    override suspend fun insertAcceptedNonHumanAnimalForFosterHome(
-        acceptedNonHumanAnimalEntityForFosterHome: AcceptedNonHumanAnimalEntityForFosterHome,
-        onInsertAcceptedNonHumanAnimalType: (rowId: Long) -> Unit
-    ) {
-        onInsertAcceptedNonHumanAnimalType(
-            reskiumeDatabase.getFosterHomeDao()
-                .insertAcceptedNonHumanAnimalForFosterHome(acceptedNonHumanAnimalEntityForFosterHome)
-        )
-    }
-
-    override suspend fun insertResidentNonHumanAnimalIdForFosterHome(
-        residentNonHumanAnimalIdEntityForFosterHome: ResidentNonHumanAnimalIdEntityForFosterHome,
-        onInsertResidentNonHumanAnimalId: (rowId: Long) -> Unit
-    ) {
-        onInsertResidentNonHumanAnimalId(
-            reskiumeDatabase.getFosterHomeDao()
-                .insertResidentNonHumanAnimalIdForFosterHome(residentNonHumanAnimalIdEntityForFosterHome)
-        )
-    }
-
-    override suspend fun modifyFosterHome(
-        fosterHomeEntity: FosterHomeEntity,
-        onModifyFosterHome: suspend (rowsUpdated: Int) -> Unit
-    ) {
-        onModifyFosterHome(reskiumeDatabase.getFosterHomeDao().modifyFosterHome(fosterHomeEntity))
-    }
+        allAcceptedNonHumanAnimals: List<AcceptedNonHumanAnimalEntityForFosterHome>,
+        allResidentNonHumanAnimalIds: List<ResidentNonHumanAnimalIdEntityForFosterHome>
+    ): Flow<Boolean> =
+        flow {
+            reskiumeDatabase.getFosterHomeDao().upsertAllFosterHomeData(
+                fosterHomeEntity,
+                allAcceptedNonHumanAnimals,
+                allResidentNonHumanAnimalIds
+            )
+            emit(true)
+        }.catch {
+            emit(false)
+        }
 
     override suspend fun deleteFosterHome(
         id: String,

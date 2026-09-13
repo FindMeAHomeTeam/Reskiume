@@ -8,25 +8,11 @@ import kotlinx.coroutines.flow.Flow
 
 interface LocalFosterHomeRepository {
 
-    suspend fun insertFosterHome(
+    suspend fun upsertAllFosterHomeData(
         fosterHomeEntity: FosterHomeEntity,
-        onInsertFosterHome: suspend (rowId: Long) -> Unit
-    )
-
-    suspend fun insertAcceptedNonHumanAnimalForFosterHome(
-        acceptedNonHumanAnimalEntityForFosterHome: AcceptedNonHumanAnimalEntityForFosterHome,
-        onInsertAcceptedNonHumanAnimalType: (rowId: Long) -> Unit
-    )
-
-    suspend fun insertResidentNonHumanAnimalIdForFosterHome(
-        residentNonHumanAnimalIdEntityForFosterHome: ResidentNonHumanAnimalIdEntityForFosterHome,
-        onInsertResidentNonHumanAnimalId: (rowId: Long) -> Unit
-    )
-
-    suspend fun modifyFosterHome(
-        fosterHomeEntity: FosterHomeEntity,
-        onModifyFosterHome: suspend (rowsUpdated: Int) -> Unit
-    )
+        allAcceptedNonHumanAnimals: List<AcceptedNonHumanAnimalEntityForFosterHome>,
+        allResidentNonHumanAnimalIds: List<ResidentNonHumanAnimalIdEntityForFosterHome>
+    ): Flow<Boolean>
 
     suspend fun deleteFosterHome(id: String, onDeleteFosterHome: suspend (rowsDeleted: Int) -> Unit)
 

@@ -5,7 +5,6 @@ import androidx.room3.Insert
 import androidx.room3.OnConflictStrategy.Companion.REPLACE
 import androidx.room3.Query
 import androidx.room3.Transaction
-import androidx.room3.Update
 import com.findmeahometeam.reskiume.data.database.entity.fosterHome.AcceptedNonHumanAnimalEntityForFosterHome
 import com.findmeahometeam.reskiume.data.database.entity.fosterHome.FosterHomeEntity
 import com.findmeahometeam.reskiume.data.database.entity.fosterHome.FosterHomeWithAllNonHumanAnimalData
@@ -24,8 +23,16 @@ interface FosterHomeDao {
     @Insert(onConflict = REPLACE)
     suspend fun insertResidentNonHumanAnimalIdForFosterHome(residentNonHumanAnimalIdEntityForFosterHome: ResidentNonHumanAnimalIdEntityForFosterHome): Long
 
-    @Update
-    suspend fun modifyFosterHome(fosterHomeEntity: FosterHomeEntity): Int
+    @Transaction
+    suspend fun upsertAllFosterHomeData(
+        fosterHomeEntity: FosterHomeEntity,
+        allAcceptedNonHumanAnimals: List<AcceptedNonHumanAnimalEntityForFosterHome>,
+        allResidentNonHumanAnimalIds: List<ResidentNonHumanAnimalIdEntityForFosterHome>
+    ) {
+        insertFosterHome(fosterHomeEntity)
+        allAcceptedNonHumanAnimals.forEach { insertAcceptedNonHumanAnimalForFosterHome(it) }
+        allResidentNonHumanAnimalIds.forEach { insertResidentNonHumanAnimalIdForFosterHome(it) }
+    }
 
     @Query("DELETE FROM FosterHomeEntity WHERE id = :id")
     suspend fun deleteFosterHome(id: String): Int

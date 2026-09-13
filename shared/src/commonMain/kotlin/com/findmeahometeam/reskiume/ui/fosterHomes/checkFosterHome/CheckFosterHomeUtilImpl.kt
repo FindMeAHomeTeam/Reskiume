@@ -134,21 +134,21 @@ class CheckFosterHomeUtilImpl(
         fosterHome: FosterHome,
         coroutineScope: CoroutineScope
     ) {
-        insertFosterHomeInLocalRepository(
+        val isSuccess = insertFosterHomeInLocalRepository(
             fosterHome,
             coroutineScope
-        ) { isSuccess ->
-            if (isSuccess) {
-                log.d(
-                    "CheckFosterHomeUtilImpl",
-                    "insertFosterHomesInLocalRepository: Foster home ${fosterHome.id} added to local database"
-                )
-            } else {
-                log.e(
-                    "CheckFosterHomeUtilImpl",
-                    "insertFosterHomesInLocalRepository: Error adding the Foster home ${fosterHome.id} to local database"
-                )
-            }
+        ).first()
+
+        if (isSuccess) {
+            log.d(
+                "CheckFosterHomeUtilImpl",
+                "insertFosterHomesInLocalRepository: Foster home ${fosterHome.id} added to local database"
+            )
+        } else {
+            log.e(
+                "CheckFosterHomeUtilImpl",
+                "insertFosterHomesInLocalRepository: Error adding the Foster home ${fosterHome.id} to local database"
+            )
         }
     }
 
@@ -192,22 +192,22 @@ class CheckFosterHomeUtilImpl(
         val previousFosterHome =
             getFosterHomeFromLocalRepository(updatedFosterHome.id).first()!!
 
-        modifyFosterHomeInLocalRepository(
+        val isSuccess = modifyFosterHomeInLocalRepository(
             updatedFosterHome = updatedFosterHome,
             previousFosterHome = previousFosterHome,
             coroutineScope = coroutineScope
-        ) { isSuccess ->
-            if (isSuccess) {
-                log.d(
-                    "CheckFosterHomeUtilImpl",
-                    "modifyFosterHomesInLocalRepository: Foster home ${updatedFosterHome.id} modified in local database"
-                )
-            } else {
-                log.e(
-                    "CheckFosterHomeUtilImpl",
-                    "modifyFosterHomesInLocalRepository: Error modifying the Foster home ${updatedFosterHome.id} in local database"
-                )
-            }
+        ).first()
+
+        if (isSuccess) {
+            log.d(
+                "CheckFosterHomeUtilImpl",
+                "modifyFosterHomesInLocalRepository: Foster home ${updatedFosterHome.id} modified in local database"
+            )
+        } else {
+            log.e(
+                "CheckFosterHomeUtilImpl",
+                "modifyFosterHomesInLocalRepository: Error modifying the Foster home ${updatedFosterHome.id} in local database"
+            )
         }
     }
 }
